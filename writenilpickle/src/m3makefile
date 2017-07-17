@@ -1,0 +1,15 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Scheutz semantic editor.                         %%
+%% Copyright 1988..2007, Rodney M. Bates.                                    %%
+%% rodney.bates@wichita.edu                                                  %%
+%% Licensed under the Gnu Public License, version 2 or later.                %%
+%% -----------------------------------------------------------------------2- %%
+
+%option("internal_backend","") %Pm3 only. 
+%m3_option("-commands")
+%m3_option("-verbose")
+import("libm3")
+%include_dir("../../pickle/src")
+implementation("WriteNILPickle")
+program("writenilpickle")
