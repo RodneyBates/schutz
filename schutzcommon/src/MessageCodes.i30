@@ -1,0 +1,60 @@
+
+(* -----------------------------------------------------------------------1- *)
+(* This file is part of the Scheutz semantic editor.                         *)
+(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* rodney.bates@wichita.edu                                                  *)
+(* Licensed under the Gnu Public License, version 2 or later.                *)
+(* -----------------------------------------------------------------------2- *)
+
+
+
+(* INTERFACE MessageCodes.  
+   Rodney M. Bates JULY 2001 
+
+   This starts out in file MessageCodes.i30, which is hand written.
+   Various sed, sort, awk, cpp, etc. scripts extract the message codes
+   from their uses in whatever source files contain them. 
+   These and information derived from them are inserted, giving
+   file MessageCodes.I3, which is Modula-3.
+
+   Be sure to edit MessageCodes.i30, not MessageCodes.i3 
+
+   Message codes used should begin with 'E' for error, 'W' for
+   warning, 'F' for translator failures, 'A' for assertion failure,
+   or 'I' for information.
+
+   To get the message text, this prefix is stripped, the words
+   in what remains are separated by blanks and lower cased. 
+   A new word begins when a capital follows a lower case letter,
+   or after an underscore. 
+*) 
+
+INTERFACE MessageCodes 
+
+; TYPE KindTyp 
+    = { MkUnknown 
+      , MkInformation 
+      , MkWarning 
+      , MkError 
+      , MkFatal 
+      , MkAssert
+      , MkRuntime 
+      } 
+
+; TYPE T  
+    = { NullCode 
+      , RuntimeError 
+#include "../derived/codes4"
+      }  
+
+; PROCEDURE Image ( Code : T ) : TEXT 
+
+; PROCEDURE Kind ( Code : T ) : KindTyp  
+
+; PROCEDURE KindImage ( Kind : KindTyp ) : TEXT 
+
+; PROCEDURE KindImageOfCode ( Code : T ) : TEXT 
+
+; END MessageCodes 
+.  
+

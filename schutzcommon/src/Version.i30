@@ -1,0 +1,38 @@
+
+(* -----------------------------------------------------------------------1- *)
+(* This file is part of the Scheutz semantic editor.                         *)
+(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* rodney.bates@wichita.edu                                                  *)
+(* Licensed under the Gnu Public License, version 2 or later.                *)
+(* -----------------------------------------------------------------------2- *)
+
+
+(* INTERFACE Version.  
+   Rodney M. Bates JULY 2001 
+
+   This starts out in file Version.i30, which is hand written.
+   Makefiles/scripts patch it to give file Version.i3, which 
+   is Modula-3.
+
+   Be sure to edit Version.i30, not Version.i3 
+*) 
+
+INTERFACE Version 
+
+; IMPORT LbeStd 
+
+; CONST VersionString = "V0.0"
+
+; CONST DataStructureVersion 
+    = LbeStd . VersionTyp 
+        { Incompatible := 0 
+        , UpwardCompatible := 0 
+        , Compatible := 0 
+        , Minor := 0 
+        } 
+
+; CONST DateString = "%DATESTRING%"
+
+; END Version 
+ 
+. 

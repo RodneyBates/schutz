@@ -1,0 +1,84 @@
+
+(* -----------------------------------------------------------------------1- *)
+(* This file is part of the Scheutz semantic editor.                         *)
+(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* rodney.bates@wichita.edu                                                  *)
+(* Licensed under the Gnu Public License, version 2 or later.                *)
+(* -----------------------------------------------------------------------2- *)
+
+
+(* MODULE MessageCodes.  
+   Rodney M. Bates JULY 2001 
+
+   This starts out in file MessageCodes.m30, which is hand written.
+   Various sed, sort, awk, cpp, etc. scripts extract the message codes
+   from their uses in whatever source files contain them. 
+   These and information derived from them are inserted, giving
+   file MessageCodes.m3, which is Modula-3.
+
+   Be sure to edit MessageCodes.m30, not MessageCodes.m3 
+
+   Message codes used should begin with 'E' for error, 'W' for
+   warning, 'F' for translator failures, 'A' for assertion failure,
+   or 'I' for information.
+
+   To get the message text, this prefix is stripped, the words
+   in what remains are separated by blanks and lower cased. 
+   A new word begins when a capital follows a lower case letter,
+   or after an underscore. 
+*) 
+
+
+MODULE MessageCodes 
+
+(* VISIBLE: *) 
+; PROCEDURE Image ( Code : T ) : TEXT 
+  = BEGIN 
+      CASE Code 
+      OF T . NullCode => RETURN "NullCode" 
+      | T . RuntimeError => RETURN "RuntimeError"   
+#include "../derived/codes5" 
+      ELSE RETURN "Unknown message" ; 
+      END (* CASE *) 
+    END Image 
+
+(* VISIBLE: *) 
+; PROCEDURE Kind ( Code : T ) : KindTyp 
+  = BEGIN 
+      CASE Code 
+      OF T . NullCode => RETURN KindTyp . MkUnknown  
+      | T . RuntimeError => RETURN KindTyp . MkRuntime   
+#include "../derived/codes6" 
+      ELSE RETURN KindTyp . MkUnknown ; 
+      END (* CASE *) 
+    END Kind  
+
+(* VISIBLE: *) 
+; PROCEDURE KindImage ( Kind : KindTyp ) : TEXT 
+
+  = BEGIN 
+      CASE Kind 
+      OF KindTyp . MkUnknown => RETURN "Unknown problem" ; 
+      | KindTyp . MkInformation => RETURN "Information" ; 
+      | KindTyp . MkWarning => RETURN "Warning" ; 
+      | KindTyp . MkError => RETURN "Error" ; 
+      | KindTyp . MkFatal => RETURN "Fatal error" ; 
+      | KindTyp . MkAssert => RETURN "Assertion failure" ; 
+      | KindTyp . MkRuntime => RETURN "Runtime error" ; 
+      END (* CASE *)  
+    END KindImage 
+
+(* VISIBLE: *) 
+; PROCEDURE KindImageOfCode ( Code : T ) : TEXT  
+
+  = BEGIN 
+      RETURN KindImage ( Kind ( Code ) )  
+    END KindImageOfCode 
+
+; BEGIN 
+  END MessageCodes  
+. 
+
+
+
+
