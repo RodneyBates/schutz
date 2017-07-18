@@ -1,0 +1,123 @@
+; <* UNUSED *> PROCEDURE ReadPickleFile 
+       ( FileName : TEXT ) : PaintHs . ImageTransientTyp 
+  RAISES { AssertionFailure } 
+
+  = VAR LRd : Rd . T 
+  ; VAR LPickle : REFANY 
+  ; VAR LResult : PaintHs . ImageTransientTyp 
+  ; VAR LLineCtDisplay : LbeStd . LineNoTyp 
+  ; VAR LSuffixInfo : SuffixInfo . T 
+
+  ; <* FATAL Thread . Alerted *> 
+    BEGIN (* ReadPickleFile *) 
+      LSuffixInfo 
+        := LangUtil . RetSuffixInfo 
+             ( Misc . TextName 
+                ( Pathname . LastExt ( Misc . WoVersionSuffix ( FileName ) ) ) 
+             ) 
+    ; TRY 
+        LRd := FileRd . Open ( FileName ) 
+      EXCEPT 
+
+      ELSE 
+        DL ( "Can't open input pickle file " & FileName ) 
+      ; RETURN NIL 
+      END (* EXCEPT *) 
+    ; TRY 
+        LPickle := Pickle . Read ( LRd ) 
+      ; Rd . Close ( LRd ) 
+      EXCEPT ELSE 
+        DL ( "Error unpickling file " & FileName ) 
+      ; RETURN NIL 
+      END (* EXCEPT *) 
+    ; TYPECASE LPickle 
+      OF PaintHs . ImageTransientTyp ( TImageRef ) 
+      => (* This shouldn't happen. *) 
+         RETURN TImageRef 
+      | PaintHs . ImagePersistentTyp ( TIp ) 
+      => LResult := NEW ( PaintHs . ImageTransientTyp ) . initDefaults ( ) 
+      ; LResult . ItPers := TIp  
+      ; LResult . ItLangIdRef := LangUtil . LangIdRef ( TIp . IpLang ) 
+      ; RETURN LResult 
+
+      | EstHs . KTreeRefTyp ( TEstRef ) 
+      => LResult := NEW ( PaintHs . ImageTransientTyp ) . initDefaults ( ) 
+      ; LResult . ItPers 
+          := NEW ( PaintHs . ImagePersistentTyp ) . initDefaults ( ) 
+      ; LResult . ItPers . IpLang := LSuffixInfo . Lang 
+      ; LResult . ItLangIdRef := LangUtil . LangIdRef ( LSuffixInfo . Lang ) 
+(* TODO: Recompute IpIsParsed, IpIsAnalyzed, and possibly other fields of 
+         LResult and LResult . ItPers *) 
+      ; LResult . ItPers . IpLineCt := LineNumbers . LineCt ( LResult ) 
+
+; LLineCtDisplay := LineNumbers . LineCtDisplay ( LResult ) 
+; IF LLineCtDisplay # LResult . ItPers . IpLineCt 
+  THEN
+    DL ( "Inconsistent line counts." ) 
+  END (* IF *) 
+
+      ; LResult . ItPers . IpLineCtIsExact := TRUE 
+      ; LResult . ItPers . IpEstRoot := TEstRef 
+      ; RETURN LResult 
+      ELSE 
+        DL ( "Wrong pickle Type in file " & FileName ) 
+      ; RETURN NIL 
+      END (* TYPECASE *) 
+    END ReadPickleFile 
+
+; <* UNUSED *> 
+  PROCEDURE ParseFile ( FileName : TEXT ) : PaintHs . ImageTransientTyp 
+(* TODO: Take this out.  It's unused. *) 
+
+  = VAR LRd : Rd . T 
+  ; VAR LResult : PaintHs . ImageTransientTyp 
+  ; VAR LSuffixInfo : SuffixInfo . T 
+  ; VAR LSuffix : TEXT 
+  ; VAR LLineCtDisplay : LbeStd . LineNoTyp 
+  ; VAR LScannerIf : ScannerIf . ScanIfTyp 
+
+  ; BEGIN (* ParseFile *) 
+      LSuffix 
+        := Misc . TextName 
+             ( Pathname . LastExt ( Misc . WoVersionSuffix ( FileName ) ) )  
+    ; LSuffixInfo := LangUtil . RetSuffixInfo ( LSuffix ) 
+    ; IF LSuffixInfo . Lang = LbeStd . LangNull 
+      THEN
+        DL ( "Unrecognized file suffix: \"" & LSuffix & "\"" ) 
+      ; LResult := NIL 
+      ELSE 
+        TRY 
+          LRd := FileRd . Open ( FileName ) 
+        ; LResult := NEW ( PaintHs . ImageTransientTyp ) . initDefaults ( ) 
+        ; LResult . ItPers 
+            := NEW ( PaintHs . ImagePersistentTyp ) . initDefaults ( ) 
+        ; LResult . ItPers . IpLang := LSuffixInfo . Lang 
+        ; LResult . ItLangIdRef := LangUtil . LangIdRef ( LSuffixInfo . Lang ) 
+        ; LScannerIf 
+          := LangUtil . ScannerIfForLang ( LResult . ItPers . IpLang ) 
+     (* ; LResult . ItScannerIf := LScannerIf These things choke pickles. *) 
+        ; Files . ParseTextRdT 
+            ( LSuffixInfo . Lang 
+            , LScannerIf 
+            , LRd 
+            , LResult . ItPers . IpEstRoot 
+            , InsertNilFixedChildren := DoInsertNilFixedChildren
+            ) 
+        ; LResult . ItPers . IpLineCt := LineNumbers . LineCt ( LResult ) 
+; LLineCtDisplay := LineNumbers . LineCtDisplay ( LResult ) 
+; IF LLineCtDisplay # LResult . ItPers . IpLineCt 
+  THEN
+    DL ( "Inconsistent line counts." ) 
+  END (* IF *) 
+        ; LResult . ItPers . IpLineCtIsExact := TRUE 
+        ; Rd . Close ( LRd ) 
+        EXCEPT 
+
+        ELSE 
+          DL ( "Can't open input text file " & FileName ) 
+        ; LResult := NIL 
+        END (* EXCEPT *) 
+      END (* IF *) 
+    ; RETURN LResult 
+    END ParseFile 
+

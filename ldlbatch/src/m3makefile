@@ -1,0 +1,59 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Schutz semantic editor.                          %%
+%% Copyright 1988..2017, Rodney M. Bates.                                    %%
+%% rodney.m.bates@acm.org                                                    %%
+%% Licensed under the MIT License.                                           %%
+%% -----------------------------------------------------------------------2- %%
+
+% m3makefile for ldlbatch subdirectory, Schutz semantic editor. 
+% Works for either pm3 or cm3 compiler.
+
+proc is_cm3 ( ) 
+is
+  return defined("CM3_VERSION")
+end
+
+proc is_pm3 ( )  
+is
+  return not defined("CM3_VERSION")
+end
+
+if is_pm3 ( ) 
+  option("internal_backend","")
+  %Disables the internal backend 
+end
+
+if is_pm3 ( )  
+  % option("standalone","T")
+  %^2005-06-03: fails because libX11.a can't find pthread_equal ' 
+end 
+
+if is_cm3 ( ) 
+   % build_standalone ( ) 
+end 
+
+if is_pm3 ( ) 
+  %m3_option("-commands")
+  %m3_option("-verbose")
+end 
+
+if is_cm3 ( )
+  %m3_option("-commands")
+  %m3_option("-verbose")
+end 
+
+import ("schutzcommon")
+
+include_dir("../ldl1/src")
+
+resource_named("Ldl0Sem.pkl","../derived/Ldl0Sem.pkl")
+bundle("Ldl0Bundle") 
+
+% Uncomment to build an empty bundle for Ldl1Sem.pkl and get it from a file.
+resource_named("Ldl1Sem.pkl","../../writenilpickle/src/NIL.pkl")
+% resource_named("Ldl1Sem.pkl","../derived/Ldl1Sem.pkl")
+bundle("Ldl1Bundle") 
+
+implementation("LdlBatch")
+program("LdlBatch")
