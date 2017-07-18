@@ -1,0 +1,19 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Schutz semantic editor.                          %%
+%% Copyright 1988..2017, Rodney M. Bates.                                    %%
+%% rodney.m.bates@acm.org                                                    %%
+%% Licensed under the MIT License.                                           %%
+%% -----------------------------------------------------------------------2- %%
+
+% m3makefile for vararray subdirectory, Schutz semantic editor.
+
+% Only a container for generic source files. 
+
+%import("libm3")
+
+generic_module("Ranges")
+
+generic_module("VarArray")
+
+
