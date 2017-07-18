@@ -1,0 +1,51 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Schutz semantic editor.                          %%
+%% Copyright 1988..2017, Rodney M. Bates.                                    %%
+%% rodney.m.bates@acm.org                                                    %%
+%% Licensed under the MIT License.                                           %%
+%% -----------------------------------------------------------------------2- %%
+
+% m3makefile for ldlboot subdirectory, Schutz semantic editor. 
+% Works for either pm3 or cm3 compiler.
+
+proc is_cm3 ( ) 
+is
+  return defined("CM3_VERSION")
+end
+
+proc is_pm3 ( )  
+is
+  return not defined("CM3_VERSION")
+end
+
+if is_pm3 ( ) 
+  option("internal_backend","")
+  %Disables the internal backend 
+  option("keep_files","T") % Keeps intermediate build files. 
+  %option("msg_level",2) % 0-silent,1-explain,2-commands,3-verbose,4-debug
+end
+
+if is_pm3 ( )  
+  % option("standalone","T")
+  %^2005-06-03: fails because libX11.a can't find pthread_equal ' 
+end 
+
+if is_cm3 ( ) 
+  % build_standalone ( ) 
+end 
+
+if is_pm3 ( ) 
+  %m3_option("-commands")
+  %m3_option("-verbose")
+end 
+
+if is_cm3 ( )
+  %m3_option("-commands")
+  %m3_option("-verbose")
+end 
+
+import ("schutzcommon")
+
+implementation("LdlBootMain")
+program("LdlBoot")
