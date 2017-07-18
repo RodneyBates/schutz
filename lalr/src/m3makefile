@@ -1,0 +1,40 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Schutz semantic editor.                          %%
+%% Copyright 1988..2017, Rodney M. Bates.                                    %%
+%% rodney.m.bates@acm.org                                                    %%
+%% Licensed under the MIT License.                                           %%
+%% -----------------------------------------------------------------------2- %%
+
+% m3makefile for lalr subdirectory, Schutz semantic editor.  
+
+% This m3makefile needs include_dir("../../vararray/src").  But schutzcommon,
+% which includes this directory, needs vararray too, so we just rely on its
+% coming from there. 
+
+module("LALRTypes")
+
+interface("Production")
+build_generic_intf("IntProdVarArray","VarArray",["Integer","Production","IntRanges"],VISIBLE) 
+build_generic_impl("IntProdVarArray","VarArray",["IntRanges"]) 
+
+interface("Item")
+build_generic_intf("IntItemVarArray","VarArray",["Integer","Item","IntRanges"],VISIBLE) 
+build_generic_impl("IntItemVarArray","VarArray",["IntRanges"]) 
+
+interface("State")
+build_generic_intf("IntStateVarArray","VarArray",["Integer","State","IntRanges"],VISIBLE) 
+build_generic_impl("IntStateVarArray","VarArray",["IntRanges"]) 
+
+%interface("LALRTypesRep") 
+
+module("Automaton")
+module("Check")
+module("Compress")
+module("Debug")
+module("Default")
+module("Gen")
+module("Infos")
+module("LALRLookahead")
+module("LRUtils") 
+module("Reduce")
