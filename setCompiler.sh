@@ -1,0 +1,1 @@
+./scripts/setcm3.sh
