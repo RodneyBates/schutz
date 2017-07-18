@@ -1,0 +1,148 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Schutz semantic editor.                          %%
+%% Copyright 1988..2017, Rodney M. Bates.                                    %%
+%% rodney.m.bates@acm.org                                                    %%
+%% Licensed under the MIT License.                                           %%
+%% -----------------------------------------------------------------------2- %%
+
+% m3makefile for schutzcommon subdirectory, Schutz semantic editor. 
+
+% Works for either pm3 or cm3 compiler.
+
+proc is_cm3 ( ) 
+is
+  return defined("CM3_VERSION")
+end
+
+proc is_pm3 ( )  
+is
+  return not defined("CM3_VERSION")
+end
+
+if is_pm3 ( ) 
+  option("internal_backend","") %Disables the internal backend 
+  option("keep_files","T") % Keeps intermediate build files. 
+  %option("msg_level",2) % 0-silent,1-explain,2-commands,3-verbose,4-debug
+end
+
+if is_pm3 ( )  
+  % option("standalone","T")
+  %^2005-06-03: fails because libX11.a can't find pthread_equal ' 
+end 
+
+if is_cm3 ( ) 
+  % build_standalone ( ) 
+end 
+
+if is_pm3 ( ) 
+  %m3_option("-commands")
+  %m3_option("-verbose")
+end 
+
+if is_cm3 ( )
+  %m3_option("-commands")
+  %m3_option("-verbose")
+end 
+
+if is_pm3 ( ) 
+  %returnCode = exec(["echo", "We're here!"])
+  %returnCode = exec(["pwd"])
+  %returnCode = exec(["make", "-f", "../src/makefile", "all"])
+  %returnCode = exec(["pwd"], ["", "", ""], "." )
+  %returnCode = exec(["pwd"], ["", "", ""], "../../schutzcommon/src" )
+
+  returnCode = exec(["make", "all"], ["", "", ""], "../../schutzcommon/src" )
+end 
+if is_cm3 ( ) 
+  exec("cd", "../../schutzcommon/src", ";", "make", "all")
+end
+
+include_dir("../../generics/src") 
+include_dir("../../lalr/src")
+include_dir("../../ldl0/src")
+
+import("m3core")
+import("libm3")
+
+table("TextSuffixInfo","Text","SuffixInfo")
+build_generic_intf("SharedStringRefTbl","Table",["SharedStrings","Refany"],VISIBLE)
+build_generic_impl("SharedStringRefTbl","Table",["SharedStrings","Refany"])
+
+interface("BitNoTable")
+
+build_generic_intf("IntRanges","Ranges",["Integer"],VISIBLE)
+build_generic_impl("IntRanges","Ranges",[""])
+build_generic_intf("IntVarArray","VarArray",["Integer","Integer","IntRanges"],VISIBLE)
+build_generic_impl("IntVarArray","VarArray",["IntRanges"])
+
+interface("IntForOrdSets")
+generic_module("OrdSets")
+build_generic_intf("IntSets","OrdSets",["IntForOrdSets"],VISIBLE)
+build_generic_impl("IntSets","OrdSets",[])
+
+interface("ClassInfo") 
+build_generic_intf("SetClassInfoTbl","Table",["IntSets","ClassInfo"],VISIBLE)
+build_generic_impl("SetClassInfoTbl","Table",["IntSets","ClassInfo"])
+
+module("TokString") 
+
+interface("TokStringInfo") 
+build_generic_intf("TokStringInfoTbl","Table",["TokString","TokStringInfo"],VISIBLE)
+build_generic_impl("TokStringInfoTbl","Table",["TokString","TokStringInfo"])
+import("formsvbt")
+
+interface("../derived/Version")
+module("TokRelation")  
+module("TextIntSymbolTable")  
+module("LangMap")
+module("PortTypes")
+module("Misc")
+module("../derived/MessageCodes") 
+module("Messages") 
+module("LbeStd")
+module("Assertions")
+interface("Ascii")
+interface("Errors")
+module("Strings")
+module("SharedStrings")
+interface("LangUtilRep")
+module("LangUtil")
+module("LangUtilLo")
+module("Options")
+module("Marks")
+module("EstHs")
+module("PaintHs")
+interface("WindowPrivate")
+module("TravUtil")
+module("Coroutine")
+module("PickleThread")
+module("ParseHs")
+module("SyntEdit")
+module("ModHs")
+module("EstUtil")
+module("EstBuild")
+module("FsTreeUtils")
+module("WriteTrv")
+module("LineMarks") 
+module("MergeTxt")
+module("ParseTrv")
+module("Parser")
+%interface("SemHs")
+module("AstView")
+module("UnsafeUtils")
+module("LRTable")
+module("SuffixInfo")
+module("Files")
+module("VersionedFiles")
+module("LineNumbers")
+module("Boot") 
+module("GenConstEst")
+module("LdlSemantics")
+module("TreeBrowse")
+module("GrammarGen")
+module("UncertainBool")
+interface("ScannerIf") 
+interface("ScannerIfRep")
+
+Library("SchutzCommon") 

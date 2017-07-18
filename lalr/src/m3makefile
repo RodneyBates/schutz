@@ -8,8 +8,8 @@
 
 % m3makefile for lalr subdirectory, Schutz semantic editor.  
 
-% This m3makefile needs include_dir("../../vararray/src").  But schutzcommon,
-% which includes this directory, needs vararray too, so we just rely on its
+% This m3makefile needs include_dir("../../generics/src").  But schutzcommon,
+% which includes this directory, needs generics too, so we just rely on its
 % coming from there. 
 
 module("LALRTypes")
