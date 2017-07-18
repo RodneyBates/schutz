@@ -10,15 +10,14 @@
 
 interface("../derived/Ldl1Tok") 
 implementation("Ldl1Tok") 
-interface("../derived/Ldl1Child") % no implementation 
+interface("../derived/Ldl1Child") % No implementation is needed. 
 
-# Ldl1MakeEst is not normally needed.  It could be used to skip some
-# bootstrap steps.
+% Ldl1MakeEst is not normally needed.  It could be used to skip some
+% bootstrap steps.
 %interface("Ldl1MakeEst") 
 %implementation("../derived/Ldl1MakeEst") 
 
 module("Ldl1FsTrees")
-%module("Ldl1ChildTok")
 module("Ldl1Scanner") 
 module("Ldl1Semantics") 
 
