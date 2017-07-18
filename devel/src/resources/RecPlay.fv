@@ -1,0 +1,272 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Schutz semantic editor.                          %%
+%% Copyright 1988..2017, Rodney M. Bates.                                    %%
+%% rodney.m.bates@acm.org                                                    %%
+%% Licensed under the MIT License.                                           %%
+%% -----------------------------------------------------------------------2- %%
+
+% File devel/src/resources/RecPlay.fv, Schutz semantic editor.
+
+( Shape %Rc_Window 
+  ( Height 300 - 200 + Inf )
+  ;( Width 425 - 200 + Inf ) 
+  ( LabelFont ( Family "new century schoolboot" ) ) 
+  ( Font "fixed" ) 
+  ( BgColor "SlightlyLightOliveGreen" ) 
+  ( LightShadow "VeryVeryLightOliveGreen" ) 
+  ( DarkShadow "DullOliveGreen" ) 
+
+  ( Macro FILEDIALOG 
+     ( Name BgColor DarkShadow Title fbName OKName OKLabel
+       cancelName ( cancelLabel "Cancel" ) helperName ( ReadOnly FALSE )
+       ( other ( ) )
+     )
+    `( ZChassis %,Name   
+       ( BgColor ,BgColor ) 
+       ( LightShadow "White" ) 
+       ( DarkShadow ,DarkShadow )
+       ( Title ,Title )
+       ( Shape ( Width 300  + Inf ) ( ShadowSize 1 )
+         ( Rim
+           ( Pen 10 )
+           ( VBox
+             ( HBox
+               ( Shape ( Width 150 + Inf ) ( Height 150 + Inf )
+                 ( VBox 
+                   ( LabelFont "fixed" )
+                   ( DirMenu ( For ,fbName ) )
+                   ( Glue 6 )
+                   ( Frame Lowered
+                     ( FileBrowser %,fbName ( BgColor "PaleGray") )
+                   )
+                 )
+               )
+               Fill
+               ( Shape ( Width 100 )
+                  ( VBox
+                    Fill
+                    ( Button %,OKName ,OKLabel )
+                    ( Glue 10 )
+                    ( Filter ( CloseButton %,cancelName ,cancelLabel ) )
+                  )
+               )
+             )
+             ( Glue 6 )
+             ( HBox
+               ( Shape ( Width 30 ) "File:" )
+               ( Frame Lowered
+                 ( Helper %,helperName FirstFocus ( For ,fbName )
+                     ( BgColor "PaleGray" )
+                 )
+               )
+             )
+             ,@other
+           ) ; VBox 
+         ) ; Rim 
+       ) ; Shape 
+     ) ; ZChassis 
+   )
+
+  (Macro TLA BOA (x) `(Text LeftAlign ,x))
+  (Macro TRA BOA (x) `(Text RightAlign ,x))
+  (Macro SEP () '(VBox (Glue 3) Ridge (Glue 3)))
+  (Macro BOX (pens child)
+    (IF (= pens '())
+      child
+      `(Border
+         (Pen ,(Nth pens 0))
+         (Rim (Pen ,(Nth pens 1))
+           (BOX (pens ,(NthTail pens 2)) (child ,child))))))
+  (Macro TEXTBUBBLE BOA (child text) 
+    `(Help ,child
+        (Border (Pen 1) (Color "Black") (BgColor "LightYellow")
+           (Rim (Pen 4) (Text ,text) )  
+  )  )  )            
+
+  ( Macro RBUTTON BOA ( name label dormant helptext ) 
+    `( Help 
+       ( Filter  ( Dormant ,dormant ) 
+         ( Rim ( Pen 1 ) ( Button ( Name ,name ) ( Text ,label ) ) ) 
+       ) 
+       ( Border 
+         ( Pen 1 ) ( Color "Black" ) ( BgColor "LightYellow" )
+         ( Rim ( Pen 4 ) ( Text ,helptext) )
+       ) 
+     ) 
+  ) 
+
+  ( ZSplit 
+    ( ZBackground 
+      ( Rim ( Pen 4 ) 
+        ( VBox  
+           ( Shape ; Title of whole window 
+             ( Height + 0 ) 
+             ( HBox Fill ( Text "Scheutz Batch Record & Playback" ) Fill ) 
+           ) 
+           ( Glue 4 ) 
+           ( Frame Lowered 
+             ( HBox ; Divide into record and playback subareas 
+               ( Shape ; Record area 
+                 ( Width 250 - 0 + Inf ) 
+                 ( VBox
+                   ( Shape ( Height 10 ) ( HBox Fill ( Text "Record" ) Fill ) ) 
+                   ( HBox
+                     ( Glue 2 ) 
+                     ( RBUTTON Rc_Record_Open "Open" FALSE 
+                       "Open recorded event output file" 
+                     )  
+                     ( Glue 4 ) 
+                     ( RBUTTON Rc_Record_Reopen "Reopen" TRUE 
+                       "Empty the output file" 
+                     )  
+                     ( Glue 4 ) 
+                     ( RBUTTON Rc_Record_Append "Append" FALSE 
+                       "Open recorded event output file for append" 
+                     )  
+                     ( Glue 4 ) 
+                     ( RBUTTON Rc_Record_Close "Close" TRUE 
+                       "Close recorded event output file" 
+                     ) 
+                     Fill
+                   ) 
+                   Ridge 
+                   ( Shape ( Height 20 ) 
+                     ( HBox 
+                       ( Glue 2 ) 
+		       ( RBUTTON Rc_Record_Enable "Enable" TRUE 
+			 "Start recording events" 
+		       ) 
+                       ( Glue 4 ) 
+		       ( RBUTTON Rc_Record_Disable "Disable" TRUE 
+			 "Stop recording events" 
+		       )  
+                       ( Glue 4 ) 
+		       ( RBUTTON Rc_Record_InsertStop "Insert STOP" TRUE 
+			 "Insert a STOP command" 
+		       )  
+		       Fill
+                     ) 
+                   ) 
+                   Ridge 
+                   ( Shape ( Height 12 ) 
+                     ( HBox 
+                       ( Glue 2 ) 
+                       ( Text "Message:" ) 
+                       ( Glue 2 ) 
+                       ( Text %Rc_Record_Message "Disabled" ) 
+                       Fill 
+                     ) 
+                   ) 
+                   Ridge 
+                   ( Shape ( Height 12 ) 
+                     ( HBox 
+                       ( Glue 2 ) 
+                       ( Text "File:" ) 
+                       ( Glue 2 ) 
+                       ( Text %Rc_Record_FileName "<No file is open>" ) 
+                       Fill 
+                     ) 
+                   ) 
+                   Ridge 
+                   ( Typescript %Rc_Record_Log ReadOnly ) 
+                 ) 
+               ) 
+               ( Ridge 5.0 )  
+               ( Shape ; Playback area 
+                 ( Width 250 - 0 + Inf ) 
+                 ( VBox
+                   ( Shape ( Height 10 ) ( HBox Fill ( Text "Playback" ) Fill ) ) 
+                   ( HBox
+                     ( Glue 2 ) 
+                     ( RBUTTON Rc_Playback_Open "Open" FALSE 
+                       "Open playback input file" 
+                     ) 
+                     ( Glue 4 ) 
+                     ( RBUTTON Rc_Playback_Reopen "Reopen" TRUE 
+                       "Reread the input file" 
+                     ) 
+                     ( Glue 4 ) 
+                     ( RBUTTON Rc_Playback_Close "Close" TRUE 
+                       "Close Plaback input file" 
+                     ) 
+                     ( Glue 4 ) 
+                     ( RBUTTON Rc_Playback_Run "Run" TRUE 
+                       "Playback events continuously" 
+                     ) 
+                     ( Glue 4 ) 
+                     ( RBUTTON Rc_Playback_Stop "Stop" TRUE
+                       "Stop playing back events" 
+                     ) 
+                     ( Glue 4 ) 
+                     ( RBUTTON Rc_Playback_Skip "Skip" TRUE 
+                       "Skip the next event in the input file" 
+                     ) 
+                     ( Glue 4 ) 
+                     ( RBUTTON Rc_Playback_Step "Step" TRUE 
+                       "Play back a single event" 
+                     ) 
+                     Fill
+                   ) 
+                   Ridge 
+                   ( HBox
+                     ( Glue 2 ) 
+                     ( Text "Delay, 0.1 sec.:" ) 
+                     ( Glue 2 ) 
+                     ( Numeric %Rc_Playback_Delay =1 ) 
+                     Fill
+                   ) 
+                   Ridge 
+                   ( Shape ( Height 12 ) 
+                     ( HBox 
+                       ( Glue 2 ) 
+                       ( Text "Message:" ) 
+                       ( Glue 2 ) 
+                       ( Text %Rc_Playback_Message "Stopped" ) 
+                       Fill 
+                     ) 
+                   ) 
+                   Ridge 
+                   ( Shape ( Height 12 ) 
+                     ( HBox 
+                       ( Glue 2 ) 
+                       ( Text "File:" ) 
+                       ( Glue 2 ) 
+                       ( Text %Rc_Playback_FileName "<No file is open>" ) 
+                       Fill 
+                     ) 
+                   ) 
+                   Ridge 
+                   ( Typescript %Rc_Playback_Log ReadOnly ) 
+                 ) 
+               ) 
+             ) 
+           )  
+        ) 
+      ) 
+    ) 
+    ( ZChassis %Rc_ErrorPopup
+      ( At .95 .1 NE )
+      ( BgColor "VeryPaleSlateBlue" )
+      ( Title "Error" )
+      ( LightShadow "White" )
+      ( DarkShadow "SlateBlue" )
+      ( Shape ( Width 300 + Inf - 200 ) ( Height 50 + Inf - 50 )
+        ( TextEdit %Rc_ErrorPopup_Message ReadOnly )
+      )
+    )
+    ( FILEDIALOG %Rc_OpenDialog  
+      ( BgColor "VeryPaleSlateBlue" )
+      ( DarkShadow "SlateBlue" )
+      ( Title "Open File" )
+      ( fbName Rc_OpenDialog_FileName )
+      ( OKName Rc_OpenDialog_OK )
+      ( OKLabel "Open" )
+      ( cancelName Rc_OpenDialog_Cancel )
+      ( helperName Rc_OpenDialog_Helper )
+    )
+  ) 
+) 
+
+
+   
