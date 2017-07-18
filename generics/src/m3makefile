@@ -6,7 +6,7 @@
 %% Licensed under the MIT License.                                           %%
 %% -----------------------------------------------------------------------2- %%
 
-% m3makefile for vararray subdirectory, Schutz semantic editor.
+% m3makefile for generics subdirectory, Schutz semantic editor.
 
 % Only a container for generic source files. 
 
@@ -15,5 +15,7 @@
 generic_module("Ranges")
 
 generic_module("VarArray")
+
+generic_module("OrdSets")
 
 
