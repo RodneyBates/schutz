@@ -1,0 +1,921 @@
+
+;; -----------------------------------------------------------------------1- ;;
+;; This file is part of the Scheutz semantic editor.                         ;;
+;; Copyright 1988..2007, Rodney M. Bates.                                    ;;
+;; rodney.bates@wichita.edu                                                  ;;
+;; Licensed under the Gnu Public License, version 2 or later.                ;;
+;; -----------------------------------------------------------------------2- ;;
+
+(Shape %Fv_Window (Height 500 - 400 + Inf ) (Width 450 - 200 + Inf )
+  ( Macro BG_COLOR ( ) '( 0.754 0.832 0.664 ) )
+  (LabelFont (Family "new century schoolbook" ) ) 
+  (Font "fixed" ) 
+  ;(BgColor "SlightlyLightOliveGreen")
+  (BgColor 0.754 0.832 0.664 )
+  (LightShadow "VeryVeryLightOliveGreen")
+  (DarkShadow "DullOliveGreen")
+  (Macro TLA BOA (x) `(Text LeftAlign ,x))
+  (Macro TRA BOA (x) `(Text RightAlign ,x))
+  (Macro SEP () '(VBox (Glue 3) Ridge (Glue 3)))
+  (Macro BOX (pens child)
+    (IF (= pens '())
+      child
+      `(Border
+         (Pen ,(Nth pens 0))
+         (Rim (Pen ,(Nth pens 1))
+           (BOX (pens ,(NthTail pens 2)) (child ,child))))))
+  (Macro TEXTBUBBLE BOA (child text) 
+    `(Help ,child
+        (Border (Pen 1) (Color "Black") (BgColor "LightYellow")
+           (Rim (Pen 4) (Text ,text) )  
+  )  )  )            
+  (Macro COMMAND BOA (name label k1 k2 k3 k4 (type (MButton)))
+    `(,@type
+       ,name
+       (HBox
+         (TLA ,label)
+         Fill
+         (TSplit
+           %,(Intern (Cat "Model_" (SymbolName (Nth name 1))))
+           (TRA ,k1)
+           (TRA ,k2)
+           (TRA ,k3)
+           (TRA ,k4)
+         ))))
+
+  (Macro FILEMENU ()
+   '(Menu
+       (Shape (Width 24) "File")
+       (Border
+         (Shape (Width 110)
+           (VBox
+             (Filter (Active TRUE)
+               (COMMAND %Fv_File_Open "Open..."
+                 "oO" "M-o" "c-o" "M-o"
+                 (PopMButton (For Fv_OpenDialog)))
+             )
+             (SEP)
+             (MButton %Fv_File_Close (TLA "Close"))
+             (Filter (COMMAND %Fv_File_Save "Save" "oS" "M-s" "c-s" "M-s"))
+             (MButton %Fv_File_SaveAs (TLA "Save As..."))
+             (MButton %Fv_File_Export (TLA "Export..."))
+             (PopMButton %Fv_File_Revert (For Fv_RevertDialog)
+               (TLA "Revert To Saved"))
+             (SEP)
+             (COMMAND %Fv_File_Quit "Quit" "oQ" "M-q" "c-q" "M-q"))
+           ))))
+
+  (Macro EDITMENU ()
+    '(Menu
+       (Shape (Width 24) "Edit")
+       (Border
+         (Shape (Width 100)
+           (VBox
+             ; ( COMMAND %undo "Undo" "cZ" "C-_" "c-z" "M-z" )
+             ; ( COMMAND %redo "Redo" "csZ" "M-_" "c-Z" "M-Z" )
+             ; ( SEP )
+             ( MButton %Fv_Edit_Cut ( TLA "Cut" ) )
+             ( MButton %Fv_Edit_Copy ( TLA "Copy" ) )
+             ( MButton %Fv_Edit_Paste ( TLA "Paste" ) )   
+             ( MButton %Fv_Edit_Search 
+               ; ( For Sch_TSplit ) ; M3 code takes care of doing this, 
+                                    ; but only conditionally, if 
+                                    ; NOT UiSearch . SeparateSearchWindow 
+                                    ; Also must change MBotton to PageMButton
+                                    ; to get this forms file to do it. 
+               (TLA "Search and replace..." ) 
+             )
+           (SEP) 
+             ;(COMMAND %selectAll "SelectAll"
+             ;  "oA" "M-a" "c-a" "M-a")
+             ;(SEP)
+             ;(COMMAND %findMButton "Find..."
+             ; "oF" "" "c-f" "M-f"
+             ; (LinkMButton (For FindInBuffer2)))
+             ;(COMMAND %findNext "Find Next" "c," "C-s" "" "")
+             ;(COMMAND %findPrev "Find Prev" "cM" "C-r" "" "")
+    )))))
+
+    (Macro SEMMENU ()
+    '(Menu
+       (Shape (Width 46) "Analysis")
+       (Border
+         (VBox
+           (PopMButton %Fv_Sem_Margin (For Fv_MarginDialog)
+             (TLA "Set margin..."))
+           (SEP)
+           (MButton %Fv_Sem_Parse (TLA "Parse") )
+           (MButton %Fv_Sem_Accept (TLA "Accept syntax repair") )
+           (SEP)
+           (MButton %Fv_Sem_Analyze (TLA "Semanticize") )
+    ))))
+
+    (Macro DEVMENU ()
+    '(Menu
+       (Shape (Width 30) "Devel")
+       (Border
+         (VBox
+           (MButton %Fv_Devel_WriteCheckpoint (TLA "Write checkpoint") ) 
+           (MButton %Fv_Devel_TakeFocus (TLA "Take keyboard focus") )
+           (MButton %Fv_Devel_Repaint (TLA "Repaint") )
+           (MButton %Fv_Devel_ForceAssert (TLA "Force assertion failure") )
+           (MButton %Fv_Devel_ReplayLast (TLA "Replay failing command") )
+           (MButton %Fv_Devel_MergeText (TLA "Merge text") )
+           (MButton %Fv_Devel_ReconstructLines (TLA "Reconstruct lines") )
+           (MButton %Fv_Devel_VerifyLinesRefs (TLA "Verify lines refs") )
+           (SEP)
+           (MButton %Fv_Devel_BrowseEst (TLA "Browse Est") )
+           (MButton %Fv_Devel_RecPlayWindow (TLA "Open Record/Playback window") )
+           (PopMButton %Fv_Devel_DebugLevel (For Fv_Devel_DebugLevelDialog )
+               (TLA "Set debug level..."))
+           (SEP) 
+           (MButton %Fv_Devel_WriteStats (TLA "Write Statistics") )
+           (MButton %Fv_Devel_WriteEstPickle (TLA "Write Est Pickle") )
+           (MButton %Fv_Devel_GenEstModule (TLA "Generate Est Module") )
+           (SEP)
+           (MButton %Fv_Devel_WriteParseInfo (TLA "Write Parse Info") )
+           (MButton %Fv_Devel_WriteFsTrees (TLA "Write Format Syntax Trees") )
+           (MButton %Fv_Devel_WriteSemPickle (TLA "Write Semantic Pickle") )
+           (MButton %Fv_Devel_GenTokInterface (TLA "Generate LdlTok interface") )
+           (MButton %Fv_Devel_GenChildInterface (TLA "Generate LdlChild interface") )
+           (SEP)
+           (MButton %Fv_Devel_GenAll (TLA "Generate all." ) ) 
+           ))))
+
+  (Macro HELPMENU ()
+    '(Menu
+       (Shape (Width 26) (Height 13.5) "Help")
+       (Border
+         (VBox
+           (PopMButton (For aboutMFE) (TLA "About Scheutz..."))
+           (SEP)
+           (COMMAND %Fv_Help_Help "Help..."
+             "oH" "M-h" "c-h" "M-h" (PopMButton (For manpage)))
+         ))))
+               
+  (Macro FINDER (first next prev typein show close)
+    `(TSplit
+       Flex
+       Circular
+       (LightShadow "White")
+       (BgColor "VeryPaleBlue")
+       (Shape (Height 0) Fill)
+       (VBox
+         %,show
+         Ridge
+         (Glue 2)
+         (HBox
+           (Shape (Width + 0) "Find:")
+           (Shape (Width 0 + 3000)
+             (Frame Lowered
+               (TypeIn %,typein FirstFocus (BgColor "VeryVeryPaleBlue"))))
+           (Glue 5)
+           (Shape (Width 0 + 1000)
+             (Rim (Pen 1) (Button %,first "First")))
+           (Shape (Width 0 + 1000) (ShadowSize 2.5)
+             (Button %,next "Next"))
+           (Shape (Width 0 + 1000)
+             (Rim (Pen 1) (Button %,prev "Prev.")))
+           (Glue 20)
+           (Rim (Pen 1) (PageButton %,close "C")))
+         (Glue 2))))
+
+  (Macro YESNO (Name msg yesName noName)
+    `(ZChild %,Name 
+       (BgColor "VeryPaleGray")
+       (LightShadow "White")
+       (DarkShadow "VeryDarkGray")
+       (Shape (Width 300)
+         (BOX (pens (2 2 1 26))
+           (child
+             (VBox
+               ,msg
+               (Glue 20)
+               (HBox
+                 Fill
+                 (Button %,yesName (BgColor "Red")
+                   (Shape (Width 80) "Yes"))
+                 Fill
+                 (CloseButton %,noName (BgColor "Green")
+                   (Shape (Width 80) "No"))
+                 Fill)))))))
+  (Macro CONFIRM (Name question yesName noName cancelName cancelLabel)
+    `(ZChild %,Name 
+       (BgColor "VeryPaleBlue")
+       (LightShadow "White")
+       (DarkShadow "VeryDarkBlue")
+       (Shape (Width 300)
+         (BOX (pens (2 2 1 26))
+           (child
+             (VBox
+               ,question
+               (Glue 20)
+               (HBox
+                 Fill
+                 (VBox
+                   (Button %,yesName (BgColor "Green")
+                     (Shape (Width 80) "Yes"))
+                   (Glue 10)
+                   (Button %,noName (BgColor "Red")
+                     (Shape (Width 80) "No")))
+                 (Glue 20)
+                 (VBox
+                   Fill
+                   (Filter %,cancelName
+                     (CloseButton (Shape (Width 80) ,cancelLabel))))
+                 Fill)))))))
+  (Macro FILEDIALOG (Name BgColor DarkShadow Title fbName OKName OKLabel
+                     cancelName (cancelLabel "Cancel") helperName (ReadOnly FALSE)
+                     (other ()))
+    `(ZChassis %,Name  (BgColor ,BgColor) (LightShadow "White") (DarkShadow ,DarkShadow)
+       (Title ,Title)
+       (Shape (Width 300  + Inf) (ShadowSize 1)
+         (Rim
+           (Pen 10)
+           (VBox
+             (HBox
+               (Shape (Width 150 + Inf) (Height 150 + Inf)
+                 (VBox (LabelFont "fixed")
+                   (DirMenu (For ,fbName))
+                   (Glue 6)
+                   (Frame Lowered
+                     (FileBrowser %,fbName (BgColor "PaleGray")))))
+               Fill
+               (Shape (Width 100)
+                 (VBox
+                   Fill
+                   (Button %,OKName ,OKLabel)
+                   (Glue 10)
+                   (Filter (CloseButton %,cancelName ,cancelLabel)))))
+             (Glue 6)
+             (HBox
+               (Shape (Width 30) "File:")
+               (Frame Lowered
+                 (Helper %,helperName FirstFocus (For ,fbName)
+                   (BgColor "PaleGray"))))
+             ,@other)))))
+
+  (ZSplit
+    (ZBackground 
+     (Filter %Fv_Background 
+       ( VTile 
+         (VBox
+           (Glue 2)
+           (HBox %Fv_Menubar
+             (Pixmap (Color "Blue") "ScheutzLogo.pbm")
+             (Glue 2)
+             (FILEMENU)
+             (Glue 2)
+             (EDITMENU)
+             (Glue 2)
+             (SEMMENU)
+             (Glue 2)
+             (DEVMENU)
+             (Glue 2)
+             (HELPMENU)
+             (Glue 2)
+             Ridge
+               (TEXTBUBBLE 
+                  ( Filter 
+                      ( Button %Fv_StopButton 
+                        ( Pixmap %Fv_StopButton_Pixmap "Stop.pbm" )
+                      ) 
+                  ) 
+                  "Click to stop currently executing operation"
+               ) 
+             Ridge
+             (Glue 2)
+             (TEXTBUBBLE  
+               (Button %Fv_Save (BgColor  0.754 0.832 0.664  )
+                 (TSplit %Fv_Modified
+                   ;(Text (Color "Gray") "Save") 
+                   ( VBox 
+                     (Text (Color "Very Very Dark Green") "Saved") 
+                     (Text (Color "Very Very Dark Green") "Exported") 
+                   ) 
+                   ( VBox 
+                     (Shape (Width 47) (Color "Dark Red") "Unsaved") 
+                     (Shape (Width 47) (Color "Dark Red") "Unexported") 
+                   ) 
+                   ; (Text "")
+                   ; (Pixmap (Color "Red") "bnote.pbm")
+               ) ) 
+               "Saved status, click to save and export"     
+             )
+             (Glue 2)
+             (TEXTBUBBLE  
+               (Button %Fv_Parse (BgColor  0.754 0.832 0.664 )
+                 (TSplit %Fv_Unparsed
+                   ;(Text (Color "Gray") "Parse") 
+                   (Text (Color "Very Very Dark Green") "Parsed") 
+                   (Shape (Width 40) (Color "Dark Red") "Unparsed") 
+                   (Shape (Width 43) (Color "Orange") "Misparsed")
+                   ; (Text "")
+                   ; (Pixmap (Color "Orange") "bnote.pbm")
+               ) )
+               "Parsed status, click to parse"     
+             )
+             (Glue 2)
+             (TEXTBUBBLE  
+               (Button %Fv_Analyze (BgColor  0.754 0.832 0.664 )
+                 (TSplit %Fv_Unanalyzed
+                   ;(Text (Color "Gray") "Analyze") 
+                   (Text (Color "Very Very Dark Green") "Analyzed") 
+                   (Shape (Width 48) (Color "Dark Red") "Unanalyzed") 
+                   ; (Text "")
+                   ; (Pixmap (Color "Yellow") "bnote.pbm")
+               ) )
+               "Analyzed status, click to analyze"     
+             )
+             (Glue 2) 
+             (TEXTBUBBLE
+               ( Button %Fv_InsertModeButton (BgColor  0.754 0.832 0.664 ) 
+                 ( Text %Fv_InsertMode "Insert" ) 
+               )
+               "Insert/Overlay edit mode. Click or keyboard Insert to toggle."
+             ) 
+             (Glue 2)
+             (TEXTBUBBLE
+               ( Text %Fv_CursorCoords "  0,0     " )  
+               "Cursor Line,Column"
+             ) 
+             Fill
+           ) ; HBox Menu bar 
+           (Glue 2)
+           Ridge
+           (Glue 2)
+           (HTile       
+              (TEXTBUBBLE
+                 (Shape (Width 300 + Inf - Inf ) (Height 10) 
+                    (Text %Fv_PathName RightAlign "" ) )
+              "Path to the file whose image is open in this window"
+              ) 
+              (TEXTBUBBLE
+                (Text %Fv_ImageName LeftAlign "<No Image Loaded>" )
+              "Name of the image open in this window"
+              ) 
+              (TEXTBUBBLE
+                (Text %Fv_LangName "" )           
+              "Language of the image open in this window"
+              ) 
+           ) ; HTile Image name bar 
+           (Glue 2)  
+           Ridge
+           (Shape (Height + Inf) 
+             (HBox 
+               ( Shape (Width + Inf) ( Height 450 + Inf - 350 ) 
+                   ( Generic %Fv_LbeWindow (Color 0.925 0.925 0.925 ) ) 
+               )
+               Ridge 
+               (Shape (Width 13) (Scroller Vertical %Fv_VertScroller))
+           ) )
+           Ridge 
+           ( HBox 
+              ( Scroller %Fv_HorizScroller ) 
+              ; SE corner, with colored squares. 
+              ( Shape ( Width 13 ) 
+                 ( HBox 
+                   Fill 
+                   ( VBox 
+                      Fill 
+                      ( Shape ( Width 4 ) ( Height 4 ) 
+                         ( Texture %Fv_EstCursor ( Color "Green" ) ) 
+                      )  
+                      Fill 
+                      ( Shape ( Width 4 ) ( Height 4 ) 
+                         ( Texture %Fv_EstLineCt ( Color "Green" ) ) 
+                      )  
+                      Fill 
+                   ) ; VBox 
+                   Fill 
+                 ) ; HBox  
+               ) ; Shape 
+           ) ; HBox Horiz scroller and SE corner  
+         ) ; VBox 
+           ( TSplit %Sch_TSplit ; Absent/present search and replace stuff.
+             Flex 
+             Circular 
+             (BgColor "VeryPaleSlateBlue")
+             (LightShadow "White")
+             (DarkShadow "SlateBlue") 
+             ( Shape ( Height 0 ) "" ) ; The empty child of the TSplit 
+             ( VBox %Sch_Box ; The visible stuff. 
+               ( Shape (Height + 0 - 0 ) ( Text "Search String:" ) ) 
+               (Glue 2) 
+               (HBox 
+                 ( Glue 4 ) 
+                 ( Border ( Pen 1)
+                   ( Shape ( Height 16 - 0 ) 
+                     ( TextEdit %Sch_SearchString 
+                       ( BgColor "White") 
+                       FirstFocus 
+                     ) 
+                   ) 
+                 ) 
+                 ( Glue 4 ) 
+               ) 
+               (Shape (Height - 0 + 0 ) ( Text "Replace String:") ) 
+               ( Glue 2 ) 
+               ( HBox 
+                 ( Glue 4 ) 
+                 ( Border ( Pen 1 )
+                   ( Shape ( Height 16 - 0 ) 
+                     (  TextEdit %Sch_ReplaceString ( BgColor "White" ) ) 
+                   ) 
+                 ) 
+                 ( Glue 4 ) 
+               ) 
+               ( Glue 4 ) 
+               ( HBox 
+                   ( Glue 4 ) 
+                   ( Boolean CheckBox %Sch_IsCaseSensitive
+                     ( Text LeftAlign "Case sensitive" ) 
+                   ) 
+                   ( Glue 4 ) 
+                   ( Boolean CheckBox %Sch_IsRegexp
+                     ( Text LeftAlign "Regular expression" )  
+                   ) 
+                   ( Glue 4 ) 
+                   ( Boolean CheckBox %Sch_IsSyntactic
+                     ( Text LeftAlign "Syntactic" ) 
+                   ) 
+                   ( Glue 20 ) 
+                   ( Rim ( Pen 1 ) 
+                     ( TEXTBUBBLE ( Button %Sch_First "First" ) 
+                       "Move cursor to first occurrence of search string." 
+                     ) 
+                   ) 
+                   (Glue 4) 
+                   ( Rim ( Pen 1 ) 
+                     ( TEXTBUBBLE ( Button %Sch_Next "Next" ) 
+                       "Move cursor to next occurrence of search string." 
+                     )
+                   ) 
+                   ( Glue 4 ) 
+                   ( Rim ( Pen 1 ) 
+                     ( TEXTBUBBLE ( Button %Sch_Prev "Previous" ) 
+                       "Move cursor to previous occurrence of search string." 
+                     )
+                   ) 
+                   (Glue 4) 
+                   ( Rim ( Pen 1 ) 
+                     ( TEXTBUBBLE ( Button %Sch_Last "Last" ) 
+                       "Move cursor to last occurrence of search string." 
+                     ) 
+                   )
+                   Fill 
+               ) ; HBox 
+               (Glue 4) 
+               ( HBox 
+                 ( Glue 4 )
+                 ( Rim ( Pen 1 ) 
+                   ( TEXTBUBBLE ( Button %Sch_ReplaceOnce "Replace" ) 
+                     "Replace matched string with replace string." 
+                   )
+                 ) 
+                 ( Glue 4 ) 
+                 ( Rim ( Pen 1 ) 
+                   ( TEXTBUBBLE ( Button %Sch_ReplaceNext "Replace and Next" ) 
+                     "Replace matched string with replace string and move cursor to next occurrence of search string." 
+                   )
+                 ) 
+                 ( Glue 4 ) 
+                 ( Rim ( Pen 1 ) 
+                   ( TEXTBUBBLE ( Button %Sch_ReplaceRest "Replace in rest of image" ) 
+                     "Replace matched string  and all remaining occurrences of search string with replace string." 
+                   )
+                 ) 
+                 (Glue 4) 
+                 ( Rim ( Pen 1 ) 
+                   ( TEXTBUBBLE ( Button %Sch_ReplaceAll "Replace everywhere" ) 
+                     "Replace all occurences of search string in all open images with replace string."
+                   )
+                 ) 
+                 Fill 
+               )
+               (Glue 4)
+             ) ; VBox 
+
+           ) ; TSplit Search and replace stuff  
+        ) ; VTile 
+      ) 
+    ) 
+    (ZChassis %manpage (At .05 .95 .1 .9  )
+      (BgColor "VeryPaleBlue")
+      (Title "Scheutz help")
+      (VBox
+        (HBox
+          (Menu
+            (Shape (Width 40) "Edit")
+            (VBox
+              (COMMAND %mpcopy "Copy" "oC" "M-w" "c-c" "M-c")
+              (COMMAND %mpselectAll "SelectAll"
+                "oA" "M-a" "c-a" "M-a")
+              (SEP)
+              (COMMAND %mpfindMButton "Find..."
+                "oF" "" "c-f" "M-f"
+                (LinkMButton (For FindDialog)))
+              (COMMAND %mpfindNext "Find Next"
+                "c," "C-s" "" "")
+              (COMMAND %mpfindPrev "Find Prev"
+                "cM" "C-r" "" "")))
+          Fill)
+        Ridge
+        (Shape (Width 360 + Inf) (Height 150 + Inf)
+          (TextEdit ReadOnly %manpagetext))
+        (FINDER
+          (show FindDialog)
+          (first helpfindfirst)
+          (next helpfindnext)
+          (prev helpfindprev)
+          (typein helpfindtext)
+          (close helpfindclose))))
+    (ZChild %notfound (BgColor "Red") (Color "White")
+      (Rim (Border "Not found")))
+    (ZChild %aboutMFE (BgColor 0.8 0.8 1)
+      (BOX (pens (1.5 2 1 12))
+        (child
+          (VBox
+            (Pixmap (Color "Blue") "ScheutzLogo.pbm")
+            (Glue 6)
+            "Scheutz semantic editor, version 0.1"
+            "Written by Rodney M. Bates"
+            "Copyright \251 2002, Bluestem Software."
+            "Send comments to rodney.bates@wichita.edu"
+            (Glue 6)
+            Ridge
+            Ridge
+            (Glue 6)
+            (HBox
+              Fill
+              (CloseButton (BgColor "VeryPaleBlue")
+                           (LightShadow "White")
+                (Text (Margin 5) "Close"))
+              Fill)))))
+    (ZChassis %errorPopup
+              (At .95 .1 NE)
+              (BgColor "VeryPaleSlateBlue")
+              (Title "Error")
+              (LightShadow "White")
+              (DarkShadow "SlateBlue")
+      (Shape (Width 300 + Inf - 200) (Height 50 + Inf - 50)
+        (TextEdit %Fv_Stderr ReadOnly)))
+    (ZChassis %Fv_ErrorPopup
+              (At .95 .1 NE)
+              (BgColor "VeryPaleSlateBlue")
+              (Title "Error")
+              (LightShadow "White")
+              (DarkShadow "SlateBlue")
+      (Shape (Width 300 + Inf - 200) (Height 50 + Inf - 50)
+        (TextEdit %Fv_ErrorPopup_Message ReadOnly)))
+    (ZChassis %Fv_CheckpointPopup
+              (At .95 .7 NE)
+              (BgColor "VeryPaleSlateBlue")
+              (Title "Checkpoint")
+              (LightShadow "White")
+              (DarkShadow "SlateBlue")
+      (Shape (Width 400 + Inf - 200) (Height 50 + Inf - 50)
+        (TextEdit %Fv_CheckpointPopup_Message ReadOnly)
+      )
+    )
+    (ZChassis %Fv_AssertDialog
+              (At .95 .1 NE)
+              (BgColor "VeryPaleSlateBlue")
+              (Title "Assertion Failure")
+              (LightShadow "White")
+              (DarkShadow "SlateBlue")
+      (Shape (Width 400 + Inf - 200) (Height 100 + Inf - 50)
+        (VBox 
+           (Text Center (LabelFont (PointSize 240) ) "O H   N O !" ) 
+           (Text Center (LabelFont (PointSize 120) ) 
+              "The usually marvelous Scheutz editor has suffered a humiliating" 
+           ) 
+           (Text Center (LabelFont (PointSize 240) ) "ASSERTION FAILURE!" ) 
+           Ridge 
+           (HBox 
+             (Text LeftAlign "Location:" ) 
+             (TypeIn %Fv_Assert_Location ReadOnly )
+           ) 
+           (HBox
+             (Text LeftAlign "Problem:")
+             (TypeIn %Fv_Assert_Message ReadOnly )
+           ) 
+           (HBox
+              (Shape (Width 0 + 1000)
+                 (Rim(Pen 1) 
+                   (Button %Fv_Assert_Backout "Back out")
+              )  )
+              (Shape (Width 0 + 1000)
+                 (Rim(Pen 1) 
+                    ( Filter (Dormant TRUE) 
+                      ( Button %Fv_Assert_Proceed "Ignore and Proceed")
+                    ) 
+              )  )
+              (Shape (Width 0 + 1000)
+                 (Rim(Pen 1) 
+                    ( Filter (Dormant TRUE) 
+                      ( Button %Fv_Assert_Terminate "Terminate")
+                    )
+                 )
+              )
+           ) 
+        )
+      )
+    )
+
+    (ZChassis %Fv_SaveDialog
+              (At .95 .1 NE)
+              (BgColor "VeryPaleSlateBlue")
+              (Title "Save Dialog")
+              (LightShadow "White")
+              (DarkShadow "SlateBlue")
+      (Shape (Width 300 + Inf - 200) (Height 50 + Inf - 50)
+       (VBox (TextEdit ReadOnly %Fv_SaveDialog_Image ) 
+        ( HBox  
+              (Shape (Width 0 + 1000)
+                (Rim (Pen 1) (Button %Fv_SaveDialog_Save "Save")))
+              (Shape (Width 0 + 1000)
+                (Rim (Pen 1) (Button %Fv_SaveDialog_Forget "Forget Changes")))
+              (Shape (Width 0 + 1000)
+                (Rim (Pen 1) (Button %Fv_SaveDialog_Cancel "Cancel")))
+        )
+       )
+      )
+    ) 
+
+    (ZChassis %Fv_MarginDialog
+              NoClose
+              (BgColor "VeryPaleSlateBlue")
+              (LightShadow "White")
+              (DarkShadow "SlateBlue")
+              (Title (Text "Right Margin for PrettyPrinting"))
+              (At 0.95 0.1 NE)
+      (Shape (Width 250 + Inf)
+        (Rim
+          (Pen 10)
+          (VBox
+            (HBox
+              Fill
+              (Shape (Width 80) "Line width:")
+              (Glue 10)
+              (Shape (Width 70)
+                (Numeric %Fv_Margin FirstFocus
+                  =78 (Min 30) (Max 200)))
+              Fill)
+            (Glue 10)
+            (HBox
+              (Shape (Width 0 + 1000)
+                (Rim (Pen 1) (CloseButton "Cancel")))
+              (Shape (Width 0 + 1000)
+                (Rim (Pen 1) (Button %Fv_MarginDialog_Apply "Apply")))
+              (Shape (Width 0 + 1000) (ShadowSize 2.5)
+                (Button %Fv_MarginDialog_OK "OK")))))))
+
+    (ZChassis %Fv_Devel_DebugLevelDialog
+              (BgColor "VeryPaleSlateBlue")
+              (LightShadow "White")
+              (DarkShadow "SlateBlue")
+              (Title (Text "Set debug level"))
+              (At 0.95 0.1 NE)
+      (Shape (Width 250 + Inf)
+        (Rim
+          (Pen 10)
+          (VBox
+            (HBox
+              Fill
+              (Shape (Width 80) "Debug level:")
+              (Glue 10)
+              (Shape (Width 70)
+                (Numeric %Fv_Devel_DebugLevelValue FirstFocus
+                  =3 (Min 0) (Max 5)))
+              Fill)
+            (Glue 10)
+            (HBox
+              (Shape (Width 0 + 1000)
+                (Rim (Pen 1) (CloseButton "Cancel")))
+              (Shape (Width 0 + 1000)
+                (Rim (Pen 1) (Button %Fv_Devel_DebugLevelApply "Apply")))
+              (Shape (Width 0 + 1000) (ShadowSize 2.5)
+                (Button %Fv_Devel_DebugLevelOK "OK")))))))
+    (ZChassis %snapshotDialog
+      (At 0.1 0.9 0.2 0.8 )
+      (BgColor "VeryPaleTurquoise")
+      (Title (Text (BgColor "White") (Color "DarkTurquoise")
+             "Current Snapshot"))
+      (Shape (Height 250 - 100 + Inf)
+        (TextEdit %SnapshotText ReadOnly)))
+    ( ZChassis %Fv_AltOpenDialog 
+      ; Open 
+      ( At 10 80 NW Absolute )
+      ( BgColor "VeryPaleSlateBlue" )
+      ( Title "Save Dialog" )
+      ( LightShadow "White" )
+      ( DarkShadow "SlateBlue" )
+      ( Title "Alternate File Open Dialog" )
+      ( Shape ( Width 400 - 0 + Inf ) 
+;TODO: Figure out why the + Inf above doesn't work.  Long file names get
+;      Clipped, and the ZChassis won't grow.    
+        ( Rim 
+          ( Pen 10 ) 
+          ( VBox 
+            ( Text LeftAlign "The file named:" )
+            ( Glue 5 )  
+            ( HBox 
+              ( Glue 10 ) 
+              ( Text %Fv_AltOpenDialog_FirstFileName 
+                ( LabelFont "fixed" )
+                LeftAlign  
+                "file" 
+              )   
+            )  
+            ( Glue 5 )  
+            ( Text LeftAlign "does not exist, but a counterpart file named:" ) 
+            ( Glue 5 )  
+            ( HBox 
+              ( Glue 10 ) 
+              ( Text %Fv_AltOpenDialog_SecondFileName 
+                ( LabelFont "fixed" )
+                LeftAlign  
+                "file_" 
+              ) 
+            )  
+            ( Glue 5 )  
+            ( Text LeftAlign 
+              "exists in the same directory.  Do you want to open it instead?" 
+            ) 
+            ( Glue 10 ) 
+            ( HBox 
+              Fill
+              ( Shape ( Width 150 ) ( Button %Fv_AltOpenDialog_Yes "Open counterpart file" ) ) 
+              Fill
+              ( Shape ( Width 150 ) ( Button %Fv_AltOpenDialog_No "Create new file" ) ) 
+              Fill 
+              ( Button %Fv_AltOpenDialog_Cancel "Cancel" ) 
+              Fill 
+            )   
+          ) 
+        ) 
+      ) 
+    ) 
+
+    ( ZChassis %Fv_SaveAsNameDialog 
+      ; Open 
+      ( At 10 80 NW Absolute )
+      ( BgColor "VeryPaleSlateBlue" )
+      ( LightShadow "White" )
+      ( DarkShadow "SlateBlue" )
+      ( Title "SaveAs File Name Correction Dialog" )
+      ( Shape ( Width 400 - 0 + Inf ) 
+;TODO: Figure out why the + Inf above doesn't work.  Long file names get
+;      Clipped, and the ZChassis won't grow.    
+        ( Rim 
+          ( Pen 10 ) 
+          ( VBox 
+            ( Text LeftAlign "The file name:" )
+            ( Glue 5 )  
+            ( HBox 
+              ( Glue 10 ) 
+              ( Text %Fv_SaveAsNameDialog_FirstFileName 
+                ( LabelFont "fixed" )
+                LeftAlign  
+                "file" 
+              )   
+            )  
+            ( Glue 5 )  
+            ( Text LeftAlign "is not an internal file name.  Do you want to change it to:" ) 
+            ( Glue 5 )  
+            ( HBox 
+              ( Glue 10 ) 
+              ( Text %Fv_SaveAsNameDialog_SecondFileName 
+                ( LabelFont "fixed" )
+                LeftAlign  
+                "file_" 
+              ) 
+            )  
+            ( Glue 5 )  
+            ( Text LeftAlign "instead?" 
+            ) 
+            ( Glue 10 ) 
+            ( HBox 
+              Fill
+              ( Shape ( Width 35 ) ( Button %Fv_SaveAsNameDialog_Yes "Yes" ) ) 
+              Fill 
+              ( Button %Fv_SaveAsNameDialog_Cancel "Cancel" ) 
+              Fill 
+            )   
+          ) 
+        ) 
+      ) 
+    ) 
+
+    ( ZChassis %Fv_SaveAsDuplDialog 
+      ; Open 
+      ( At 10 80 NW Absolute )
+      ( BgColor "VeryPaleSlateBlue" )
+      ( LightShadow "White" )
+      ( DarkShadow "SlateBlue" )
+      ( Title "SaveAs Duplicate Image Name " )
+      ( Shape ( Width 400 - 0 + Inf ) 
+;TODO: Figure out why the + Inf above doesn't work.  Long file names get
+;      Clipped, and the ZChassis won't grow.    
+        ( Rim 
+          ( Pen 10 ) 
+          ( VBox 
+            ( Text LeftAlign "Another image is already open with the name:" )
+            ( Glue 5 )  
+            ( HBox 
+              ( Glue 10 ) 
+              ( Text %Fv_SaveAsDuplDialog_Name 
+                ( LabelFont "fixed" )
+                LeftAlign  
+                "Image" 
+              )   
+            )  
+          ) 
+        ) 
+      ) 
+    ) 
+
+    (FILEDIALOG %Fv_OpenDialog
+      (BgColor "VeryPaleSlateBlue")
+      (DarkShadow "SlateBlue")
+      (Title "Open a file for editing")
+      (fbName Fv_OpenDialog_FileName)
+      (ReadOnly TRUE)
+      (OKName Fv_OpenDialog_Open )
+      (OKLabel "Open")
+      (cancelName Fv_OpenDialog_Cancel)
+      (helperName Fv_OpenDialog_Helper)
+      (other
+        ((Glue 6)
+          (HBox
+            (Radio =Fv_OpenDialog_SameWindow
+              (VBox
+                (Choice %Fv_OpenDialog_SameWindow (TLA "Use this window"))
+                (Choice %Fv_OpenDialog_NewWindow (TLA "Open a new window"))
+                Fill
+              ))
+            Fill
+            Ridge 
+            Fill 
+            (Radio =Fv_OpenDialog_PickleOnly
+              (VBox
+                (Choice %Fv_OpenDialog_NewOnly (TLA "New files only"))
+                (Choice %Fv_OpenDialog_PickleOnly (TLA "Existing Pickle files only"))
+                (Choice %Fv_OpenDialog_ExistingOnly (TLA "Existing files only"))
+                (Choice %Fv_OpenDialog_AnyFile (TLA "Any file"))))))))
+    (FILEDIALOG %Fv_SaveAsDialog 
+      (BgColor "VeryPaleSlateBlue")
+      (DarkShadow "SlateBlue")
+      (Title "Save As...")
+      (fbName Fv_SaveAsDialog_FileName )
+      (OKName Fv_SaveAsDialog_OK)
+      (OKLabel "Save")
+      (cancelName Fv_SaveAsDialog_Cancel)
+      (helperName Fv_SaveAsDialog_Helper))
+    (FILEDIALOG %Fv_ExportDialog 
+      (BgColor "VeryPaleSlateBlue")
+      (DarkShadow "SlateBlue")
+      (Title "Export in text format")
+      (fbName Fv_ExportDialog_FileName )
+      (OKName Fv_ExportDialog_OK)
+      (OKLabel "Export")
+      (cancelName Fv_ExportDialog_Cancel)
+      (helperName Fv_ExportDialog_Helper))
+    (FILEDIALOG %Fv_BootWriteDialog 
+      (BgColor "VeryPaleSlateBlue")
+      (DarkShadow "SlateBlue")
+      (Title (Text %Fv_BootWriteDialog_Title "Write language file"))
+      (fbName Fv_BootWriteDialog_FileName )
+      (OKName Fv_BootWriteDialog_OK)
+      (OKLabel "Write")
+      (cancelName Fv_BootWriteDialog_Cancel)
+      (helperName Fv_BootWriteDialog_Helper))
+    (CONFIRM %Fv_QuitDialog
+      (question "Save changes before quitting?")
+      (yesName Fv_QuitDialog_Save)
+      (noName Fv_QuitDialog_NoSave)
+      (cancelName Fv_QuitDialog_Cancel)
+      (cancelLabel "Don't quit"))
+    (CONFIRM %Fv_SwitchConf
+      (question "Save changes before switching?")
+      (yesName Fv_Switch_Save)
+      (noName Fv_Switch_NoSave)
+      (cancelName Fv_SwitchSwitch_Cancel)
+      (cancelLabel "Don't switch"))
+    (CONFIRM %Fv_CloseConf
+      (question "Save changes before closing?")
+      (yesName Fv_CloseConf_Save)
+      (noName Fv_CloseConf_NoSave)
+      (cancelName Fv_CloseConf_Cancel)
+      (cancelLabel "Don't close"))
+    (YESNO %Fv_OverwriteConf
+      (msg "That file already exists. Overwrite it?")
+      (yesName Fv_OverwriteConf_Overwrite)
+      (noName Fv_OverwriteConfCancel))
+    (YESNO %Fv_RevertDialog
+      (yesName Fv_RevertDialog_Revert)
+      (noName Fv_RevertDialog_Cancel)
+      (msg "Revert to the last version saved?"))))
+
+    

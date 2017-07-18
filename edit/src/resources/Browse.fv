@@ -1,0 +1,28 @@
+
+;; -----------------------------------------------------------------------1- ;;
+;; This file is part of the Scheutz semantic editor.                         ;;
+;; Copyright 1988..2007, Rodney M. Bates.                                    ;;
+;; rodney.bates@wichita.edu                                                  ;;
+;; Licensed under the Gnu Public License, version 2 or later.                ;;
+;; -----------------------------------------------------------------------2- ;;
+
+(Shape
+  (LabelFont ( Family "new century schoolbook" ) ) 
+  (Font "fixed") 
+  (BgColor "SlightlyLightOliveGreen")
+  (LightShadow "VeryVeryLightOliveGreen")
+  (DarkShadow "DullOliveGreen") 
+  (Rim (Pen 4) 
+    (VBox
+      (Shape (Height + 0 ) 
+       (HBox Fill (Text "Est Browser") Fill)) 
+      (Glue 4)
+      (Shape (Width 600 + Inf - 200 ) (Height 400 - 200 + Inf ) 
+        (Frame Lowered 
+          (Typescript %Br_Typescript)
+        ) 
+      ) 
+    )
+  ) 
+)
+     

@@ -1,0 +1,82 @@
+
+;; -----------------------------------------------------------------------1- ;;
+;; This file is part of the Scheutz semantic editor.                         ;;
+;; Copyright 1988..2007, Rodney M. Bates.                                    ;;
+;; rodney.bates@wichita.edu                                                  ;;
+;; Licensed under the Gnu Public License, version 2 or later.                ;;
+;; -----------------------------------------------------------------------2- ;;
+
+(Shape ( Width + Inf ) ( Height + Inf )
+  (BgColor "VeryPaleSlateBlue")
+  (LightShadow "White")
+  (DarkShadow "SlateBlue")
+  (VBox 
+    ( Frame 
+      ( Shape ( Height 16 ) 
+        ( HBox Fill (Text "Scheutz Search and Replace") Fill ) 
+      ) 
+    ) ; Frame 
+    ( Shape (Height + 0 - 0 ) ( Text "Search String:") ) 
+    (Glue 2) 
+    (HBox 
+      (Glue 4) 
+      (Border (Pen 1)
+        (TextEdit %Sch_SearchString 
+          (BgColor "White") 
+          FirstFocus 
+        ) 
+      ) 
+      (Glue 4) 
+    ) 
+    (Glue 4) 
+    (Shape (Height - 0 + 0 ) ( Text "Replace String:") ) 
+    (Glue 2) 
+    (HBox 
+      (Glue 4) 
+      (Border (Pen 1)
+        (TextEdit %Sch_ReplaceString (BgColor "White") ) 
+      ) 
+      (Glue 4) 
+    ) 
+    (Glue 4) 
+    ( HBox 
+      ( Glue 4 )
+      ( VBox  
+        ( Boolean CheckBox %Sch_IsCaseSensitive
+          ( Text LeftAlign "Case sensitive" ) 
+        ) 
+        ( Boolean CheckBox %Sch_IsRegexp
+          ( Text LeftAlign "Regular expression" )  
+        ) 
+        ( Boolean CheckBox %Sch_IsSyntactic
+          ( Text LeftAlign "Syntactic" ) 
+        ) 
+        Fill 
+      )
+      (Glue 4)
+      ( VBox  
+         ( Rim ( Pen 1 ) ( Button %Sch_First "First" ) )
+         ( Rim ( Pen 1 ) ( Button %Sch_Next "Next" ) )
+         ( Rim ( Pen 1 ) ( Button %Sch_Prev "Previous" ) )
+         ( Rim ( Pen 1 ) ( Button %Sch_Last "Last" ) )
+      )
+      (Glue 4)
+      (VBox  
+         ( Rim ( Pen 1 ) 
+           ( Button %Sch_ReplaceOnce "Replace once" ) )
+         ( Rim ( Pen 1 ) 
+           ( Button %Sch_ReplaceNext "Replace and Next" ) ) 
+         ( Rim ( Pen 1 ) 
+           ( Button %Sch_ReplaceRest "Replace rest of image" ) )
+         ( Rim ( Pen 1 ) 
+           ( Button %Sch_ReplaceAll "Replace everywhere" ) )
+         Fill 
+      )
+      (Glue 4) 
+      Fill 
+    )
+    (Glue 4)
+  )
+) ; Shape  
+
+ 
