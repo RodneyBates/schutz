@@ -1,0 +1,24 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Schutz semantic editor.                          %%
+%% Copyright 1988..2017, Rodney M. Bates.                                    %%
+%% rodney.m.bates@acm.org                                                    %%
+%% Licensed under the MIT License.                                           %%
+%% -----------------------------------------------------------------------2- %%
+
+% m3makefile for m3 subdirectory, Schutz semantic editor.  
+
+interface("../derived/M3Tok") 
+implementation("M3Tok") 
+interface("../derived/M3Child") %no implementation 
+
+% Ldl1MakeEst is not normally needed.  It could be used to skip some
+% bootstrap steps.
+%interface("M3MakeEst") 
+%implementation("../derived/M3MakeEst") 
+
+interface("M3InitTokStrings") 
+implementation("../derived/M3InitTokStrings") 
+
+module("M3Scanner") 
+

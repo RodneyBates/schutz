@@ -1,0 +1,1724 @@
+
+(* -----------------------------------------------------------------------1- *)
+(* This file is part of the Schutz semantic editor.                         *)
+(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* rodney.bates@wichita.edu                                                  *)
+(* Licensed under the Gnu Public License, version 2 or later.                *)
+(* -----------------------------------------------------------------------2- *)
+
+(* Schutz semantic editor. 
+   Specification of Modula-3. 
+   In second version of LDL. 
+*)
+
+LDL M3 VERSION 0 . 0 . 0 . 0
+
+(* Reserved words: *)
+
+ RwAND = "AND" .
+ RwANY = "ANY" .
+ RwARRAY = "ARRAY" .
+ RwAS = "AS" .
+ RwBEGIN = "BEGIN" .
+ RwBITS = "BITS" .
+ RwBRANDED = "BRANDED" .
+ RwBY = "BY" .
+ RwCASE = "CASE" .
+ RwCONST = "CONST" .
+ RwDIV = "DIV" .
+ RwDO = "DO" .
+ RwELSE = "ELSE" .
+ RwELSIF = "ELSIF" .
+ RwEND = "END" .
+ RwEVAL = "EVAL" .
+ RwEXCEPT = "EXCEPT" .
+ RwEXCEPTION = "EXCEPTION" .
+ RwEXIT = "EXIT" .
+ RwEXPORTS = "EXPORTS" .
+ RwFINALLY = "FINALLY" .
+ RwFOR = "FOR" .
+ RwFROM = "FROM" .
+ RwGENERIC = "GENERIC" .
+ RwIF = "IF" .
+ RwIMPORT = "IMPORT" .
+ RwIN = "IN" .
+ RwINTERFACE = "INTERFACE" .
+ RwLOCK = "LOCK" .
+ RwLOOP = "LOOP" .
+ RwMETHODS = "METHODS" .
+ RwMOD = "MOD" .
+ RwMODULE = "MODULE" .
+ RwNOT = "NOT" .
+ RwOBJECT = "OBJECT" .
+ RwOF = "OF" .
+ RwOR = "OR" .
+ RwOVERRIDES = "OVERRIDES" .
+ RwPROCEDURE = "PROCEDURE" .
+ RwRAISE = "RAISE" .
+ RwRAISES = "RAISES" .
+ RwREADONLY = "READONLY" .
+ RwRECORD = "RECORD" .
+ RwREF = "REF" .
+ RwREPEAT = "REPEAT" .
+ RwRETURN = "RETURN" .
+ RwREVEAL = "REVEAL" .
+ RwROOT = "ROOT" .
+ RwSET = "SET" .
+ RwTHEN = "THEN" .
+ RwTO = "TO" .
+ RwTRY = "TRY" .
+ RwTYPE = "TYPE" .
+ RwTYPECASE = "TYPECASE" .
+ RwUNSAFE = "UNSAFE" .
+ RwUNTIL = "UNTIL" .
+ RwUNTRACED = "UNTRACED" .
+ RwVALUE = "VALUE" .
+ RwVAR = "VAR" .
+ RwWHILE = "WHILE" .
+ RwWITH = "WITH" .
+
+(* Punctuation character tokens. *)
+
+ Semicolon = ";" .
+ Dot = "." .
+ Equal = "=" .
+ OpenParen = "(" .
+ CloseParen = ")" .
+ Comma = "," .
+ Colon = ":" .
+ Subtype = "<:" .
+ Becomes = ":=" .
+ OpenBrace = "{" .
+ CloseBrace = "}" .
+ Stroke = "|" .
+ Arrow = "=>" .
+ Ellipsis = ".." .
+ OpenBracket = "[" .
+ CloseBracket = "]" .
+ Unequal = "#" .
+ Less = "<" .
+ Greater = ">" .
+ LessEqual = "<=" .
+ GreaterEqual = ">=" .
+ Plus = "+" .
+ Minus = "-" .
+ Ampersand = "&" .
+ Star = "*" .
+ Slash = "/" .
+ Deref = "^" .
+
+ PREC NONE AsExpr 
+      NONE ")" 
+      NONE AsRaisesAny AsRaisesList "RAISES"  
+ . 
+
+(* Variable terminals: *)
+
+ Id VARTERM .
+ TextLit VARTERM .
+ CharLit VARTERM .
+ Number VARTERM .
+
+(* Abstract syntax: *)
+
+     (* Compilation units: *)
+
+ START Compilation SUFFIXES "i3" , "m3" , "ig" , "mg" .
+
+ Compilation
+   = ::= AsInterface | AsInstInterface | AsModule | AsInstModule
+         | AsGenInterface | AsGenModule
+   .
+
+ AsInterface
+   :: Safety : [ AsUnsafe ]
+      ; Name : Id
+      ; Imports : AsImportList
+      ; Decls : AsDeclList
+      ; FinalName : Id
+   .
+
+ AsInstInterface
+   :: Safety : [ AsUnsafe ]
+      ; Name : Id
+      ; GenName : Id
+      ; Actuals : AsIdPlusList
+      ; FinalName : Id
+   .
+
+ AsModule
+   :: Safety : [ AsUnsafe ]
+      ; Name : Id
+      ; Exports : [ AsIdPlusList ]
+      ; Imports : AsImportList
+      ; Block : AsBlock
+      ; FinalName : Id
+   .
+
+ AsInstModule
+   :: Safety : [ AsUnsafe ]
+      ; Name : Id
+      ; Exports : [ AsIdPlusList ]
+      ; GenName : Id
+      ; Actuals : AsIdPlusList
+      ; FinalName : Id
+   .
+
+ AsGenInterface
+   :: Name : Id
+      ; Formals : AsIdPlusList
+      ; Imports : AsImportList
+      ; Decls : AsDeclList
+      ; FinalName : Id
+   .
+
+ AsGenModule
+   :: Name : Id
+      ; Formals : AsIdPlusList
+      ; Imports : AsImportList
+      ; Block : AsBlock
+      ; FinalName : Id
+   .
+
+ AsImportList ::* Elems : AsImport .
+
+ AsImport = AsIntfImportList | AsFROMImport .
+
+ AsIntfImportList ::+ Elems : AsCsClIntfImportItem .
+
+ AsCsClIntfImportItem = ::= Id | AsASItem .
+
+ AsASItem :: InterfaceName : Id ; LocalName : Id .
+
+ AsFROMImport :: InterfaceName : Id ; Names : AsIdPlusList .
+
+ AsUnsafe :: .
+
+   (* Blocks and declarations: *)
+
+ AsBlock :: Decls : AsDeclList ; Stmts : AsStmtList .
+
+ AsDeclList ::* Elems : AsDecl .
+
+ AsDecl
+   = AsConstDeclList | AsTypeDeclList | AsExceptionDeclList | AsVarDeclList
+     | AsCsClProcDecl | AsRevelationList
+   .
+
+ AsConstDeclList ::* Elems : AsConstDecl .
+
+ AsConstDecl :: Name : Id ; Type : [ AsType ] ; Value : AsExpr .
+
+ AsTypeDeclList ::* Elems : AsCsClTypeDecl .
+
+ AsCsClTypeDecl = ::= AsPlainTypeDecl | AsOpaqueTypeDecl .
+
+ AsPlainTypeDecl | AsOpaqueTypeDecl :: Name : Id ; Type : AsType .
+
+ AsExceptionDeclList ::* Elems : AsExceptionDecl .
+
+ AsExceptionDecl :: Name : Id ; Type : [ AsType ] .
+
+ AsVarDeclList ::* Elems : AsVarDecl .
+
+ AsVarDecl
+ | AsDefaultFormal
+ | AsValueFormal
+ | AsVarFormal
+ | AsReadonlyFormal
+ | AsFieldDecl
+   :: Names : AsIdPlusList ; Type : [ AsType ] ; Value : [ AsExpr ]
+   .
+
+ AsCsClProcDecl = ::= AsProcInterfaceDecl | AsProcBodyDecl .
+
+ AsProcInterfaceDecl :: Name : Id ; Signature : AsSignature .
+
+ AsProcBodyDecl
+   :: Name : Id ; Signature : AsSignature ; Block : AsBlock ; FinalName : Id
+   .
+
+ AsRevelationList ::* Elems : AsCsClRevelation .
+
+ AsCsClRevelation = ::= AsPartialRevelation | AsFullRevelation .
+
+ AsPartialRevelation | AsFullRevelation 
+   :: QualName : AsQualId ; Type : AsType .
+
+(* Procedure signatures: *)
+
+ AsSignature | AsProcType
+   :: Formals : AsFormalList 
+      ; ResultType : [ AsType ] 
+      ; Raises : [ AsRaises ]
+   .
+
+ AsFormalList ::* Elems : AsFormal .
+
+ AsFormal
+   = ::= AsDefaultFormal | AsValueFormal | AsVarFormal | AsReadonlyFormal
+   .
+
+ AsRaises = AsRaisesAny | AsRaisesList .
+
+ AsRaisesAny :: .
+
+ AsRaisesList :: List : AsQualIdList .
+
+   (* Statements: *)
+
+ AsStmtList ::* AsStmt .
+
+ AsStmt
+   = ::= AsAssignStmt | AsBlock | AsCallStmt | AsCaseStmt | AsCaseStmtStroke
+         | AsExitStmt | AsEvalStmt | AsForStmt | AsIfStmt | AsLockStmt
+         | AsRaiseStmt | AsRepeatStmt | AsReturnStmt | AsTypecaseStmt
+         | AsTypecaseStmtStroke | AsTryExceptStmt | AsTryExceptStmtStroke
+         | AsTryFinallyStmt | AsWhileStmt | AsWithStmt | AsLoopStmt
+   .
+
+ AsAssignStmt :: Lhs : AsExpr ; Rhs : AsExpr .
+
+ AsCallStmt | AsFuncCall :: Proc : AsExpr ; Actuals : AsActualList .
+
+ AsActualList ::* Elems : AsActual .
+
+ AsActual 
+   = AsROOT | AsUNTRACEDROOT | AsTypeConstructor | AsExpr
+     | AsColonEqualBinding
+   .
+
+ AsEqualBinding | AsColonEqualBinding :: Name : Id ; Expr : AsExpr .
+
+ AsCaseStmt | AsCaseStmtStroke
+   :: Expr : AsExpr ; Alts : AsCaseAltList ; Else : [ AsStmtList ]
+   .
+
+ AsCaseAltList ::* AsCaseAlt .
+
+ AsCaseAlt :: Labels : AsAltLabelPlusList ; Stmts : AsStmtList .
+
+ AsAltLabelPlusList ::+ AsAltLabel .
+
+ AsAltLabel = AsExpr | AsRange .
+
+ AsRange :: Low : AsExpr ; High : AsExpr .
+
+ AsExitStmt :: .
+
+ AsEvalStmt :: Expr : AsExpr .
+
+ AsForStmt
+   :: Name : Id
+      ; From : AsExpr
+      ; To : AsExpr
+      ; By : [ AsExpr ]
+      ; Body : AsStmtList
+   .
+
+ AsIfStmt :: IfThens : AsIfThenPlusList ; Else : [ AsStmtList ] .
+
+ AsIfThenPlusList ::+ AsIfThen .
+
+ AsIfThen | AsLockStmt | AsWhileStmt :: Expr : AsExpr ; Stmts : AsStmtList .
+
+ AsRaiseStmt :: Ref : AsQualId ; Argument : [ AsExpr ] .
+
+ AsRepeatStmt :: Stmts : AsStmtList ; Expr : AsExpr .
+
+ AsReturnStmt :: Value : [ AsExpr ] .
+
+ AsTypecaseStmt | AsTypecaseStmtStroke
+   :: Expr : AsExpr ; Alts : AsTypecaseAltList ; Else : [ AsStmtList ]
+   .
+
+ AsTypecaseAltList ::* AsTypecaseAlt .
+
+ AsTypecaseAlt 
+   :: Types : AsTypePlusList ; Name : [ Id ] ; Stmts : AsStmtList .
+
+ AsTypePlusList ::+ AsType .
+
+ AsTryExceptStmt | AsTryExceptStmtStroke
+   :: Stmts : AsStmtList ; Handlers : AsHandlerList ; Else : [ AsStmtList ]
+   .
+
+ AsHandlerList ::* AsHandler .
+
+ AsHandler
+   :: Exceptions : AsQualIdPlusList ; Name : [ Id ] ; Stmts : AsStmtList
+   .
+
+ AsTryFinallyStmt :: TryStmts : AsStmtList ; FinalStmts : AsStmtList .
+
+ AsWithStmt :: Bindings : AsEqualBindingPlusList ; Stmts : AsStmtList .
+
+ AsEqualBindingPlusList ::+ AsEqualBinding .
+
+ AsLoopStmt :: Stmts : AsStmtList .
+
+ (* Types: *)
+
+ AsTypeConstructor
+   = AsArrayType | AsPackedType | AsEnumType | AsObjectType | AsProcType
+     | AsRecordType | AsRefType | AsSetType | AsSubrangeType
+   .
+
+ AsTypeName = AsQualId | AsROOT | AsUNTRACEDROOT .
+
+ AsType = AsTypeName | AsTypeConstructor .
+
+ AsSupertype = AsTypeName | AsObjectType .
+
+ AsROOT | AsUNTRACEDROOT :: .
+
+ AsArrayType = ::= AsFixedArrayType | AsOpenArrayType .
+
+ AsFixedArrayType :: Subscripts : AsTypePlusList ; ElemType : AsType .
+
+ AsOpenArrayType :: ElemType : AsType .
+
+ AsPackedType :: Bits : AsExpr ; For : AsType .
+
+ AsEnumType :: Ids : AsIdPlusList .
+
+ AsObjectType
+   :: Supertype : [ AsSupertype ]
+      ; Brand : [ AsBrand ]
+      ; Fields : AsFieldDeclList
+      ; Methods : [ AsMethodList ]
+      ; Overrides : [ AsOverrideList ]
+   .
+
+ AsFieldDeclList ::* Elems : AsFieldDecl .
+
+ AsMethodList ::* AsMethod .
+
+ AsMethod :: Name : Id ; Signature : AsSignature ; Body : [ AsExpr ] .
+
+ AsOverrideList ::* AsColonEqualBinding .
+
+ AsRecordType :: Fields : AsFieldDeclList .
+
+ AsRefType = ::= AsUntracedRefType | AsTracedRefType .
+
+ AsUntracedRefType | AsTracedRefType
+   :: Brand : [ AsBrand ] ; Referent : AsType 
+   .
+
+ AsSetType :: BaseType : AsType .
+
+ AsSubrangeType :: Range : AsRange .
+
+ AsBrand = ::= AsBrandEmpty | TextLit | AsQualId .
+
+ AsBrandEmpty :: .
+
+ (* Expressions: *)
+
+(* The AsEn here are different from the En in the Modula-3 syntax.  There,
+   an En can be an En+1 alone, as well as an operator with precedence n.
+   Here, an AsEn includes only the operators of exactly precedence n. *) 
+
+ AsExpr
+   = AsE0 | AsE1 | AsE2 | AsE3 | AsE4 | AsE5 | AsE6 | AsE7 | AsE8
+   .
+
+ AsE0 = AsOr .
+ AsE0OrLess = AsE0 .
+ AsE1 = AsAnd .
+ AsE1OrLess = AsE1 | AsE0OrLess .
+ AsE2 = AsNot .
+ AsE2OrLess = AsE2 | AsE1OrLess .
+ AsE3
+   = AsEqual | AsUnequal | AsLess | AsLessOrEqual | AsGreater | AsGreaterOrEqual
+     | AsIn
+   .
+ AsE3OrLess = AsE3 | AsE2OrLess .
+ AsE4 = AsPlus | AsMinus | AsAmpersand .
+ AsE4OrLess = AsE4 | AsE3OrLess .
+ AsE5 = AsTimes | AsSlash | AsDiv | AsMod .
+ AsE5OrLess = AsE5 | AsE4OrLess .
+ AsE6 = AsUnaryPlus | AsUnaryMinus .
+ AsE6OrLess = AsE6 | AsE5OrLess .
+ AsE7 = AsDeref | AsIdDotId | AsDot | AsSubscript | AsFuncCall .
+ AsE7OrLess = AsE7 | AsE6OrLess .
+ AsE8 = Id | CharLit | TextLit | Number | AsConstructor | AsExplicitParens .
+
+ AsDotLeftOpnd 
+   (* We exclude Id from the left operand of AsDot, so (Id "." Id) will 
+      deterministically be the left operand of AsIdDotId, not AsDot. *) 
+   = ::= CharLit | TextLit | Number | AsConstructor | AsExplicitParens 
+   . 
+
+
+ AsExplicitParens :: Expr : AsExpr .
+
+ AsAnd
+ | AsOr
+ | AsEqual
+ | AsUnequal
+ | AsLess
+ | AsLessOrEqual
+ | AsGreater
+ | AsGreaterOrEqual
+ | AsIn
+ | AsPlus
+ | AsMinus
+ | AsAmpersand
+ | AsTimes
+ | AsSlash
+ | AsDiv
+ | AsMod
+   :: Left : AsExpr ; Right : AsExpr
+   .
+
+ AsDot :: Left : AsExpr ; Right : Id .
+(* CHECK ^ Do we want AsDotLeftOpnd here?  And in the FsRule too? *) 
+                                                                               
+ AsNot | AsUnaryPlus | AsUnaryMinus | AsDeref :: Arg : AsExpr .
+
+ AsSubscript :: Array : AsExpr ; Subscripts : AsExprPlusList .
+
+ AsConstructor :: Type : AsType ; Values : AsConstructorElemList .
+
+ AsConstructorElemList ::* AsConstructorElem .
+
+ AsConstructorElem = AsExpr | AsRange | AsColonEqualBinding | AsEllipsis .
+
+ AsEllipsis :: .
+
+ AsExprPlusList ::+ AsExpr .
+
+ (* Misc: *)
+
+ AsQualId = AsIdDotId | Id .
+
+ AsIdDotId :: Left : Id ; Right : Id .
+
+ AsIdPlusList ::+ Id .
+
+ AsQualIdList ::* AsQualId .
+
+ AsQualIdPlusList ::+ AsQualId .
+
+(*****************************************************************************)
+(* Format syntax: *)
+
+(* NOTE:  This format syntax usually follows the convention that a list
+          whose separators are placed on the left receives the indentation
+          for the list _elements_.  The list FS rule then places the
+          separators at negative relative indentation.  This paranoid
+          technique generally ensures that only the separators will be
+          placed here, and any components of list elements will be to
+          the right of the separators, without extra effort.  This can
+          be important if blank lines appear in unusual places.  
+
+          In cases such as IMPORT and declaration lists, the semicolons
+          are, according to the way the syntax is defined, terminators.
+          However, the formatting here makes them look like separators
+          and puts them on the left.  This is done by having the list
+          element place its terminating semicolon on the next line, and
+          at negative indentation, similar to the way true list separators
+          are handled.
+*)
+
+(* Compilation units: *)
+
+ AsInterface
+   VERT -> ( Safety : AsUnsafe RwINTERFACE ! Name : Id ) 
+           ! ";" @ 2 Imports : INDENT @ 2 AsImportList (* Trailing ! *) 
+           @ 2 Decls : INDENT @ 2 AsDeclList (* Trailing ! *)
+           RwEND FinalName : Id
+           ! "."
+   .
+
+ AsInstInterface
+   -> ( Safety : AsUnsafe RwINTERFACE Name : Id ) 
+      ! ( @ 2 "=" GenName : Id
+          ! @ 6 ( "(" @ 8 Actuals : INDENT @ 8 AsIdPlusList ! @ 6 ")" ) 
+        ) 
+      ! RwEND FinalName : Id
+      ! "."
+   .
+
+ AsModule
+   VERT -> ( ( Safety : AsUnsafe RwMODULE ! Name : Id ) 
+             NONEMPTY ( ! RwEXPORTS @ 2 Exports : INDENT @ 4 AsIdPlusList )
+           )
+           ! ";" @ 2 Imports : INDENT @ 2 AsImportList (* Trailing ! *)
+           @ 2 Block : INDENT @ 2 AsBlock (* Trailing ! *)
+           FinalName : Id
+           ! "."
+   .
+
+ AsInstModule
+   -> ( ( Safety : AsUnsafe RwMODULE ! Name : Id ) 
+        NONEMPTY ( ! RwEXPORTS @ 2 Exports : INDENT @ 4 AsIdPlusList )
+      )
+      ! ( @ 2 "=" GenName : Id
+          ! @ 6 ( "(" @ 8 Actuals : INDENT @ 8 AsIdPlusList ! @ 6 ")" )
+        ) 
+      ! RwEND FinalName : Id
+      ! "."
+   .
+
+ AsGenInterface
+   VERT -> ( RwGENERIC RwINTERFACE ! Name : Id ) 
+           ! @ 2 ( "(" @ 4 Formals : INDENT @ 4 AsIdPlusList ! @ 2 ")" )
+           ! ";" @ 2 Imports : INDENT @ 2 AsImportList (* Trailing ! *)
+           @ 2 Decls : INDENT @ 2 AsDeclList (* Trailing ! *)
+           RwEND FinalName : Id
+           ! "."
+   .
+
+ AsGenModule
+   VERT -> ( RwGENERIC RwMODULE ! Name : Id ) 
+           ! @ 2 ( "(" @ 4 Formals : INDENT @ 4 AsIdPlusList ! @ 2 ")" )
+           ! ";" @ 2 Imports : INDENT @ 2 AsImportList (* Trailing ! *)
+           @ 2 Block : INDENT @ 2 AsBlock (* Trailing ! *)
+           FinalName : Id
+           ! "."
+   .
+
+ AsImportList
+   VERT ->*
+                CASE Elems : AsImport
+                OF MEMBER AsIntfImportList
+                     ( (   RwIMPORT @ 2 Elems : INDENT @ 2 AsImport )
+                       !
+                       @ - 2
+                       ";"
+                       @ 0
+                     )
+                   ELSE ( Elems : AsImport ) ! @ - 2 ";" @ 0
+                END
+   .
+
+
+ AsIntfImportList FILL ->* Elems : AsCsClIntfImportItem || ! @ - 2 "," @ 0 .
+
+ AsASItem -> InterfaceName : Id ! RwAS LocalName : Id .
+
+ AsFROMImport
+   HORIZ ->   RwFROM
+            InterfaceName : Id
+            !
+            @ 2
+              RwIMPORT
+            @ 4
+            Names : INDENT @ 4 AsIdPlusList
+   .
+
+ AsUnsafe -> RwUNSAFE .
+
+   (* Blocks and declarations: *)
+
+ AsBlock
+   VERT -> Decls : AsDeclList
+             RwBEGIN
+           !
+           @ 2
+           Stmts : INDENT @ 2 AsStmtList  
+           !
+             RwEND
+   .
+
+ AsDeclList
+   ->*
+           CASE Elems : AsDecl
+           OF
+(* CHECK: What about empty? Is this ambiguous? *)
+              MEMBER AsConstDeclList ( RwCONST Elems : AsDecl )
+              | MEMBER AsTypeDeclList ( RwTYPE Elems : AsDecl )
+              | MEMBER AsVarDeclList ( RwVAR Elems : AsDecl )
+              | MEMBER AsExceptionDeclList ( RwEXCEPTION Elems : AsDecl )
+              | MEMBER AsRevelationList ( RwREVEAL Elems : AsDecl )
+              ELSE AsDecl
+           END
+   .
+
+ AsConstDeclList ->* Elems : AsConstDecl .
+
+ AsConstDecl
+   VERT -> ( ( Name : Id 
+               PRESENT ( ! @ 2 ":" @ 4 Type : INDENT @ 4 AsType ) 
+             )
+             ( ! @ 2 "=" @ 4 Value : INDENT @ 4 AsExpr )
+           )
+           !
+           @ - 2
+           ";"
+           @ 0
+   .
+
+ AsTypeDeclList ->* Elems : AsCsClTypeDecl .
+
+ AsPlainTypeDecl
+   VERT -> ( Name : Id ! @ 2 "=" @ 4 Type : INDENT @ 4 AsType ) 
+           ! @ - 2 ";" @ 0
+   .
+
+ AsOpaqueTypeDecl
+   VERT -> ( Name : Id ! @ 2 "<:" @ 5 Type : INDENT @ 5 AsType ) 
+           ! @ - 2 ";" @ 0
+   .
+
+ AsExceptionDeclList ->* Elems : AsExceptionDecl .
+
+ AsExceptionDecl
+   VERT -> ( Name : Id
+             PRESENT 
+               ( ! @ 2 ( "(" @ 4 Type : INDENT @ 4 AsType ! @ 2 ")" ) )
+           )
+           !
+           @ - 2
+           ";"
+           @ 0
+   .
+
+ AsVarDeclList ->* Elems : AsVarDecl .
+
+ AsVarDecl
+   VERT -> ( ( @ 2
+               Names : INDENT @ 2 AsIdPlusList
+               PRESENT ( ! @ 2 ":" @ 4 Type : INDENT @ 4 AsType )
+             )
+             PRESENT ( ! @ 2 ":=" @ 5 Value : INDENT @ 5 AsExpr )
+           )
+           !
+           @ - 2
+           ";"
+           @ 0
+   .
+
+ AsRevelationList ->* Elems : AsCsClRevelation .
+
+ AsPartialRevelation
+   VERT -> ( QualName : AsQualId ! @ 2 "<:" @ 5 Type : INDENT @ 5 AsType )
+           !
+           @ - 2
+           ";"
+           @ 0
+   .
+
+ AsFullRevelation
+   VERT -> ( QualName : AsQualId ! @ 2 "=" @ 2 Type : INDENT @ 4 AsType )
+           !
+           @ - 2
+           ";"
+           @ 0
+   .
+
+ AsProcInterfaceDecl
+   VERT -> ( RwPROCEDURE Name : Id Signature : AsSignature ) ! @ - 2 ";" @ 0
+   .
+
+ AsProcBodyDecl
+   VERT -> (   RwPROCEDURE Name : Id Signature : AsSignature )
+           !
+           "="
+           @ 2
+           Block : INDENT @ 2 AsBlock
+           FinalName : Id
+           !
+           @ - 2
+           ";"
+           @ 0
+   .
+
+(* Procedure signatures: *)
+
+ AsSignature
+   -> ( ( ! @ 2 ( "(" @ 4 Formals : INDENT @ 4 AsFormalList ! @ 2 ")" ) )
+        PRESENT ( ! ":" ResultType : INDENT @ 2 AsType )
+      )
+      PRESENT ( ! Raises : AsRaises )
+   .
+
+ AsFormalList ->* Elems : AsFormal || ! @ - 2 ";" @ 0 .
+
+ AsDefaultFormal
+   -> Names : INDENT @ 2 AsIdPlusList
+      PRESENT ( ! @ 2 ":" Type : INDENT @ 4 AsType )
+      PRESENT ( ! @ 2 ":=" Value : INDENT @ 5 AsExpr )
+   .
+
+ AsValueFormal
+   ->   RwVALUE
+      Names : INDENT @ 2 AsIdPlusList
+      PRESENT ( ! @ 2 ":" Type : INDENT @ 4 AsType )
+      PRESENT ( ! @ 2 ":=" Value : INDENT @ 5 AsExpr )
+   .
+
+ AsVarFormal
+   ->   RwVAR
+      Names : INDENT @ 4 AsIdPlusList
+      PRESENT ( ! @ 2 ":" Type : INDENT @ 4 AsType )
+      PRESENT ( ! @ 2 ":=" Value : INDENT @ 5 AsExpr )
+   .
+
+ AsReadonlyFormal
+   ->   RwREADONLY
+      Names : INDENT @ 4 AsIdPlusList
+      PRESENT ( ! @ 2 ":" Type : INDENT @ 4 AsType )
+      PRESENT ( ! @ 2 ":=" Value : INDENT @ 5 AsExpr )
+   .
+
+ AsRaisesAny -> RwRAISES RwANY .
+
+ AsRaisesList
+   ->   RwRAISES ( ! @ 2 ( "{" @ 4 INDENT @ 4 AsQualIdList ! @ 2 "}" ) )
+   .
+
+(* Statements: *)
+
+ AsStmtList VERT ->* Elems : AsStmt ||| ! @ - 2 ";" @ 0 .
+
+ AsAssignStmt -> Lhs : AsExpr ! @ 2 ":=" Rhs : INDENT @ 5 AsExpr .
+
+ AsActualList ->* Elems : AsActual || ! @ - 2 "," @ 0 .
+
+ AsEqualBinding -> Name : Id ! @ 4 "=" Expr : INDENT @ 6 AsExpr .
+
+ AsColonEqualBinding -> Name : Id ! @ 2 ":=" @ 5 Expr : INDENT @ 5 AsExpr .
+
+ AsCaseStmt
+   VERT ->   RwCASE
+           Expr : INDENT @ 5 AsExpr
+           !
+             RwOF
+           @ 2
+           Alts : INDENT @ 2 AsCaseAltList
+           PRESENT ( ! RwELSE ! @ 2 Else : INDENT @ 2 AsStmtList )
+           !
+             RwEND
+   .
+
+ AsCaseStmtStroke
+   VERT ->   RwCASE
+           Expr : INDENT @ 5 AsExpr
+           !
+             RwOF
+           !
+           "|"
+           @ 2
+           Alts : INDENT @ 2 AsCaseAltList
+           PRESENT ( ! RwELSE ! @ 2 Else : INDENT @ 2 AsStmtList )
+           !
+             RwEND
+   .
+
+ AsCaseAltList VERT ->* Elems : AsCaseAlt || ! @ - 2 "|" @ 0 .
+
+ AsCaseAlt
+   -> Labels : AsAltLabelPlusList ! "=>" @ 4 Stmts : INDENT @ 4 AsStmtList
+   .
+
+ AsAltLabelPlusList ->* Elems : AsAltLabel || ! @ - 2 "," @ 0 .
+
+ AsRange -> Low : AsExpr ! ".." High : INDENT @ 3 AsExpr .
+
+ AsTypecaseStmt
+   VERT ->   RwTYPECASE
+           Expr : INDENT @ 9 AsExpr
+           !
+             RwOF
+           @ 2
+           Alts : INDENT @ 2 AsTypecaseAltList
+           PRESENT ( ! RwELSE ! @ 2 Else : INDENT @ 2 AsStmtList )
+           !
+             RwEND
+   .
+
+ AsTypecaseStmtStroke
+   VERT ->   RwTYPECASE
+           Expr : INDENT @ 9 AsExpr
+           !
+             RwOF
+           !
+           "|"
+           @ 2
+           Alts : INDENT @ 2 AsTypecaseAltList
+           PRESENT ( ! RwELSE ! @ 2 Else : INDENT @ 2 AsStmtList )
+           !
+             RwEND
+   .
+
+ AsTypecaseAltList VERT ->* Elems : AsTypecaseAlt || ! @ - 2 "|" @ 0 .
+
+ AsTypecaseAlt
+   -> ( Types : AsTypePlusList PRESENT ( ! @ 2 "(" Name : Id ")" ) )
+      !
+      "=>"
+      @ 4
+      Stmts : INDENT @ 4 AsStmtList
+   .
+
+ AsTypePlusList ->* Elems : AsType || ! @ - 2 "," @ 0 .
+
+ AsExitStmt -> RwEXIT .
+
+ AsEvalStmt -> RwEVAL ! @ 2 Expr : INDENT @ 2 AsExpr .
+
+ AsForStmt
+   ->   RwFOR
+      ( ( Name : Id ! ":=" @ 3 From : INDENT @ 3 AsExpr )
+        !
+          RwTO
+        @ 3
+        To : INDENT @ 3 AsExpr
+        PRESENT ( ! RwBY @ 3 By : INDENT @ 3 AsExpr )
+      )
+      !
+        RwDO
+      !
+      @ 2
+      Body : INDENT @ 2 AsStmtList
+      !
+        RwEND
+   .
+
+ AsIfStmt
+   VERT ->   RwIF
+           IfThens : AsIfThenPlusList
+           PRESENT ( ! RwELSE ! @ 2 Else : INDENT @ 2 AsStmtList )
+           !
+             RwEND
+   .
+
+ AsIfThenPlusList ->* AsIfThen || ! RwELSIF .
+
+ AsIfThen
+   VERT -> @ 3
+           Expr : INDENT @ 3 (* Current Position *) AsExpr
+           !
+             RwTHEN
+           !
+           @ 2
+           Stmts : INDENT @ 2 AsStmtList
+   .
+
+ AsLockStmt
+   ->   RwLOCK
+      Expr : INDENT @ 5 AsExpr
+      !
+        RwDO
+      !
+      @ 2
+      Stmts : INDENT @ 2 AsStmtList
+      !
+        RwEND
+   .
+
+ AsWhileStmt
+   ->   RwWHILE
+      Expr : INDENT @ 6 AsExpr
+      !
+        RwDO
+      !
+      @ 2
+      Stmts : INDENT @ 2 AsStmtList
+      !
+        RwEND
+   .
+
+ AsRaiseStmt
+   ->   RwRAISE
+      Ref : INDENT @ 6 AsQualId
+      PRESENT ( ! @ 8 ( "(" Argument : INDENT @ 10 AsExpr ! @ 8 ")" ) )
+   .
+
+ AsRepeatStmt
+   ->   RwREPEAT
+      !
+      @ 2
+      Stmts : INDENT @ 2 AsStmtList
+      !
+        RwUNTIL
+      Expr : INDENT @ 6 AsExpr
+   .
+
+ AsReturnStmt -> RwRETURN PRESENT ( ! @ 2 Value : INDENT @ 2 AsExpr ) .
+
+ AsTryExceptStmt
+   VERT ->   RwTRY
+           !
+           @ 2
+           Stmts : INDENT @ 2 AsStmtList
+           !
+             RwEXCEPT
+           !
+           @ 2
+           Handlers : INDENT @ 2 AsHandlerList
+           PRESENT ( ! RwELSE ! @ 2 Else : INDENT @ 2 AsStmtList )
+           !
+             RwEND
+   .
+
+ AsTryExceptStmtStroke
+   VERT ->   RwTRY
+           !
+           @ 2
+           Stmts : INDENT @ 2 AsStmtList
+           !
+             RwEXCEPT
+           !
+           "|"
+           @ 2
+           Handlers : INDENT @ 2 AsHandlerList
+           PRESENT ( ! RwELSE ! @ 2 Else : INDENT @ 2 AsStmtList )
+           !
+             RwEND
+   .
+
+ AsHandlerList VERT ->* Elems : AsHandler || ! @ - 2 "|" @ 0 .
+
+ AsHandler
+   -> ( Exceptions : INDENT @ 2 AsQualIdPlusList
+        PRESENT ( ! @ 2 "(" Name : Id ")" )
+      )
+      !
+      "=>"
+      @ 4
+      Stmts : INDENT @ 4 AsStmtList
+   .
+
+ AsTryFinallyStmt
+   ->   RwTRY
+      !
+      @ 2
+      TryStmts : INDENT @ 2 AsStmtList
+      !
+        RwFINALLY
+      !
+      @ 2
+      FinalStmts : INDENT @ 2 AsStmtList
+      !
+        RwEND
+   .
+
+ AsWithStmt
+   ->   RwWITH
+      @ 2
+      Bindings : INDENT @ 2 AsEqualBindingPlusList
+      !
+        RwDO
+      !
+      @ 2
+      Stmts : INDENT @ 2 AsStmtList
+      !
+        RwEND
+   .
+
+ AsEqualBindingPlusList ->* Elem : AsEqualBinding || ! @ - 2 "," @ .
+
+ AsLoopStmt -> RwLOOP ! @ 2 Stmts : INDENT @ 2 AsStmtList ! RwEND .
+
+(* Types: *)
+
+ AsEnumType -> "{" @ 2 INDENT @ 2 AsIdPlusList ! "}" .
+
+ AsSubrangeType -> "[" AsRange ! "]" .
+
+ AsRecordType
+   ->   RwRECORD NONEMPTY ( ! @ 2 Fields : INDENT @ 2 AsFieldDeclList ) ! RwEND
+   .
+
+ AsROOT -> RwROOT .
+
+ AsUNTRACEDROOT -> RwUNTRACED RwROOT .
+
+ AsFixedArrayType
+   -> (   RwARRAY ! @ 2 Subscripts : INDENT @ 2 AsTypePlusList )
+      !
+        RwOF
+      ElemType : INDENT @ 3 AsType 
+   .
+
+ AsOpenArrayType -> RwARRAY ! RwOF ElemType : INDENT @ 3 AsType .
+
+ AsPackedType
+   ->   RwBITS Bits : INDENT @ 4 AsExpr ! RwFOR For : INDENT @ 4 AsType 
+   .
+
+ AsObjectType
+   -> ( PRESENT ( Supertype : AsSupertype ! )
+        PRESENT ( RwBRANDED Brand : INDENT @ 8 AsBrand ! )
+          RwOBJECT
+      )
+      NONEMPTY ( ! @ 2 Fields : INDENT @ 2 AsFieldDeclList )
+      PRESENT ( ! RwMETHODS ! @ 2 Methods : INDENT @ 2 AsMethodList )
+      PRESENT ( ! RwOVERRIDES ! @ 2 Overrides : INDENT @ 2 AsOverrideList )
+      !
+        RwEND
+   .
+
+ AsFieldDecl
+   -> Names : INDENT @ 2 AsIdPlusList
+      PRESENT ( ! @ 2 ":" Type : INDENT @ 4 AsType )
+      PRESENT ( ! @ 2 ":=" Value : INDENT @ 5 AsExpr )
+   .
+
+ AsFieldDeclList ->* AsFieldDecl || ! @ - 2 ";" @ 0 .
+
+ AsMethodList ->* Elem : AsMethod || ! @ - 2 ";" @ 0 .
+
+ AsMethod
+   -> ( Name : Id ! Signature : AsSignature )
+      PRESENT ( ! ":=" Body : INDENT @ 3 AsExpr )
+   .
+
+ AsOverrideList ->* Elem : AsColonEqualBinding || ! @ - 2 ";" @ 0 .
+
+ AsTracedRefType
+   -> PRESENT ( RwBRANDED Brand : INDENT @ 8 AsBrand ! )
+        RwREF
+      Referent : INDENT @ 4 AsType 
+   .
+
+ AsUntracedRefType
+   -> PRESENT ( RwBRANDED Brand : INDENT @ 8 AsBrand ! )
+        RwUNTRACED
+        RwREF
+      Referent : INDENT @ 13 AsType 
+   .
+
+ AsSetType -> RwSET RwOF ! @ 2 BaseType : INDENT @ 2 AsType .
+
+ AsBrandEmpty -> .
+
+ AsProcType
+   ->   RwPROCEDURE
+      !
+      @ 2
+      ( ( "(" @ 4 Formals : INDENT @ 4 AsFormalList ! @ 2 ")" )
+        PRESENT ( ! ":" ResultType : INDENT @ 2 AsType )
+      )
+      PRESENT ( ! Raises : INDENT @ 2 AsRaises )
+   .
+
+(* Expressions: *)
+
+ AsExplicitParens -> "(" Expr : INDENT @ 2 AsExpr ! @ 2 ")" .
+
+ AsOr
+   -> Left : AsExpr
+      !
+        RwOR
+      MEMBER AsE0OrLess ( ( "(" Right : INDENT @ 3 AsExpr ! ")" ) )
+   .
+
+ AsAnd
+   -> MEMBER AsE0OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+        RwAND
+      MEMBER AsE1OrLess ( ( "(" Right : INDENT @ 6 AsExpr ! @ 4 ")" ) )
+   .
+
+ AsNot
+   ->   RwNOT MEMBER AsE2OrLess ( ( "(" Arg : INDENT @ 6 AsExpr ! @ 4 ")" ) )
+   .
+
+ AsEqual
+   -> MEMBER AsE2OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      "="
+      MEMBER AsE3OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsUnequal
+   -> MEMBER AsE2OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      "#"
+      MEMBER AsE3OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsLess
+   -> MEMBER AsE2OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      "<"
+      MEMBER AsE3OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsGreater
+   -> MEMBER AsE2OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      ">"
+      MEMBER AsE3OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsLessOrEqual
+   -> MEMBER AsE2OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      "<="
+      MEMBER AsE3OrLess ( ( "(" Right : INDENT @ 5 AsExpr ! @ 3 ")" ) )
+   .
+
+ AsGreaterOrEqual
+   -> MEMBER AsE2OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      ">="
+      MEMBER AsE3OrLess ( ( "(" Right : INDENT @ 5 AsExpr ! @ 3 ")" ) )
+   .
+
+ AsIn
+   -> MEMBER AsE2OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+        RwIN
+      MEMBER AsE3OrLess ( ( "(" Right : INDENT @ 5 AsExpr ! @ 3 ")" ) )
+   .
+
+ AsPlus
+   -> MEMBER AsE3OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      "+"
+      MEMBER AsE4OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsMinus
+   -> MEMBER AsE3OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      "-"
+      MEMBER AsE4OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsAmpersand
+   -> MEMBER AsE3OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      "&"
+      MEMBER AsE4OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsTimes
+   -> MEMBER AsE4OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      "*"
+      MEMBER AsE5OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsSlash
+   -> MEMBER AsE4OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+      "/"
+      MEMBER AsE5OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsDiv
+   -> MEMBER AsE4OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+        RwDIV
+      MEMBER AsE5OrLess ( ( "(" Right : INDENT @ 6 AsExpr ! @ 4 ")" ) )
+   .
+
+ AsMod
+   -> MEMBER AsE4OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      !
+        RwMOD
+      MEMBER AsE5OrLess ( ( "(" Right : INDENT @ 6 AsExpr ! @ 4 ")" ) )
+   .
+
+ AsUnaryPlus
+   -> "+" MEMBER AsE6OrLess ( ( "(" Arg : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+ AsUnaryMinus
+   -> "-" MEMBER AsE6OrLess ( ( "(" Arg : INDENT @ 4 AsExpr ! @ 2 ")" ) )
+   .
+
+(* Operators at precedence E7 are a bit confusing, and don't follow the usual
+   pattern.  This level really consists of an E8, followed by a list of 
+   Selectors.  These are left-associative, but since none of them has an 
+   expression as right operand, there is no possibility of a right-associative 
+   interpretation anyway.  So parentheses around a left operand of precedence 
+   E7 or E8 are redundant. *)  
+
+ AsDeref -> MEMBER AsE6OrLess ( ( "(" Arg : INDENT @ 2 AsExpr ! ")" ) ) ! "^" .
+
+ AsDot
+   -> MEMBER AsE6OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+      ! "." Id
+   .
+
+ AsSubscript
+   -> MEMBER AsE6OrLess ( ( "(" Array : AsExpr ! ")" ) )
+      !
+      @ 2
+      ( "[" @ 4 Subscripts : INDENT @ 4 AsExprPlusList ! @ 2 "]" )
+   .
+
+ AsCallStmt | AsFuncCall
+   -> MEMBER AsE6OrLess ( ( "(" Proc : (* INDENT @ 2 *) AsExpr ! ")" ) )
+      !
+      @ 2
+      ( "(" @ 4 Actuals : INDENT @ 4 AsActualList ! @ 2 ")" )
+   .
+
+ AsConstructor
+   -> Type : AsType 
+      !
+      @ 2
+      ( "{" @ 4 Values : INDENT @ 4 AsConstructorElemList ! @ 2 "}" )
+   .
+
+ AsConstructorElemList ->* Elem : AsConstructorElem || ! @ - 2 "," @ 0 .
+
+ AsEllipsis -> ".." .
+
+ AsExprPlusList ->* Elem : AsExpr || ! @ - 2 "," @ 0 .
+
+   (* Misc: *)
+
+ AsIdDotId -> Id ! "." Id .
+
+ AsIdPlusList FILL ->* Id || ! @ - 2 "," @ 0 .
+
+ AsQualIdList | AsQualIdPlusList ->* Elem : AsQualId || ! @ - 2 "," @ 0 .
+
+
+(*****************************************************************************)
+(* Concrete syntax: *)
+
+ (* Compilation units: *)
+
+ AsInterface
+   ::= [ AsUnsafeCs ] RwINTERFACE Id ";" AsImportList AsDeclList RwEND Id "." .
+
+ AsInstInterface
+   ::= [ AsUnsafeCs ] RwINTERFACE Id "=" Id "(" AsIdPlusList ")" RwEND Id "." .
+
+ AsModule
+   ::= [ AsUnsafeCs ]
+       RwMODULE
+       Id
+       [ RwEXPORTS AsIdPlusList ]
+       ";"
+       AsImportList
+       AsBlock
+       Id
+       "." .
+
+ AsInstModule
+   ::= [ AsUnsafeCs ]
+       RwMODULE
+       Id
+       [ RwEXPORTS AsIdPlusList ]
+       "="
+       Id
+       "("
+       AsIdPlusList
+       ")"
+       RwEND
+       Id
+       "." .
+
+ AsGenInterface
+   ::= RwGENERIC
+       RwINTERFACE
+       Id
+       "("
+       AsIdPlusList
+       ")"
+       ";"
+       AsImportList
+       AsDeclList
+       RwEND
+       Id
+       "." .
+
+ AsGenModule
+   ::= RwGENERIC
+       RwMODULE
+       Id
+       "("
+       AsIdPlusList
+       ")"
+       ";"
+       AsImportList
+       AsBlock
+       Id
+       "." .
+
+ AsImportList ::=* CsImport .
+
+ CsImport ::= CsIntfImport | CsFROMImport .
+
+ CsIntfImport ::= RwIMPORT AsIntfImportList ";" .
+
+ AsIntfImportList ::=+ AsCsClIntfImportItem || "," .
+
+ AsASItem ::= Id RwAS Id .
+
+ CsFROMImport ::= AsFROMImport ";" .
+
+ AsFROMImport ::= RwFROM Id RwIMPORT AsIdPlusList .
+
+ AsUnsafeCs BUILD AsUnsafe ::= RwUNSAFE .
+
+ (* Blocks and declarations: *)
+
+ AsBlock ::= AsDeclList RwBEGIN AsStmtList RwEND .
+
+ AsDeclList ::=* AsDeclCs .
+
+ AsDeclCs
+   ::= AsConstDeclCs | AsTypeDeclCs | AsExceptionDeclCs | AsVarDeclCs
+       | AsRevelationCs | AsCsClProcDecl .
+
+ AsConstDeclCs ::= RwCONST AsConstDeclList .
+
+ AsConstDeclList ::=* AsConstDecl .
+
+ AsConstDecl ::= Id [ ":" CsType ] "=" CsExpr ";" .
+
+ AsTypeDeclCs ::= RwTYPE AsTypeDeclList .
+
+ AsTypeDeclList ::=* AsCsClTypeDecl .
+
+ AsPlainTypeDecl ::= Id "=" CsType ";" .
+
+ AsOpaqueTypeDecl ::= Id "<:" CsType ";" .
+
+ AsRevelationCs ::= RwREVEAL AsRevelationList .
+
+ AsRevelationList ::=* AsCsClRevelation .
+
+ AsPartialRevelation ::= CsQualId "<:" CsType ";" .
+
+ AsFullRevelation ::= CsQualId "=" CsType ";" .
+
+ AsExceptionDeclCs ::= RwEXCEPTION AsExceptionDeclList .
+
+ AsExceptionDeclList ::=* AsExceptionDecl .
+
+ AsExceptionDecl ::= Id [ "(" CsType ")" ] ";" .
+
+ AsVarDeclCs ::= RwVAR AsVarDeclList .
+
+ AsVarDeclList ::=* AsVarDecl .
+
+ AsVarDecl ::= AsIdPlusList [ ":" CsType ] [ ":=" CsExpr ] ";" .
+
+ AsProcInterfaceDecl ::= RwPROCEDURE Id AsSignature ";" .
+
+ AsProcBodyDecl ::= RwPROCEDURE Id AsSignature "=" AsBlock Id ";" .
+
+ (* Procedure signatures: *)
+
+ AsSignature ::= "(" AsFormalList ")" [ ":" CsType ] [ CsRaises ] .
+
+ CsRaises ::= AsRaisesAny | AsRaisesList .
+
+ AsRaisesAny ::= RwRAISES RwANY .
+
+ AsRaisesList ::= RwRAISES "{" CsQualIdList "}" .
+
+ AsFormalList ::=* AsFormal || ";" .
+
+ AsDefaultFormal ::= AsIdPlusList [ ":" CsType ] [ ":=" CsExpr ] .
+
+ AsValueFormal ::= RwVALUE AsIdPlusList [ ":" CsType ] [ ":=" CsExpr ] .
+
+ AsVarFormal ::= RwVAR AsIdPlusList [ ":" CsType ] [ ":=" CsExpr ] .
+
+ AsReadonlyFormal ::= RwREADONLY AsIdPlusList [ ":" CsType ] [ ":=" CsExpr ] .
+
+ (* Statements: *)
+
+ AsStmtList ::=* AsStmt ||| ";" .
+
+ AsCallStmt ::= G7 "(" AsActualList ")" .
+
+ AsRedunSemi ::= ";" .
+
+ AsAssignStmt ::= CsExpr ":=" CsExpr .
+
+ AsActualList ::=* CsActual || "," .
+
+ CsActual ::= CsActualType | CsExpr | AsColonEqualBinding .
+
+ CsActualType (* An actual parameter that is a type. *)
+   ::= AsROOT
+       | AsUNTRACEDROOT | AsArrayType | AsPackedType | AsEnumType | AsObjectType
+       | AsProcType | AsRecordType | AsRefType | AsSetType | AsSubrangeType
+       (* Omit CsQualId from this list, because it creates parsing 
+           ambiguities with CsExpr, which an actual can also be. 
+       *)
+       .
+
+ AsEqualBinding ::= Id "=" CsExpr .
+
+ AsColonEqualBinding ::= Id ":=" CsExpr .
+
+ AsCaseStmt ::= RwCASE CsExpr RwOF AsCaseAltList [ RwELSE AsStmtList ] RwEND .
+
+ AsCaseStmtStroke
+   ::= RwCASE CsExpr RwOF "|" AsCaseAltList [ RwELSE AsStmtList ] RwEND .
+
+ AsCaseAltList ::=* AsCaseAlt || "|" .
+
+ AsCaseAlt ::= AsAltLabelPlusList "=>" AsStmtList .
+
+ AsAltLabelPlusList ::=+ CsAltLabel || "," .
+
+ CsAltLabel ::= CsExpr | AsRange .
+
+ AsRange ::= CsExpr ".." CsExpr .
+
+ AsTypecaseStmt
+   ::= RwTYPECASE CsExpr RwOF AsTypecaseAltList [ RwELSE AsStmtList ] RwEND .
+
+ AsTypecaseStmtStroke
+   ::= RwTYPECASE CsExpr RwOF "|" AsTypecaseAltList [ RwELSE AsStmtList ] RwEND .
+
+ AsTypecaseAltList ::=* AsTypecaseAlt || "|" .
+
+ AsTypecaseAlt ::= AsTypePlusList [ "(" Id ")" ] "=>" AsStmtList .
+
+ AsTypePlusList ::=+ CsType || "," .
+
+ AsExitStmt ::= RwEXIT .
+
+ AsEvalStmt ::= RwEVAL CsExpr .
+
+ AsForStmt
+   ::= RwFOR Id ":=" CsExpr RwTO CsExpr [ RwBY CsExpr ] RwDO AsStmtList RwEND .
+
+ AsIfStmt ::= RwIF AsIfThenPlusList [ RwELSE AsStmtList ] RwEND .
+
+ AsIfThenPlusList ::=+ AsIfThen || RwELSIF .
+
+ AsIfThen ::= CsExpr RwTHEN AsStmtList .
+
+ AsLockStmt ::= RwLOCK CsExpr RwDO AsStmtList RwEND .
+
+ AsWhileStmt ::= RwWHILE CsExpr RwDO AsStmtList RwEND .
+
+ AsRaiseStmt ::= RwRAISE CsQualId [ "(" CsExpr ")" ] .
+
+ AsRepeatStmt ::= RwREPEAT AsStmtList RwUNTIL CsExpr .
+
+ AsReturnStmt ::= RwRETURN [ CsExpr ] .
+
+ AsTryExceptStmt
+   ::= RwTRY AsStmtList RwEXCEPT AsHandlerList [ RwELSE AsStmtList ] RwEND .
+
+ AsTryExceptStmtStroke
+   ::= RwTRY AsStmtList RwEXCEPT "|" AsHandlerList [ RwELSE AsStmtList ] RwEND .
+
+ AsHandlerList ::=* AsHandler || "|" .
+
+ AsHandler ::= CsQualIdPlusList [ "(" Id ")" ] "=>" AsStmtList .
+
+ AsTryFinallyStmt ::= RwTRY AsStmtList RwFINALLY AsStmtList RwEND .
+
+ AsWithStmt ::= RwWITH AsEqualBindingPlusList RwDO AsStmtList RwEND .
+
+ AsEqualBindingPlusList ::=+ AsEqualBinding || "," .
+
+ AsLoopStmt ::= RwLOOP AsStmtList RwEND .
+
+ (* Types: *)
+
+ CsType
+   ::= CsTypeName | AsArrayType | AsPackedType | AsEnumType | AsObjectType
+       | AsProcType | AsRecordType | AsRefType | AsSetType | AsSubrangeType .
+
+ CsTypeName ::= Id | AsROOT | AsUNTRACEDROOT .
+
+ CsTypeName BUILD AsIdDotId ::= Id "." Id .
+
+ CsSupertype ::= CsTypeName | AsObjectType .
+
+ AsEnumType ::= "{" AsIdPlusList "}" .
+
+ AsSubrangeType ::= "[" AsRange "]" .
+
+ AsRecordType ::= RwRECORD AsFieldDeclList RwEND .
+
+ AsROOT ::= RwROOT .
+
+ AsUNTRACEDROOT ::= RwUNTRACED RwROOT .
+
+ AsFixedArrayType ::= RwARRAY AsTypePlusList RwOF CsType .
+
+ AsOpenArrayType ::= RwARRAY RwOF CsType .
+
+ AsPackedType ::= RwBITS CsExpr RwFOR CsType .
+
+ AsObjectType
+   ::= [ CsSupertype ]
+       [ RwBRANDED AsBrand ]
+       RwOBJECT
+       AsFieldDeclList
+       [ RwMETHODS AsMethodList ]
+       [ RwOVERRIDES AsOverrideList ]
+       RwEND .
+
+ AsFieldDeclList ::=* AsFieldDecl || ";" .
+(* FIX: Allow trailing ";" in field, method, override, and formals lists. *)
+
+ AsFieldDecl ::= AsIdPlusList [ ":" CsType ] [ ":=" CsExpr ] .
+
+ AsMethodList ::=* AsMethod || ";" .
+
+ AsMethod ::= Id AsSignature [ ":=" CsExpr ] .
+
+ AsOverrideList ::=* AsColonEqualBinding || ";" .
+
+ AsTracedRefType ::= [ RwBRANDED AsBrand ] RwREF CsType .
+
+ AsUntracedRefType ::= [ RwBRANDED AsBrand ] RwUNTRACED RwREF CsType .
+
+ AsSetType ::= RwSET RwOF CsType .
+
+ AsBrandEmpty ::= .
+
+(*AsBrand ::= [ CsBrand ] .
+
+  CsBrand ::= TextLit | CsQualId .
+*)
+
+ AsProcType ::= RwPROCEDURE "(" AsFormalList ")" [ ":" CsType ] [ CsRaises ] .
+
+(* Expressions: *)
+
+ CsExpr ::= G0 .
+
+ (* Parenthesized subexpressions of different precedence. 
+    These do not build an AsExplicitParens.  That is left to
+    higher in the derivation tree, when reducing to a Gn and when
+    we know the right operator, if any. *)
+
+ PE0 ::= "(" E0 ")" .
+ PE1 ::= "(" E1 ")" .
+ PE2 ::= "(" E2 ")" .
+ PE3 ::= "(" E3 ")" .
+ PE4 ::= "(" E4 ")" .
+ PE5 ::= "(" E5 ")" .
+ PE6 ::= "(" E6 ")" .
+ PE7 ::= "(" E7 ")" .
+ PCsE8 ::= "(" CsE8 ")" .
+
+ (* Higher precedence subexpressions: Build nothing. *)
+ G0 ::= E0 | E1 | E2 | E3 | E4 | E5 | E6 | E7 | CsE8 .
+ G1 ::= E1 | E2 | E3 | E4 | E5 | E6 | E7 | CsE8 .
+ G2 ::= E2 | E3 | E4 | E5 | E6 | E7 | CsE8 .
+ G3 ::= E3 | E4 | E5 | E6 | E7 | CsE8 .
+ G4 ::= E4 | E5 | E6 | E7 | CsE8 .
+ G5 ::= E5 | E6 | E7 | CsE8 .
+ G6 ::= E6 | E7 | CsE8 .
+ G7 ::= E7 | CsE8 .
+ G7MinusId ::= E7 | CsE8MinusId .
+ G8 ::= CsE8 .
+
+ (* Higher precedence parenthesized subexpressions: Build AsExplicitParens. *)
+ (* 
+ G0 BUILD AsExplicitParens
+   ::= PE0 | PE1 | PE2 | PE3 | PE4 | PE5 | PE6 | PE7 | PCsE8 .
+ G1 BUILD AsExplicitParens 
+   ::= PE1 | PE2 | PE3 | PE4 | PE5 | PE6 | PE7 | PCsE8 .
+ G2 BUILD AsExplicitParens ::= PE2 | PE3 | PE4 | PE5 | PE6 | PE7 | PCsE8 .
+ G3 BUILD AsExplicitParens ::= PE3 | PE4 | PE5 | PE6 | PE7 | PCsE8 .
+ G4 BUILD AsExplicitParens ::= PE4 | PE5 | PE6 | PE7 | PCsE8 .
+ G5 BUILD AsExplicitParens ::= PE5 | PE6 | PE7 | PCsE8 .
+ G6 BUILD AsExplicitParens ::= PE6 | PE7 | PCsE8 .
+ G7 BUILD AsExplicitParens ::= PE7 | PCsE8 .
+ G8 BUILD AsExplicitParens ::= PCsE8 .
+*)
+
+ G0 BUILD AsExplicitParens ::= PE0 .
+ G1 BUILD AsExplicitParens ::= PE1 .
+ G2 BUILD AsExplicitParens ::= PE2 .
+ G3 BUILD AsExplicitParens ::= PE3 .
+ G4 BUILD AsExplicitParens ::= PE4 .
+ G5 BUILD AsExplicitParens ::= PE5 .
+ G6 BUILD AsExplicitParens ::= PE6 .
+ G7 BUILD AsExplicitParens ::= PE7 .
+ G8 BUILD AsExplicitParens ::= PCsE8 .
+
+ (* Lower precedence parenthesized subexpressions: Build nothing. *)
+ G1 ::= PE0 .
+ G2 ::= PE0 | PE1 .
+ G3 ::= PE0 | PE1 | PE2 .
+ G4 ::= PE0 | PE1 | PE2 | PE3 .
+ G5 ::= PE0 | PE1 | PE2 | PE3 | PE4 .
+ G6 ::= PE0 | PE1 | PE2 | PE3 | PE4 | PE5 .
+ G7 ::= PE0 | PE1 | PE2 | PE3 | PE4 | PE5 | PE6 .
+ G8 ::= PE0 | PE1 | PE2 | PE3 | PE4 | PE5 | PE6 | PE7 .
+
+ E0 BUILD AsOr ::= G0 RwOR G1 .
+
+ E1 BUILD AsAnd ::= G1 RwAND G2 .
+
+ E2 BUILD AsNot ::= RwNOT G2 .
+
+ E3 BUILD AsEqual ::= G3 "=" G4 .
+ E3 BUILD AsUnequal ::= G3 "#" G4 .
+ E3 BUILD AsLess ::= G3 "<" G4 .
+ E3 BUILD AsGreater ::= G3 ">" G4 .
+ E3 BUILD AsLessOrEqual ::= G3 "<=" G4 .
+ E3 BUILD AsGreaterOrEqual ::= G3 ">=" G4 .
+ E3 BUILD AsIn ::= G3 RwIN G4 .
+
+ E4 BUILD AsPlus ::= G4 "+" G5 .
+ E4 BUILD AsMinus ::= G4 "-" G5 .
+ E4 BUILD AsAmpersand ::= G4 "&" G5 .
+
+ E5 BUILD AsTimes ::= G5 "*" G6 .
+ E5 BUILD AsSlash ::= G5 "/" G6 .
+ E5 BUILD AsDiv ::= G5 RwDIV G6 .
+ E5 BUILD AsMod ::= G5 RwMOD G6 .
+
+ E6 BUILD AsUnaryPlus ::= "+" G7 .
+ E6 BUILD AsUnaryMinus ::= "-" G7 .
+
+ E7 BUILD AsDeref ::= G7 "^" .
+ E7 BUILD AsDot ::= G7MinusId "." Id .
+ E7 BUILD AsDot ::= Id "." Id .
+ (* ^Here, we need to avoid reducing the left Id to anything, until the dot 
+    and right Id have been shifted.  It is possible, in an expression context,
+    that we will see Id "." Id "{" ... (a constructor), 
+    or Id ". Id OBJECT ... or Id ". Id BRANDED ... (object types with 
+    supertype).  In these cases, Id "." Id needs to build AsIdDotId, not AsDot.
+    If we were to allow the full G7 here, it would drastically expand the 
+    syntax of constructors and object types.  This way, we avoid any reduction 
+    until we have the token after the right Id as lookahead, which determines 
+    what to reduce Id "." Id to. *) 
+ E7 BUILD AsSubscript ::= G7 "[" AsExprPlusList "]" .
+ E7 BUILD AsFuncCall ::= G7 "(" AsActualList ")" .
+
+ CsE8MinusId ::= CharLit | TextLit | Number | AsConstructor .
+
+ CsE8 ::= Id | CharLit | TextLit | Number | AsConstructor .
+
+ AsConstructor ::= CsType "{" AsConstructorElemList "}" .
+
+ AsConstructorElemList ::=* CsConstructorElem || "," .
+
+ CsConstructorElem ::= CsExpr | AsRange | AsColonEqualBinding | AsEllipsis .
+
+ AsEllipsis ::= ".." .
+
+ AsExprPlusList ::=+ CsExpr || "," .
+
+ (* Misc: *)
+
+ AsIdDotId ::= Id "." Id .
+
+ AsIdPlusList ::=+ Id || "," .
+
+
+(* Use CsQualId only in contexts where neither a general expression nor a
+   general type are allowable, to avoid parsing nondeterminisms.  In those
+   contexts, A constructor, object type, or AsDot would not want a reduction
+   to CsQualId. *)  
+ CsQualId ::= Id .
+
+ CsQualId BUILD AsIdDotId ::= Id "." Id .
+
+ CsQualIdList BUILD AsQualIdList ::=* CsQualId || "," .
+
+ CsQualIdPlusList BUILD AsQualIdPlusList ::=+ CsQualId || "," .
+
+END M3
