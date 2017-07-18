@@ -1,0 +1,4 @@
+subdirectory 'maybe' contains files that were not in use as of initial
+git repository creation, but it was not obvious they will never be
+needed.
+
