@@ -1,0 +1,23 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Schutz semantic editor.                          %%
+%% Copyright 1988..2017, Rodney M. Bates.                                    %%
+%% rodney.m.bates@acm.org                                                    %%
+%% Licensed under the MIT License.                                           %%
+%% -----------------------------------------------------------------------2- %%
+
+% m3makefile for ldl0 subdirectory, Schutz semantic editor, pm3 
+
+interface("../derived/Ldl0Tok") 
+implementation("Ldl0Tok") 
+interface("../derived/Ldl0Child") % Needs no implementation. 
+interface("Ldl0MakeEst") 
+implementation("../derived/Ldl0MakeEst") 
+% See comment in LdlBootMain where it IMPORTs Ldl0MakeEst. 
+
+module("Ldl0ChildTok")
+module("ManualAsTrees")
+module("Ldl0Scanner") 
+module("Ldl0Semantics") 
+module("Ldl0FsTrees")
+

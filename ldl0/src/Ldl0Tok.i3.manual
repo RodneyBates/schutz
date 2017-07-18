@@ -1,0 +1,224 @@
+
+(* -----------------------------------------------------------------------1- *)
+(* This file is part of the Scheutz semantic editor.                         *)
+(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* rodney.bates@wichita.edu                                                  *)
+(* Licensed under the Gnu Public License, version 2 or later.                *)
+(* -----------------------------------------------------------------------2- *)
+
+INTERFACE Ldl0Tok 
+
+; IMPORT LbeStd 
+
+(* Initial, handwritten version of Ldl0Tok, with arbitrary values. *) 
+
+; CONST MinTok = LbeStd . Tok__Null 
+; CONST MaxTok = 1300 
+
+(* Strings: 100 *) 
+
+; CONST RwVERT_Tok = 100 (* = "VERT" *) 
+; CONST RwVARTERM_Tok = 101 (* = "VARTERM" *) 
+; CONST RwSTART_Tok = 102 (* = "START" *) 
+; CONST RwRIGHT_Tok = 103 (* = "RIGHT" *) 
+; CONST RwPRESENT_Tok = 104 (* = "PRESENT" *) 
+; CONST RwPREC_Tok = 105 (* = "PREC" *) 
+; CONST RwPLURAL_Tok = 106 (* = "PLURAL" *) 
+; CONST RwMEMBER_Tok = 107 (* = "MEMBER" *) 
+; CONST RwLDL_Tok = 108 (* = "LDL" *) 
+; CONST RwLEFT_Tok = 109 (* = "LEFT" *) 
+; CONST RwNONEMPTY_Tok = 110 (* = "NONEMPTY" *) 
+; CONST RwNONE_Tok = 111 (* = "NONE" *) 
+; CONST RwHORIZ_Tok = 112 (* = "HORIZ" *) 
+; CONST RwFILL_Tok = 113 (* = "FILL" *) 
+; CONST RwEND_Tok = 114 (* = "END" *) 
+; CONST CloseParen_Tok = 115 (* = ")" *) 
+; CONST OpenParen_Tok = 116 (* = "(" *) 
+; CONST At_Tok = 117 (* = "@" *) 
+; CONST Bang_Tok = 118 (* = "!" *) 
+; CONST Underscore_Tok = 119 (* = "_" *) 
+; CONST Arrow_Tok = 120 (* = "->" *) 
+; CONST DoubleStroke_Tok = 121 (* = "||" *) 
+; CONST Stroke_Tok = 122 (* = "|" *) 
+; CONST Equals_Tok = 123 (* = "=" *) 
+; CONST CloseBracePlus_Tok = 124 (* = "}+" *) 
+; CONST CloseBrace_Tok = 125 (* = "}" *) 
+; CONST OpenBrace_Tok = 126 (* = "{" *) 
+; CONST CloseBracket_Tok = 127 (* = "]" *) 
+; CONST OpenBracket_Tok = 128 (* = "[" *) 
+; CONST Semicolon_Tok = 129 (* = ";" *) 
+; CONST ColonColonEquals_Tok = 130 (* = "::=" *) 
+; CONST ColonEquals_Tok = 131 (* = ":=" *) 
+; CONST Dot_Tok = 132 (* = "." *) 
+; CONST Colon_Tok = 133 (* = ":" *) 
+
+(* VarTerms: 200 *) 
+
+; CONST Ident = 200
+; CONST Integer = 201
+; CONST String = 202
+
+(* AsFixedRules: 300 *) 
+
+; CONST AsClassRule = 301 
+; CONST AsFixedRule = 302
+; CONST AsOptChild = 303
+; CONST AsPlusRule = 304
+; CONST AsReqdChild = 305
+; CONST AsStarRule = 306
+; CONST AsVarTermRule = 307
+; CONST CsAltRule = 308
+; CONST CsFixedRule = 309
+; CONST CsOptChild = 310
+; CONST CsPlusRule = 311
+; CONST CsReqdChild = 312
+; CONST CsStarRule = 313
+; CONST DontCare = 314
+; CONST FsChildPlain = 315
+; CONST FsCondMember = 316
+; CONST FsCondNonempty = 317
+; CONST FsCondPlural = 318
+; CONST FsCondPresent = 319
+; CONST FsFillSubtree = 323
+; CONST FsFixedFillRule = 324
+; CONST FsFixedDefaultRule = 325
+; CONST FsFixedHorizRule = 326
+; CONST FsFixedVertRule = 327 
+; CONST FsDefaultSubtree = 328 
+; CONST FsHorizSubtree = 329 
+; CONST FsListFillRule = 330 
+; CONST FsListDefaultRule = 331 
+; CONST FsListHorizRule = 332 
+; CONST FsListVertRule = 333 
+; CONST FsVertSubtree = 334 
+; CONST LanguageDefinition = 335 
+; CONST LineBreak = 336 
+; CONST PrecLevelNone = 337
+; CONST PrecLevelLeft = 338 
+; CONST PrecLevelRight = 339 
+; CONST PrecRule = 340 
+; CONST StartRule = 341 
+
+(* Abstract list star nodes: 400 *) 
+
+; CONST AsChildList = 401
+; CONST Concatenation = 402 
+; CONST FormatterList = 403 
+; CONST FsFixedChildList = 404 
+; CONST PrecLevels = 406 
+; CONST RuleList = 407 
+; CONST CsAtomList = 408 
+
+(* Abstract list plus nodes: 500 *) 
+
+; CONST Alternation = 501 
+; CONST IdentPlusList = 502 
+
+(* Classes: 600 *) 
+
+; CONST AsChild = 601
+; CONST AsListRule = 602 
+; CONST AsRule = 603 
+; CONST CsChild = 604 
+; CONST CsListRule = 605 
+; CONST CsRule = 606 
+; CONST Formatter = 607 
+; CONST FsChild = 608 
+; CONST FsChildCondFmt = 609 
+; CONST FsFixedChild = 610 
+; CONST FsFixedRule = 611 
+; CONST FsListRule = 612 
+; CONST FsRule = 613 
+; CONST FsSubtree = 614 
+; CONST IdentOrDontCare = 615 
+; CONST PrecLevel = 616 
+; CONST Rule = 617 
+; CONST CsAtom = 618  
+
+(* Concrete fixed: 700 *)
+
+; CONST OptLabel = 701 
+; CONST OptHoriz = 702 
+
+(* Concrete star: 800 *) 
+
+(* Concrete plus: 900 *) 
+
+(* Concrete alternations: *) 
+
+; CONST CsChildCs = 1001
+; CONST CsOptChildCs = 1002
+
+(* Misc: 1100 *) 
+
+; CONST Ldl0 = 1101
+
+(* Names of children: 1200 *) 
+
+; CONST Alternatives = 1201
+; CONST Child = 1202 
+; CONST ChildClass = 1203 
+; CONST ChildName = 1204 
+; CONST Children = 1205 
+; CONST Class = 1206 
+; CONST ClassMembers = 1207 
+; CONST ClassName = 1208  
+; CONST ClosingName = 1209 
+; CONST Elements = 1210
+; CONST Formatters = 1211 
+; CONST IndentCode = 1212 
+; CONST LanguageName = 1213 
+; CONST Levels = 1214 
+; CONST Lhs = 1215 
+; CONST ListChild = 1216 
+; CONST Name = 1217 
+; CONST Operators = 1218 
+; CONST Parents = 1219 
+; CONST Rhs = 1220 
+; CONST Rules = 1221 
+; CONST Separators = 1222 
+; CONST StartName = 1223
+
+(* Names of strings: 1300 *) 
+
+; CONST Colon = 1300 
+; CONST Dot = 1301 
+; CONST ColonEquals = 1302 
+; CONST ColonColonEquals = 1303 
+; CONST Semicolon = 1304 
+; CONST OpenBracket = 1305 
+; CONST CloseBracket = 1306 
+; CONST OpenBrace = 1307 
+; CONST CloseBrace = 1308 
+; CONST CloseBracePlus = 1309 
+; CONST Equals = 1310 
+; CONST Stroke = 1311 
+; CONST DoubleStroke = 1312 
+; CONST Arrow = 1313 
+; CONST Underscore = 1314 
+; CONST Bang = 1315 
+; CONST At  = 1316 
+; CONST OpenParen = 1317 
+; CONST CloseParen = 1318 
+
+; CONST RwEND = 1360 
+; CONST RwFILL = 1361 
+; CONST RwHORIZ = 1362 
+; CONST RwNONE = 1363 
+; CONST RwNONEMPTY = 1364 
+; CONST RwLEFT = 1365 
+; CONST RwLDL = 1366 
+; CONST RwMEMBER = 1367  
+; CONST RwPLURAL = 1368 
+; CONST RwPREC = 1369  
+; CONST RwPRESENT = 1370 
+; CONST RwRIGHT = 1371  
+; CONST RwSTART = 1372 
+; CONST RwVARTERM = 1373 
+; CONST RwVERT = 1374 
+
+; PROCEDURE ToText ( Tok : LbeStd . TokTyp ) : TEXT 
+
+; END Ldl0Tok 
+. 
+

@@ -1,0 +1,152 @@
+
+(* -----------------------------------------------------------------------1- *)
+(* This file is part of the Scheutz semantic editor.                         *)
+(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* rodney.bates@wichita.edu                                                  *)
+(* Licensed under the Gnu Public License, version 2 or later.                *)
+(* -----------------------------------------------------------------------2- *)
+
+INTERFACE Ldl0Child  
+
+(* Initial, handwritten version of Ldl0Child, made to match
+   the initial abstract syntax of ldl0. *) 
+
+(* Entire language definition: *) 
+
+; CONST LanguageDefinition_LanguageName = 0 
+; CONST LanguageDefinition_Rules = 1
+; CONST LanguageDefinition_ClosingName = 2 
+
+; CONST RuleList_Element = 0 
+
+(* Start rule: *) 
+
+; CONST StartRule_StartName = 0 
+
+(* Variable terminals: *)   
+
+; CONST AsVarTermRule_Name = 0  
+
+(* Abstract syntax: *) 
+
+; CONST AsFixedRule_Parents = 0 
+; CONST AsFixedRule_Children = 1 
+
+; CONST AsChildList_Elements = 0 
+
+; CONST AsReqdChild_ChildName = 0 
+; CONST AsReqdChild_ChildClass = 1 
+
+; CONST AsOptChild_ChildName = 0 
+; CONST AsOptChild_ChildClass = 1 
+
+; CONST AsPlusRule_Parents = 0
+; CONST AsPlusRule_ChildName = 1 
+; CONST AsPlusRule_ChildClass = 2
+
+; CONST AsStarRule_Parents = 0
+; CONST AsStarRule_ChildName = 1 
+; CONST AsStarRule_ChildClass = 2
+
+; CONST AsClassRule_ClassName = 0 
+; CONST AsClassRule_ClassMembers = 1 
+
+; CONST IdentPlusList_Elements = 0 
+
+(* Concrete syntax: *) 
+
+; CONST CsAltRule_Lhs = 0 
+; CONST CsAltRule_Alternatives = 1 
+
+; CONST Alternation_Elements = 0 
+
+; CONST CsFixedRule_Lhs = 0 
+; CONST CsFixedRule_Rhs = 1 
+
+; CONST Concatenation_Elements = 0 
+
+; CONST CsOptChild_Child = 0 
+
+; CONST CsReqdChild_Child = 0 
+
+; CONST CsStarRule_Lhs = 0 
+; CONST CsStarRule_ListChild = 1 
+; CONST CsStarRule_Separators = 2 
+
+; CONST CsPlusRule_Lhs = 0 
+; CONST CsPlusRule_ListChild = 1 
+; CONST CsPlusRule_Separators = 2 
+
+; CONST CsStringList_Elements = 0 
+
+(* Precedence and associativity specification: *) 
+
+; CONST PrecRule_Levels = 0 
+
+; CONST PrecLevels_Elements = 0 
+
+; CONST PrecLevelNone_Operators = 0 
+
+; CONST PrecLevelLeft_Operators = 0 
+
+; CONST PrecLevelRight_Operators = 0 
+
+; CONST OperatorList_Elements = 0 
+
+(* Format Syntax Rules: *) 
+
+; CONST FsFixedDefaultRule_Parents = 0 
+; CONST FsFixedDefaultRule_Children = 1 
+
+; CONST FsFixedHorizRule_Parents = 0 
+; CONST FsFixedHorizRule_Children = 1 
+
+; CONST FsFixedVertRule_Parents = 0 
+; CONST FsFixedVertRule_Children = 1 
+
+; CONST FsFixedFillRule_Parents = 0 
+; CONST FsFixedFillRule_Children = 1 
+
+; CONST FsFixedChildList_Elements = 0 
+
+; CONST FormatterList_Elements = 0 
+
+; CONST LineBreak_IndentCode = 0 
+
+; CONST FsDefaultSubtree_Children = 0 
+; CONST FsHorizSubtree_Children = 0 
+
+; CONST FsVertSubtree_Children = 0 
+
+; CONST FsFillSubtree_Children = 0 
+
+; CONST FsChildPlain_ChildName = 0 
+; CONST FsChildPlain_ChildClass = 1 
+
+; CONST FsCondPresent_Children = 0 
+
+; CONST FsCondNonempty_Children = 0 
+
+; CONST FsCondPlural_Children = 0 
+
+; CONST FsCondMember_Class = 0 
+; CONST FsCondMember_Children = 1 
+
+; CONST FsListDefaultRule_Parents = 0 
+; CONST FsListDefaultRule_ListChild = 1 
+; CONST FsListDefaultRule_Formatters = 2 
+
+; CONST FsListHorizRule_Parents = 0 
+; CONST FsListHorizRule_ListChild = 1 
+; CONST FsListHorizRule_Formatters = 2 
+
+; CONST FsListVertRule_Parents = 0 
+; CONST FsListVertRule_ListChild = 1 
+; CONST FsListVertRule_Formatters = 2 
+
+; CONST FsListFillRule_Parents = 0 
+; CONST FsListFillRule_ListChild = 1 
+; CONST FsListFillRule_Formatters = 2 
+
+; END Ldl0Child 
+. 
