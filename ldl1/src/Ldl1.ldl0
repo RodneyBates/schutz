@@ -1,0 +1,842 @@
+
+(* -----------------------------------------------------------------------1- *)
+(* This file is part of the Schutz semantic editor.                         *)
+(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* rodney.bates@wichita.edu                                                  *)
+(* Licensed under the Gnu Public License, version 2 or later.                *)
+(* -----------------------------------------------------------------------2- *)
+
+
+(* Schutz semantic editor. 
+   Specification of the Language Definition Language LDL1,
+   second bootstrap version, expressed in LDL0.
+*)
+
+ LDL Ldl1
+
+  RwVERT = "VERT" .
+  RwVARTERM = "VARTERM" .
+  RwSTART = "START" .
+  RwRIGHT = "RIGHT" .
+  RwPRESENT = "PRESENT" .
+  RwPREC = "PREC" .
+  RwPLURAL = "PLURAL" .
+  RwNONPLURAL = "NONPLURAL" .
+  RwMEMBER = "MEMBER" .
+  RwLDL = "LDL" .
+  RwLEFT = "LEFT" .
+  RwNONEMPTY = "NONEMPTY" .
+  RwNONE = "NONE" .
+  RwHORIZ = "HORIZ" .
+  RwFILL = "FILL" .
+  RwEND = "END" .
+  RwBUILD = "BUILD" .
+  RwCASE = "CASE" .
+  RwOF = "OF" .
+  RwELSE = "ELSE" .
+  RwABSENT = "ABSENT" .
+  RwEMPTY = "EMPTY" .
+  RwINDENT = "INDENT" .
+  RwINLINE = "INLINE" .
+  RwNIL = "NIL" .
+  RwVERSION = "VERSION" .
+  RwSUFFIXES = "SUFFIXES" .
+  RwNOPARSE = "NOPARSE" . 
+  CloseParen = ")" .
+  OpenParen = "(" .
+  At = "@" .
+  Bang = "!" .
+  Dollar = "$" .
+  Circumflex = "^" .
+  Plus = "+" .
+  Minus = "-" .
+  Underscore = "_" .
+  Arrow = "->" .
+  ArrowStar = "->*" .
+  DoubleStroke = "||" .
+  TripleStroke = "|||" .
+  Stroke = "|" .
+  Equals = "=" .
+(*CloseBracePlus = "}+" . *)
+  CloseBrace = "}" .
+  OpenBrace = "{" .
+  CloseBracket = "]" .
+  OpenBracket = "[" .
+  Semicolon = ";" .
+  ColonColonEquals = "::=" .
+  ColonColonEqualsStar = "::=*" .
+  ColonColonEqualsPlus = "::=+" .
+  ColonColonEqualsPlusPlus = "::=++" .
+  ColonColon = "::" .
+  ColonColonPlus = "::+" .
+  ColonColonStar = "::*" .
+  Dot = "." .
+  Comma = "," .
+  Colon = ":" .
+
+(* The abstract syntax of Ldl1: *)
+
+(* Abstract Syntax of Entire language definition. *)
+
+  START LanguageDefinition .
+
+  LanguageDefinition
+    := LanguageName : Ident
+       ; Version : [ IntPlusList ] 
+       ; Rules : RuleList
+       ; ClosingName : Ident
+    .
+
+  IntPlusList := { Integer }+ .
+
+  Ident VARTERM .
+
+  String VARTERM .
+
+  Integer VARTERM .
+
+  RuleList := Elements : { Rule } .
+
+  Rule = StartRule | CsRule | PrecRule | AsRule | FsRule .
+
+(* Abstract Syntax of Start symbol specification: *)
+
+  StartRule := StartName : Ident ; Suffixes : [ StringPlusList ] .
+
+  StringPlusList := { String }+ .
+
+(* Abstract Syntax of Abstract Syntax Rules: *)
+  AsRule 
+    = AsVarTermRule | AsFixedRule | AsListRule | AsClassRule | AsCsClassRule .
+
+  AsVarTermRule := Name : Ident .
+
+  AsFixedRule := Parents : IdentPlusList ; Children : AsChildList .
+
+  AsChildList := Elements : { AsChild } .
+
+  AsChild = AsReqdChild | AsOptChild .
+
+  AsReqdChild | AsOptChild := ChildName : [ Ident ] ; ChildClass : AsClass .
+
+  AsClass = Ident | Alternation .
+
+  AsListRule = AsStarRule | AsPlusRule  .
+
+  AsStarRule | AsPlusRule  
+    := Parents : IdentPlusList ; ChildName : [ Ident ] ; ChildClass : AsClass
+    .
+
+  AsClassRule | AsCsClassRule 
+    := ClassName : Ident ; ClassMembers : Alternation .
+
+  IdentPlusList := Elements : { Ident }+ .
+
+(* Abstract Syntax of Productions of concrete syntax: *)
+
+  CsRule = CsFixedRule | CsListRule | CsAltRule .
+
+  CsAltRule := Lhs : Ident ; Build : [ Ident ] ; Alternatives : Alternation .
+(* NOTE: ^This should require the alternation be plural, to avoid generated-
+         grammar ambiguity with a CsFixed rule with singleton RHS.  But we
+         have no way to do this in Ldl0. 
+*) 
+
+
+(* TODO: Can't we use CsAtomPlusList in place of Alternation? *) 
+  Alternation := Elements : { CsAtom }+ .
+
+  CsFixedRule := Lhs : Ident ; Build : [ Ident ] ; Rhs : Concatenation .
+
+  Concatenation := Elements : { CsChild } .
+
+  CsChild = CsReqdChild | CsOptChild .
+
+  CsReqdChild = CsAtom | Nil .
+
+  CsOptChild = Concatenation .
+
+  CsListRule 
+    = CsStarRule | CsPlusRule | CsPluralRule 
+      | CsStarTrailRule | CsPlusTrailRule | CsPluralTrailRule .
+
+  CsStarRule | CsPlusRule | CsPluralRule 
+    := Lhs : Ident
+       ; Build : [ Ident ]
+       ; ListChild : CsAtom
+       ; Separators : [ CsAtomPlusList ]
+    .
+
+  CsStarTrailRule | CsPlusTrailRule | CsPluralTrailRule 
+    := Lhs : Ident
+       ; Build : [ Ident ]
+       ; ListChild : CsAtom
+       ; Separators : CsAtomPlusList 
+    .
+
+  CsAtomPlusList := Elements : { CsAtom }+ .
+
+  CsAtom 
+    = Ident | String (* A delimiter, i.e. terminal with fixed spelling. *)
+    .
+
+  Nil := .
+
+(* Abstract Syntax of Precedence and associativity specification: *)
+
+  PrecRule := Levels : PrecLevels .
+
+  PrecLevels := Elements : { PrecLevel } .
+
+  PrecLevel = PrecLevelNone | PrecLevelLeft | PrecLevelRight .
+
+  PrecLevelNone | PrecLevelLeft | PrecLevelRight := Operators : [ CsAtomPlusList ] .
+
+(* Abstract Syntax of Format Syntax Rules: *)
+
+  FsRule = FsFixedRule | FsInlineRule | FsListRule .
+
+  FsFixedRule
+    = FsFixedDefaultRule | FsFixedHorizRule | FsFixedVertRule | FsFixedFillRule
+    .
+
+  FsFixedDefaultRule | FsFixedHorizRule | FsFixedVertRule | FsFixedFillRule
+    := Parents : IdentPlusList ; Children : FsFixedChildList
+    .
+
+  FsInlineRule := Name : Ident ; Children : FsFixedChildList .
+
+  FsFixedChildList := Elements : { FsFixedChild } .
+
+  FsFixedChild = FsChild | LineBreak | Indenter | String .
+
+  FormatterList := Elements : { Formatter } .
+
+  Formatter = LineBreak | Indenter | Ident | String .
+
+  LineBreak := .
+
+  Indenter
+    = BolIndenter | ParentIndenter | PosIndenter | BolPlusIndenter
+      | ParentPlusIndenter | PosPlusIndenter | BolMinusIndenter
+      | ParentMinusIndenter | PosMinusIndenter
+    .
+
+  BolIndenter | ParentIndenter | PosIndenter := IndentCode : [ Integer ] .
+
+  BolPlusIndenter
+  | ParentPlusIndenter
+  | PosPlusIndenter
+  | BolMinusIndenter
+  | ParentMinusIndenter
+  | PosMinusIndenter
+    := IndentCode : Integer
+    .
+
+  FsSubtree
+    = FsDefaultSubtree | FsHorizSubtree | FsVertSubtree | FsFillSubtree
+    .
+
+  FsSubtreeChild = FsFixedChildList | FsCondFmt .
+
+  FsDefaultSubtree 
+    := Children : FsFixedChildList 
+    .
+
+  FsHorizSubtree | FsVertSubtree | FsFillSubtree
+    := Children : FsSubtreeChild
+    .
+
+  FsChild = FsChildPlain | FsSubtree | FsCondFmt | FsChildCase .
+
+  FsChildPlain
+    := ChildName : [ Ident ]
+       ; ChildIndenter : [ Indenter ]
+       ; ChildClass : FsClass
+    .
+
+  IdentOrDontCare = Ident | DontCare .
+  FsClass = IdentOrDontCare | Alternation .
+
+  DontCare := . 
+
+  FsNoParse := . 
+
+  FsCondFmt 
+    = FsCondAbsent | FsCondPresent | FsCondEmpty | FsCondNonempty 
+      | FsCondPlural | FsCondNonplural | FsCondMember 
+    .
+
+  FsCondFmtList := Elements : { FsCondFmt }+ .
+
+  FsCondAbsent
+  | FsCondPresent
+  | FsCondEmpty
+  | FsCondNonempty
+  | FsCondPlural
+  | FsCondNonplural
+  | FsCondElse 
+    := NoParse : [ FsNoParse ] ; Children : FsFixedChildList
+    .
+
+  FsCondMember 
+     := NoParse : [ FsNoParse ] ; Class : Ident ; Children : FsFixedChildList .
+
+  FsChildCase
+    := EstChild : FsChildPlain
+       ; Alternatives : FsCondFmtList
+       ; Else : [ FsCondElse ]  
+    .
+
+  FsListRule
+    = FsListDefaultRule | FsListHorizRule | FsListVertRule | FsListFillRule
+      | FsListTrailDefaultRule | FsListTrailHorizRule 
+      | FsListTrailVertRule | FsListTrailFillRule
+    .
+
+  FsListDefaultRule | FsListHorizRule | FsListVertRule | FsListFillRule
+    := Parents : IdentPlusList
+       ; ListChild : FsChild 
+       ; Formatters : [ FormatterList ] 
+    .
+
+  FsListTrailDefaultRule | FsListTrailHorizRule 
+  | FsListTrailVertRule | FsListTrailFillRule
+    := Parents : IdentPlusList
+       ; ListChild : FsChild 
+       ; Formatters : FormatterList  
+    .
+
+
+(* The Concrete Syntax of Ldl1: *)
+
+(* Concrete Syntax of Entire language definition. *)
+
+  LanguageDefinition
+    ::=   "LDL" Ident [ "VERSION" IntPlusList ] RuleList "END" Ident .
+
+  IntPlusList ::= { Integer || "." }+ .
+
+  RuleList ::= { Rule } .
+
+(* Concrete Syntax of Start symbol specification: *)
+
+  StartRule ::= "START" Ident [ "SUFFIXES" StringPlusList ] "." .
+
+  StringPlusList ::= { String || "," }+ .
+
+(* Concrete Syntax of Abstract Syntax Rules: *)
+
+  AsVarTermRule ::= Ident "VARTERM" "." .
+
+  AsFixedRule ::= IdentPlusList "::" AsChildList "." .
+
+  AsChildList ::= { AsChild || ";" } .
+
+  AsReqdChild ::= [ Ident ":" ] Ident .
+  AsReqdChild ::= [ Ident ":" ] "{" Alternation "}" .
+
+  AsOptChild ::= [ Ident ":" ] "[" Ident "]" .
+  AsOptChild ::= [ Ident ":" ] "[" "{" Alternation "}" "]" .
+
+  AsStarRule ::= IdentPlusList "::*" [ Ident ":" ] Ident "." .
+  AsStarRule ::= IdentPlusList "::*" [ Ident ":" ] "{" Alternation "}" "." .
+
+  AsPlusRule ::= IdentPlusList "::+" [ Ident ":" ] Ident "." .
+  AsPlusRule ::= IdentPlusList "::+" [ Ident ":" ] "{" Alternation "}" "." .
+
+  AsClassRule ::= Ident "=" Alternation "." .
+  AsCsClassRule ::= Ident "=" "::=" Alternation "." .
+
+  IdentPlusList ::= { Ident || "|" }+ .
+
+(* Concrete Syntax of Productions of concrete syntax: *)
+
+  CsAltRule ::= Ident [ "BUILD" Ident ] "::=" Alternation "." .
+(* FIX: ^This should only parse when the Alternation is plural, to avoid
+         ambiguity with a CsFixed rule with singleton RHS.
+*) 
+
+  Alternation ::= { CsAtom || "|" }+ .
+
+  CsFixedRule ::= Ident [ "BUILD" Ident ] "::=" Concatenation "." .
+
+  Concatenation ::= { CsChildCs } .
+
+  CsChildCs ::= CsReqdChild | CsOptChildCs .   
+(* CHECK: Is there any reason not to make this and all Cs Alt rules
+          into As Class rules, as follows:?  
+          The only thing this would do, I think, is create a class
+          name that is not reachable in the abstract syntax.  But
+          why should that matter? 
+    CsChildCs = CsReqdChild | CsOptChildCs .
+*)
+
+  CsOptChildCs ::= "[" Concatenation "]" .
+
+  CsStarRule 
+    ::= Ident [ "BUILD" Ident ] "::=*" CsAtom [ "||" CsAtomPlusList ] "." .
+  CsPlusRule 
+    ::= Ident [ "BUILD" Ident ] "::=+" CsAtom [ "||" CsAtomPlusList ] "." .
+  CsPluralRule 
+    ::= Ident [ "BUILD" Ident ] "::=++" CsAtom [ "||" CsAtomPlusList ] "." .
+
+  CsStarTrailRule 
+    ::= Ident [ "BUILD" Ident ] "::=*" CsAtom "|||" CsAtomPlusList "." .
+  CsPlusTrailRule 
+    ::= Ident [ "BUILD" Ident ] "::=+" CsAtom "|||" CsAtomPlusList "." .
+  CsPluralTrailRule 
+    ::= Ident [ "BUILD" Ident ] "::=++" CsAtom "|||" CsAtomPlusList "." .
+
+  CsAtomPlusList ::= { CsAtom }+ .
+
+  Nil ::= "NIL" .
+
+(* Concrete Syntax of Precedence and associativity specification: *)
+
+  PrecRule ::= "PREC" PrecLevels "." .
+
+  PrecLevels ::= { PrecLevel } .
+
+  PrecLevelNone ::= "NONE" [ CsAtomPlusList ] .
+  PrecLevelLeft ::= "LEFT" [ CsAtomPlusList ] .
+  PrecLevelRight ::= "RIGHT" [ CsAtomPlusList ] .
+
+(* Concrete Syntax of Format Syntax Rules: *)
+
+  FsFixedDefaultRule ::= IdentPlusList "->" FsFixedChildList "." .
+  FsFixedHorizRule ::= IdentPlusList "HORIZ" "->" FsFixedChildList "." .
+  FsFixedVertRule ::= IdentPlusList "VERT" "->" FsFixedChildList "." .
+  FsFixedFillRule ::= IdentPlusList "FILL" "->" FsFixedChildList "." .
+
+  FsInlineRule ::= "INLINE" Ident "->" FsFixedChildList "." .
+
+  FsFixedChildList ::= { FsFixedChild } .
+
+  FormatterList ::= { Formatter } .
+
+  DontCare ::= "_" .
+
+  FsNoParse ::= "NOPARSE" .
+
+  LineBreak ::= "!" .
+
+  BolIndenter ::= "^" [ Integer ] .
+  ParentIndenter ::= "@" [ Integer ] .
+  PosIndenter ::= "$" [ Integer ] .
+  BolPlusIndenter ::= "^" "+" Integer .
+  ParentPlusIndenter ::= "@" "+" Integer .
+  PosPlusIndenter ::= "$" "+" Integer .
+  BolMinusIndenter ::= "^" "-" Integer .
+  ParentMinusIndenter ::= "@" "-" Integer .
+  PosMinusIndenter ::= "$" "-" Integer .
+
+  FsDefaultSubtree ::= "(" FsFixedChildList ")" .
+  FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")" .
+  FsVertSubtree ::= "VERT" "(" FsFixedChildList ")" .
+  FsFillSubtree ::= "FILL" "(" FsFixedChildList ")" .
+
+  FsHorizSubtree ::= "HORIZ" FsCondFmt .
+  FsVertSubtree ::= "VERT" FsCondFmt .
+  FsFillSubtree ::= "FILL" FsCondFmt .
+
+  FsChildPlain ::= [ Ident ":" ] [ "INDENT" Indenter ] IdentOrDontCare .
+  FsChildPlain ::= [ Ident ":" ] [ "INDENT" Indenter ] "{" Alternation "}" .
+
+  FsCondAbsent ::= "ABSENT" [ FsNoParse ] "(" FsFixedChildList ")" .
+  FsCondPresent ::= "PRESENT" [ FsNoParse ] "(" FsFixedChildList ")" .
+  FsCondEmpty ::= "EMPTY" [ FsNoParse ] "(" FsFixedChildList ")" .
+  FsCondNonempty ::= "NONEMPTY" [ FsNoParse ] "(" FsFixedChildList ")" .
+  FsCondPlural ::= "PLURAL" [ FsNoParse ] "(" FsFixedChildList ")" .
+  FsCondNonplural ::= "NONPLURAL" [ FsNoParse ] "(" FsFixedChildList ")" .
+  FsCondMember ::= "MEMBER" [ FsNoParse ] Ident "(" FsFixedChildList ")" .
+
+  FsCondElse ::= "ELSE" [ FsNoParse ] FsFixedChildList .
+
+  FsCondFmtList ::= { FsCondFmt || "|" }+ .
+
+  FsChildCase
+    ::= "CASE" FsChildPlain "OF" FsCondFmtList [ FsCondElse ] "END"
+  .
+
+  FsListDefaultRule ::= IdentPlusList "->*" FsChild [ "||" FormatterList ] "." .
+  FsListHorizRule
+    ::= IdentPlusList "HORIZ" "->*" FsChild [ "||" FormatterList ] "." .
+  FsListVertRule
+    ::= IdentPlusList "VERT" "->*" FsChild [ "||" FormatterList ] "." .
+  FsListFillRule
+    ::= IdentPlusList "FILL" "->*" FsChild [ "||" FormatterList ] "." .
+
+  FsListTrailDefaultRule 
+    ::= IdentPlusList "->*" FsChild "|||" FormatterList "." .
+  FsListTrailHorizRule
+    ::= IdentPlusList "HORIZ" "->*" FsChild "|||" FormatterList "." .
+  FsListTrailVertRule
+    ::= IdentPlusList "VERT" "->*" FsChild "|||" FormatterList "." .
+  FsListTrailFillRule
+    ::= IdentPlusList "FILL" "->*" FsChild "|||" FormatterList "." .
+
+(* The Format syntax of Ldl1: *)
+
+(* Format Syntax of Entire language definition. *)
+
+  LanguageDefinition
+    -> VERT "LDL"
+            LanguageName : Ident
+            PRESENT ( "VERSION" IntPlusList )
+            ! @ 1
+            Rules : RuleList
+            !
+            "END"
+            ClosingName : Ident
+    .
+
+  IntPlusList -> FILL { Integer || ! "." } .
+
+  RuleList -> VERT { Rule || ! } .
+
+(* Format Syntax of Start symbol specification: *)
+
+  StartRule
+    -> HORIZ
+         "START"
+         StartName : Ident
+         ! @ 2
+         PRESENT ( "SUFFIXES" StringPlusList )
+         ! @ 2
+         "."
+    .
+
+  StringPlusList -> FILL { String || ! "," } .
+
+(* Format Syntax of Abstract Syntax Rules: *)
+
+  AsVarTermRule -> HORIZ Name : Ident ! @ 2 "VARTERM" "." .
+
+  AsFixedRule -> HORIZ IdentPlusList ! @ 2 "::" AsChildList ! @ 2 "." .
+
+  AsChildList -> HORIZ { AsChild || ! ";" } .
+
+  AsReqdChild
+    -> HORIZ
+         PRESENT ( Ident ":" ) ! @ 2 MEMBER Alternation ( "{" AsClass "}" )
+    .
+
+  AsOptChild
+    -> HORIZ
+         PRESENT ( Ident ":" )
+         ! @ 2
+         "["
+         MEMBER Alternation ( "{" AsClass "}" )
+         "]"
+    .
+
+  AsStarRule
+    -> HORIZ
+         IdentPlusList
+         ! @ 2 "::*"
+         HORIZ
+           ( PRESENT ( Ident ":" ) ! @ 2 MEMBER Alternation ( "{" AsClass "}" )
+           )
+         ! @ 2 "."
+    .
+
+  AsPlusRule
+    -> HORIZ
+         IdentPlusList
+         ! @ 2 "::+"
+         HORIZ
+           ( PRESENT ( Ident ":" ) ! @ 2 MEMBER Alternation ( "{" AsClass "}" )
+           )
+         ! @ 2 "."
+
+    .
+
+  AsClassRule -> HORIZ Ident ! @ 2 "=" Alternation ! @ 2 "." .
+  AsCsClassRule -> HORIZ Ident ! @ 2 "=" "::=" Alternation ! @ 2 "." .
+
+  IdentPlusList -> HORIZ { Ident || ! "|" } .
+
+(* Format Syntax of Productions of concrete syntax: *)
+
+  CsAltRule
+    -> HORIZ
+           Ident
+         HORIZ ( PRESENT ( ! @ 2 "BUILD" Ident ) )
+         ! @ 2
+         "::="
+           PLURAL ( Alternation ) 
+(* NOTE: ^This should require the alternation be plural, to avoid generated-
+         grammar ambiguity with a CsFixed rule with singleton RHS.  A NOPARSE
+         on an ELSE here would do it, but we don't have NOPARSE in Ldl0. 
+*) 
+         "."
+    .
+
+  Alternation -> FILL { CsAtom || ! "|" } .
+
+  CsFixedRule
+    -> HORIZ
+           Ident
+         HORIZ ( PRESENT ( ! @ 2 "BUILD" Ident ) )
+         ! @ 2
+         "::="
+           Concatenation
+         "."
+    .
+
+  Concatenation -> HORIZ { MEMBER Concatenation ( "[" CsChild "]" ) || ! } .
+
+  Nil -> HORIZ "NIL" .
+
+  CsStarRule
+    -> HORIZ
+           Ident
+         HORIZ ( PRESENT ( ! @ 2 "BUILD" Ident ) )
+         ! @ 2
+         "::=*"
+         HORIZ ( CsAtom PRESENT ( ! @ 3 "||" CsAtomPlusList ) ! )
+         "."
+    .
+
+  CsPlusRule
+    -> HORIZ
+           Ident
+         HORIZ ( PRESENT ( ! @ 2 "BUILD" Ident ) )
+         ! @ 2
+         "::=+"
+         HORIZ ( CsAtom PRESENT ( ! @ 3 "||" CsAtomPlusList ) ! )
+         "."
+    .
+
+  CsPluralRule
+    -> HORIZ
+           Ident
+         HORIZ ( PRESENT ( ! @ 2 "BUILD" Ident ) )
+         ! @ 2
+         "::=++"
+         HORIZ ( CsAtom PRESENT ( ! @ 3 "||" CsAtomPlusList ) ! )
+         "."
+    .
+
+  CsStarTrailRule
+    -> HORIZ
+           Ident
+         HORIZ ( PRESENT ( ! @ 2 "BUILD" Ident ) )
+         ! @ 2
+         "::=*"
+         HORIZ ( CsAtom ! @ 3 "|||" CsAtomPlusList ! )
+         "."
+    .
+
+  CsPlusTrailRule
+    -> HORIZ
+           Ident
+         HORIZ ( PRESENT ( ! @ 2 "BUILD" Ident ) )
+         ! @ 2
+         "::=+"
+         HORIZ ( CsAtom ! @ 3 "|||" CsAtomPlusList ! )
+         "."
+    .
+
+  CsPluralTrailRule
+    -> HORIZ
+           Ident
+         HORIZ ( PRESENT ( ! @ 2 "BUILD" Ident ) )
+         ! @ 2
+         "::=++"
+         HORIZ ( CsAtom ! @ 3 "|||" CsAtomPlusList ! )
+         "."
+    .
+
+  CsAtomPlusList -> HORIZ { CsAtom } .
+
+(* Format Syntax of Precedence and associativity specification: *)
+
+  PrecRule -> VERT "PREC" PrecLevels ! "." .
+
+  PrecLevels -> VERT { PrecLevel } .
+
+  PrecLevelNone -> HORIZ "NONE" PRESENT ( CsAtomPlusList ) .
+  PrecLevelLeft -> HORIZ "LEFT" PRESENT ( CsAtomPlusList ) .
+  PrecLevelRight -> HORIZ "RIGHT" PRESENT ( CsAtomPlusList ) .
+
+(* Format Syntax of Format Syntax Rules: *)
+
+  FsFixedDefaultRule
+    -> HORIZ
+           IdentPlusList ! @ 2 "->" FsFixedChildList ! @ 2 "."
+    .
+
+  FsFixedHorizRule
+    -> HORIZ
+           IdentPlusList ! @ 2 "HORIZ" "->" FsFixedChildList ! @ 2 "."
+    .
+
+  FsFixedVertRule
+    -> HORIZ
+           IdentPlusList ! @ 2 "VERT" "->" FsFixedChildList ! @ 2 "."
+    .
+
+  FsFixedFillRule
+    -> HORIZ
+           IdentPlusList ! @ 2 "FILL" "->" FsFixedChildList ! @ 2 "."
+    .
+
+  FsInlineRule -> HORIZ "INLINE" Ident ! @ 2 "->" FsFixedChildList ! @ 2 "." .
+
+  FsFixedChildList -> HORIZ { FsFixedChild || ! } .
+
+  FormatterList -> HORIZ { Formatter || ! } .
+
+  LineBreak -> HORIZ "!" .
+
+  BolIndenter -> HORIZ "^" PRESENT ( Integer ) .
+  ParentIndenter -> HORIZ "@" PRESENT ( Integer ) .
+  PosIndenter -> HORIZ "$" PRESENT ( Integer ) .
+  BolPlusIndenter -> HORIZ "^" "+" Integer .
+  ParentPlusIndenter -> HORIZ "@" "+" Integer .
+  PosPlusIndenter -> HORIZ "$" "+" Integer .
+  BolMinusIndenter -> HORIZ "^" "-" Integer .
+  ParentMinusIndenter -> HORIZ "@" "-" Integer .
+  PosMinusIndenter -> HORIZ "$" "-" Integer .
+
+  FsDefaultSubtree -> HORIZ "(" FsFixedChildList ! ")" .
+  FsHorizSubtree
+    -> HORIZ
+         "HORIZ" ! @ 2 MEMBER FsFixedChildList ( "(" FsSubtreeChild ! @ 2 ")" )
+    .
+  FsVertSubtree
+    -> HORIZ
+         "VERT" ! @ 2 MEMBER FsFixedChildList ( "(" FsSubtreeChild ! @ 2 ")" )
+    .
+  FsFillSubtree
+    -> HORIZ
+         "FILL" ! @ 2 MEMBER FsFixedChildList ( "(" FsSubtreeChild ! @ 2 ")" )
+    .
+
+  FsChildPlain
+    -> HORIZ
+         PRESENT ( Ident ":" )
+         ! @ 2
+         PRESENT ( "INDENT" Indenter )
+         ! @ 2
+         MEMBER Alternation ( "{" FsClass "}" )
+    .
+
+  DontCare -> HORIZ "_" .
+
+  FsNoParse -> HORIZ "NOPARSE" . 
+
+  FsCondAbsent 
+    -> HORIZ "ABSENT" FsNoParse ! @ 2 "(" FsFixedChildList ! @ 2 ")" .
+  FsCondPresent 
+    -> HORIZ "PRESENT" FsNoParse ! @ 2 "(" FsFixedChildList ! @ 2 ")" .
+  FsCondEmpty 
+    -> HORIZ "EMPTY" FsNoParse ! @ 2 "(" FsFixedChildList ! @ 2 ")" .
+  FsCondNonempty 
+    -> HORIZ "NONEMPTY" FsNoParse ! @ 2 "(" FsFixedChildList ! @ 2 ")" .
+  FsCondPlural 
+    -> HORIZ "PLURAL" FsNoParse ! @ 2 "(" FsFixedChildList ! @ 2 ")" .
+  FsCondNonplural 
+    -> HORIZ "NONPLURAL" FsNoParse ! @ 2 "(" FsFixedChildList ! @ 2 ")" .
+  FsCondMember 
+    -> HORIZ "MEMBER" FsNoParse Ident ! @ 2 "(" FsFixedChildList ! @ 2 ")" .
+  FsCondElse  
+    -> HORIZ "ELSE" FsNoParse ! @ 2 FsFixedChildList .
+
+  FsCondFmtList -> HORIZ { Elements : FsCondFmt || ! "|" } .
+
+  FsChildCase
+    -> HORIZ
+         "CASE"
+           FsChildPlain
+         !
+         "OF"
+           FsCondFmtList
+         PRESENT ( ! FsCondElse )
+         !
+         "END"
+    .
+
+  FsListDefaultRule
+    -> HORIZ
+           IdentPlusList
+         HORIZ ( ! @ 2 "->*"
+                 HORIZ ( ! @ 4 FsChild PRESENT ( "||" FormatterList ) ) 
+               ) 
+         ! @ 2
+         "."
+    .
+
+  FsListHorizRule
+    -> HORIZ
+           IdentPlusList
+         HORIZ ( ! @ 2 "HORIZ" "->*"
+                 HORIZ ( ! @ 4 FsChild PRESENT ( "||" FormatterList ) )
+               ) 
+         ! @ 2
+         "."
+    .
+
+  FsListVertRule
+    -> HORIZ
+           IdentPlusList
+         HORIZ ( ! @ 2 "VERT" "->*"
+                  HORIZ ( ! @ 4 FsChild PRESENT ( "||" FormatterList ) ) 
+               ) 
+         ! @ 2
+         "."
+    .
+
+  FsListFillRule
+    -> HORIZ
+           IdentPlusList
+         HORIZ ( ! @ 2 "FILL" "->*"
+                 HORIZ ( ! @ 4 FsChild PRESENT ( "||" FormatterList ) ) 
+               ) 
+         ! @ 2
+         "."
+    .
+
+  FsListTrailDefaultRule
+    -> HORIZ
+           IdentPlusList
+         HORIZ ( ! @ 2 "->*"
+                 HORIZ ( ! @ 4 FsChild "|||" FormatterList ) 
+               ) 
+         ! @ 2
+         "."
+    .
+
+  FsListTrailHorizRule
+    -> HORIZ
+           IdentPlusList
+         HORIZ ( ! @ 2 "HORIZ" "->*"
+                 HORIZ ( ! @ 4 FsChild  "|||" FormatterList )
+               ) 
+         ! @ 2
+         "."
+    .
+
+  FsListTrailVertRule
+    -> HORIZ
+           IdentPlusList
+         HORIZ ( ! @ 2 "VERT" "->*"
+                  HORIZ ( ! @ 4 FsChild "|||" FormatterList ) 
+               ) 
+         ! @ 2
+         "."
+    .
+
+  FsListTrailFillRule
+    -> HORIZ
+           IdentPlusList
+         HORIZ ( ! @ 2 "FILL" "->*"
+                 HORIZ ( ! @ 4 FsChild "|||" FormatterList ) 
+               ) 
+         ! @ 2
+         "."
+    .
+
+ END Ldl1
