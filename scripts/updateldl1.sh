@@ -8,7 +8,7 @@
 
 # File updateldl1.sh, subdirectory scripts, Schutz Semantic editor. 
 
-# Copy various generated files for ldl0 to places they will be sought. 
+# Copy various generated files for language ldl1 to places they will be sought. 
 
 echo "========================================================================"
 echo "  Copy various generated files to where they will be sought." 
