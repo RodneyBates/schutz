@@ -7,7 +7,8 @@
 ## -----------------------------------------------------------------------2- ##
 
 # File setpm3.sh, subdirectory scripts, Schutz Semantic editor. 
-# setup to use PM3 compiler 
+
+# Setup to use PM3 compiler. 
 
 source ../sethostdep.sh 
 

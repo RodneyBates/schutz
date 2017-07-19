@@ -6,11 +6,17 @@
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
 
-# File setcm3.sh, subdirectory scripts, Schutz Semantic editor. 
+# File topm3.sh, subdirectory scripts, Schutz Semantic editor. 
 
-# Setup to use CM3 compiler. 
+# Change things to build with PM3
 
-source ../sethostdep.sh 
+rm -f ../setCompiler.sh
+ln -s ./scripts/setpm3.sh ../setCompiler.sh
+echo "Compiler for script commands set to PM3"
 
-M3C="cm3"
-
+./topickle.sh 
+echo "Pickle imports set to 'Pickle'."
+./removecompiled.sh 
+echo "Compiled files removed."
+./copynilpickles.sh
+echo "NIL pickles copied." 

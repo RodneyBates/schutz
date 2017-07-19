@@ -6,11 +6,13 @@
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
 
-# File setcm3.sh, subdirectory scripts, Schutz Semantic editor. 
+# File removecompiled.sh, subdirectory scripts, Schutz Semantic editor. 
 
-# Setup to use CM3 compiler. 
+# Remove all compiled code. 
 
-source ../sethostdep.sh 
+source ../setCompiler.sh 
 
-M3C="cm3"
-
+rm -fr ../ldlboot/$TARGET
+rm -fr ../ldlbatch/$TARGET
+rm -fr ../edit/$TARGET
+rm -fr ../schutzcommon/$TARGET

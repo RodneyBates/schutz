@@ -6,11 +6,24 @@
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
 
-# File setcm3.sh, subdirectory scripts, Schutz Semantic editor. 
+# File veryclean.sh, subdirectory scripts, Schutz Semantic editor.
 
-# Setup to use CM3 compiler. 
+# Reset to an original state, ready for fullboot.sh
 
-source ../sethostdep.sh 
+source ../setCompiler.sh 
 
-M3C="cm3"
+cd ..
+rm -fr ldlboot/$TARGET
+rm -fr ldlbatch/$TARGET
+rm -fr edit/$TARGET
 
+rm -fr common/derived
+rm -fr ldl0/derived
+rm -fr ldl1/derived
+rm -fr m3/derived
+rm -fr ldlbatch/derived
+rm -fr edit/derived
+
+rm -fr boot
+
+cd scripts 

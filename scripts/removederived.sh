@@ -6,11 +6,13 @@
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
 
-# File setcm3.sh, subdirectory scripts, Schutz Semantic editor. 
+# File removederived.sh, subdirectory scripts, Schutz Semantic editor.
 
-# Setup to use CM3 compiler. 
+# Remove all derived directories and their contents.
 
-source ../sethostdep.sh 
-
-M3C="cm3"
-
+rm -fr ../common/derived
+rm -fr ../ldl0/derived
+rm -fr ../ldl1/derived
+rm -fr ../m3/derived
+rm -fr ../edit/derived
+rm -fr ../ldlbatch/derived
