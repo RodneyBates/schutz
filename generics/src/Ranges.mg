@@ -3,8 +3,8 @@
 (* File Ranges.mg                                                            *)
 (* Modula-3 source code.                                                     *)
 (* Copyright 2013, Rodney M. Bates.                                          *)
-(* (* rodney.m.bates@acm.org                                                      *)
-(* Licensed under the MIT License.                                                                      *) 
+(* rodney.m.bates@acm.org                                                    *)
+(* Licensed under the MIT License.                                           *) 
 (* -----------------------------------------------------------------------2- *)
 
 GENERIC MODULE Ranges ( ) 

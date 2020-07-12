@@ -1,9 +1,9 @@
   
 (* -----------------------------------------------------------------------1- *)
 (* File OrdSets.ig  Modula-3 source code.                                    *)
-(* Copyright 2010 .. 2012, Rodney M. Bates.                                  *)
-(* rbates@acm.org                                                            *)
-(* Licensed under the MIT License.                                           *)
+(* Copyright 2010 .. 2016, Rodney M. Bates.                                  *)
+(* rodney.m.bates@acm.org                                                    *)
+(* Licensed under the MIT License.                                           *) 
 (* -----------------------------------------------------------------------2- *)
 
 GENERIC INTERFACE OrdSets ( Element ) 
@@ -13,7 +13,7 @@ GENERIC INTERFACE OrdSets ( Element )
                      FIRST (INTEGER) <= ORD (FIRST (T)) 
                      AND ORD (LAST (T)) <= LAST (INTEGER).   
 
-     TYPE ValidElemT A nonempty, proper subrange of T. Elements of sets 
+     TYPE ValidElemT A nonempty, proper subrange of T.  Elements of sets 
                      provided by instantiations of OrdSets will have this type. 
 
      CONST NullElem  A constant of type T, that is not a member of ValidElemT.
@@ -43,20 +43,26 @@ GENERIC INTERFACE OrdSets ( Element )
    actual set member, plus some overhead, of course.
 
    If you compile with a later CM3 Modula-3 compiler and garbage
-   collector that tolerate misaligned "pseudo" pointers, i.e, with the
+   collector that tolerate misaligned _pseudopointers_, i.e, with the
    least significant bit set to one, you can set a boolean constant in
    the corresponding module OrdSets.mg.  This will cause it to utilize
    this Modula-3 implementation feature to store sufficiently small set 
    values entirely within the pointer word, avoiding the high space and 
    time overheads of heap allocation.  The CM3 5-8 compiler is sufficient.  
    SRC M3, PM3, EZM3, and earlier CM3 versions are not.  As of 2012-7-15,
-   Pickles do not handle these.  Enable this with DoPseudoPointers, in 
-   OrdSets.mg.  
+   Pickles do not handle these.  Enable this with DoPseudopointers, in 
+   OrdSets.ig.  
 
-   Up through 2013-02-17, Pickles will not tolerate this misaligned
-   pointers.  Also, up through the same date, even without misaligned
-   pointers, pickles will not correctly convert these sets between different
-   word sizes.     
+   Also, although the pickle specials herein handle writing of sets
+   that are pseudo-pointers, the dispatching mechanism for specials
+   won't work on them.  
+
+   As of 2015-5-14, pickling values with these misaligned pointers will
+   work, and independently, unpickling will conditionally construct
+   misaligned pointers if the reading program handles them. 
+
+   As of 2015-5-14, pickling and unpickling sets will handle mixes of
+   word sizes (32 or 64) and of endianness correctly.   
 *) 
 
 (* Thread safety: 
@@ -87,9 +93,9 @@ GENERIC INTERFACE OrdSets ( Element )
   (* Empty set. *) 
 
 ; PROCEDURE Singleton ( Elem : ElemT ) : T 
-(* Singleton set containing just Elem.  Empty set if 
-   Elem not in ValidElemT 
-*) 
+  (* Singleton set containing just Elem.  Empty set if 
+     Elem is not in ValidElemT 
+  *) 
 
 ; PROCEDURE Range ( Lo , Hi : ElemT ) : T 
   (* Set containing all elements in the range [ Lo .. Hi ].  Empty set if
@@ -102,10 +108,10 @@ GENERIC INTERFACE OrdSets ( Element )
   *) 
 
 ; PROCEDURE Union ( Set1 : T ; Set2 : T ) : T
-(* Union of Set1 and Set2. *) 
+  (* Union of Set1 and Set2. *) 
 
 ; PROCEDURE Intersection ( Set1 : T ; Set2 : T ) : T 
-(* Intersection of Set1 and Set2. *) 
+  (* Intersection of Set1 and Set2. *) 
 
 ; PROCEDURE Project ( Set : T ; Min , Max : ElemT ) : T 
   (* Remove elements outside the range Min .. Max *)
@@ -115,7 +121,7 @@ GENERIC INTERFACE OrdSets ( Element )
 
 ; PROCEDURE SymDiff ( Set1 : T ; Set2 : T ) : T 
   (* Symmetric difference of Set1 and Set2. 
-     IsElement(SymDiff(S1,S2),E) iff IsElement(S1,E) # IsElement(S2,E) 
+     IsElement(SymDiff(S1,S2),E) IFF IsElement(S1,E) # IsElement(S2,E) 
   *) 
 
 ; PROCEDURE Include ( Set : T ; Elem : ElemT ) : T 
@@ -147,7 +153,7 @@ GENERIC INTERFACE OrdSets ( Element )
 ; PROCEDURE Complement 
     ( Set : T ; UnivLo , UnivHi : ElemT := NullElem ) : T 
   (* Complement WRT a universe of [ UnivLo .. UnivHi ].
-     The universe is first widened if necessary to cover Minimun(Set)
+     The universe is first widened if necessary to cover Minimum(Set)
      ..Maximum(Set). 
      If Set is empty and exactly one of UnivLo,UnivHi is valid, Set is 
      complemented WRT Singleton(TheOneValidUnivBound).  Otherwise Empty()
@@ -155,10 +161,10 @@ GENERIC INTERFACE OrdSets ( Element )
 
      WARNING: This can create a *very* large heap object if the
               universe is large.  You probably want a universe having
-              dynamically computed bounds that are far less
-              extravagant than ValidElemT.  And if ValidElemT weren't
-              large, you would probably be using some other set
-              representation, such as Modula-3's builtin SET types.
+              dynamically computed bounds that are far less extravagant 
+              than ValidElemT.  And if ValidElemT weren't large, you 
+              would probably be using some other set representation, 
+              such as Modula-3's builtin SET types.
               There is no Complement operation WRT ValidElemT, to make 
               it harder to inadvertently construct huge objects.
   *)   
@@ -183,13 +189,13 @@ GENERIC INTERFACE OrdSets ( Element )
 
 ; PROCEDURE Compare ( Set1 , Set2 : T ) : [ - 1 .. 1 ] (* <, =, >*)  
   (* Compare two sets according to an arbitrary but consistent total ordering
-     on their abstract velues. 
+     on their abstract values. 
   *) 
 
 ; TYPE HashTyp = Word . T 
 
 ; PROCEDURE Hash ( Set : T ) : HashTyp
-  (* Hash(S) = 0 iff Equal(S,Empty()) *)  
+  (* Hash(S) = 0 IFF Equal(S,Empty()) *)  
 
 ; PROCEDURE IsElement ( Elem : ElemT ; Set : T ) : BOOLEAN
 
@@ -219,9 +225,10 @@ GENERIC INTERFACE OrdSets ( Element )
     ( Set : T 
     ; ElemImage : ElemImageFuncTyp 
     ; Prefix : TEXT := ""  
-      (* If a new line is inserted, the following line will begin with this. *)
-    ; LineLen : CARDINAL := 80
-      (* Lines with more than one element or range will not exceed this. *) 
+      (* ^If a new line is inserted, the next line will begin with Prefix. *)
+    ; MaxLine : CARDINAL := 80
+      (* Lines with more than one element or range will not be longer than
+         MaxLine characters. *) 
     ) 
   : TEXT  
   RAISES { Thread . Alerted , Wr . Failure } 
@@ -232,6 +239,81 @@ GENERIC INTERFACE OrdSets ( Element )
      EorR := Elem | Elem '..' Elem
   *) 
 
+(* -------------------- Pseudopointers and Pickling ------------------------ *)
+
+(* Pseudopointers are a space-saving internal representation trick.
+   Since genuine pointer values are always aligned at least on an even
+   boundary, odd values can be used to put certain small set values
+   directly in a variable of type T, without the space and time
+   overhead or the fragmentation of heap allocation.  OrdSets can
+   use pseudopointers internally in this way to save space.  Its 
+   abstract behaviour is unchanged by their use.
+
+   OrdSets will not construct pseudopointers unless client code has
+   explicitly requested it to, by setting DoPseudopointers := TRUE.
+   OrdSets will always correctly interpret in-memory pseudopointers. 
+
+   Pickling and unpickling of set values that are not pseudopointers 
+   always correctly adjusts for differences in endianness and word size 
+   (32 or 64 bit) between the pickle-writing and the pickle-reading 
+   system.
+
+   The default mechanism of Pickles will treat any pseudopointers it
+   encounters as having type INTEGER.  This will work correctly only
+   if the word sizes are the same on the pickle-writing and the
+   pickle-reading system.  Otherwise, the values will be garbled
+   when unpickled.  
+
+   If client code requests, by calling RegisterPseudopointerPickleSpecial,
+   on both the pickling and unpickling systems, pickling and unpickling 
+   of pseudopointer sets will be handled correctly for all mixes of word 
+   size and endianness.  
+
+   If, on the writing system, client code further requests, by setting 
+   DoPicklePseudopointers := TRUE, in-memory pseudopointers will be written 
+   as pseudopointers in the pickle file too, thus saving space there.  
+   Otherwise, they will be converted to normal internal representation 
+   in the pickle file.  Either way, they will be correctly unpickled, if 
+   client code has called RegisterPseudopointerPickleSpecial on the 
+   pickle-reading system.  
+
+   THERE ARE PITFALLS HERE: 
+
+   1) The general pickle mechanism can only handle registration of a 
+      single special for all pseudopointers in the entire link closure.  
+
+   2) Not registering the OrdSets pseudopointer special, and reading 
+      and writing pickles on systems with different word sizes will 
+      garble any in-memory pseudopointers.  
+
+   3) Registering the OrdSets pseudopointer special on one of the 
+      pickle-reading and pickle-writing systems, but not the other, will 
+      garble any in-memory pseudopointers.  
+
+*) 
+
+; VAR DoPseudopointers := FALSE 
+  (* If set TRUE, set-producing operations and unpickling will construct 
+     pseudopointers in-memory, when their values allow.  Regardless, 
+     set-accessing operations will always correctly interpret in-memory 
+     pseudopointers.
+  *) 
+
+; PROCEDURE RegisterPseudopointerPickleSpecial ( ) 
+  (* Register a special to pickle and unpickle sets in pseudopointer form.  
+     NOTE: The Pickle mechanism can only handle one pseudopointer
+           special in the entire link closure of a main program, so
+           don't do this if some other abstraction registers its own. 
+
+     If so registered, pickle reading will always correctly read pseudopointers 
+     in pickles, but won't write in pseudopointer form unless, additionally, 
+     DoPicklePseudopointers = TRUE.
+  *) 
+  
+; VAR DoPicklePseudopointers := FALSE
+  (* If set TRUE, AND RegisterPseudopointerPickleSpecial has been called,
+     write set values to pickles in pseudopointer form, where possible. *)  
+
 ; EXCEPTION BadInvariant ( TEXT ) 
 
 ; PROCEDURE VerifySet ( Set : T ) RAISES { BadInvariant } 
@@ -239,5 +321,4 @@ GENERIC INTERFACE OrdSets ( Element )
 
 ; END OrdSets 
 . 
-
 

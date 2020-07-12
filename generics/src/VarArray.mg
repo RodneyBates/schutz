@@ -3,8 +3,8 @@
 (* File VarArray.mg                                                          *)
 (* Modula-3 source code.                                                     *)
 (* Copyright 2013, Rodney M. Bates.                                          *)
-(* (* rodney.m.bates@acm.org                                                      *)
-(* Licensed under the MIT License.                                                                      *) 
+(* rodney.m.bates@acm.org                                                    *)
+(* Licensed under the MIT License.                                           *) 
 (* -----------------------------------------------------------------------2- *)
 
 
@@ -112,7 +112,7 @@ GENERIC MODULE VarArray ( Ranges )
 
 (* EXPORTED: *) 
 ; PROCEDURE New 
-    ( InitElemValue : ElemTyp 
+    ( READONLY InitElemValue : ElemTyp 
     ; InitialAlloc : RangeTyp := EmptyRange 
     ; ExpansionFactor : REAL := DefaultExpansionFactor 
     ) 
@@ -662,7 +662,7 @@ GENERIC MODULE VarArray ( Ranges )
     END AllocateAndTouchRange  
 
 (* EXPORTED: *) 
-; PROCEDURE Assign ( Array : T ; Ss : SsTyp ; Value : ElemTyp ) 
+; PROCEDURE Assign ( Array : T ; Ss : SsTyp ; READONLY Value : ElemTyp ) 
   RAISES { AllocationFailure } 
   (* PRE: Array # NIL *) 
   (* Abstract view: 

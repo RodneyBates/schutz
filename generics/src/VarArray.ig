@@ -3,8 +3,8 @@
 (* File VarArray.ig                                                          *)
 (* Modula-3 source code.                                                     *)
 (* Copyright 2013, Rodney M. Bates.                                          *)
-(* (* rodney.m.bates@acm.org                                                      *)
-(* Licensed under the MIT License.                                                                      *) 
+(* rodney.m.bates@acm.org                                                    *)
+(* Licensed under the MIT License.                                           *) 
 (* -----------------------------------------------------------------------2- *)
 
 GENERIC INTERFACE VarArray ( Subscript , Element , Ranges )
@@ -134,7 +134,7 @@ GENERIC INTERFACE VarArray ( Subscript , Element , Ranges )
 ; EXCEPTION AllocationFailure
 
 ; PROCEDURE New 
-    ( InitElemValue : ElemTyp 
+    ( READONLY InitElemValue : ElemTyp 
     ; InitialAlloc : RangeTyp := EmptyRange 
     ; ExpansionFactor : REAL := DefaultExpansionFactor 
     ) 
@@ -173,7 +173,7 @@ GENERIC INTERFACE VarArray ( Subscript , Element , Ranges )
      Performance: O(1). 
   *)
 
-; PROCEDURE Assign ( Array : T ; Ss : SsTyp ; Value : ElemTyp ) 
+; PROCEDURE Assign ( Array : T ; Ss : SsTyp ; READONLY Value : ElemTyp ) 
   RAISES { AllocationFailure } 
   (* PRE: Array # NIL *) 
   (* Abstract view: 
@@ -190,7 +190,7 @@ GENERIC INTERFACE VarArray ( Subscript , Element , Ranges )
       Ss need not be in touched(A).
       Do not touch Array[Ss].
         (Untouched elements implicitly have InitElemValue(Array)) 
-     Concrete view: (Make no change of allocation. )
+     Concrete view: (Make no change of allocation.)
      Performance: O(1). 
   *)  
 

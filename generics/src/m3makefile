@@ -8,7 +8,7 @@
 
 % m3makefile for generics subdirectory, Schutz semantic editor.
 
-% Only a container for generic source files. 
+% A container for generic source files and their support. 
 
 %import("libm3")
 
