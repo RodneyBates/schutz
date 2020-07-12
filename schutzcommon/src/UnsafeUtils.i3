@@ -1,14 +1,14 @@
-
+  
 (* -----------------------------------------------------------------------1- *)
-(* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* File UnsafeUtils.i3  Modula-3 source code.                                *)
+(* Copyright 2010 .. 2016, Rodney M. Bates.                                  *)
 (* rodney.m.bates@acm.org                                                    *)
-(* Licensed under the MIT License.                                           *)
+(* Licensed under the MIT License.                                           *) 
 (* -----------------------------------------------------------------------2- *)
 
 INTERFACE UnsafeUtils 
 
-; IMPORT PortTypes 
+; IMPORT Word 
 
 ; PROCEDURE IntOfRefany ( Ref : REFANY ) : INTEGER 
 
@@ -16,9 +16,12 @@ INTERFACE UnsafeUtils
 
 ; PROCEDURE NULLOfInt ( I : INTEGER ) : NULL
 
+; PROCEDURE PtrTo8CharArray ( VAR W : Word . T ) 
+  : UNTRACED REF ARRAY [ 0 .. 7 ] OF CHAR
+
 ; TYPE TypeCodeTyp = CARDINAL 
 
-; PROCEDURE ObjectSize ( TC : TypeCodeTyp ) : PortTypes . Int32Typ 
+; PROCEDURE ObjectSize ( TC : TypeCodeTyp ) : INTEGER 
 
 ; END UnsafeUtils 
 . 
