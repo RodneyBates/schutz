@@ -140,7 +140,7 @@ INTERFACE LangUtil
       , PredicateKindInClass 
         (* ^An absent node is not in any class, not even a universal one. *) 
       } 
-; TYPE PredicateKindPackedTyp = BITS 16 FOR PredicateKindTyp 
+; TYPE PredicateKindPackedTyp = (*BITS 16 FOR*) PredicateKindTyp 
 
 ; PROCEDURE PredicateKindImage ( Value : PredicateKindTyp ) : TEXT 
 
@@ -517,15 +517,15 @@ INTERFACE LangUtil
           (* ^ = FmtNo of child NUMBER ( FsChildren ^ ) - 1, 
                or = FsFmtNo, for a leaf. 
           *) 
-        ; FsIsInsideList : BITS 1 FOR BOOLEAN := FALSE 
-        ; FsIsInsideCondFmt : BITS 1 FOR BOOLEAN := FALSE  
-        ; FsIsInsideFill : BITS 1 FOR BOOLEAN := FALSE 
+        ; FsIsInsideList : (*BITS 1 FOR*) BOOLEAN := FALSE 
+        ; FsIsInsideCondFmt : (*BITS 1 FOR*) BOOLEAN := FALSE  
+        ; FsIsInsideFill : (*BITS 1 FOR*) BOOLEAN := FALSE 
           (* ^Meaningful for all FsKinds. *) 
-        ; FsIsAutonomous : BITS 1 FOR BOOLEAN := FALSE 
-        ; FsContainsLineBreak : BITS 1 FOR BOOLEAN := FALSE 
+        ; FsIsAutonomous : (*BITS 1 FOR*) BOOLEAN := FALSE 
+        ; FsContainsLineBreak : (*BITS 1 FOR*) BOOLEAN := FALSE 
           (* For EstList/Fixed nodes, has BOI/EOI *) 
-        ; FsDeletableItemsAreToRight : BITS 1 FOR BOOLEAN := TRUE 
-        ; FsPad1 : BITS 2 FOR [ 0 .. 0 ] := 0 
+        ; FsDeletableItemsAreToRight : (*BITS 1 FOR*) BOOLEAN := TRUE 
+        ; FsPad1 : (*BITS 2 FOR*) [ 0 .. 0 ] := 0 
         ; FsKind : FsKindTyp := FsKindTyp . FsKindNull 
           (* ^This is the tag field for a flattened variant record. *) 
         ; FsIndentCode : IndentCodeTyp := IndentCodeNull 
@@ -538,16 +538,16 @@ INTERFACE LangUtil
              The format number of the rightmost item of a whole list slice. 
              This is the rightmost CondFmt child, if any, or the Est child. 
           *) 
-        ; FsFormatsEmpty : BITS 2 FOR UncertainBool . T 
+        ; FsFormatsEmpty : (*BITS 2 FOR*) UncertainBool . T 
                          := UncertainBool . T . Unknown 
           (* ^For valid format syntax, will not end up Unknown. *) 
           (* ^For FsKindAsList*, this applies to the conditional construct,
              if any, surrounding the FsKindEstChildOfList, or if none, the
              FsKindEstChildOfList itself. 
           *) 
-        ; FsHasLineBreak : BITS 2 FOR FormatsEmptyTyp 
+        ; FsHasLineBreak : (*BITS 2 FOR*) FormatsEmptyTyp 
             := FormatsEmptyTyp . FeUnknown 
-        ; FsPad2 : BITS 4 FOR [ 0 .. 0 ] := 0 
+        ; FsPad2 : (*BITS 4 FOR*) [ 0 .. 0 ] := 0 
         ; FsTok : LbeStd . TokTyp := LbeStd . Tok__Null 
           (* ^Meaningful for all FsKinds. *) 
         ; FsSublistTok : LbeStd . TokTyp := LbeStd . Tok__Null 
@@ -664,23 +664,23 @@ INTERFACE LangUtil
              are not separated from this one by a line break. 
 (* CHECK: What if there is a conditional line break? *) 
           *) 
-        ; FsEstChildIsOptional : BITS 1 FOR BOOLEAN := FALSE 
+        ; FsEstChildIsOptional : (*BITS 1 FOR*) BOOLEAN := FALSE 
           (* ^ For FsKindEstChildOfFixed: 
              (Always FALSE for FsKindEstChildOfList.
              Also copied up into FsKindCondFmt nodes. 
           *) 
-        ; FsIsInFirstLine : BITS 1 FOR BOOLEAN := FALSE 
+        ; FsIsInFirstLine : (*BITS 1 FOR*) BOOLEAN := FALSE 
           (* Counting only line breaks (which are assumed taken), is this
              node in the first line of formatted text.  For a list, this
              assumes we are within the first list child and its insertion
              tokens. 
           *)
-        ; FsIsRightOfEstListChild : BITS 1 FOR BOOLEAN := FALSE 
+        ; FsIsRightOfEstListChild : (*BITS 1 FOR*) BOOLEAN := FALSE 
           (* Inside the tree for an Est list, are we in the part to the
              right of the Est child. 
           *)   
-        ; FsEstChildOpt : BITS 2 FOR ChildOptTyp := ChildOptTyp . OptRequired
-        ; FsPadChild : BITS 3 FOR [ 0 .. 0 ] := 0 
+        ; FsEstChildOpt : (*BITS 2 FOR*) ChildOptTyp := ChildOptTyp . OptRequired
+        ; FsPadChild : (*BITS 3 FOR*) [ 0 .. 0 ] := 0 
         ; FsEstDescendantRef : FsNodeRefTyp := NIL  
           (* For an FsKindEstList* or any interior node descendant thereof,
              this points to the leaf FsKindEstChildOf* descendant node. 

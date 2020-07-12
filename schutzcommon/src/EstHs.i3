@@ -677,7 +677,7 @@ INTERFACE EstHs
 
 ; TYPE EdgeInfoTyp 
     = RECORD 
-        EiTok : LbeStd . TokPackedTyp 
+        EiTok : LbeStd . TokTyp 
       ; EiFmtNo : BITS 8 FOR FmtNoTyp 
       ; EiEdgeKind : EdgeKindPackedTyp 
       END (* RECORD *) 
@@ -738,9 +738,9 @@ INTERFACE EstHs
 
 ; TYPE EstMiscInfoTyp 
     = RECORD 
-        EmiLeftTok : LbeStd . TokPackedTyp 
-      ; EmiRightTok : LbeStd . TokPackedTyp 
-      ; EmiTok : LbeStd . TokPackedTyp 
+        EmiLeftTok : LbeStd . TokTyp 
+      ; EmiRightTok : LbeStd . TokTyp 
+      ; EmiTok : LbeStd . TokTyp 
       ; EmiSyntTokCt : LbeStd . LimitedTokCtTyp 
       ; EmiEdgeKind : EdgeKindTyp 
       ; EmiWidthInfo : WidthInfoTyp 
@@ -814,9 +814,9 @@ INTERFACE EstHs
 ; TYPE EstRefTyp 
     = KTreeRefTyp 
         OBJECT 
-          EstTok : LbeStd . TokPackedTyp 
-        ; EstLeftTok : LbeStd . TokPackedTyp 
-        ; EstRightTok : LbeStd . TokPackedTyp 
+          EstTok : LbeStd . TokTyp 
+        ; EstLeftTok : LbeStd . TokTyp 
+        ; EstRightTok : LbeStd . TokTyp 
         ; EstNodeKind : EstNodeKindPackedTyp 
         (* EstHeight = 0 => no children at all. *) 
         ; EstHeight : KTreeHeightPackedTyp

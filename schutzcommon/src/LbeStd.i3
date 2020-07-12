@@ -244,7 +244,7 @@ INTERFACE LbeStd
 (* Lexical token codes. *) 
 
 ; TYPE TokTyp = PortTypes . Card16Typ 
-; TYPE TokPackedTyp = BITS 16 FOR TokTyp 
+(* ; TYPE TokPackedTyp = BITS 16 FOR TokTyp *)
 
 ; CONST NumTokImage = PortTypes . Int16Image 
         (* Purely numeric. *) 

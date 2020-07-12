@@ -52,8 +52,8 @@ MODULE EstBuild
     = RECORD 
         MsLrObjRef : EstHs . KTreeRefTyp 
       ; MsLrKindSet : EstHs . EstChildKindSetTyp 
-      ; MsLrLeftTok : LbeStd . TokPackedTyp 
-      ; MsLrRightTok : LbeStd . TokPackedTyp 
+      ; MsLrLeftTok : LbeStd . TokTyp 
+      ; MsLrRightTok : LbeStd . TokTyp 
       (* ^MsLrLeftTok and MsLrRightTok are not stored in a KTree leaf 
           element.  They are only maintained to avoid repeated calls 
           to time-consuming EstUtil . ComputeWholeLeafSliceEdgeInfoPair, when 
@@ -297,8 +297,8 @@ MODULE EstBuild
 ; PROCEDURE PrependSliceTokPair 
     ( PrependLeftTok : LbeStd . TokTyp 
     ; PrependRightTok : LbeStd . TokTyp 
-    ; VAR (* IN OUT *) ExistingLeftTok : LbeStd . TokPackedTyp 
-    ; VAR (* IN OUT *) ExistingRightTok : LbeStd . TokPackedTyp 
+    ; VAR (* IN OUT *) ExistingLeftTok : LbeStd . TokTyp 
+    ; VAR (* IN OUT *) ExistingRightTok : LbeStd . TokTyp 
     ) 
   RAISES { AssertionFailure } 
 
