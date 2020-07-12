@@ -62,7 +62,7 @@ EXPORTS Main
 ; CONST M3SemFileName = "M3Sem.pkl" 
 ; CONST DefaultDebugLevel = 3 
 
-; VAR ResourceDirDefault : TEXT := "/home/rodney/proj/lbe/working/resources"  
+; VAR ResourceDirDefault : TEXT := "/home/rodney/proj/lbe/git/resources"  
 ; VAR ResourceDir : TEXT 
 ; VAR PlaybackFileName : TEXT 
 ; VAR RecordFileName : TEXT 

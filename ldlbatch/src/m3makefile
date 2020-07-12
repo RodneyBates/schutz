@@ -45,7 +45,7 @@ end
 
 import ("schutzcommon")
 
-include_dir("../ldl1/src")
+include_dir("../../ldl1/src")
 
 resource_named("Ldl0Sem.pkl","../derived/Ldl0Sem.pkl")
 bundle("Ldl0Bundle") 

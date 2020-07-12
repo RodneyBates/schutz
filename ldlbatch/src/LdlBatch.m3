@@ -111,7 +111,7 @@ EXPORTS Main
 ; VAR DoInsertNilFixedChildren := FALSE 
 ; VAR UseGenGrammar := FALSE 
 
-; VAR ResourceDirDefault : TEXT := "/home/rodney/proj/lbe/working/resources"  
+; VAR ResourceDirDefault : TEXT := "/home/rodney/proj/lbe/git/resources"  
 ; VAR ResourceDir : TEXT := ResourceDirDefault 
 
 ; VAR GFileName : TEXT := ""

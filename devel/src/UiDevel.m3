@@ -1922,7 +1922,7 @@ MODULE UiDevel
 
 ; BEGIN 
     Options . DevelWritePath 
-      := "/home/rodney/proj/lbe/working/boot"
+      := "/home/rodney/proj/lbe/git/boot"
          (* Pathname . Current *)  
   END UiDevel 
 . 

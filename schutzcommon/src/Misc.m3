@@ -602,7 +602,7 @@ MODULE Misc
 ; PROCEDURE RelFileName 
     ( Name : TEXT  
     ; RelativeTo : TEXT := NIL 
-      (* ^NIL, "", and Pathname.Current all mean working directory. *) 
+      (* ^NIL, "", and Pathname.Current all mean git directory. *) 
     ) 
   : TEXT 
   (* If anything goes wrong, returns Name unchanged. *)
