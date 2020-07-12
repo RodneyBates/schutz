@@ -77,7 +77,7 @@ build_generic_intf("IntVarArray","VarArray",["Integer","Integer","IntRanges"],VI
 build_generic_impl("IntVarArray","VarArray",["IntRanges"])
 
 interface("IntForOrdSets")
-generic_module("OrdSets")
+%generic_module("OrdSets")
 build_generic_intf("IntSets","OrdSets",["IntForOrdSets"],VISIBLE)
 build_generic_impl("IntSets","OrdSets",[])
 
