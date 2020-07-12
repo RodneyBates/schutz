@@ -416,7 +416,7 @@ MODULE LALRLookahead
       ELSE 
         LStackCount := NUMBER ( Stack . Array ^ ) 
       ; IF LStackCount <= Stack . Used 
-        THEN (* Extend array. *) 
+        THEN (* Expand array. *) 
           Assert 
             ( LAST ( LALRTypes . ListCountTyp ) DIV 2 >= LStackCount 
             , AFT . A_Lookahead_PushItem_Stack_overflow
