@@ -15,7 +15,8 @@ cd ../ldl0
 mkdir -p derived
 
 if test ! -e derived/Ldl0Tok.i3
-then  "  Copying a token Ldl0Tok.i3 into ./ldl0/derived"
+then
+  echo " Copying a token Ldl0Tok.i3 into ./ldl0/derived"
   cp -p src/Ldl0Tok.i3.initial derived/Ldl0Tok.i3
 fi
 if test ! -e derived/Ldl0Child.i3
