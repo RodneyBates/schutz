@@ -1148,28 +1148,31 @@ MODULE FsTreeUtils
     = PROCEDURE HasBookendsRecurse ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
       RAISES { Done } 
 
-      = BEGIN 
-          CASE FsNodeRef . FsKind 
-          OF FsKindTyp . FsKindNull 
-          , FsKindTyp . FsKindLineBreakReqd
-          , FsKindTyp . FsKindLineBreakOpt
-          => (* Ignore these. *) 
+      = BEGIN
+          IF FsNodeRef # NIL
+          THEN 
+            CASE FsNodeRef . FsKind 
+            OF FsKindTyp . FsKindNull 
+            , FsKindTyp . FsKindLineBreakReqd
+            , FsKindTyp . FsKindLineBreakOpt
+            => (* Ignore these. *) 
 
-          | FsKindTyp . FsKindInsTok 
-          => FsRuleNodeRef . FsEstListHasBookends := TRUE 
-            ; RAISE Done 
+            | FsKindTyp . FsKindInsTok 
+            => FsRuleNodeRef . FsEstListHasBookends := TRUE 
+              ; RAISE Done 
 
-          | FsKindTyp . FsKindSubtreeVert 
-          , FsKindTyp . FsKindSubtreeHoriz 
-          , FsKindTyp . FsKindSubtreeFill 
-          => (* Traverse these. *) 
-              FOR RFsChildNo := 0 TO NUMBER ( FsNodeRef . FsChildren ^ ) - 1 
-              DO HasBookendsRecurse 
-                   ( FsNodeRef . FsChildren ^ [ RFsChildNo ] ) 
-              END (* FOR *) 
+            | FsKindTyp . FsKindSubtreeVert 
+            , FsKindTyp . FsKindSubtreeHoriz 
+            , FsKindTyp . FsKindSubtreeFill 
+            => (* Traverse these. *) 
+                FOR RFsChildNo := 0 TO NUMBER ( FsNodeRef . FsChildren ^ ) - 1 
+                DO HasBookendsRecurse 
+                     ( FsNodeRef . FsChildren ^ [ RFsChildNo ] ) 
+                END (* FOR *) 
 
-          ELSE (* Don't descend into anything else. *) 
-          END (* CASE *) 
+            ELSE (* Don't descend into anything else. *) 
+            END (* CASE *)
+          END (* IF *) 
         END HasBookendsRecurse 
 
     ; VAR LFsChildNo : LangUtil . FsChildNoTyp 
