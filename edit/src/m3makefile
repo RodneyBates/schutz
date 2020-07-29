@@ -1,0 +1,83 @@
+
+%% -----------------------------------------------------------------------1- %%
+%% This file is part of the Schutz semantic editor.                          %%
+%% Copyright 1988..2017, Rodney M. Bates.                                    %%
+%% rodney.m.bates@acm.org                                                    %%
+%% Licensed under the MIT License.                                           %%
+%% -----------------------------------------------------------------------2- %%
+
+% m3makefile for edit subdirectory, Schutz semantic editor. 
+% Works for either pm3 or cm3 compiler.
+
+proc is_cm3 ( ) 
+is
+  return defined("CM3_VERSION")
+end
+
+proc is_pm3 ( )  
+is
+  return not defined("CM3_VERSION")
+end
+
+if is_pm3 ( ) 
+  option("internal_backend","")
+  %^Disables the internal backend 
+  % option("standalone","T")
+  %^2005-06-03: fails because libX11.a can't find pthread_equal ' 
+  %m3_option("-commands")
+  %m3_option("-verbose")
+  % Why does this fail? returnCode = exec(["ulimit", "-s", "32000"])
+end 
+
+if is_cm3 ( )
+  %m3_option("-commands")
+  %m3_option("-verbose")
+  %m3_option("-keep")
+  % build_standalone ( ) 
+  % The following does not get passed to cm3cg, which is what needes it.
+  % Instead, on selkirk, type this command manually before building.
+  % exec( "ulimit", "-s", "160000" )
+end 
+
+import("libm3")
+import("formsvbt")
+import ("schutzcommon")
+
+% Do the bundles early, because they use a lot of memory to compile.
+% They are more likely to succeed if fewer other modules have been
+% compiled in the same run.  When a compile on a bundle fails for lack
+% of memory (usually NIL pointer deref), restarting the compile will
+% often get past the problem. 
+
+% Uncomment to build an empty bundle for M3Sem.pkl and get it from a file.
+resource_named("M3Sem.pkl","../../writenilpickle/src/NIL.pkl")
+% resource_named("M3Sem.pkl","../derived/M3Sem.pkl")
+bundle("M3Bundle") 
+
+% Uncomment to build an empty bundle for Ldl1Sem.pkl and get it from a file.
+resource_named("Ldl1Sem.pkl","../../writenilpickle/src/NIL.pkl")
+% resource_named("Ldl1Sem.pkl","../derived/Ldl1Sem.pkl")
+bundle("Ldl1Bundle") 
+
+resource_named("Ldl0Sem.pkl","../derived/Ldl0Sem.pkl")
+bundle("Ldl0Bundle") 
+
+include_dir("../../devel/src")
+include_dir("../../ldl1/src")
+include_dir("../../m3/src")
+include_dir("resources")
+module("TextEdit")
+module("Display")
+module("EditWindow")
+module("TempMark") 
+% module("GuiAssert")
+module("Ui") 
+module("Images") 
+module("Worker") 
+module("Selection") 
+module("Delay")
+module("UiSearch")
+module("Search")
+
+implementation("Lbe")
+program("Lbe")
