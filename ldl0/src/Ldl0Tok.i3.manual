@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Scheutz semantic editor.                         *)
-(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.bates@wichita.edu                                                  *)
 (* Licensed under the Gnu Public License, version 2 or later.                *)
 (* -----------------------------------------------------------------------2- *)
@@ -10,7 +10,10 @@ INTERFACE Ldl0Tok
 
 ; IMPORT LbeStd 
 
-(* Initial, handwritten version of Ldl0Tok, with arbitrary values. *) 
+(* Initial, handwritten version of Ldl0Tok, with arbitrary values. 
+   This is just to allow a working LdlBoot to be compiled and run,
+   to generate proper version, which will then be used to recompile.
+*)
 
 ; CONST MinTok = LbeStd . Tok__Null 
 ; CONST MaxTok = 1300 

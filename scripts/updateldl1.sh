@@ -1,7 +1,7 @@
 
 ## -----------------------------------------------------------------------1- ##
 ## This file is part of the Schutz semantic editor.                          ##
-## Copyright 1988..2017, Rodney M. Bates.                                    ##
+## Copyright 1988..2020, Rodney M. Bates.                                    ##
 ## rodney.m.bates@acm.org                                                    ##
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
@@ -12,24 +12,30 @@
 
 echo "========================================================================"
 echo "  Copy various generated files to where they will be sought." 
-echo "  Copying generated source files for Ldl1 to ldl1/derived" 
+echo "  Copy generated source files for Ldl1 to ldl1/derived" 
 cd ../ldl1/derived
 cp -p ../../boot/Ldl1Tok.i3 Ldl1Tok.i3 
+rm -f ../$TARGET/Ldl1Tok_i.o # Force recompile.
+rm -f ../$TARGET/Ldl1Tok.io # Force recompile.
 cp -p ../../boot/Ldl1Child.i3 Ldl1Child.i3 
+rm -f ../$TARGET/Ldl1Child_i.o # Force recompile.
+rm -f ../$TARGET/Ldl1Child.io # Force recompile.
 cp -p ../../boot/Ldl1MakeEst.m3 Ldl1MakeEst.m3 
+rm -f ../$TARGET/Ldl1MakeEst_m.o # Force recompile.
+rm -f ../$TARGET/Ldl1MakeEst.io # Force recompile.
 ls -l Ldl1Tok.i3 Ldl1Child.i3 Ldl1MakeEst.m3  
 
-echo "  Copying generated pickle files for Ldl1 to ldlbatch/derived" 
+echo "  Copy generated pickle files for Ldl1 to ldlbatch/derived" 
 cd ../../ldlbatch/derived
 cp -p ../../boot/Ldl1Sem.pkl Ldl1Sem.pkl
 ls -l Ldl1Sem.pkl 
 
-echo "  Copying generated pickle files for Ldl1 to edit/derived" 
+echo "  Copy generated pickle files for Ldl1 to edit/derived" 
 cd ../../edit/derived
 cp -p ../../boot/Ldl1Sem.pkl Ldl1Sem.pkl
 ls -l Ldl1Sem.pkl 
 
-echo "  Copying Ldl1Sem.pkl to resources "
+echo "  Copy generated pickle files to resources "
 cd ../../resources
 cp -p ../boot/Ldl1Sem.pkl Ldl1Sem.pkl
 ls -l Ldl1Sem.pkl

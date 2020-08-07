@@ -1,19 +1,20 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Scheutz semantic editor.                         *)
-(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.bates@wichita.edu                                                  *)
 (* Licensed under the Gnu Public License, version 2 or later.                *)
 (* -----------------------------------------------------------------------2- *)
 
-MODULE M3MakeEst
+(* A hand-written, do-nothing, dummy module, just to enable initially
+   compiling LdlBatch, which is used to generate the real module. *) 
 
-(* A hand-written dummy for what is usually a machine-generated module. *) 
+MODULE M3MakeEst
 
 ; IMPORT LbeStd 
 ; FROM Assertions IMPORT AssertionFailure 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE Root ( Lang : LbeStd . LangTyp := LbeStd . LangNull ) 
   : LbeStd . EstRootTyp 
   RAISES { AssertionFailure } 

@@ -1,7 +1,7 @@
 
 ## -----------------------------------------------------------------------1- ##
 ## This file is part of the Schutz semantic editor.                          ##
-## Copyright 1988..2017, Rodney M. Bates.                                    ##
+## Copyright 1988..2020, Rodney M. Bates.                                    ##
 ## rodney.m.bates@acm.org                                                    ##
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
@@ -37,6 +37,14 @@ fi
 echo "========================================================================"
 echo "Build LdlBatch, using all generated files:"
 echo "  In directory: ldlbatch, Command: $M3C" 
+
+cd ../schutzcommon 
+echo "  In directory: `pwd`, Command: $M3C " 
+if ! $M3C
+then
+  exit 1
+fi
+
 cd ../ldlbatch
 if ! $M3C
 then
@@ -51,6 +59,14 @@ fi
 echo "========================================================================"
 echo "Build Lbe, using all generated files:"
 echo "  In directory: edit, Command: $M3C" 
+
+cd ../schutzcommon 
+echo "  In directory: `pwd`, Command: $M3C " 
+if ! $M3C
+then
+  exit 1
+fi
+
 cd ../edit
 if ! $M3C
 then
@@ -60,4 +76,5 @@ cd ../scripts
 
 echo "========================================================================"
 echo "AddLdl1.sh, completed normally." 
+echo "========================================================================"
 

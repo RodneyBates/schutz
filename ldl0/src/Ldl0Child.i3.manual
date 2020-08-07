@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Scheutz semantic editor.                         *)
-(* Copyright 1988..2007, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.bates@wichita.edu                                                  *)
 (* Licensed under the Gnu Public License, version 2 or later.                *)
 (* -----------------------------------------------------------------------2- *)
@@ -9,7 +9,10 @@
 INTERFACE Ldl0Child  
 
 (* Initial, handwritten version of Ldl0Child, made to match
-   the initial abstract syntax of ldl0. *) 
+   the initial abstract syntax of ldl0. 
+   This is just to allow a working LdlBoot to be compiled and run,
+   to generate a proper version, which will then be used to recompile.
+*)
 
 (* Entire language definition: *) 
 

@@ -1,0 +1,28 @@
+
+(* -----------------------------------------------------------------------1- *)
+(* This file is part of the Schutz semantic editor.                          *)
+(* Copyright 2020,       Rodney M. Bates.                                    *)
+(* rodney.m.bates@acm.org                                                    *)
+(* Licensed under the MIT License.                                           *)
+(* -----------------------------------------------------------------------2- *)
+
+(* A hand-written, do-nothing, dummy module, just to enable initially
+   compiling LdlBatch, which is used to generate the real module. *) 
+
+MODULE M3InitTokStrings 
+
+; IMPORT TextIntTbl  
+
+(* EXPORTED: *) 
+; PROCEDURE InitRw ( Table : TextIntTbl . Default )
+  = BEGIN
+    END InitRw 
+
+(* EXPORTED: *) 
+; PROCEDURE InitPh ( Table : TextIntTbl . Default ) 
+  = BEGIN
+    END InitPh 
+
+; BEGIN
+  END M3InitTokStrings 
+. 

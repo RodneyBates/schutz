@@ -1,7 +1,7 @@
 
 ## -----------------------------------------------------------------------1- ##
 ## This file is part of the Schutz semantic editor.                          ##
-## Copyright 1988..2017, Rodney M. Bates.                                    ##
+## Copyright 1988..2020, Rodney M. Bates.                                    ##
 ## rodney.m.bates@acm.org                                                    ##
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
@@ -20,7 +20,7 @@ echo "Set up derived directories"
 
 if test ! -d ../boot 
 then 
-  echo "  Creating working directory ./boot:"
+  echo "  Create working directory ./boot:"
   mkdir ../boot 
 fi
 
@@ -29,38 +29,40 @@ fi
 echo "========================================================================"
 echo "Build LdlBoot using manually created Ldl0Tok.i3 and Ldl0Child.i3:"
 
-echo "  Resetting to handcoded versions of Ldl0Tok.i3 and Ldl0Child.i3"
+echo "  Reset to handcoded versions of Ldl0Tok.i3 and Ldl0Child.i3"
 cd ../ldl0/derived
 
-#echo "    Renaming old version to ./ldl0/derived/" `newversion Ldl0Tok.i3`
-cp ../src/Ldl0Tok.i3.manual Ldl0Tok.i3
-# ^It would be nice to use -p here, so the date on the
-#   source file reflects its actual creation date, but
-#   this undermines the recompilation of the compiler. 
+#echo "    Rename old version to ./ldl0/derived/" `newversion Ldl0Tok.i3`
+cp -p ../src/Ldl0Tok.i3.manual Ldl0Tok.i3
+rm -f ../$TARGET/Ldl0Tok_i.o # Force recompile.
+rm -f ../$TARGET/Ldl0Tok.io # Force recompile.
 echo "    Ldl0Tok.i3 reset to manual version:"
 ls -l Ldl0Tok.i3
 
-#echo "    Renaming old version to ./ldl0/derived/" `newversion Ldl0Child.i3`
-cp ../src/Ldl0Child.i3.manual Ldl0Child.i3
+#echo "    Rename old version to ./ldl0/derived/" `newversion Ldl0Child.i3`
+cp -p ../src/Ldl0Child.i3.manual Ldl0Child.i3
+rm -f ../$TARGET/Ldl0Child_i.o # Force recompile.
+rm -f ../$TARGET/Ldl0Child.io # Force recompile.
 echo "    Ldl0Child.i3 reset to manual version:"
 ls -l Ldl0Child.i3
 
-# Force recompile: (manual versions have very old dates)  
-rm -f ../../ldlboot/$TARGET/Ldl0Tok.io
-rm -f ../../ldlboot/$TARGET/Ldl0Tok.mo
-rm -f ../../ldlboot/$TARGET/Ldl0Child.io
-rm -f ../../ldlboot/$TARGET/Ldl0Child.mo
+# Rebuild schutzcommon and ldlboot.
+cd ../..
+./scripts/innerscripts/buildcommon.sh
 
-cd ../../ldlboot 
+cd ldlboot 
 echo "  In directory: `pwd`, Command: $M3C" 
 if ! $M3C
 then
+  cd ..
   exit 1
 fi
-echo "  Copying executable LdlBoot to ./boot."
+
+echo "  Copy executable LdlBoot to ./boot."
 rm -f ../boot/LdlBoot 
 if ! cp -p $TARGET/LdlBoot ../boot/LdlBoot
 then
+  cd ..
   exit 1
 fi
 cd ../scripts
@@ -72,6 +74,7 @@ COMMAND="./LdlBoot -tc"
 echo "  In directory: `pwd`, Command: $COMMAND" 
 if ! $COMMAND
 then
+  cd ..
   exit 1
 fi
 echo "  Newly generated files in ./boot:"
@@ -81,27 +84,38 @@ cd ../scripts
 echo "========================================================================"
 echo "Rebuild LdlBoot using generated Ldl0Tok.i3 and Ldl0Child.i3:"
 
-echo "  Copying generated versions of Ldl0Tok.i3 and Ldl0Child.i3 to ./ldl0/derived/"
+echo "  Copy generated versions of Ldl0Tok.i3 and Ldl0Child.i3 to ./ldl0/derived/"
 cd ../ldl0/derived
 
-#echo "    Renaming old version to ./ldl0/derived/" `newversion Ldl0Tok.i3`
+#echo "    Rename old version to ./ldl0/derived/" `newversion Ldl0Tok.i3`
 cp -p ../../boot/Ldl0Tok.i3 Ldl0Tok.i3
+rm -f ../$TARGET/Ldl0Tok_i.o # Force recompile.
+rm -f ../$TARGET/Ldl0Tok.io # Force recompile.
 ls -l Ldl0Tok.i3
 
-#echo "    Renaming old version to ./ldl0/derived/" `newversion Ldl0Child.i3`
+#echo "    Rename old version to ./ldl0/derived/" `newversion Ldl0Child.i3`
 cp -p ../../boot/Ldl0Child.i3 Ldl0Child.i3
+rm -f ../$TARGET/Ldl0Child_i.o # Force recompile.
+rm -f ../$TARGET/Ldl0Child.io # Force recompile.
 ls -l Ldl0Child.i3
 
-cd ../../ldlboot
+# Rebuild schutzcommon and ldlboot.
+cd ../..
+./scripts/innerscripts/buildcommon.sh
+
+cd ldlboot
 echo "  In directory: `pwd`, Command: $M3C" 
 if ! $M3C
 then
+  cd ..
   exit 1
 fi
-echo "  Copying executable LdlBoot to ./boot."
+
+echo "  Copy executable LdlBoot to ./boot."
 rm -f ../boot/LdlBoot 
 if ! cp -p $TARGET/LdlBoot ../boot/LdlBoot
 then
+  cd ..
   exit 1
 fi
 cd ../scripts
@@ -112,7 +126,8 @@ cd ../boot
 COMMAND="./LdlBoot -tc"
 echo "  In directory: `pwd`, Command: $COMMAND" 
 if ! $COMMAND  
-then
+then 
+  cd ..
   exit 1
 fi
 cd ../scripts
@@ -130,6 +145,7 @@ COMMAND="./LdlBoot -al"
 echo "  In directory: `pwd`, Command: $COMMAND"
 if ! $COMMAND 
 then
+  cd ..
   exit 1
 fi
 cd ../scripts 
@@ -146,6 +162,7 @@ COMMAND="./LdlBoot -ad"
 echo "  In directory: `pwd`, Command: $COMMAND" 
 if ! $COMMAND 
 then
+  cd ..
   exit 1
 fi
 cd ../scripts
@@ -153,22 +170,31 @@ cd ../scripts
 echo "========================================================================"
 echo "Rebuild LdlBoot using generated Ldl0MakeEst.m3:"
 
-echo "  Copying generated version of Ldl0MakeEst.m3 to ./ldl0/derived"
+echo "  Copy generated version of Ldl0MakeEst.m3 to ./ldl0/derived"
 cd ../ldl0/derived
-#echo "    Renaming old version to ./ldl0/derived/" `newversion Ldl0MakeEst.m3`
+#echo "    Rename old version to ./ldl0/derived/" `newversion Ldl0MakeEst.m3`
 cp -p ../../boot/Ldl0MakeEst.m3 Ldl0MakeEst.m3
+rm -f ../$TARGET/Ldl0MakeEst_m.o # Force recompile.
+rm -f ../$TARGET/Ldl0MakeEst.mo # Force recompile.
 ls -l Ldl0MakeEst.m3
 
-cd ../../ldlboot
+# Rebuild schutzcommon and ldlboot.
+cd ../..
+./scripts/innerscripts/buildcommon.sh
+
+cd ldlboot
 echo "  In directory: `pwd`, Command: $M3C" 
 if ! $M3C
 then
+  cd ..
   exit 1
 fi
-echo "  Copying executable LdlBoot to ./boot."
+
+echo "  Copy executable LdlBoot to ./boot."
 rm -f ../boot/LdlBoot 
 if ! cp -p $TARGET/LdlBoot ../boot/LdlBoot
 then
+  cd ..
   exit 1
 fi
 cd ../scripts
@@ -180,11 +206,12 @@ COMMAND="./LdlBoot -adE $UOpt"
 echo "  In directory: `pwd`, Command: $COMMAND" 
 if ! $COMMAND 
 then
+  cd ..
   exit 1
 fi
 cd ../scripts
 
-echo "  diffing Ldl0MakeEst.m3"
+echo "  diff Ldl0MakeEst.m3"
 diff --ignore-space-change ../ldl0/derived/Ldl0MakeEst.m3 ../boot/Ldl0MakeEst.m3
 
 echo "========================================================================"
@@ -194,82 +221,98 @@ COMMAND="./LdlBoot -aeEfgGklprRsS $UOpt"
 echo "  In directory: `pwd`, Command: $COMMAND" 
 if ! $COMMAND 
 then
+  cd ..
   exit 1
 fi
 cd ../scripts
 
 echo "========================================================================"
-echo "Build LdlBoot, using all generated files:"
-cd ../ldlboot 
+echo "Build schutzcommon and LdlBoot, using all generated files:"
+cd ..
+./scripts/innerscripts/buildcommon.sh
+
+cd ldlboot 
 echo "  In directory: `pwd`, Command: $M3C" 
-echo "    (This is probably unnecessary.)" 
+#echo "    (This is probably unnecessary.)" 
 if ! $M3C
 then
+  cd ..
   exit 1
 fi
 
-echo "  Copying executable LdlBoot to ./boot."
+echo "  Copy executable LdlBoot to ./boot."
 rm -f ../boot/LdlBoot 
 if ! cp -p $TARGET/LdlBoot ../boot/LdlBoot
 then
+  cd ..
   exit 1
 fi
 cd ../scripts 
 
 echo "========================================================================"
-echo "Build LdlBatch, using all generated files:"
+echo "Build schutzcommon and LdlBatch, using all generated files:"
 
-echo "  Copying Ldl0Sem.pkl to ./ldlbatch/derived "
+echo "  Copy Ldl0Sem.pkl to ./ldlbatch/derived "
 cd ../ldlbatch/derived 
-#echo "    Renaming old version to ./ldlbatch/derived/" `newversion Ldl0Sem.pkl`
+#echo "    Rename old version to ./ldlbatch/derived/" `newversion Ldl0Sem.pkl`
 cp -p ../../boot/Ldl0Sem.pkl Ldl0Sem.pkl
 ls -l Ldl0Sem.pkl
 
-cd ../../ldlbatch
+cd ../..
+./scripts/innerscripts/buildcommon.sh
+
+cd ldlbatch
 echo "  In directory: `pwd`, Command: $M3C" 
 if ! $M3C
 then
   echo "Build of LdlBatch failed."
-  echo "But try running AddLdl1.sh."
+  echo "But try again after running AddLdl1.sh."
+  cd ..
   exit 1
 fi
-echo "  Copying executable LdlBoot to ./boot."
+echo "  Copy executable LdlBoot to ./boot."
 rm -f ../boot/LdlBatch 
 if ! cp -p $TARGET/LdlBatch ../boot/LdlBatch
 then
+  cd ..
   exit 1
 fi
 cd ../scripts 
 
 echo "========================================================================"
-echo "Build Lbe, using all generated files:"
+echo "Build schutzcommon and Lbe, using all generated files:"
 
-echo "  Copying Ldl0Sem.pkl to ./edit/derived"
+echo "  Copy Ldl0Sem.pkl to ./edit/derived"
 cd ../edit/derived 
 
-#echo "    Renaming old version to ./edit/derived/" `newversion Ldl0Sem.pkl`
+#echo "    Rename old version to ./edit/derived/" `newversion Ldl0Sem.pkl`
 cp -p ../../boot/Ldl0Sem.pkl Ldl0Sem.pkl
 ls -l Ldl0Sem.pkl*
 
-cd ..
+cd ../..
+./scripts/innerscripts/buildcommon.sh
+
+cd edit
 echo "  In directory: `pwd`, Command: $M3C" 
 if ! $M3C
 then
   echo "Build of Lbe failed."
-  echo "But try running AddLdl1.sh and AddM3.sh."
+  echo "But try again after running AddLdl1.sh and AddM3.sh."
+  cd ..
   exit 1
 fi
 cd ../scripts 
 
 echo "========================================================================"
-echo "Copying final files to ./resources "
-echo "  Copying Ldl0Sem.pkl to ./resources "
+echo "Copy final files to ./resources "
+echo "  Copy Ldl0Sem.pkl to ./resources "
 cd ../resources
 
-#echo "    Renaming old version to ./resources/" `newversion Ldl0Sem.pkl`
+#echo "    Rename old version to ./resources/" `newversion Ldl0Sem.pkl`
 cp -p ../boot/Ldl0Sem.pkl Ldl0Sem.pkl
 ls -l Ldl0Sem.pkl*
 cd ../scripts 
 
 echo "========================================================================"
 echo "fullboot, completed normally." 
+echo "========================================================================"
