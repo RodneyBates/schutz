@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -190,7 +190,7 @@ EXPORTS Main
   ; VAR GaHelp : BOOLEAN := FALSE 
   ; VAR GaVersion : BOOLEAN := FALSE 
 
-  ; PROCEDURE GaNumericArg ( VAR Result : PortTypes . Int32Typ ) 
+  ; PROCEDURE GaNumericArg ( VAR Result : INTEGER ) 
 
     = VAR LNumString : TEXT 
     ; VAR LRdT : Rd . T 
@@ -203,8 +203,7 @@ EXPORTS Main
             GaBadArgs := TRUE 
           ELSE 
             LNumString := Params . Get ( GaArgNo + 1 ) 
-          ; LRdT 
-              := NEW ( TextRd . T ) . init ( LNumString ) 
+          ; LRdT := NEW ( TextRd . T ) . init ( LNumString ) 
           ; Result := Lex . Int ( LRdT ) 
           ; IF NOT Rd . EOF ( LRdT ) 
             THEN 
@@ -222,7 +221,7 @@ EXPORTS Main
       END GaNumericArg 
 
   ; BEGIN (* GetArgs *) 
-      VAR LInt : PortTypes . Int32Typ 
+      VAR LInt : INTEGER 
 
     ; BEGIN (* Block GetArgs *) 
         GaArgNo := 1 

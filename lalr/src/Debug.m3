@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -108,7 +108,7 @@ MODULE Debug
 ; PROCEDURE WriteVoc 
     ( Gram : LRTable . GrammarTyp 
     ; Tok : LbeStd . TokTyp 
-    ; VAR length : LbeStd . CharNoTyp 
+    ; VAR length : INTEGER 
       (* ^Set to the length of the string written. *)  
 (* CHECK: ^ There seems to be some inconsistency in the type passed to this. *)
     ) 
@@ -164,7 +164,7 @@ MODULE Debug
       (* ^Incremented by length of text preceeding the dot. *) 
     ) 
 
-  = VAR LLength : LbeStd . CharNoTyp 
+  = VAR LLength : INTEGER 
 
   ; <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -193,7 +193,7 @@ MODULE Debug
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
-    VAR LLength : LbeStd . CharNoTyp 
+    VAR LLength : INTEGER 
 
   ; BEGIN (* WriteItem *) 
       WITH 
@@ -206,7 +206,6 @@ MODULE Debug
       ; Wr . PutChar ( DebugWr , ' ' ) 
       ; WriteVoc ( Gram , WProd . Left , (* VAR *) LLength ) 
       ; Wr . PutText ( DebugWr , " ::= " ) 
-      ; LLength := 0 
       ; IF WProd . Len = 0 
         THEN 
           Wr . PutText ( DebugWr , Infos . LRDotString ) 
@@ -722,8 +721,8 @@ MODULE Debug
     VAR LProdSs : LRTable . ProdNoTyp 
   ; VAR LDotPos : LbeStd . TokNoTyp 
   ; VAR LDotPos1 : LbeStd . TokNoTyp 
-  ; VAR LLength : LbeStd . CharNoTyp 
-  ; VAR LLength1 : LbeStd . CharNoTyp 
+  ; VAR LLength : INTEGER 
+  ; VAR LLength1 : INTEGER 
 
   ; BEGIN (* WritePartB *) 
       LProdSs := Gram . ItemArrayRef ^ [ I ] . ProdSs 
@@ -931,7 +930,7 @@ MODULE Debug
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
     VAR LProdSs : LRTable . ProdNoTyp 
-  ; VAR LDotPos : LbeStd . CharNoTyp 
+  ; VAR LDotPos : INTEGER 
   ; VAR LLength1 : INTEGER 
 
   ; BEGIN (* WritePartC *) 

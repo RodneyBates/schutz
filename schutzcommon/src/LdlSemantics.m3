@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -2916,7 +2916,7 @@ MODULE LdlSemantics
      identifier up in the symbol table and insert a SemRef. 
   *) 
 
-  = VAR LDeclNodeNo : LbeStd . EstNodeNoTyp 
+  = VAR LDeclNodeNo : INTEGER 
   ; VAR LWasFound : BOOLEAN 
 
   ; BEGIN (* DeclOfRef *) 
@@ -2964,9 +2964,7 @@ MODULE LdlSemantics
              THEN 
                LDeclNodeNo 
                  := LangInfo . TokMapRef ^ 
-                      [ TFirstOccClass . SingletonTok 
-                        - TokMapBias 
-                      ] 
+                      [ TFirstOccClass . SingletonTok - TokMapBias ] 
              END (* IF *) 
           ELSE 
           END (* TYPECASE *) 
@@ -3007,7 +3005,7 @@ MODULE LdlSemantics
         END (* IF *) 
       END VisitMember 
 
-  ; VAR LAsDeclNodeNo : LbeStd . EstNodeNoTyp 
+  ; VAR LAsDeclNodeNo : INTEGER 
   ; VAR LSemDecl : SemDeclTyp 
   ; VAR LTok : LbeStd . TokTyp 
   ; VAR LWasFound : BOOLEAN 
@@ -3092,7 +3090,7 @@ MODULE LdlSemantics
         END (* IF *) 
       END VisitMember 
 
-  ; VAR LAsDeclNodeNo : LbeStd . EstNodeNoTyp 
+  ; VAR LAsDeclNodeNo : INTEGER 
   ; VAR LSemDecl : SemDeclTyp 
   ; VAR LTok : LbeStd . TokTyp 
   ; VAR LWasFound : BOOLEAN 

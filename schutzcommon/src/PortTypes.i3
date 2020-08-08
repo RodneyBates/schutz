@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1997..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -18,9 +18,6 @@ INTERFACE PortTypes
    them will continue to work as before. 
 *) 
 
-(* TODO: Needs updating for the modern world. *) 
-(* This version is for PM3. *) 
-
 ; TYPE Card8Typ = [ 0 .. 255 ] 
   (* ^8 bit cardinal *) 
 
@@ -33,24 +30,24 @@ INTERFACE PortTypes
 ; TYPE Int16Typ = [ - 32768 .. 32767 ] 
   (* ^16 bit integer *) 
 
-; TYPE Card32Typ = [ 0 .. LAST ( INTEGER ) ] 
+; TYPE Card32Typ = [ 0 .. 16_7FFFFFFF ] 
   (* ^32 bit cardinal *) 
-  (* Make it compatible with INTEGER *) 
 
-; TYPE Int32Typ = INTEGER 
+; TYPE Int32Typ = [ - 16_7FFFFFFF - 1 .. 16_7FFFFFFF ] 
   (* ^32 bit integer *) 
 
-; PROCEDURE Int32Image ( Value : Int32Typ ) : TEXT 
+; PROCEDURE IntImage ( Value : INTEGER ) : TEXT 
   (* Result never has blanks. *) 
-  (* Works for other Int* and Card* types with subset value ranges. *) 
+  (* Works for Int* and Card* types with subset value ranges. *) 
 
-; CONST Card32Image = Int32Image 
-; CONST Int16Image = Int32Image 
-; CONST Card16Image = Int32Image 
-; CONST Int8Image = Int32Image 
-; CONST Card8Image = Int32Image 
+; CONST Int32Image = IntImage 
+; CONST Card32Image = IntImage 
+; CONST Int16Image = IntImage 
+; CONST Card16Image = IntImage 
+; CONST Int8Image = IntImage 
+; CONST Card8Image = IntImage 
 
-; CONST INTEGERImage = Int32Image 
+; CONST INTEGERImage = IntImage 
 
 ; END PortTypes 
 . 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -690,7 +690,7 @@ MODULE Ldl1FsTrees
     : LangUtil . FsNodeRefTyp 
     RAISES { AssertionFailure } 
 
-    = VAR LAsDeclNodeNo : LbeStd . EstNodeNoTyp 
+    = VAR LAsDeclNodeNo : INTEGER 
     ; VAR LAsSemDecl : LdlSemantics . SemDeclTyp 
     ; VAR LWasFound : BOOLEAN 
     ; VAR LHasErrors : BOOLEAN 
@@ -795,7 +795,7 @@ MODULE Ldl1FsTrees
 
     = VAR LAsSemDecl: LdlSemantics . SemDeclTyp 
     ; VAR LChildIndentCode : LangUtil . IndentCodeTyp 
-    ; VAR LAsDeclNodeNo : LbeStd . EstNodeNoTyp 
+    ; VAR LAsDeclNodeNo : INTEGER 
     ; VAR LHasErrors : BOOLEAN 
     ; VAR LWasFound : BOOLEAN 
     ; VAR LFsChildren : ARRAY [ 0 .. Ldl1Child . FsChildPlain_ChildClass ] 
@@ -1004,7 +1004,7 @@ MODULE Ldl1FsTrees
     ; VAR LLeadingChildCt : LbeStd . EstChildNoTyp := 0 
     ; VAR LFsNodeForEstChild : LangUtil . FsNodeRefTyp := NIL 
     ; VAR LLdlEstChild : AstView . AstRefTyp := AstView . AstRefNull 
-    ; VAR LDeclNodeNo : LbeStd . EstNodeNoTyp 
+    ; VAR LDeclNodeNo : INTEGER 
     ; VAR LFsEstDescendant : LangUtil . FsNodeRefTyp 
     ; VAR LPredicate : LangUtil . PredicateTyp 
     ; VAR LDoParse : BOOLEAN := FALSE 

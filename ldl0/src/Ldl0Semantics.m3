@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -262,7 +262,7 @@ MODULE Ldl0Semantics
       RAISES { AssertionFailure } 
 
       = VAR LWasFound : BOOLEAN 
-      ; VAR LOldDeclNodeNo : LbeStd . EstNodeNoTyp 
+      ; VAR LOldDeclNodeNo : INTEGER  
       ; VAR LNewSem : LdlSemantics . SemAddlDefStringTyp 
 
       ; BEGIN (* VisitRhsNode *) 
@@ -329,7 +329,7 @@ MODULE Ldl0Semantics
       RAISES { AssertionFailure } 
 
       = VAR LWasFound : BOOLEAN 
-      ; VAR LOldDeclNodeNo : LbeStd . EstNodeNoTyp 
+      ; VAR LOldDeclNodeNo : INTEGER 
 
       ; BEGIN (* VarTermRule *) 
           LdlSemantics . MapAstRef ( LangInfo , NameNode ) 
@@ -370,7 +370,7 @@ MODULE Ldl0Semantics
         RAISES { AssertionFailure } 
 
         = VAR LWasFound : BOOLEAN 
-        ; VAR LOldDeclNodeNo : LbeStd . EstNodeNoTyp 
+        ; VAR LOldDeclNodeNo : INTEGER 
 
         ; BEGIN (* VisitAsNodeDecl *) 
             LdlSemantics . MapAstRef ( LangInfo , DeclNode ) 
@@ -434,7 +434,7 @@ MODULE Ldl0Semantics
     ; PROCEDURE AsClassDecl ( DeclNode : AstView . AstRefTyp ) 
 
       = VAR LWasFound : BOOLEAN 
-      ; VAR LOldDeclNodeNo : LbeStd . EstNodeNoTyp 
+      ; VAR LOldDeclNodeNo : INTEGER 
       ; VAR LNewSem : LdlSemantics . SemAddlDefClassTyp 
 
       ; BEGIN (* AsClassDecl *) 
@@ -1202,7 +1202,7 @@ MODULE Ldl0Semantics
         RAISES { AssertionFailure } 
 
         = VAR LWasFound : BOOLEAN 
-        ; VAR LDeclNodeNo : LbeStd . EstNodeNoTyp 
+        ; VAR LDeclNodeNo : INTEGER 
         ; VAR LTok : LbeStd . TokTyp 
 
         ; BEGIN (* VisitMember *) 
@@ -1413,7 +1413,7 @@ MODULE Ldl0Semantics
   ; PROCEDURE StartRule ( StartIdNode : AstView . AstRefTyp ) 
 
     = VAR LWasFound : BOOLEAN 
-    ; VAR LDeclNodeNo : LbeStd . EstNodeNoTyp 
+    ; VAR LDeclNodeNo : INTEGER 
 
     ; BEGIN (* StartRule *) 
         TextIntSymbolTable . Find 
@@ -1495,7 +1495,7 @@ MODULE Ldl0Semantics
 
       ; BEGIN (* AsChildClass *) 
           VAR LWasFound : BOOLEAN 
-        ; VAR LDeclNodeNo : LbeStd . EstNodeNoTyp 
+        ; VAR LDeclNodeNo : INTEGER 
 
         ; BEGIN (* Block *) 
             TextIntSymbolTable . FindOrAdd 
@@ -1701,7 +1701,7 @@ MODULE Ldl0Semantics
 
       ; BEGIN (* CsRule *) 
           VAR LWasFound : BOOLEAN 
-        ; VAR LOldDeclNodeNo : LbeStd . EstNodeNoTyp 
+        ; VAR LOldDeclNodeNo : INTEGER 
         ; VAR LNewSemAddlDefCs : LdlSemantics . SemAddlDefCsTyp 
         ; VAR LNewSemFirstOccCs : LdlSemantics . SemFirstOccCsTyp 
 
@@ -1867,7 +1867,7 @@ MODULE Ldl0Semantics
 
     ; PROCEDURE VisitFsLhs ( RefNode : AstView . AstRefTyp ) 
 
-      = VAR DeclNodeNo : LbeStd . EstNodeNoTyp 
+      = VAR DeclNodeNo : INTEGER 
 
       ; PROCEDURE LinkFsRule 
           ( SemDeclAsNode : LdlSemantics . SemDeclAsNodeTyp ) 

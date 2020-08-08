@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 2001..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -21,21 +21,21 @@ MODULE PortTypes
 ; IMPORT Fmt 
 ; IMPORT Text 
 
-(* VISIBLE: *) 
-; PROCEDURE Int32Image ( Value : Int32Typ ) : TEXT 
+(* EXPORTED: *) 
+; PROCEDURE IntImage ( Value : INTEGER ) : TEXT 
   (* Result never has blanks. *) 
 
   = VAR LImage : TEXT := Fmt . Int ( Value ) 
   ; VAR LLength := Text . Length ( LImage ) 
 
-  ; BEGIN (* Int32Image *) 
+  ; BEGIN (* IntImage *) 
       IF LLength > 0 AND Text . GetChar ( LImage , 0 ) = ' ' 
       THEN 
         RETURN Text . Sub ( LImage , 1 ) 
       ELSE 
         RETURN LImage 
       END (* IF *) 
-    END Int32Image 
+    END IntImage 
 
 ; BEGIN (* PortTypes *) 
   END PortTypes 
