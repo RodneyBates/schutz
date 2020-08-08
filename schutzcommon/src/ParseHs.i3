@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -176,14 +176,13 @@ INTERFACE ParseHs
 
 ; TYPE ParseTravStateRefTyp 
     = OBJECT 
-        PtsTokInfo : TokInfoTyp 
-      ; PtsPrevTokAfter : LbeStd . TokTyp 
-        (* ^After any scanning. *) 
-      ; PtsNonCmntSeenOnLine : BOOLEAN 
-      ; PtsAdvanceStateRef : ParseTravStateRefTyp 
+       PtsAdvanceStateRef : ParseTravStateRefTyp 
       (* ^If an advance operation from this state has been done, 
           this will point to the state it leads to, so that state does not 
           have to be recomputed, if the advance is repeated. *) 
+      ; PtsTokInfo : TokInfoTyp 
+      ; PtsPrevTokAfter : LbeStd . TokTyp (* After any scanning. *) 
+      ; PtsNonCmntSeenOnLine : BOOLEAN 
       ; PtsSeqNo : PortTypes.Int32Typ 
       ; PtsScanInfo : ScanInfoTyp 
       END (* OBJECT  ParseTravStateRefTyp *) 
@@ -356,6 +355,8 @@ INTERFACE ParseHs
       ; PiScanIf : ScannerIf . ScanIfTyp 
       ; PiTempMarkListRef : TempMarkArrayRefTyp 
       ; PiString : Strings . StringTyp 
+      ; PiAttemptedRepairCt : CARDINAL := 0 
+      ; PiAttemptedRepairActionCt : CARDINAL := 0 
       ; PiGram : LRTable . GrammarTyp 
       ; PiDeferredInfoRef : DeferredInfoRefTyp := NIL 
       ; PiLineCtIncr : LbeStd . LineNoSignedTyp := 0 
@@ -369,8 +370,6 @@ INTERFACE ParseHs
            end of image. *)  
       ; PiLang : LbeStd . LangTyp 
       ; PiParseKind : LbeStd . ParseKindTyp 
-      ; PiAttemptedRepairCt : CARDINAL := 0 
-      ; PiAttemptedRepairActionCt : CARDINAL := 0 
       ; PiEof : BOOLEAN 
       ; PiNlIsWaiting : BOOLEAN 
       ; PiInsertNilFixedChildren : BOOLEAN := FALSE 

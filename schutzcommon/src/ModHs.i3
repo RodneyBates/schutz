@@ -50,8 +50,8 @@ INTERFACE ModHs
 ; TYPE ModLexErrTyp 
     = ModErrTyp 
         OBJECT 
-          ModLexErrCode : LbeStd . ErrCodeTyp 
-        ; ModLexErrPos : LbeStd . LimitedCharNoTyp 
+          ModLexErrPos : LbeStd . LimitedCharNoTyp 
+        ; ModLexErrCode : LbeStd . ErrCodeTyp 
         OVERRIDES 
           Image := ModLexErrImage 
         END (* OBJECT  ModLexErrTyp *) 
@@ -89,12 +89,12 @@ INTERFACE ModHs
 ; TYPE ModCmntTyp 
     = ModRefTyp 
         OBJECT 
-          ModCmntBegScanState : LbeStd . ScanStateTyp 
+          ModCmntStringRef : SharedStrings . T 
+        ; ModCmntBegScanState : LbeStd . ScanStateTyp 
         ; ModCmntEndScanState : LbeStd . ScanStateTyp 
         ; ModCmntFromPos : LbeStd . LimitedCharNoSignedTyp 
         ; ModCmntNlBefore : BOOLEAN := FALSE 
         ; ModCmntNlAfter : BOOLEAN := FALSE 
-        ; ModCmntStringRef : SharedStrings . T 
         METHODS 
           KindImage ( ) : TEXT := ModCmntKindImage 
         OVERRIDES 
@@ -147,14 +147,14 @@ INTERFACE ModHs
 ; TYPE ModTextTyp 
     = ModRefTyp 
         OBJECT 
-          ModTextLeftTokToPos : LbeStd . LimitedCharNoTyp 
+          ModTextStringRef : SharedStrings . T 
+        ; ModTextLeftTokToPos : LbeStd . LimitedCharNoTyp 
         ; ModTextFromPos : LbeStd . LimitedCharNoTyp 
         ; ModTextToPos : LbeStd . LimitedCharNoTyp 
         (* ^ModTextToPos 
            = LbeStd . LimitedCharNoInfinity means new line after. *) 
         ; ModTextOrigToPos : LbeStd . LimitedCharNoTyp 
           (* Absolute to position of the original text that this replaces. *) 
-        ; ModTextStringRef : SharedStrings . T 
         OVERRIDES 
           Image := ModTextImage 
         END (* OBJECT ModTextTyp *) 

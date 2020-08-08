@@ -206,7 +206,9 @@ INTERFACE PaintHs
 ; TYPE LinesRefMeatTyp 
     = LinesRefTyp 
         OBJECT 
-          LrBolTokMark : Marks . TokMarkTyp 
+          LrBolTokMark : Marks . TokMarkTyp
+        ; LrTextAttrArrayRef : TextAttrArrayRefTyp := NIL 
+        ; LrLineErrArrayRef : LineErrArrayRefTyp := NIL 
         ; LrVisibleIn : WindowNoSetTyp := WindowNoSetEmpty 
         ; LrLineCt : LbeStd . LineNoTyp := 0 
           (* INVARIANT: ( LrLineCt > 0 ) IMPLIES ( LrLineLen = 0 ) *) 
@@ -223,8 +225,6 @@ INTERFACE PaintHs
         ; LrLineLen : LbeStd . LimitedCharNoTyp := 0 
           (* Including the unstored leading blanks. *) 
         ; LrLineText : TEXT := NIL (* Leading blanks removed. *) 
-        ; LrTextAttrArrayRef : TextAttrArrayRefTyp := NIL 
-        ; LrLineErrArrayRef : LineErrArrayRefTyp := NIL 
         END (* OBJECT LinesRefMeatTyp *) 
 
 ; PROCEDURE IncludeLrVisibleIn 
@@ -303,9 +303,9 @@ INTERFACE PaintHs
     = LineMarkTyp 
         OBJECT 
           LmWindowRef : WindowRefTyp 
+        ; LmLinesRef : LinesRefMeatTyp 
         ; LmMarkSs : MarkSsTyp 
         ; LmTokMark : Marks . TokMarkTyp 
-        ; LmLinesRef : LinesRefMeatTyp 
         ; LmCharPos : LbeStd . LimitedCharNoSignedTyp 
         ; LmLineNo : LbeStd . LineNoTyp 
         END (* OBJECT *) 
@@ -412,15 +412,15 @@ INTERFACE PaintHs
 ; TYPE TempEditRefTyp 
     = OBJECT 
         TeLinesRef : LinesRefMeatTyp 
+      ; TeEditedString : Strings . T 
+        (* ^Contains leading blanks, in case they are involved in editing. *) 
+      ; TeTextAttrArrayRef : TextAttrArrayRefTyp := NIL  
+      ; TeLineErrArrayRef : LineErrArrayRefTyp := NIL 
+      ; TeTextAttrActualSize : PortTypes . Int32Typ 
       ; TeDelFromPos : LbeStd . LimitedCharNoTyp 
       ; TeDelToPos : LbeStd . LimitedCharNoTyp 
       ; TeInsLen : LbeStd . LimitedCharNoTyp 
       ; TeLineNo : LbeStd . LineNoTyp 
-      ; TeEditedString : Strings . T 
-        (* ^Contains leading blanks, in case they are involved in editing. *) 
-      ; TeTextAttrArrayRef : TextAttrArrayRefTyp := NIL  
-      ; TeTextAttrActualSize : PortTypes . Int32Typ 
-      ; TeLineErrArrayRef : LineErrArrayRefTyp := NIL 
       END (* OBJECT TempEditReFTyp *) 
 
 ; TYPE TempEditStateTyp = { TeStateIdle , TeStateText , TeStateSynt } 
@@ -461,26 +461,26 @@ INTERFACE PaintHs
         ; IrEstRoot : LbeStd . EstRootTyp := NIL 
         ; IrSemRoot : REFANY 
         ; IrMarkCt : LbeStd . MarkNoTyp := 0 
-        ; IrMarkHeader : LineMarkHeaderTyp := NIL 
-        ; IrTempEditState : TempEditStateTyp := TempEditStateTyp . TeStateIdle 
+        ; IrMarkHeader : LineMarkHeaderTyp := NIL
         ; IrTempEditRef : TempEditRefTyp := NIL 
         ; IrImageName : TEXT := NIL 
         (* ^Simple name, with text file suffix. *) 
         ; IrAbsPklFileName : TEXT := NIL 
         (* ^Canonical file system path name, with pickle suffix. *) 
         ; IrAbsTextFileName : TEXT := NIL 
+        ; IrHistoryWrT : Wr . T := NIL  
+        ; IrHistoryText : TEXT := NIL  
+        ; IrLastCommand : TEXT := NIL 
+        ; IrCrashCommand : TEXT := NIL 
+        ; IrTempEditState : TempEditStateTyp := TempEditStateTyp . TeStateIdle 
         ; IrVerNo : VerNoTyp := 0 
         ; IrVerUpdKind : VerUpdKindTyp := 0 
         ; IrVerState : VerStateTyp := VerStateTyp . VerStateNull 
-        ; IrHistoryWrT : Wr . T := NIL  
-        ; IrHistoryText : TEXT := NIL  
         ; IrLineCt : LbeStd . LineNoTyp := 0 
           (* This is maintained only approximately during incremental
              reparsing.  It is used only for scrollbar thumb positioning. *)
-        ; IrLineCtIsExact : BOOLEAN := FALSE  
-        ; IrLastCommand : TEXT := NIL 
-        ; IrCrashCommand : TEXT := NIL 
         ; IrCrashCode : MessageCodes . T := MessageCodes . T . NullCode  
+        ; IrLineCtIsExact : BOOLEAN := FALSE  
         ; IrIsMutatedSinceCommandStarted : BOOLEAN := FALSE 
         ; IrScannerIf : ScannerIf . ScanIfTyp 
         ; IrIsSaved : BOOLEAN := TRUE 

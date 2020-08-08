@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -519,10 +519,10 @@ INTERFACE EstHs
 
 ; TYPE LeafElemTyp 
     = RECORD 
-        LeCumNodeCt : LbeStd . EstNodeNoTyp 
+        LeChildRef : LbeStd . EstRootTyp 
+      ; LeCumNodeCt : LbeStd . EstNodeNoTyp 
         (* ^Node count of Est descendents of this subtree, plus all the 
             subtrees to the right (which have lower numbered subscripts). *) 
-      ; LeChildRef : LbeStd . EstRootTyp 
       ; LeKindSet : EstChildKindSetTyp 
       ; LeFmtNo : BITS 8 FOR FmtNoTyp 
       END (* RECORD *) 
@@ -572,14 +572,14 @@ INTERFACE EstHs
 
 ; TYPE NonleafElemTyp 
     = RECORD 
-        NleCumNodeCt : LbeStd . EstNodeNoTyp 
-        (* ^Node count of Est descendents of this subtree, plus all the 
-           subtrees to the right (which have lower numbered subscripts). *) 
+        NleChildRef : KTreeRefTyp 
       ; NleCumChildCt : LbeStd . EstChildNoTyp 
         (* ^Child count of direct Est children of this nonleaf node, 
            plus all the subtrees to the right (which have lower 
            numbered subscripts). *) 
-      ; NleChildRef : KTreeRefTyp 
+      ; NleCumNodeCt : LbeStd . EstNodeNoTyp 
+        (* ^Node count of Est descendents of this subtree, plus all the 
+           subtrees to the right (which have lower numbered subscripts). *) 
       ; NleKindSet : EstChildKindSetTyp 
       END (* RECORD *) 
 
@@ -643,8 +643,6 @@ INTERFACE EstHs
               which can have a ModDel, or an EstChild, which can have 
               an EstChild. 
            2) We can distinguish a TrailingMod by looking at the Tok. *) 
-; TYPE EdgeKindPackedTyp = BITS 2 FOR EdgeKindTyp
-       (* ^Can't assume 100% self-adapting. *) 
 
 ; PROCEDURE IsFirstOfGroup 
     ( LeftFmtNo : FmtNoTyp 
@@ -678,8 +676,8 @@ INTERFACE EstHs
 ; TYPE EdgeInfoTyp 
     = RECORD 
         EiTok : LbeStd . TokTyp 
-      ; EiFmtNo : BITS 8 FOR FmtNoTyp 
-      ; EiEdgeKind : EdgeKindPackedTyp 
+      ; EiFmtNo : FmtNoTyp 
+      ; EiEdgeKind : EdgeKindTyp 
       END (* RECORD *) 
 
 ; PROCEDURE EdgeInfoImage ( READONLY Value : EdgeInfoTyp ) : TEXT 
@@ -744,7 +742,7 @@ INTERFACE EstHs
       ; EmiSyntTokCt : LbeStd . LimitedTokCtTyp 
       ; EmiEdgeKind : EdgeKindTyp 
       ; EmiWidthInfo : WidthInfoTyp 
-      END (* RECORD  EstMiscInfoTyp *) 
+      END (* RECORD EstMiscInfoTyp *) 
 
 (* K-tree nodes. These are fields common to leaf/nonleaf, 
    root/nonroot nodes. *) 
@@ -814,7 +812,8 @@ INTERFACE EstHs
 ; TYPE EstRefTyp 
     = KTreeRefTyp 
         OBJECT 
-          EstTok : LbeStd . TokTyp 
+          EstSemRef : ROOT := NIL (* For use by semantics. *) 
+        ; EstTok : LbeStd . TokTyp 
         ; EstLeftTok : LbeStd . TokTyp 
         ; EstRightTok : LbeStd . TokTyp 
         ; EstNodeKind : EstNodeKindPackedTyp 
@@ -823,7 +822,6 @@ INTERFACE EstHs
         ; EstRepairCost : LbeStd . RepairCostTyp  
 (* TODO: ^Add this field, use it, review packing of this type. *) 
         ; EstChildKindSet : EstChildKindSetTyp 
-        ; EstSemRef : ROOT := NIL (* For use by semantics. *) 
         OVERRIDES 
           Image := EstRefImage 
         END (* OBJECT EstRefTyp *) 
@@ -863,8 +861,8 @@ INTERFACE EstHs
 ; TYPE KTreeNonleafRefTyp (* Nonroot, nonleaf *) 
     = KTreeRefTyp 
         OBJECT 
-          KTreeNonleafSliceEdgeInfoPair : SliceEdgeInfoPairTyp 
-        ; KTreeNonleafArrayRef : NonleafArrayRefTyp 
+          KTreeNonleafArrayRef : NonleafArrayRefTyp 
+        ; KTreeNonleafSliceEdgeInfoPair : SliceEdgeInfoPairTyp 
         OVERRIDES 
           KTreeChildCt := KTreeNonleafChildCt 
         ; KTreeNodeCt := KTreeNonleafNodeCt 
@@ -910,8 +908,8 @@ INTERFACE EstHs
 ; TYPE EstNonleafRefTyp (* Root, nonleaf *) 
     = EstRefTyp 
         OBJECT 
-          EstNonleafSliceEdgeInfoPair : SliceEdgeInfoPairTyp 
-        ; EstNonleafArrayRef : NonleafArrayRefTyp 
+          EstNonleafArrayRef : NonleafArrayRefTyp 
+        ; EstNonleafSliceEdgeInfoPair : SliceEdgeInfoPairTyp 
         OVERRIDES 
           KTreeChildCt := EstNonleafChildCt 
         ; KTreeNodeCt := EstNonleafNodeCt 
