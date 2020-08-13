@@ -270,7 +270,7 @@ then
   cd ..
   exit 1
 fi
-echo "  Copy executable LdlBoot to ./boot."
+echo "  Copy executable LdlBatch to ./boot."
 rm -f ../boot/LdlBatch 
 if ! cp -p $TARGET/LdlBatch ../boot/LdlBatch
 then
