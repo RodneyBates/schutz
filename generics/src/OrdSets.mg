@@ -8328,8 +8328,7 @@ GENERIC MODULE OrdSets ( )
           ; LBitset . BitwordArrayRef := NIL 
 
         | '1' (* Ref to previously read Bitword array. *)  
-          => LRefID := PickleStubs . InInteger ( reader )
-                       (* ^I sure hope this one doesn't overflow. *)  
+          => LRefID := PickleStubs . InInt32 ( reader )
           ; LBitwordArrayRef := Pickle2 . RefOfRefID ( reader , LRefID )
           ; LBitset := ConstructBitset ( LBitsetInfo , LBitwordArrayRef )
 
