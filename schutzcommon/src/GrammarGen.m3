@@ -2820,7 +2820,8 @@ CLEAN UP^ Not so, at least not yet.
   ; VAR LMessageCt : PortTypes . Card32Typ 
 
   ; BEGIN (* Block *)
-      GDoFactorClasses := Factored  
+      IF LangInfo = NIL THEN RETURN END (* IF *) 
+    ; GDoFactorClasses := Factored  
     ; GDoFactorSubstrings := Factored  
     ; GDoFactorAlts := Factored  
     ; GPossibleTokstringAtomTokCt := 0 

@@ -1059,16 +1059,19 @@ MODULE LRUtils
 ; PROCEDURE StripGrammar ( Gram : LRTable . GrammarTyp ) 
   (* Remove stuff only needed during LR generation. *) 
 
-  = BEGIN 
-      Gram . ProdArrayRef := NIL 
-    ; Gram . ItemArrayRef := NIL 
-    ; Gram . StateArrayRef := NIL 
-    ; Gram . NontermInfoArrayRef := NIL 
-    ; Gram . NullableNTs := NIL 
-    ; Gram . LR1ListStateTbl := NIL 
-    ; Gram . LR1SetStateTbl := NIL 
-    ; Gram . LR0ListStateTbl := NIL 
-    ; Gram . LR0ItemTbl := NIL 
+  = BEGIN
+      IF Gram # NIL
+      THEN
+        Gram . ProdArrayRef := NIL 
+      ; Gram . ItemArrayRef := NIL 
+      ; Gram . StateArrayRef := NIL 
+      ; Gram . NontermInfoArrayRef := NIL 
+      ; Gram . NullableNTs := NIL 
+      ; Gram . LR1ListStateTbl := NIL 
+      ; Gram . LR1SetStateTbl := NIL 
+      ; Gram . LR0ListStateTbl := NIL 
+      ; Gram . LR0ItemTbl := NIL
+      END (* IF *) 
     END StripGrammar 
 
 ; BEGIN 
