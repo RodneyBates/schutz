@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -1666,18 +1666,21 @@ MODULE UiDevel
 ; PROCEDURE ShowDebugOptions ( ) 
 
   = <* FATAL FormsVBT . Error *> 
-    BEGIN 
-      IF Options . AllowProceedAfterAssert 
-      THEN
-        FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Proceed" ) 
-      ELSE 
-        FormsVBT . MakeDormant ( Options . MainForm , "Fv_Assert_Proceed" ) 
-      END (* IF *) 
-    ; IF Options . AllowTerminateAfterAssert 
-      THEN
-        FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Terminate" ) 
-      ELSE 
-        FormsVBT . MakeDormant ( Options . MainForm , "Fv_Assert_Terminate" ) 
+    BEGIN
+      IF Options . MainForm # NIL
+      THEN 
+        IF Options . AllowProceedAfterAssert 
+        THEN
+          FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Proceed" ) 
+        ELSE 
+          FormsVBT . MakeDormant ( Options . MainForm , "Fv_Assert_Proceed" ) 
+        END (* IF *) 
+      ; IF Options . AllowTerminateAfterAssert 
+        THEN
+          FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Terminate" ) 
+        ELSE 
+          FormsVBT . MakeDormant ( Options . MainForm , "Fv_Assert_Terminate" ) 
+        END (* IF *)
       END (* IF *) 
     END ShowDebugOptions 
 

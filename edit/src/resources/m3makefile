@@ -8,12 +8,12 @@
 
 % m3makefile for subdirectory edit/src/resources, Schutz semantic editor. 
 
-resource("Scheutz.fv")
+resource("Schutz.fv")
 resource("Search.fv")
 resource("Browse.fv")
 %resource("Assert.fv")
 resource("bnote.pbm")
-resource("ScheutzLogo.pbm")
+resource("SchutzLogo.pbm")
 resource("digitalLogo.pbm")
 resource("Stop.pbm")
 resource("pen.pbm")

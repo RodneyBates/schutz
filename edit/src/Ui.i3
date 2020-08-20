@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -17,7 +17,6 @@ INTERFACE Ui
 ; IMPORT PaintHs 
 ; IMPORT ScannerIf
 ; IMPORT Worker 
-
 
 <* PRAGMA LL *>
 
@@ -77,6 +76,7 @@ INTERFACE Ui
     ; RecordFileName : TEXT 
     ; DelayTime : INTEGER 
     ) 
+  : BOOLEAN (* => Success. *) 
   RAISES { Assertions . AssertionFailure } 
 
 (* Convenience procedures for setting standard fields of closures. *) 

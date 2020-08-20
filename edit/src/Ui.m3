@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -2759,7 +2759,8 @@ ReadSelections (* q.v. *) ( Window , Time )
     ; RespectStops : BOOLEAN 
     ; RecordFileName : TEXT 
     ; DelayTime : INTEGER 
-    ) 
+    )
+  : BOOLEAN (* => Success. *) 
   RAISES { AssertionFailure } 
   = <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
@@ -2771,22 +2772,23 @@ ReadSelections (* q.v. *) ( Window , Time )
       EXCEPT 
         Rsrc . NotFound 
         => DL ( LbeStd . AppName & ": Unable to locate resource Schutz.fv" )  
-        ; RETURN 
+        ; RETURN FALSE 
       | Rd . Failure  
         => DL ( LbeStd . AppName & ": Unable to read resource Schutz.fv" )  
-        ; RETURN 
+        ; RETURN FALSE 
       | Thread . Alerted 
-        => RETURN 
+        => RETURN FALSE 
       END 
     ; UiRecPlay . RespectStops := RespectStops 
     ; InitForm ( Options . MainForm ) 
+    ; IF Options . MainForm = NIL THEN RETURN FALSE END 
     ; Options . MainWindow 
         := FormsVBT . GetGeneric ( Options . MainForm , "Fv_LbeWindow" ) 
     ; FormsVBT . PutInteger 
         ( Options . MainForm 
         , "Fv_Devel_DebugLevelValue" 
         , Options . DebugLevel 
-        )  
+        )
     ; TRY
         TrestleInstall ( Options . MainForm ) 
       ; IF EditFileName # NIL AND NOT Text . Equal ( EditFileName , "" ) 
@@ -2850,8 +2852,10 @@ ReadSelections (* q.v. *) ( Window , Time )
           DL ( LbeStd . AppName 
                & ": Could not open display " & Options . Display 
              )
-        ; Assertions . TerminatingNormally := TRUE 
-      END 
+        ; Assertions . TerminatingNormally := TRUE
+        ; RETURN FALSE 
+      END
+    ; RETURN TRUE 
     END Install 
 
 (* VISIBLE: *) 
