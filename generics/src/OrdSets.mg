@@ -285,6 +285,20 @@ GENERIC MODULE OrdSets ( )
       RETURN BitwordNo * BitsPerBitword 
     END BitZeroIElemOfBitwordNo
 
+; PROCEDURE ByteImage ( Ch : CHAR ) : TEXT
+  = VAR LByte : INTEGER
+  ; VAR LResult : TEXT
+  
+  ; BEGIN
+      LByte := ORD ( Ch )
+    ; LResult := "16_" & Fmt . Pad ( Fmt . Int ( LByte ) , 2 , '0' )
+    ; IF 16_20 <= LByte AND LByte <= 16_7E
+      THEN
+        LResult := LResult & "/\'" & Fmt . Char ( Ch ) & "\'"
+      END (* IF *)
+    ; RETURN LResult 
+    END ByteImage
+
 (* ============================ Heap allocation. =========================== *) 
 
 (* Accumulated statistics. *) 
@@ -8379,7 +8393,10 @@ GENERIC MODULE OrdSets ( )
 
         ELSE 
 (* TODO: Something about compatibility with older pickles, cases '2', '3'. *)
-          RAISE Pickle2 . Error ("Malformed pickle (unknown switch).")
+          RAISE Pickle2 . Error
+            ( "Invalid pickled OrdSet (unknown switch"
+              & ByteImage ( LCh ) & ")."
+            )
         END (* CASE *) 
       ; LResult := LBitset 
 
@@ -8478,7 +8495,9 @@ GENERIC MODULE OrdSets ( )
         END (* IF *) 
       ELSE  
         RAISE Pickle2 . Error 
-          ( "Invalid pickled OrdSet (invalid set kind flag byte)." )
+          ( "Invalid pickled OrdSet (invalid set kind flag byte"
+            & ByteImage ( VAL ( LFlag , CHAR ) ) & ")."
+          )
       END (* CASE LFlag *) 
     ; reader . noteRef ( LResult , Id )
     ; RETURN LResult 
