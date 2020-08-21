@@ -818,7 +818,7 @@ Enabled := FALSE ;
   RAISES { Thread . Alerted }  
 
   = BEGIN 
-      IF RecordClosure . IsOpen 
+      IF RecordClosure # NIL AND RecordClosure . IsOpen 
       THEN 
         RecordDisable ( RecordClosure )  
       ; TRY 
@@ -2169,6 +2169,10 @@ Enabled := FALSE ;
             DL ( LbeStd . AppName & ": Unable to locate resource RecPlay.fv" )
           EXCEPT Thread . Alerted=> (* Ignore *) 
           END (* TRY EXCEPT *) 
+        ; RETURN 
+      | FormsVBT . Error ( msg )
+        => DL ( LbeStd . AppName & ": Unable to init from resource RecPlay.fv ("
+                & msg & ")" )  
         ; RETURN 
       | Thread . Alerted 
         => RETURN 

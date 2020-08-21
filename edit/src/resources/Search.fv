@@ -1,7 +1,7 @@
 
 ;; -----------------------------------------------------------------------1- ;;
-;; This file is part of the Scheutz semantic editor.                         ;;
-;; Copyright 1988..2007, Rodney M. Bates.                                    ;;
+;; This file is part of the Schutz semantic editor.                          ;;
+;; Copyright 1988..2020, Rodney M. Bates.                                    ;;
 ;; rodney.bates@wichita.edu                                                  ;;
 ;; Licensed under the Gnu Public License, version 2 or later.                ;;
 ;; -----------------------------------------------------------------------2- ;;
@@ -13,7 +13,7 @@
   (VBox 
     ( Frame 
       ( Shape ( Height 16 ) 
-        ( HBox Fill (Text "Scheutz Search and Replace") Fill ) 
+        ( HBox Fill (Text "Schutz Search and Replace") Fill ) 
       ) 
     ) ; Frame 
     ( Shape (Height + 0 - 0 ) ( Text "Search String:") ) 

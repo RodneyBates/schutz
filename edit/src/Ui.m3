@@ -2775,7 +2775,11 @@ ReadSelections (* q.v. *) ( Window , Time )
         ; RETURN FALSE 
       | Rd . Failure  
         => DL ( LbeStd . AppName & ": Unable to read resource Schutz.fv" )  
-        ; RETURN FALSE 
+        ; RETURN FALSE
+      | FormsVBT . Error ( msg )
+        => DL ( LbeStd . AppName & ": Unable to init from resource Schutz.fv ("
+                & msg & ")" )  
+        ; RETURN FALSE
       | Thread . Alerted 
         => RETURN FALSE 
       END 

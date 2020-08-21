@@ -1,7 +1,7 @@
 
 ;; -----------------------------------------------------------------------1- ;;
-;; This file is part of the Scheutz semantic editor.                         ;;
-;; Copyright 1988..2007, Rodney M. Bates.                                    ;;
+;; This file is part of the Schutz semantic editor.                          ;;
+;; Copyright 1988..2020, Rodney M. Bates.                                    ;;
 ;; rodney.bates@wichita.edu                                                  ;;
 ;; Licensed under the Gnu Public License, version 2 or later.                ;;
 ;; -----------------------------------------------------------------------2- ;;
@@ -23,7 +23,7 @@
            (Glue 10)
            (Text "Oh No!" )
            (Glue 5) 
-           (Text "The amazing Scheutz semantic editor has suffered a humiliating assertion failure!" )
+           (Text "The amazing Schutz semantic editor has suffered a humiliating assertion failure!" )
            (Glue 5)
            (HBox 
             (Shape (Width 40) (Text "Location:" ))  

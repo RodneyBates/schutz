@@ -397,15 +397,17 @@ EXPORTS Main
       ; EVAL LangUtil . LoadLanguage ( "m3" ) 
       ; 
 *)
-        Ui . Install 
-          ( Options . EditFileName 
-          , PlaybackFileName 
-          , DoRunPlayback 
-          , RespectStops 
-          , RecordFileName 
-          , DelayTime 
-          ) 
-      ; UiDevel . ShowDebugOptions ( ) 
+        IF NOT Ui . Install 
+                 ( Options . EditFileName 
+                 , PlaybackFileName 
+                 , DoRunPlayback 
+                 , RespectStops 
+                 , RecordFileName 
+                 , DelayTime 
+                 )
+        THEN Assertions . TerminatingNormally := TRUE 
+        ELSE UiDevel . ShowDebugOptions ( )
+        END (* IF *)
       ELSE Assertions . TerminatingNormally := TRUE 
       END (* IF *) 
     END Work 

@@ -1,7 +1,7 @@
 
 ;; -----------------------------------------------------------------------1- ;;
-;; This file is part of the Scheutz semantic editor.                         ;;
-;; Copyright 1988..2007, Rodney M. Bates.                                    ;;
+;; This file is part of the Schutz semantic editor.                          ;;
+;; Copyright 1988..2020, Rodney M. Bates.                                    ;;
 ;; rodney.bates@wichita.edu                                                  ;;
 ;; Licensed under the Gnu Public License, version 2 or later.                ;;
 ;; -----------------------------------------------------------------------2- ;;
@@ -147,7 +147,7 @@
        (Shape (Width 26) (Height 13.5) "Help")
        (Border
          (VBox
-           (PopMButton (For aboutMFE) (TLA "About Scheutz..."))
+           (PopMButton (For aboutMFE) (TLA "About Schutz..."))
            (SEP)
            (COMMAND %Fv_Help_Help "Help..."
              "oH" "M-h" "c-h" "M-h" (PopMButton (For manpage)))
@@ -262,7 +262,7 @@
          (VBox
            (Glue 2)
            (HBox %Fv_Menubar
-             (Pixmap (Color "Blue") "ScheutzLogo.pbm")
+             (Pixmap (Color "Blue") "SchutzLogo.pbm")
              (Glue 2)
              (FILEMENU)
              (Glue 2)
@@ -502,7 +502,7 @@
     ) 
     (ZChassis %manpage (At .05 .95 .1 .9  )
       (BgColor "VeryPaleBlue")
-      (Title "Scheutz help")
+      (Title "Schutz help")
       (VBox
         (HBox
           (Menu
@@ -536,9 +536,9 @@
       (BOX (pens (1.5 2 1 12))
         (child
           (VBox
-            (Pixmap (Color "Blue") "ScheutzLogo.pbm")
+            (Pixmap (Color "Blue") "SchutzLogo.pbm")
             (Glue 6)
-            "Scheutz semantic editor, version 0.1"
+            "Schutz semantic editor, version 0.1"
             "Written by Rodney M. Bates"
             "Copyright \251 2002, Bluestem Software."
             "Send comments to rodney.bates@wichita.edu"
@@ -588,7 +588,7 @@
         (VBox 
            (Text Center (LabelFont (PointSize 240) ) "O H   N O !" ) 
            (Text Center (LabelFont (PointSize 120) ) 
-              "The usually marvelous Scheutz editor has suffered a humiliating" 
+              "The usually marvelous Schutz editor has suffered a humiliating" 
            ) 
            (Text Center (LabelFont (PointSize 240) ) "ASSERTION FAILURE!" ) 
            Ridge 
