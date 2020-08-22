@@ -2159,10 +2159,10 @@ Enabled := FALSE ;
 *) 
       Options . RecordFileName := DefaultRecordFileName 
     ; Options . PlaybackFileName := DefaultPlaybackFileName 
+    ; Options . RecPlayForm := NEW ( FormsVBT . T ) 
     ; TRY 
-        Options . RecPlayForm 
-          := NEW ( FormsVBT . T ) 
-             . initFromRsrc ( "RecPlay.fv" , Options . ResourcePath )
+        EVAL Options . RecPlayForm . initFromRsrc
+               ( "RecPlay.fv" , Options . ResourcePath )
       EXCEPT 
         Rsrc . NotFound 
         => TRY 

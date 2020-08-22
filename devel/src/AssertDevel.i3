@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -34,7 +34,7 @@ INTERFACE AssertDevel
   (* Conduct a command line dialog about an assertion failure. *) 
 
 ; PROCEDURE RuntimeFailureDialog ( ) 
-  (* Conduct a command line dialogg about a runtime error. *) 
+  (* Conduct a command line dialog about a runtime error. *) 
 
 ; END AssertDevel 
-. 
+.

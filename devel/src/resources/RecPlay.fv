@@ -1,12 +1,12 @@
 
-%% -----------------------------------------------------------------------1- %%
-%% This file is part of the Schutz semantic editor.                          %%
-%% Copyright 1988..2017, Rodney M. Bates.                                    %%
-%% rodney.m.bates@acm.org                                                    %%
-%% Licensed under the MIT License.                                           %%
-%% -----------------------------------------------------------------------2- %%
+;; -----------------------------------------------------------------------1- ;;
+;; This file is part of the Schutz semantic editor.                          ;;
+;; Copyright 1988..2020, Rodney M. Bates.                                    ;;
+;; rodney.m.bates@acm.org                                                    ;;
+;; Licensed under the MIT License.                                           ;;
+;; -----------------------------------------------------------------------2- ;;
 
-% File devel/src/resources/RecPlay.fv, Schutz semantic editor.
+; File devel/src/resources/RecPlay.fv, Schutz semantic editor.
 
 ( Shape %Rc_Window 
   ( Height 300 - 200 + Inf )
