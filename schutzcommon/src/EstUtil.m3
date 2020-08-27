@@ -1860,23 +1860,19 @@ MODULE EstUtil
 
   ; BEGIN (* EstMiscInfo *) 
       LResult . EmiSyntTokCt := 0 
-(* EmiEdgeKind
-   EmiTok
-*) 
-
+    (* EmiEdgeKind, EmiTok, EmiLeftTok, EmiRightTok, no default. *) 
     ; LResult . EmiWidthInfo . WiIsNull := FALSE 
     ; LResult . EmiWidthInfo . WiHasAbsFromPos := FALSE 
     ; LResult . EmiWidthInfo . WiHasNlBefore := FALSE 
     ; LResult . EmiWidthInfo . WiHasNlAfter := FALSE 
     ; LResult . EmiWidthInfo . WiHasNlWithin := FALSE 
-    ; LResult . EmiWidthInfo . WiWholeLineModsOnly  := FALSE 
-(* WiWidth *) 
+    ; LResult . EmiWidthInfo . WiWholeLineModsOnly := FALSE 
+    (* WiWidth, no default. *) 
     ; LResult . EmiWidthInfo . WiNlTrigger := LbeStd . LimitedCharNoInfinity 
     ; TYPECASE ItemRef 
 
       OF ModHs . EstDummyTyp (* Including NIL *) 
       => LResult . EmiWidthInfo := EstHs . WidthInfoNull 
-      ; LResult . EmiSyntTokCt := 0  
       ; LResult . EmiTok := LbeStd . Tok__Null  
       ; LResult . EmiEdgeKind := EstHs . EdgeKindTyp . EdgeKindEstChild 
 
@@ -1891,15 +1887,12 @@ MODULE EstUtil
 
       | ModHs . ModCmntLeadingFixedTyp ( TModCmnt ) 
       => LResult . EmiEdgeKind := EstHs . EdgeKindTyp . EdgeKindLeadingMod 
-      ; LResult . EmiWidthInfo . WiIsNull := FALSE 
       ; LResult . EmiWidthInfo . WiHasAbsFromPos := TRUE 
       ; LResult . EmiWidthInfo . WiHasNlBefore := TModCmnt . ModCmntNlBefore  
       ; LResult . EmiWidthInfo . WiHasNlAfter := TModCmnt . ModCmntNlAfter
-      ; LResult . EmiWidthInfo . WiHasNlWithin := FALSE 
       ; IF TModCmnt . ModCmntNlBefore AND TModCmnt . ModCmntNlAfter  
         THEN (* It's a whole-line item.  It gets zero width. *) 
           LResult . EmiWidthInfo . WiWidth := 0
-        ; LResult . EmiWidthInfo . WiNlTrigger := LbeStd . LimitedCharNoInfinity
         ; LResult . EmiWidthInfo . WiWholeLineModsOnly := TRUE 
         ELSE 
           LResult . EmiWidthInfo . WiWidth (* Absolute. *)  
@@ -1908,7 +1901,6 @@ MODULE EstUtil
                  , SharedStrings . Length ( TModCmnt . ModCmntStringRef ) 
                  ) 
         ; LResult . EmiWidthInfo . WiNlTrigger := TModCmnt . ModCmntFromPos 
-        ; LResult . EmiWidthInfo . WiWholeLineModsOnly := FALSE 
         END (* (IF *) 
       ; IF TModCmnt . ModCmntNlAfter 
         THEN LResult . EmiTok := LbeStd . Tok__CmntAtEndOfLine 
@@ -1917,12 +1909,8 @@ MODULE EstUtil
 
       | ModHs . ModCmntLeadingRelativeTyp ( TModCmnt )  
       => LResult . EmiEdgeKind := EstHs . EdgeKindTyp . EdgeKindLeadingMod 
-      ; LResult . EmiWidthInfo . WiIsNull := FALSE 
-      ; LResult . EmiWidthInfo . WiHasAbsFromPos := FALSE 
       ; LResult . EmiWidthInfo . WiHasNlBefore := TModCmnt . ModCmntNlBefore 
       ; LResult . EmiWidthInfo . WiHasNlAfter := TModCmnt . ModCmntNlAfter
-      ; LResult . EmiWidthInfo . WiHasNlWithin := FALSE 
-      ; LResult . EmiWidthInfo . WiNlTrigger := LbeStd . LimitedCharNoInfinity
       ; IF TModCmnt . ModCmntNlBefore AND TModCmnt . ModCmntNlAfter  
         THEN (* It's a whole-line item.  It gets zero width. *)
           LResult . EmiWidthInfo . WiWidth := 0
@@ -1930,22 +1918,16 @@ MODULE EstUtil
         ELSE 
           LResult . EmiWidthInfo . WiWidth (* Relative. *) 
             := SharedStrings . Length ( TModCmnt . ModCmntStringRef )  
-        ; LResult . EmiWidthInfo . WiWholeLineModsOnly := FALSE 
         END (* (IF *) 
       ; IF TModCmnt . ModCmntNlAfter  
         THEN LResult . EmiTok := LbeStd . Tok__CmntAtEndOfLine 
         ELSE LResult . EmiTok := LbeStd . Tok__Cmnt 
         END (* IF *) 
-      ; LResult . EmiWidthInfo . WiHasNlWithin := FALSE 
 
       | ModHs . ModCmntTrailingFixedTyp ( TModCmnt ) 
       => LResult . EmiEdgeKind := EstHs . EdgeKindTyp . EdgeKindTrailingMod 
-      ; LResult . EmiWidthInfo . WiIsNull := FALSE 
       ; LResult . EmiWidthInfo . WiHasAbsFromPos := TRUE 
-      ; LResult . EmiWidthInfo . WiHasNlBefore := FALSE 
       ; LResult . EmiWidthInfo . WiHasNlAfter := TModCmnt . ModCmntNlAfter
-      ; LResult . EmiWidthInfo . WiHasNlWithin := FALSE 
-      ; LResult . EmiWidthInfo . WiWholeLineModsOnly := FALSE 
       ; LResult . EmiWidthInfo . WiNlTrigger := TModCmnt . ModCmntFromPos 
       ; LResult . EmiWidthInfo . WiWidth (* Absolute. *)  
            := WidthSum 
@@ -1959,13 +1941,7 @@ MODULE EstUtil
 
       | ModHs . ModCmntTrailingRelativeTyp ( TModCmnt ) 
       => LResult . EmiEdgeKind := EstHs . EdgeKindTyp . EdgeKindTrailingMod 
-      ; LResult . EmiWidthInfo . WiIsNull := FALSE 
-      ; LResult . EmiWidthInfo . WiHasAbsFromPos := FALSE 
-      ; LResult . EmiWidthInfo . WiHasNlBefore := FALSE 
       ; LResult . EmiWidthInfo . WiHasNlAfter := TModCmnt . ModCmntNlAfter
-      ; LResult . EmiWidthInfo . WiHasNlWithin := FALSE 
-      ; LResult . EmiWidthInfo . WiWholeLineModsOnly := FALSE 
-      ; LResult . EmiWidthInfo . WiNlTrigger := LbeStd . LimitedCharNoInfinity
       ; LResult . EmiWidthInfo . WiWidth (* Relative. *)
           := SharedStrings . Length ( TModCmnt . ModCmntStringRef ) 
       ; IF TModCmnt . ModCmntNlAfter 
@@ -1975,28 +1951,28 @@ MODULE EstUtil
 
       | ModHs . ModTextTyp ( TModText ) 
       => LResult . EmiEdgeKind := EstHs . EdgeKindTyp . EdgeKindLeadingMod 
-      ; LResult . EmiWidthInfo . WiIsNull := FALSE 
       ; LResult . EmiWidthInfo . WiHasAbsFromPos := TRUE 
       ; LResult . EmiWidthInfo . WiHasNlBefore 
           := TModText . ModTextLeftTokToPos = 0 
       ; LResult . EmiWidthInfo . WiHasNlAfter 
           := TModText . ModTextToPos = LbeStd . LimitedCharNoInfinity 
-      ; LResult . EmiWidthInfo . WiHasNlWithin := FALSE 
-      ; LResult . EmiWidthInfo . WiWholeLineModsOnly := FALSE 
-      ; LResult . EmiWidthInfo . WiNlTrigger := TModText . ModTextFromPos 
-      ; LResult . EmiWidthInfo . WiWidth := TModText . ModTextOrigToPos 
+      ; IF LResult . EmiWidthInfo . WiHasNlBefore
+           AND LResult . EmiWidthInfo . WiHasNlAfter   
+        THEN (* It's a whole-line item.  It gets zero width. *) 
+          LResult . EmiWidthInfo . WiWidth := 0
+        ; LResult . EmiWidthInfo . WiWholeLineModsOnly := TRUE 
+        ELSE 
+          LResult . EmiWidthInfo . WiWidth := TModText . ModTextOrigToPos
+        ; LResult . EmiWidthInfo . WiNlTrigger := TModText . ModTextFromPos
+        END (* IF *) 
       ; LResult . EmiTok := LbeStd . Tok__ModText 
 
       | ModHs . ModBlankLineTyp 
       => LResult . EmiEdgeKind := EstHs . EdgeKindTyp . EdgeKindLeadingMod 
-      ; LResult . EmiWidthInfo . WiIsNull := FALSE 
-      ; LResult . EmiWidthInfo . WiHasAbsFromPos := FALSE 
       ; LResult . EmiWidthInfo . WiHasNlBefore := TRUE 
       ; LResult . EmiWidthInfo . WiHasNlAfter := TRUE 
-      ; LResult . EmiWidthInfo . WiHasNlWithin := FALSE 
-      ; LResult . EmiWidthInfo . WiNlTrigger := LbeStd . LimitedCharNoInfinity
+      (* Blank line is always a whole-line item.  It gets zero width. *)
       ; LResult . EmiWidthInfo . WiWidth := 0 
-        (* Blank line is always a whole-line item.  It gets zero width. *)
       ; LResult . EmiWidthInfo . WiWholeLineModsOnly := TRUE  
       ; LResult . EmiTok := LbeStd . Tok__BlankLine 
 
@@ -2012,13 +1988,6 @@ MODULE EstUtil
 
       | SharedStrings . T ( TSharedString ) 
       => LResult . EmiTok := SharedStrings . Tok ( TSharedString ) 
-      ; LResult . EmiWidthInfo . WiIsNull := FALSE 
-      ; LResult . EmiWidthInfo . WiHasAbsFromPos := FALSE 
-      ; LResult . EmiWidthInfo . WiHasNlBefore := FALSE 
-      ; LResult . EmiWidthInfo . WiHasNlAfter := FALSE 
-      ; LResult . EmiWidthInfo . WiHasNlWithin := FALSE 
-      ; LResult . EmiWidthInfo . WiWholeLineModsOnly := FALSE 
-      ; LResult . EmiWidthInfo . WiNlTrigger := LbeStd . LimitedCharNoInfinity
       ; LResult . EmiWidthInfo . WiWidth 
           := SharedStrings . Length ( TSharedString ) 
       ; LResult . EmiEdgeKind := EstHs . EdgeKindTyp . EdgeKindEstChild 
