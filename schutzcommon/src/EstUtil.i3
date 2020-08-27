@@ -163,7 +163,8 @@ INTERFACE EstUtil
     ) 
   : LbeStd . LimitedCharNoTyp 
   RAISES { AssertionFailure } 
-  (* Add a left CharPos to a right WidthInfo, giving a CharPos. *) 
+  (* Prepend a left starting CharPos to a right WidthInfo, giving an ending
+     CharPos. *) 
   (* Return infinity if won't fit on a full-length line. *) 
 
 (* Misc. *) 

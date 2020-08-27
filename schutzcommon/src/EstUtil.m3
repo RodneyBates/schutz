@@ -471,7 +471,7 @@ MODULE EstUtil
     ) 
   : LbeStd . LimitedCharNoTyp 
   RAISES { AssertionFailure } 
-  (* Add a left starting CharPos to a right WidthInfo, giving an ending 
+  (* Prepend a left starting CharPos to a right WidthInfo, giving an ending
      CharPos. 
      Return infinity if won't fit on a full-length line. 
   *) 
@@ -479,17 +479,10 @@ MODULE EstUtil
   = BEGIN (* CharPosPlusWidthInfo *) 
 (* CHECK or FIXME: What if WiHasNlBefore? Would need a PrevChar. *) 
       IF Right . WiNlTrigger = LbeStd . LimitedCharNoInfinity 
-      THEN 
-        Assert 
-          ( NOT Right . WiHasAbsFromPos 
-          , AFT . A_CharPosPlusWidthInfoAbsButNoTrigger 
-          ) 
-      ; RETURN WidthSum ( Left , Right . WiWidth ) 
+      THEN RETURN WidthSum ( Left , Right . WiWidth ) 
       ELSIF Left <= Right . WiNlTrigger 
-      THEN 
-        RETURN Right . WiWidth 
-      ELSE 
-        RETURN LbeStd . LimitedCharNoInfinity 
+      THEN RETURN Right . WiWidth 
+      ELSE RETURN LbeStd . LimitedCharNoInfinity 
       END (* IF *) 
     END CharPosPlusWidthInfo 
 

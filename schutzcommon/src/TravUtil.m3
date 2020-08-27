@@ -3324,13 +3324,14 @@ MODULE TravUtil
           ELSIF TEstRef . KTreeWidthInfo . WiHasNlBefore 
           THEN (* Est begins on an unconditional Nl.  CharPos is unneeded. *)
             IF TEstRef . KTreeWidthInfo . WiHasAbsFromPos 
-            THEN (* WiHasNlBefore means no triggering, and WiWidth, previously
-                    found <= RightMargin, is the absolute ending position. *)
+            THEN (* WiHasNlBefore precludes triggering, and WiWidth, previously
+                    found to be <= RightMargin, is the absolute ending
+                    position. *)
               RETURN LangUtil . FmtKindTyp . FmtKindHoriz  
             ELSE (* WiHasNlBefore AND NOT WiHasAbsFromPos.  This can happen when
                     the Est starts with a BolRelativeCmnt.  WidthInfo could 
-                    still have a NlTrigger, if something with an absolute from 
-                    position follows it. *) 
+                    still have a NlTrigger, if something with an absolute
+                    from-position follows the comment. *) 
               IF FirstLineIndentPos = LbeStd . LimitedCharNoUnknown 
               THEN (* This should no longer be possible. *) 
                 RETURN LangUtil . FmtKindTyp . FmtKindUnknown 
@@ -3441,7 +3442,7 @@ TRUE OR
           ELSIF TEstRef . KTreeWidthInfo . WiHasNlBefore 
           THEN (* The Est begins with a new line, so CharPos is unneeded. *) 
             IF TEstRef . KTreeWidthInfo . WiHasAbsFromPos 
-            THEN (* WiHasNlBefore means it isn't triggered, so WiWidth is the 
+            THEN (* WiHasNlBefore precludes triggering, so WiWidth is the 
                     absolute ending position, and we previously found that 
                     that fits. *) 
               RETURN LangUtil . FmtKindTyp . FmtKindHoriz 
@@ -3559,10 +3560,10 @@ TRUE OR
               := EstUtil . EstMiscInfo 
                    ( Lang , EstTravInfo . EtiChildLeafElem . LeChildRef ) 
           ; IF LEstMiscInfo . EmiWidthInfo . WiWidth > Options . RightMargin 
-            THEN (* This includes infinite width, which in turn includes 
+            THEN (* This case includes infinite width, which in turn includes 
                     containment of any properly interior Nl in the 
                     descended-into Est child.  If WiWidth is relative, this is 
-                    conservatively correct in assuming CharPos = 0 *) 
+                    conservatively correct in assuming CharPos = 0. *) 
               RETURN LResultIfNotHoriz 
             ELSE (* The descended-to Est _child_ will fit on a line, starting at
                     zero.  This implies all Nls within are at one end or 
