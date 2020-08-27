@@ -84,11 +84,11 @@ INTERFACE EstHs
      the subtree's text.  For larger starting positions, at least one implied 
      new line will be inserted, thus it will have multiple lines and infinite 
      width.
-   - However, if WiWholeLineModsOnly, the entire subtree consists of one or
-     more whole-line comments and blank lines.  If such a group appears 
-     only at the left and right ends of the subtree, it does not contribute
-     to the width.  The interior part will be formatted as if these groups
-     were absent. 
+   - However, WiWholeLineModsOnly means the entire subtree consists only of one
+     or more blank lines, whole-line comments, and whole-line text mods.
+     If such a group appears only at the left and right ends of the subtree,
+     it does not contribute to the width.  The interior part will be formatted
+     as if these groups were absent. 
      Concatenation of WidthInfo values is associative, I confidently believe.
 *)  
 
@@ -105,7 +105,7 @@ INTERFACE EstHs
            and WiWidth is its relative (to the from- 
            position) width.  Otherwise, there are one 
            or more absolute positions in the subtree.
-           In this case, if it starts at absolute position
+           In this case, if the subtree starts at absolute position
            <= WiNlTrigger, then WiWidth is the absolute to-position 
            of the subtree. For Larger starting positions, it will 
            have multiple lines and infinite width.  
@@ -116,7 +116,7 @@ INTERFACE EstHs
       ; WiHasNlBefore : BITS 1 FOR BOOLEAN 
       ; WiHasNlAfter : BITS 1 FOR BOOLEAN 
       ; WiHasNlWithin : BITS 1 FOR BOOLEAN 
-        (* ^Properly embedded within. *) 
+        (* ^*Properly* embedded within. *) 
       ; WiWholeLineModsOnly : BITS 1 FOR BOOLEAN 
       END (* RECORD  WidthInfoTyp *) 
 

@@ -70,7 +70,7 @@ MODULE Assertions
     <* FATAL Wr . Failure *> 
     VAR LMessage : TEXT 
 
-  ; BEGIN (* CantHappen *) 
+  ; BEGIN (* Fail *) 
       LMessage := MessageCodes . Image ( Code ) 
     ; Wr . PutText 
         ( Stdio . stderr 
@@ -102,7 +102,7 @@ MODULE Assertions
     <* FATAL Wr . Failure *> 
     VAR LMessage : TEXT 
 
-  ; BEGIN 
+  ; BEGIN (* Message *)  
       LMessage := MessageCodes . Image ( Code ) 
     ; Wr . PutText 
         ( Stdio . stderr 
@@ -150,7 +150,7 @@ MODULE Assertions
 
   = <* FATAL Thread . Alerted *> 
     <* FATAL Wr . Failure *> 
-    BEGIN 
+    BEGIN (* MessageText *)  
       Wr . PutText ( Stdio . stderr , Message ) 
     ; Wr . PutText ( Stdio . stderr , Wr . EOL ) 
     ; Wr . Flush ( Stdio . stderr ) 

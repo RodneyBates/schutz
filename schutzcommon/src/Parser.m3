@@ -1,14 +1,14 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
 MODULE Parser 
 
-(* Parsing.  Includes batch parsing from a file and in incremental
+(* Parsing.  Includes batch parsing from a file and incremental
    (re)parsing of an Est with possibly text edits embedded within.
    Handles sytax error recovery/repair and (re)building of the Est.
 *)  
