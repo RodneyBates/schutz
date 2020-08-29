@@ -1841,7 +1841,26 @@ MODULE EstUtil
            LangUtil . IsInClass 
              ( Lang , LTok , FsNodeRef . FsCondPredicate . PredicateClass )
       END (* CASE *) 
-    END EvalPredicate 
+    END EvalPredicate
+
+(* VISIBLE: *) 
+; PROCEDURE IsZeroWidthModText ( ItemRef : LbeStd . EstRootTyp ) : BOOLEAN
+
+  = VAR LHasNlBefore , LHasNlAfter : BOOLEAN
+
+  ; BEGIN
+      TYPECASE ItemRef
+      OF NULL => RETURN FALSE  
+      | ModHs . ModTextTyp ( TModText ) 
+      => LHasNlBefore := TModText . ModTextLeftTokToPos = 0 
+      ; LHasNlAfter := TModText . ModTextToPos = LbeStd . LimitedCharNoInfinity 
+      ; IF LHasNlBefore AND LHasNlAfter   
+        THEN (* It's a whole-line ModText.  It gets zero width. *)
+          RETURN TRUE 
+        ELSE RETURN FALSE 
+        END (* IF *) 
+      END (* TYPECASE *)
+    END IsZeroWidthModText 
 
 (* VISIBLE: *) 
 ; PROCEDURE EstMiscInfo 

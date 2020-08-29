@@ -63,6 +63,8 @@ INTERFACE EstUtil
 
 ; PROCEDURE IsModTok ( NodeRef : LbeStd . EstRootTyp ) : BOOLEAN 
 
+; PROCEDURE IsZeroWidthModText ( ItemRef : LbeStd . EstRootTyp ) : BOOLEAN
+
 ; PROCEDURE EstMiscInfo 
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : EstHs . EstMiscInfoTyp 

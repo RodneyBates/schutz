@@ -2142,7 +2142,7 @@ MODULE TravUtil
             | ModHs . ModCmntLeadingTyp ( TModCmnt ) 
             => PtlTfsModCmnt ( TModCmnt ) 
 
-            (* Text insertion. *) 
+            (* ModText. *) 
             | ModHs . ModTextTyp ( TModText ) 
             => PtlTfsModText ( TModText ) 
 
@@ -2639,9 +2639,13 @@ MODULE TravUtil
                         AND TModCmnt . ModCmntNlAfter 
                  ) 
 
-            (* Text or token insertion. *) 
-            | ModHs . ModTextTyp 
-            , EstHs . EstRefTyp 
+            (* ModText. *) 
+            | ModHs . ModTextTyp ( TModText )  
+            => NzwrTfsEstOrMod
+                 ( IsZeroWidth := EstUtil . IsZeroWidthModText ( TModText ) ) 
+
+            (* Token insertion. *) 
+            | EstHs . EstRefTyp 
             => NzwrTfsEstOrMod ( IsZeroWidth := FALSE ) 
 
             (* Lex error characters. *) 
@@ -2935,9 +2939,13 @@ MODULE TravUtil
                         AND  TModCmnt . ModCmntNlAfter 
                  ) 
 
-            (* Text or token insertion. *) 
-            | ModHs . ModTextTyp 
-            , EstHs . EstRefTyp 
+            (* ModText. *) 
+            | ModHs . ModTextTyp ( TModText ) 
+            => NzwlTfsEstOrMod
+                 ( IsZeroWidth := EstUtil . IsZeroWidthModText ( TModText ) ) 
+
+            (* Token insertion. *) 
+            | EstHs . EstRefTyp 
             => NzwlTfsEstOrMod ( IsZeroWidth := FALSE ) 
 
             (* Lex error characters. *) 

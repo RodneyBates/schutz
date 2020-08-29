@@ -182,9 +182,8 @@
       ; BEGIN (* WtxTeTraverseFsListChildren *) 
           LFsChildNo := 0
         ; LFsChildCt := NUMBER ( ParentFsNodeRef . FsChildren ^ )   
-        ; IF 
-FALSE AND 
-(* FIXME: Remove this.  It is temporary, to remove redundant trailing
+        ; IF (* FALSE AND *)
+(* FIXME: The FALSE is only temporary, to remove redundant trailing
           separators when exporting.  Actually, make this some kind of
           option.  But that would have to be either done on many traversers,
           or done during parsing. *) 
