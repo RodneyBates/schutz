@@ -1,0 +1,7 @@
+File_Open_Text "test14_233.m3"
+File_Save_Text "test14_233.m3"
+File_Export_Text "test14_233.export.m3"
+STOP
+File_CloseImage_Text "test14_233.m3"
+STOP
+File_Quit

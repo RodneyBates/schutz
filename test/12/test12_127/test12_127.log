@@ -1,0 +1,12 @@
+157,158c157,159
+<       ; IF ( lindex = Text . Length ( String ) OR Lch = ' ' OR Lch = '\t'
+<              OR i = strlen
+---
+>       ; IF ( lindex
+>              = Text . Length
+>                ( String ) OR Lch = ' ' OR Lch = '\t' OR i = strlen
+244d244
+<                                            This should be prevented by 
+test12_127.export.m3 not as expected
+######################### F A I L E D #########################
+----------------------------- Failed in /home/rodney/proj/lbe/working/test/12/test12_127

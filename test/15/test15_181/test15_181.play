@@ -1,0 +1,123 @@
+File_Open_Text "test15_181.m3"
+MouseClickChar 11 10
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+MouseClickChar 1 10
+CharType_Char ';'
+SemParse
+MouseClickChar 1 13
+DeleteRestOfLine
+DeleteRestOfLine
+CharDelBwd
+SemParse
+MouseClickChar 15 12
+CharType_Char ';'
+SemParse
+MouseClickChar 15 11
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+SemParse
+MouseClickChar 12 11
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+MouseClickChar 8 11
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+MouseClickChar 11 10
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+MouseClickChar 9 9
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+MouseClickChar 1 14
+DeleteRestOfLine
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorUp
+DeleteRestOfLine
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+DeleteRestOfLine
+SemParse
+
+STOP
+File_Save_Text "test15_181.m3"
+File_Export_Text "test15_181.export.m3"
+STOP
+File_CloseImage_Text "test15_181.m3"
+STOP
+File_Quit

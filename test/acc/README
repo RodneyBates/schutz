@@ -1,0 +1,11 @@
+These tests happed accidentally with changes in the form layout
+caused MouseClick events, which were recorded in pixel coordinates
+relative to the whole window. to move to different places.  These
+were the cases that changed as a result. 
+
+Some had crashes, others just different results.  The crashes
+are fixed in these.  
+
+Now, mouse clicks are recorded as MouseClickChar, and are in
+character coordinats, relative to the text area of the window,
+so no such future accidents should occur.

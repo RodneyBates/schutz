@@ -1,0 +1,18 @@
+File_Open_Text "test14_180.m3"
+MouseClickChar 0 24
+Edit_Paste "  = PROCEDURE Recurse ( Node : NodeRefTyp )\n\n    = BEGIN\n        IF Node # NIL\n        THEN\n          Recurse ( Node ^ . LeftChild )\n        ; Visit ( Node )\n        ; Recurse ( Node ^ . RightChild )\n        END (* IF *)\n      END Recurse\n\n"
+CursorDown
+MouseClickChar 0 36
+CharDelBwd
+SemParse
+MouseClickChar 2 35
+SemAccept
+MouseClickChar 4 35
+SemAccept
+SemParse
+File_Save_Text "test14_180.m3"
+File_Export_Text "test14_180.expected.m3"
+STOP
+File_CloseImage_Text "test14_180.m3"
+STOP
+File_Quit

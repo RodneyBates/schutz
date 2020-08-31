@@ -1,0 +1,38 @@
+File_Open_Text "test12_140.m3"
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char '\n'
+CharType_Char '\n'
+CharType_Char ';'
+CharType_Char ' '
+CharType_Char 'I'
+CharType_Char 'M'
+CharType_Char 'P'
+CharType_Char 'O'
+CharType_Char 'R'
+CharType_Char 'T'
+CharType_Char ' '
+CharType_Char 'G'
+SemParse
+SemParse
+File_Save_Text "test12_140.m3"
+File_Export_Text "test12_140.export.m3"
+STOP
+File_CloseImage_Text "test12_140.m3"
+STOP
+File_Quit

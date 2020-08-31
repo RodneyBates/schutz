@@ -1,0 +1,8 @@
+MODULE t11_134
+(* Places for marks. *)
+; IMPORT aaaa , bbbbbbb , ccccccc
+; TYPE T = ROOT
+; TYPE A = ARRAY xxxxxx OF yyyyyy
+; BEGIN
+  END test11_134
+.

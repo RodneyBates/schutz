@@ -1,0 +1,87 @@
+LDL Prec3 VERSION 0 . 0 . 0 . 0
+
+START Comp .  
+
+(* Abstract syntax: *) 
+
+  Comp :: E : AsExpr . 
+
+  Id VARTERM .
+
+  AsExpr = ::= AsAnd | AsOr | AsPlus | Id .   
+
+  AsAnd | AsOr | AsPlus 
+    :: Left : AsExpr ; Right : AsExpr
+    .
+
+  AsE0 = AsOr .
+  AsE0OrLess = AsE0 .
+  AsE0OrMore = AsE0 | AsE1 | AsE4 | AsE8 . (* = AsExpr *) 
+
+  AsE1 = AsAnd .
+  AsE1OrLess = AsE1 | AsE0OrLess .
+  AsE1OrMore = AsE1 | AsE4 | AsE8 .        (* = AsExpr - { AsE0 } *)
+
+  AsE4 = AsPlus .
+  AsE4OrLess = AsE4 | AsE1OrLess .
+  AsE4OrMore = AsE4 | AsE8 .               (* = AsExpr - { AsE0 | AsE1 } *)
+
+  AsE8 = Id . 
+  AsE8OrLess = AsE8 | AsE4OrLess . 
+  AsE8OrMore = AsE8 . 
+
+(* Format syntax: *) 
+
+  Comp -> AsExpr . 
+
+  AsOr
+    -> Left : AsExpr
+       !
+         "OR"
+       MEMBER AsE0OrLess ( ( "(" Right : INDENT @ 3 AsExpr ! ")" ) )
+    .
+
+  AsAnd
+    -> MEMBER AsE0OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+       !
+         "AND"
+       MEMBER AsE1OrLess ( ( "(" Right : INDENT @ 6 AsExpr ! @ 4 ")" ) )
+    .
+
+  AsPlus
+    -> MEMBER AsE1OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) )
+       !
+         "+"
+       MEMBER AsE4OrLess ( ( "(" Right : INDENT @ 6 AsExpr ! @ 4 ")" ) )
+    .
+
+(* Concrete syntax: *) 
+
+  Comp ::= AsE0 | AsE1 | AsE4 | AsE8 .  
+
+  AsOr ::= AsExpr "OR" PE0OrLess . 
+  AsOr ::= AsExpr "OR" AsE1OrMore .
+  
+  PE0OrLess ::= "(" AsE0 ")" . 
+
+  AsAnd ::= PE0OrLess "AND" PE1OrLess . 
+  AsAnd ::= PE0OrLess "AND" AsE4OrMore . 
+  AsAnd ::= AsE1OrMore "AND" PE1OrLess . 
+  AsAnd ::= AsE1OrMore "AND" AsE4OrMore . 
+
+  PE1OrLess ::= "(" AsE1 ")" . 
+  PE1OrLess ::= "(" AsE0 ")" .  
+
+  AsPlus ::= PE1OrLess "+" PE4OrLess . 
+  AsPlus ::= PE1OrLess "+" AsE8OrMore . 
+  AsPlus ::= AsE4OrMore "+" PE4OrLess . 
+  AsPlus ::= AsE4OrMore "+" AsE8OrMore . 
+
+  PE4OrLess ::= "(" AsE4 ")" . 
+  PE4OrLess ::= "(" AsE1 ")" . 
+  PE4OrLess ::= "(" AsE0 ")" .  
+
+END Prec3 
+
+
+

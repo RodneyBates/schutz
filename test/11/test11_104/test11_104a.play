@@ -1,0 +1,23 @@
+File_Open_Text "/home/rodney/proj/lbe/working/test/11/test11_104/test11_104.m3"
+
+MouseClick 95 105
+%
+CharType_Char 'x'
+#
+CharType_Char 'x'
+    ; 
+Devel_MergeText
+
+;
+  #
+
+    %
+
+
+SemParse #
+File_Save_Text "test11_104.m3"   ; 
+File_Export_Text "/home/rodney/proj/lbe/working/test/11/test11_104/test11_104.export.m3"
+STOP
+File_CloseImage_Text "test11_104.m3"
+STOP
+File_Quit

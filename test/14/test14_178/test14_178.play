@@ -1,0 +1,13 @@
+File_Open_Text "test14_178.m3"
+CursorDown
+CursorDown
+CursorDown
+CharType_Char '\n'
+SemParse
+STOP
+File_Save_Text "test14_178.m3"
+File_Export_Text "test14_178.export.m3"
+STOP
+File_CloseImage_Text "test14_178.m3"
+STOP
+File_Quit

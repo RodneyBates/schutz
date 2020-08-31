@@ -1,0 +1,31 @@
+File_Open_Text "test12_105.m3"
+MouseClickChar 9 2
+STOP
+CharDelFwd
+CursorUp
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+STOP
+CharDelFwd
+SemParse
+MouseClickChar 0 5
+CharDelBwd
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelBwd
+SemParse
+File_Save_Text "test12_105.m3"
+File_Export_Text "test12_105.export.m3"
+STOP
+File_CloseImage_Text "test12_105.m3"
+STOP
+File_Quit

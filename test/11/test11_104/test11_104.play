@@ -1,0 +1,12 @@
+File_Open_Text "test11_104.m3"
+MouseClickChar 13 2
+CharType_Char 'x'
+CharType_Char 'x'
+Devel_MergeText
+SemParse
+File_Save_Text "test11_104.m3"
+File_Export_Text "test11_104.export.m3"
+STOP
+File_CloseImage_Text "test11_104.m3"
+STOP
+File_Quit

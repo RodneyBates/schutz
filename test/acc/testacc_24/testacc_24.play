@@ -1,0 +1,12 @@
+File_Open_Text "test10_24.ldl1"
+SemParse
+MouseClickChar 6 6
+MouseClickChar 6 5
+CharDelBwd
+SemParse
+File_Save_Text "test10_24.ldl1"
+File_Export_Text "test10_24.export.ldl1"
+STOP
+File_CloseImage_Text "test10_24.ldl1"
+STOP
+File_Quit

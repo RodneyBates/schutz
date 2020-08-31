@@ -1,0 +1,58 @@
+File_Open_Text "test11_97a.m3"
+MouseClickChar 9 2
+CharType_Char 'X'
+CharType_Char '('
+CharType_Char 'Y'
+CharType_Char ')'
+Devel_MergeText
+File_Save_Text "test11_97a.m3"
+File_Export_Text "test11_97a.export1.m3"
+STOP
+File_CloseImage_Text "test11_97a.m3"
+File_Open_Text "test11_97a.m3"
+MouseClickChar 9 2
+CharType_Char 'X'
+CursorLeft
+CursorLeft
+CursorLeft
+CharType_Char 'x'
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char 'v'
+Devel_MergeText
+File_Save_Text "test11_97a.m3"
+File_Export_Text "test11_97a.export2.m3"
+STOP
+File_CloseImage_Text "test11_97a.m3"
+File_Open_Text "test11_97a.m3"
+CursorDown
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char 'X'
+CharType_Char '('
+CharType_Char 'Y'
+CharType_Char ')'
+Devel_MergeText
+SemParse
+VertScroll 45 38 2
+
+VertScroll 45 38 1
+
+File_Save_Text "test11_97a.m3"
+File_Export_Text "test11_97a.export3.m3"
+STOP
+File_CloseImage_Text "test11_97a.m3"
+STOP
+File_Quit

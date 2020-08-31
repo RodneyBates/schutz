@@ -1,0 +1,12 @@
+MODULE test13_59
+
+; BEGIN
+    IF «AsConstructor»
+    «Id» THEN
+    «AsStmtList» ELSE
+    «AsStmtList» END
+  ; IF «AsExpr» THEN END ; IF «Id»
+    THEN
+    END
+  END test13_59
+.

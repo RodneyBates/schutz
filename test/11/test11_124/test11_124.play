@@ -1,0 +1,19 @@
+File_Open_Text "test11_124.m3"
+CursorDown
+CursorDown
+CursorDown
+CharType_Char 'x'
+CharDelBwd
+CursorRight
+CharType_Char 'x'
+CharDelBwd
+CursorRight
+CharType_Char 'x'
+CharDelBwd
+SemParse
+File_Save_Text "test11_124.m3"
+File_Export_Text "test11_124.export.m3"
+STOP
+File_CloseImage_Text "test11_124.m3"
+STOP
+File_Quit

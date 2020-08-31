@@ -1,0 +1,13 @@
+File_Open_Text "test12_131.m3"
+SemParse
+MouseClickChar 54 3
+Next
+Next
+Prior
+Prior
+File_Save_Text "test12_131.m3"
+File_Export_Text "test12_131.export.m3"
+STOP
+File_CloseImage_Text "test12_131.m3"
+STOP
+File_Quit

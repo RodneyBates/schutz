@@ -1,0 +1,47 @@
+File_Open_Text "test12_40.m3"
+MouseClickChar 6 11
+CharType_Char 'x'
+SemParse
+MouseClickChar 31 11
+CharType_Char 'x'
+SemParse
+MouseClickChar 6 13
+CharType_Char 'x'
+SemParse
+MouseClickChar 16 13
+CharType_Char 'x'
+SemParse
+MouseClickChar 26 13
+CharType_Char 'x'
+SemParse
+MouseClickChar 18 14
+CharType_Char 'x'
+SemParse
+MouseClickChar 8 15
+CharType_Char 'x'
+SemParse
+MouseClickChar 22 15
+CharType_Char 'x'
+SemParse
+MouseClickChar 34 15
+CharType_Char 'x'
+SemParse
+MouseClickChar 46 15
+CharType_Char 'x'
+SemParse
+MouseClickChar 11 18
+CharType_Char 'x'
+SemParse
+MouseClickChar 20 18
+CharType_Char 'x'
+SemParse
+MouseClickChar 24 18
+CharType_Char 'x'
+CharDelBwd
+CharType_Char ' '
+SemParse
+File_Save_Text "test12_40.m3"
+File_Export_Text "test12_40.export.m3"
+STOP
+File_CloseImage_Text "test12_40.m3"
+File_Quit

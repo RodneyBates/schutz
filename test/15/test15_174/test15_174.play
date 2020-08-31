@@ -1,0 +1,8 @@
+File_Open_Text "test15_174.m3"
+SemParse
+File_Save_Text "test15_174.m3"
+File_Export_Text "test15_174.export.m3"
+STOP
+File_CloseImage_Text "test15_174.m3"
+STOP
+File_Quit

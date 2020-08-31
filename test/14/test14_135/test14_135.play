@@ -1,0 +1,15 @@
+File_Open_Text "test14_135.m3"
+MouseClickChar 1 12
+Edit_Paste "       Wr . PutText\n              ( Stdio . stdout\n                  , Fmt . Pad ( Fmt . Int ( IntVal ) , 11 ) & \"\\\"\" & LResult & \"\\\"\"\n                        & Wr . EOL\n                          )\n\n"
+SemParse
+MouseClickChar 6 12
+CharType_Char ';'
+CharType_Char ' '
+SemParse
+File_Save_Text "test14_135.m3"
+File_Export_Text "test14_135.export.m3"
+STOP
+File_CloseImage_Text "test14_135.m3"
+STOP
+File_Quit
+

@@ -1,0 +1,17 @@
+File_Open_Text "test10_66.m3"
+MouseClickChar 8 4
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+SemParse
+MouseClickChar 6 4
+SemAccept
+SemParse
+File_Save_Text "test10_66.m3"
+File_Export_Text "test10_66.export.m3"
+STOP
+File_CloseImage_Text "test10_66.m3"
+STOP
+File_Quit

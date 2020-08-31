@@ -1,0 +1,48 @@
+File_Open_Text "test14_231.m3"
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char 'S'
+CharType_Char ' '
+CharType_Char ':'
+CharType_Char '='
+CharType_Char ' '
+CharType_Char '1'
+CharType_Char ' '
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+MouseClickChar 0 7
+SweepSelection 0 8
+EndSweepSelection
+MouseClickChar 0 9
+EndSweepSelection
+STOP 
+Edit_Paste "        SUBARRAY ( Q ) := SUBARRAY ( R )\n" 
+SemParse 
+File_Save_Text "test14_231.m3"
+File_Export_Text "test14_231.export.m3"
+STOP
+File_CloseImage_Text "test14_231.m3"
+STOP
+File_Quit

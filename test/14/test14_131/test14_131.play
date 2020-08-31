@@ -1,0 +1,13 @@
+File_Open_Text "test14_131.m3"
+SearchStringFwd "PROCEDURE" FALSE TRUE
+ReplaceString "PROCEDURE" "PROCEEDURE" FALSE 2
+SemParse
+SemAccept
+SemAccept
+SemParse
+File_Save_Text "test14_131.m3"
+File_Export_Text "test14_131.export.m3"
+STOP
+File_CloseImage_Text "test14_131.m3"
+STOP
+File_Quit

@@ -1,0 +1,10 @@
+INTERFACE test10_28
+
+; EXCEPTION AssertionFailure ( TEXT )
+; VAR v : INTEGER
+; CONST C = 10
+; EXCEPTION E
+; EXCEPTION F ( G )
+; PROCEDURE x ( VAR y : T )
+; END test10_28
+.

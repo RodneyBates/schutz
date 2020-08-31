@@ -1,0 +1,37 @@
+File_Open_Text "test11_145.m3"
+MouseClickChar 9 1
+SemAccept
+MouseClickChar 9 2
+SemAccept
+MouseClickChar 10 2
+SemAccept
+MouseClickChar 11 3
+SemAccept
+MouseClickChar 11 4
+SemAccept
+MouseClickChar 0 7
+SemAccept
+SemParse
+File_Save_Text "test11_145.m3"
+File_Export_Text "test11_145.export1.m3"
+STOP
+File_CloseImage_Text "test11_145.m3"
+File_Open_Text "test11_145.m3"
+MouseClickChar 10 1
+SemAccept
+MouseClickChar 10 2
+SemAccept
+MouseClickChar 11 2
+SemAccept
+MouseClickChar 12 3
+SemAccept
+MouseClickChar 12 4
+SemAccept
+MouseClickChar 1 7
+SemAccept
+SemParse
+File_Save_Text "test11_145.m3"
+File_Export_Text "test11_145.export2.m3"
+STOP
+File_CloseImage_Text "test11_145.m3"
+File_Quit

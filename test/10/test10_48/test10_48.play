@@ -1,0 +1,60 @@
+File_Open_Text "test10_48.m3"
+MouseClickChar 3 3
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CursorDown
+CursorDown
+CursorDown
+CursorRight
+CursorRight
+CharDelBwd
+CharDelBwd
+SemParse
+CharType_Char '*'
+CharType_Char ')'
+CursorUp
+CursorUp
+CursorUp
+CursorLeft
+CursorLeft
+CharType_Char '('
+CharType_Char '*'
+SemParse
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorLeft
+CursorLeft
+CharType_Char '('
+CharType_Char '*'
+CursorDown
+CursorDown
+CursorDown
+CursorLeft
+CursorLeft
+CharType_Char '*'
+CharType_Char ')'
+STOP
+SemParse
+CharDelBwd
+CharDelBwd
+CursorUp
+CursorUp
+CursorUp
+CursorUp
+CursorRight
+CursorRight
+CharDelBwd
+CharDelBwd
+SemParse
+File_Save_Text "test10_48.m3"
+File_Export_Text "test10_48.export.m3"
+STOP
+File_CloseImage_Text "test10_48.m3"
+STOP
+File_Quit

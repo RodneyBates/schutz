@@ -1,0 +1,7 @@
+File_Open_Text "/home/rodney/proj/lbe/working/test/12/test12_40/test12_40.m3"
+MouseClick 131 71
+CharType_Char 'x'
+SemParse
+MouseClick 93 89
+CharType_Char 'x'
+SemParse

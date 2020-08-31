@@ -1,0 +1,288 @@
+File_Open_Text "test11_134.m3"
+CursorRight
+CharDelBwd
+CharType_Char 'M'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharType_Char 'e'
+SemParse
+CursorRight
+CursorRight
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+CursorDown
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelBwd
+CharType_Char 'P'
+SemParse
+CursorDown
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelBwd
+CharType_Char ';'
+SemParse
+CursorRight
+CursorRight
+CharDelBwd
+CharType_Char 'I'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharType_Char 'a'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharDelBwd
+SemParse
+MouseClickChar 15 2
+CharDelBwd
+CharType_Char ','
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharType_Char 'b'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char ','
+SemParse
+CursorRight
+CharDelBwd
+SemParse
+MouseClickChar 34 2
+MouseClickChar 33 2
+CharDelBwd
+CharType_Char 'c'
+SemParse
+CursorDown
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelBwd
+CharType_Char ';'
+SemParse
+CursorRight
+CharDelBwd
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'T'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharType_Char ' '
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'T'
+SemParse
+CursorRight
+CharDelBwd
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char '='
+SemParse
+CursorRight
+CharDelBwd
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'R'
+SemParse
+CursorDown
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelBwd
+CharType_Char ';'
+SemParse
+CursorRight
+CharDelBwd
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'T'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharType_Char ' '
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'A'
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char ' '
+SemParse
+CharDelBwd
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char '='
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char ' '
+SemParse
+CharDelBwd
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'A'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharType_Char ' '
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'x'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharType_Char ' '
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'O'
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'F'
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char ' '
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char 'y'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+CursorDown
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelBwd
+CharType_Char ';'
+SemParse
+CursorRight
+CharDelBwd
+CharType_Char ' '

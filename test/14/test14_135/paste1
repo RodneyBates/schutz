@@ -1,0 +1,6 @@
+       Wr . PutText
+              ( Stdio . stdout
+                  , Fmt . Pad ( Fmt . Int ( IntVal ) , 11 ) & "\"" & LResult & "\""
+                        & Wr . EOL
+                          )
+                         

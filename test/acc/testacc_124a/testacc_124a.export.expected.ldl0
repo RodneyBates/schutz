@@ -1,0 +1,17 @@
+LDL M3
+ VERSION   .
+ PREC
+ .
+ PREC
+ .
+ 0
+
+ AsInterface
+ :    Safety : [ AsUnsafe ]
+      ; Name : Id
+      ; Imports : AsImportList
+      ; Decls : AsDeclList
+      ; FinalName : Id
+   .
+
+END M3

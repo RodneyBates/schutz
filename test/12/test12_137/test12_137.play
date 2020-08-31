@@ -1,0 +1,30 @@
+File_Open_Text "test12_137.m3"
+MouseClickChar 27 4
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelBwd
+SemParse
+SemParse
+MouseClickChar 7 2
+CharType_Char 'T'
+CharType_Char 'Y'
+CharType_Char 'P'
+CharType_Char 'E'
+CharType_Char ' '
+SemParse
+SemParse
+File_Save_Text "test12_137.m3"
+File_Export_Text "test12_137.export.m3"
+STOP
+File_CloseImage_Text "test12_137.m3"
+STOP
+File_Quit

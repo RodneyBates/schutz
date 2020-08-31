@@ -1,0 +1,4 @@
+This test passes when run in batch, but writes an empty
+test12_127.m3_ file.   
+When run using interactive playback, it segfaults in
+pickle writing, during the initial open.

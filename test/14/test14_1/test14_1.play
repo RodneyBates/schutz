@@ -1,0 +1,28 @@
+File_Open_Text "test14_1.m3"
+End
+CharType_Char '\n'
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char 'L'
+CharType_Char 'i'
+CharType_Char 'n'
+CharType_Char 'e'
+CharType_Char ' '
+CharType_Char '2'
+CharType_Char '\n'
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char 'L'
+CharType_Char 'i'
+CharType_Char 'n'
+CharType_Char 'e'
+CharType_Char ' '
+CharType_Char '3'
+File_Save_Text "test14_1.m3"
+File_Export_Text "test14_1.export.m3"
+STOP
+File_CloseImage_Text "test14_1.m3"
+STOP
+File_Quit

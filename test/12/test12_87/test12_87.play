@@ -1,0 +1,32 @@
+File_Open_Text "test12_87.m3"
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+SemParse
+CharType_Char 'x'
+Devel_MergeText
+SemParse
+SemParse
+SemParse
+CharDelBwd
+STOP
+SemParse
+File_Save_Text "test12_87.m3"
+File_Export_Text "test12_87.export.m3"
+STOP
+File_CloseImage_Text "test12_87.m3"
+STOP
+File_Quit

@@ -1,0 +1,22 @@
+File_Open_Text "test12_65.m3"
+MouseClickChar 15 2
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorLeft
+CursorLeft
+MouseClickChar 73 16
+MouseClickChar 74 20
+CharType_Char 'l'
+CharType_Char 't'
+MouseClickChar 74 20
+MouseClickChar 52 6
+CharType_Char 'C'
+SemParse
+File_Save_Text "test12_65.m3"
+File_Export_Text "test12_65.export.m3"
+STOP
+File_CloseImage_Text "test12_65.m3"
+STOP
+File_Quit

@@ -1,0 +1,101 @@
+File_Open_Text "test14_142.m3"
+MouseClickChar 22 6
+CharType_Char '\n'
+CharType_Char '\n'
+CharType_Char ';'
+CharType_Char ' '
+CharType_Char 'P'
+CharType_Char 'R'
+CharType_Char 'O'
+CharType_Char 'C'
+CharType_Char 'E'
+CharType_Char 'D'
+CharType_Char 'U'
+CharType_Char 'R'
+CharType_Char 'E'
+CharType_Char ' '
+CharType_Char 'I'
+CharType_Char 'n'
+CharType_Char 'n'
+CharType_Char 'e'
+CharType_Char 'r'
+CharType_Char ' '
+CharType_Char '('
+CharType_Char ' '
+CharType_Char ')'
+CharType_Char ' '
+CharType_Char '='
+CharType_Char ' '
+CharType_Char 'V'
+CharType_Char 'A'
+CharType_Char 'R'
+CharType_Char ' '
+CharType_Char 'I'
+CharType_Char 'V'
+CharType_Char ' '
+CharType_Char ':'
+CharType_Char ' '
+CharType_Char 'I'
+CharType_Char 'N'
+CharType_Char 'T'
+CharType_Char 'E'
+CharType_Char 'G'
+CharType_Char 'E'
+CharType_Char 'R'
+CharType_Char ' '
+CharType_Char ':'
+CharType_Char '='
+CharType_Char ' '
+CharType_Char '1'
+CharType_Char '7'
+CharType_Char ' '
+CharType_Char '\n'
+CharType_Char '\n'
+CharType_Char ';'
+CharType_Char ' '
+CharType_Char 'B'
+CharType_Char 'E'
+CharType_Char 'G'
+CharType_Char 'I'
+CharType_Char 'N'
+CharType_Char ' '
+CharType_Char '\n'
+CharType_Char 'E'
+CharType_Char 'N'
+CharType_Char 'D'
+CharType_Char ' '
+CharType_Char 'I'
+CharType_Char 'n'
+CharType_Char 'n'
+CharType_Char 'e'
+CharType_Char 'r'
+SemParse
+MouseClickChar 0 15
+SweepSelection 0 21
+EndSweepSelection
+MouseClickChar 0 21
+EndSweepSelection
+Edit_Cut
+MouseClickChar 1 12
+Edit_Paste "    ; IF F = MaxDepth\n      THEN\n        Res := MaxDepth + 2000\n      ELSE\n        Res := R ( F + 1 ) - 1\n      END (* IF *)\n"
+MouseClickChar 6 12
+CharDelBwd
+SemParse
+MouseClickChar 19 20
+CharType_Char ';'
+CharType_Char 'I'
+CharType_Char 'n'
+CharType_Char 'n'
+CharType_Char 'e'
+CharType_Char 'r'
+CharType_Char ' '
+CharType_Char '('
+CharType_Char ')'
+SemParse
+SemParse
+File_Save_Text "test14_142.m3"
+File_Export_Text "test14_142.export.m3"
+STOP
+File_CloseImage_Text "test14_142.m3"
+STOP
+File_Quit

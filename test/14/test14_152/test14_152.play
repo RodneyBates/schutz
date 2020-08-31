@@ -1,0 +1,54 @@
+File_Open_Text "test14_152.m3"
+SemParse
+MouseClickChar 21 6
+CharDelBwd
+CharDelBwd
+CharType_Char '2'
+CharType_Char '2'
+MouseClickChar 47 7
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharType_Char 'I'
+CharType_Char 'N'
+CharType_Char 'T'
+CharType_Char 'E'
+CharType_Char 'G'
+CharType_Char 'E'
+CharType_Char 'R'
+MouseClickChar 41 9
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharType_Char 'I'
+CharType_Char 'N'
+CharType_Char 'T'
+CharType_Char 'E'
+CharType_Char 'G'
+CharType_Char 'E'
+CharType_Char 'R'
+MouseClickChar 44 10
+STOP 
+CharType_Char '\n'
+CharType_Char '\n'
+CharType_Char '\n'
+SemParse
+MouseClickChar 24 9
+SearchStringFwd "IntVal" FALSE TRUE
+ReplaceString "IntVal" "Cents" FALSE 2
+SemParse
+File_Save_Text "test14_152.m3"
+File_Export_Text "test14_152.export.m3"
+STOP
+File_CloseImage_Text "test14_152.m3"
+File_Quit

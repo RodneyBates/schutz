@@ -1,0 +1,10 @@
+ LDL M3 VERSION 0 . 0 . 0 . 0
+
+  AsInterface
+    :: Safety : [ AsUnsafe ]
+       ; Name : Id
+       ; Imports : AsImportList
+       ; Decls : AsDeclList
+       ; FinalName : Id
+    .
+

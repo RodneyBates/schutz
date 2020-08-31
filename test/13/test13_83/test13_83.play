@@ -1,0 +1,28 @@
+File_Open_Text "test13_83.m3"
+MouseClickChar 15 3
+CharType_Char '\n'
+DeleteRestOfLine
+MouseClickChar 0 4
+DeleteRestOfLine
+DeleteRestOfLine
+MouseClickChar 7 3
+DeleteRestOfLine
+MouseClickChar 6 5
+DeleteRestOfLine
+MouseClickChar 0 5
+DeleteRestOfLine
+MouseClickChar 6 6
+DeleteRestOfLine
+DeleteRestOfLine
+MouseClickChar 0 7
+DeleteRestOfLine
+DeleteRestOfLine
+MouseClickChar 0 7 
+SemParse
+File_Save_Text "test13_83.m3"
+File_Export_Text "test13_83.export.m3"
+STOP
+File_CloseImage_Text "test13_83.m3"
+STOP
+File_Quit
+

@@ -1,0 +1,20 @@
+File_Open_Text "test15_176.m3"
+MouseClickChar 1 1
+CharType_Char '\n'
+CursorDown
+CharType_Char '\n'
+SemParse
+MouseClickChar 1 1
+CharType_Char '\n'
+SemParse
+CursorLeft
+CharType_Char '\n'
+SemParse
+SemParse
+STOP
+File_Save_Text "test15_176.m3"
+File_Export_Text "test15_176.export.m3"
+STOP
+File_CloseImage_Text "test15_176.m3"
+STOP
+File_Quit

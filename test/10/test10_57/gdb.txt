@@ -1,0 +1,212 @@
+Continuing.
+
+Breakpoint 3, TextEdit.InnerFlushTempEdit.IfteAdjustLineMarks (MaxTouchedNodeNo=46, 
+    MaxTouchedNodeCt=1, Bias=1) at TextEdit.m3:867
+867	            ; IF LNextNewLinesRef = NIL 
+Current language:  auto; currently m3
+$49 = OBJECT ItPers = 0x8b23020; ItLangIdRef = 0x8e77170; ItVisibleIn = {0}; 
+    ItWindowList = 0x8b38c14; ItHistoryWrT = 0x8b5b764; ItScannerIf = NIL; ItIsSaved = FALSE;  END
+$50 = OBJECT IpMagic = -993473344; IpLang = 10; IpLineHeaderRef = 0x9355b00; IpEstRoot = 0x8b129c0; 
+    IpSemRoot = NIL; IpMarkCt = 4; IpMarkHeader = 0x9355abc; IpTempEditState = TeStateText; 
+    IpTempEditRef = 0x872c4bc; IpImageName =  "test10_57.m3"; 
+    IpAbsPklFileName =  "/home/rodney/proj/lbe/working/test/10/test10_57/test10_57.m3_"; 
+    IpAbsTextFileName =  "/home/rodney/proj/lbe/working/test/10/test10_57/test10_57.m3"; IpVerNo = 0; 
+    IpVerUpdKind = 0; IpVerState = VerStateNull; IpHistoryText = NIL; IpLineCt = 17; 
+    IpLineCtIsExact = TRUE; IpLastCommand =  "STOP"; IpCrashCommand = NIL; IpCrashCode = NullCode; 
+    IpIsParsed = FALSE; IpIsAnalyzed = FALSE; IpIsMutatedSinceCommandStarted = FALSE;  END
+$51 = OBJECT LmLeftLink = 0x8b40c3c; LmRightLink = 0x8593894;  END
+$52 = OBJECT LmLeftLink = 0x9355abc; LmRightLink = 0x9355acc; LmWindowRef = NIL; 
+    LmMarkSs = MarkSsStartSel; LmTokMark = RECORD EstNodeNo = 5; EstNodeCt = 1; Tok = 24; FmtNo = 7; 
+    Kind = BlankLine; StartAtEnd = TRUE; IsImpliedNewLine = FALSE;  END; LmLinesRef = 0x8b12a14; 
+    LmCharPos = 20; LmLineNo = 0;  END
+$53 = OBJECT LmLeftLink = 0x8593894; LmRightLink = 0x8b4182c; LmWindowRef = 0x8b38c14; 
+    LmMarkSs = MarkSsCursor; LmTokMark = RECORD EstNodeNo = 45; EstNodeCt = 1; Tok = 29; FmtNo = 2; 
+    Kind = RightSibFmtNo; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LmLinesRef = 0x8b13574; 
+    LmCharPos = 0; LmLineNo = 1;  END
+$54 = OBJECT LmLeftLink = 0x9355acc; LmRightLink = 0x8b40c3c; LmWindowRef = NIL; 
+    LmMarkSs = MarkSsStartSel; LmTokMark = RECORD EstNodeNo = 45; EstNodeCt = 1; Tok = 29; FmtNo = 2; 
+    Kind = RightSibFmtNo; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LmLinesRef = 0x8b13574; 
+    LmCharPos = 0; LmLineNo = 2;  END
+$55 = OBJECT LmLeftLink = 0x8b4182c; LmRightLink = 0x9355abc; LmWindowRef = NIL; 
+    LmMarkSs = MarkSsStartSel; LmTokMark = RECORD EstNodeNo = 45; EstNodeCt = 1; Tok = 29; FmtNo = 2; 
+    Kind = RightSibFmtNo; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LmLinesRef = 0x8b13574; 
+    LmCharPos = 0; LmLineNo = 2;  END
+$56 = OBJECT LmLeftLink = 0x8b40c3c; LmRightLink = 0x8593894;  END
+$57 = OBJECT LrLeftLink = NIL; LrRightLink = NIL; LrGapAfter = TRUE; 
+    LrBolTokMark = RECORD EstNodeNo = 5; EstNodeCt = 1; Tok = 24; FmtNo = 7; Kind = BlankLine; 
+    StartAtEnd = TRUE; IsImpliedNewLine = FALSE;  END; LrVisibleIn = {}; LrLineCt = 0; 
+    LrIsStopper = TRUE; LrHasMark = TRUE; LrFromPos = 255; LrLineLen = 0; LrLineText = NIL; 
+    LrTextAttrArrayRef = NIL; LrLineErrArrayRef = NIL;  END
+$58 = OBJECT LrLeftLink = 0x8b497d0; LrRightLink = 0x9355b00; LrGapAfter = FALSE; 
+    LrBolTokMark = RECORD EstNodeNo = 46; EstNodeCt = 1; Tok = 29; FmtNo = 2; Kind = RightSibFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LrVisibleIn = {0}; LrLineCt = 0; 
+    LrIsStopper = TRUE; LrHasMark = TRUE; LrFromPos = 0; LrLineLen = 0; LrLineText = NIL; 
+    LrTextAttrArrayRef = NIL; LrLineErrArrayRef = NIL;  END
+L_10 = {<No data fields>}
+LNewLineNo = 0
+LNextNewLineCt = 145831284
+LOldToNewLineNoBias = 0
+LNextNewLineNo = 0
+LNextOldLineNo = 0
+LNextNewLinesRef = OBJECT LrLeftLink = 0x8b13538; LrRightLink = 0x8b13574; LrGapAfter = FALSE; 
+    LrBolTokMark = RECORD EstNodeNo = 46; EstNodeCt = 1; Tok = 24; FmtNo = 2; Kind = BlankLine; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LrVisibleIn = {}; LrLineCt = 3; 
+    LrIsStopper = FALSE; LrHasMark = FALSE; LrFromPos = 0; LrLineLen = 0; LrLineText =  ""; 
+    LrTextAttrArrayRef = NIL; LrLineErrArrayRef = NIL;  END
+LNextNewLinesSs = MiLeadingLine
+LNextOldLinesRef = NIL
+LMark = OBJECT LmLeftLink = 0x9355abc; LmRightLink = 0x9355acc; LmWindowRef = NIL; 
+    LmMarkSs = MarkSsStartSel; LmTokMark = RECORD EstNodeNo = 5; EstNodeCt = 1; Tok = 24; FmtNo = 7; 
+    Kind = BlankLine; StartAtEnd = TRUE; IsImpliedNewLine = FALSE;  END; LmLinesRef = 0x8b12a14; 
+    LmCharPos = 20; LmLineNo = 0;  END
+#0  TextEdit.InnerFlushTempEdit.IfteAdjustLineMarks (MaxTouchedNodeNo=46, MaxTouchedNodeCt=1, Bias=1)
+    at TextEdit.m3:867
+867	            ; IF LNextNewLinesRef = NIL 
+#1  0x081a7872 in TextEdit.InnerFlushTempEdit.IfteMakeChanges () at TextEdit.m3:966
+966	      ; IfteAdjustLineMarks 
+#2  0x081a9e1b in TextEdit.InnerFlushTempEdit (ImageRef=0x8b22ffc, LinesRef=0x8b13574, 
+    TempEditRef=0x872c4bc, InsNlPos=0, NlIndentPos=0, DelNlShift=254) at TextEdit.m3:1677
+1677	        ; IfteMakeChanges ( ) 
+$59 = OBJECT TeLinesRef = 0x8b13574; TeDelFromPos = 0; TeDelToPos = 0; TeInsLen = 0; TeLineNo = 1; 
+    TeEditedString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 80; 
+     END; TeTextAttrArrayRef = NIL; TeTextAttrActualSize = 0; TeLineErrArrayRef = NIL;  END
+L_15 = 0x9683c30
+LLineCt = 0
+LLinesRef = NIL
+L_16 = 0x9355b00
+LSecondOldActualLineCt = 0
+LSuccLinesRef = OBJECT LrLeftLink = 0x8b13574; LrRightLink = 0x8b141fc; LrGapAfter = FALSE;  END
+LEditedPredLinesRef = OBJECT LrLeftLink = 0x8b13464; LrRightLink = 0x8b497d0; LrGapAfter = FALSE; 
+    LrBolTokMark = RECORD EstNodeNo = 45; EstNodeCt = 1; Tok = 24; FmtNo = 2; Kind = BlankLine; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LrVisibleIn = {0}; LrLineCt = 1; 
+    LrIsStopper = TRUE; LrHasMark = FALSE; LrFromPos = 0; LrLineLen = 0; LrLineText =  ""; 
+    LrTextAttrArrayRef = NIL; LrLineErrArrayRef = NIL;  END
+L_17 = 0xb7617310
+LTrailingBlankLinesIncluded = 0
+LThruLineNo = 0
+LLineNo = 0
+LEditedLinesRefMeat = OBJECT LrLeftLink = 0x8b497d0; LrRightLink = 0x9355b00; LrGapAfter = FALSE; 
+    LrBolTokMark = RECORD EstNodeNo = 46; EstNodeCt = 1; Tok = 29; FmtNo = 2; Kind = RightSibFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LrVisibleIn = {0}; LrLineCt = 0; 
+    LrIsStopper = TRUE; LrHasMark = TRUE; LrFromPos = 0; LrLineLen = 0; LrLineText = NIL; 
+    LrTextAttrArrayRef = NIL; LrLineErrArrayRef = NIL;  END
+L_18 = <error type>
+LRepaintKind = RepaintKindNoShift
+LLineNoInWindow = 0
+LWindowLineLen = 157829364
+LLeadingBlankLinesIncluded = 0
+LBlankPrefixLen = 0
+LWindowRef = NIL
+LOldEndBolTokMark = RECORD EstNodeNo = 45; EstNodeCt = 1; Tok = 29; FmtNo = 2; Kind = RightSibFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END
+L_9 = <error type>
+IfteOldEstRoot = OBJECT KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; 
+    WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = TRUE;  END; KTreeSyntTokCt = 45; 
+    KTreeElemCt = 2; EstChildKindSet = {0, 1, 5, 6}; EstTok = 29; EstLeftTok = 120; EstRightTok = 24; 
+    EstKind = EstKindEst; EstHeight = 1; EstSemRef = NIL; EstRepairCost = 0; 
+    EstLeafArrayRef = 0x8b129e8;  END
+IfteActualBlankLinesAfter = 0
+IfteActualBlankLinesBefore = 3
+IfteExpectedBlankLinesAfter = 0
+IfteExpectedBlankLinesBefore = 3
+IfteExpectedString2 = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0; 
+     END
+IfteExpectedString1 = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0; 
+     END
+IfteOldSuccBolTokMark = RECORD EstNodeNo = 45; EstNodeCt = 1; Tok = 29; FmtNo = 2; 
+    Kind = RightSibFmtNo; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END
+IfteNodeNoChange = 1
+IfteMaxTouchedNodeCt = 1
+IfteMaxTouchedNodeNo = 46
+IfteSuccLinesRefMeat = OBJECT LrLeftLink = 0x8b497d0; LrRightLink = 0x9355b00; LrGapAfter = FALSE; 
+    LrBolTokMark = RECORD EstNodeNo = 46; EstNodeCt = 1; Tok = 29; FmtNo = 2; Kind = RightSibFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LrVisibleIn = {0}; LrLineCt = 0; 
+    LrIsStopper = TRUE; LrHasMark = TRUE; LrFromPos = 0; LrLineLen = 0; LrLineText = NIL; 
+    LrTextAttrArrayRef = NIL; LrLineErrArrayRef = NIL;  END
+IfteSuccLinesRef = OBJECT LrLeftLink = 0x8b497d0; LrRightLink = 0x9355b00; LrGapAfter = FALSE; 
+    LrBolTokMark = RECORD EstNodeNo = 46; EstNodeCt = 1; Tok = 29; FmtNo = 2; Kind = RightSibFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LrVisibleIn = {0}; LrLineCt = 0; 
+    LrIsStopper = TRUE; LrHasMark = TRUE; LrFromPos = 0; LrLineLen = 0; LrLineText = NIL; 
+    LrTextAttrArrayRef = NIL; LrLineErrArrayRef = NIL;  END
+IfteOldThruLinesRef = NIL
+IfteOldFromLinesRef = NIL
+IfteSecondOldLinesRef = NIL
+IfteNewEndBolTokMark = RECORD EstNodeNo = 46; EstNodeCt = 1; Tok = 29; FmtNo = 2; 
+    Kind = RightSibFmtNo; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END
+IfteNewLinesCt = 1
+IfteFirstOldActualLineCt = 2
+IfteLinesAccountedFor = 1
+IfteStartBolTokMark = RECORD EstNodeNo = 46; EstNodeCt = 1; Tok = 24; FmtNo = 2; Kind = BlankLine; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END
+IfteNewEstRoot = OBJECT KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; 
+    WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = TRUE;  END; KTreeSyntTokCt = 45; 
+    KTreeElemCt = 3; EstChildKindSet = {0, 1, 5, 6}; EstTok = 29; EstLeftTok = 120; EstRightTok = 24; 
+    EstKind = EstKindEst; EstHeight = 1; EstSemRef = NIL; EstRepairCost = 0; 
+    EstLeafArrayRef = 0x8b49794;  END
+IfteLinesRefArray = [0x8b497d0, NIL, NIL, NIL]
+IfteImagePers = OBJECT IpMagic = -993473344; IpLang = 10; IpLineHeaderRef = 0x9355b00; 
+    IpEstRoot = 0x8b129c0; IpSemRoot = NIL; IpMarkCt = 4; IpMarkHeader = 0x9355abc; 
+    IpTempEditState = TeStateText; IpTempEditRef = 0x872c4bc; IpImageName =  "test10_57.m3"; 
+    IpAbsPklFileName =  "/home/rodney/proj/lbe/working/test/10/test10_57/test10_57.m3_"; 
+    IpAbsTextFileName =  "/home/rodney/proj/lbe/working/test/10/test10_57/test10_57.m3"; IpVerNo = 0; 
+    IpVerUpdKind = 0; IpVerState = VerStateNull; IpHistoryText = NIL; IpLineCt = 17; 
+    IpLineCtIsExact = TRUE; IpLastCommand =  "STOP"; IpCrashCommand = NIL; IpCrashCode = NullCode; 
+    IpIsParsed = FALSE; IpIsAnalyzed = FALSE; IpIsMutatedSinceCommandStarted = FALSE;  END
+#1  0x081a7872 in TextEdit.InnerFlushTempEdit.IfteMakeChanges () at TextEdit.m3:966
+966	      ; IfteAdjustLineMarks 
+#0  TextEdit.InnerFlushTempEdit.IfteAdjustLineMarks (MaxTouchedNodeNo=46, MaxTouchedNodeCt=1, Bias=1)
+    at TextEdit.m3:867
+867	            ; IF LNextNewLinesRef = NIL 
+870	                LNextNewLineCt 
+872	              ; IF LNewLineNo >= LNextNewLineNo + LNextNewLineCt 
+$60 = 3
+876	                ELSE EXIT 
+Continuing.
+
+Breakpoint 3, TextEdit.InnerFlushTempEdit.IfteAdjustLineMarks (MaxTouchedNodeNo=46, 
+    MaxTouchedNodeCt=1, Bias=1) at TextEdit.m3:867
+867	            ; IF LNextNewLinesRef = NIL 
+870	                LNextNewLineCt 
+872	              ; IF LNewLineNo >= LNextNewLineNo + LNextNewLineCt 
+$61 = 3
+876	                ELSE EXIT 
+880	          ; LMark . LmTokMark := LNextNewLinesRef . LrBolTokMark  
+Continuing.
+
+Breakpoint 3, TextEdit.InnerFlushTempEdit.IfteAdjustLineMarks (MaxTouchedNodeNo=46, 
+    MaxTouchedNodeCt=1, Bias=1) at TextEdit.m3:867
+867	            ; IF LNextNewLinesRef = NIL 
+870	                LNextNewLineCt 
+872	              ; IF LNewLineNo >= LNextNewLineNo + LNextNewLineCt 
+$62 = 3
+874	                  INC ( LNextNewLineNo , LNextNewLineCt ) 
+Undefined command: "prit".  Try "help".
+$63 = 3
+$64 = 0
+$65 = 3
+$66 = OBJECT LmLeftLink = 0x9355acc; LmRightLink = 0x8b40c3c; LmWindowRef = NIL; 
+    LmMarkSs = MarkSsStartSel; LmTokMark = RECORD EstNodeNo = 45; EstNodeCt = 1; Tok = 29; FmtNo = 2; 
+    Kind = RightSibFmtNo; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; LmLinesRef = 0x8b13574; 
+    LmCharPos = 0; LmLineNo = 2;  END
+875	                ; INC ( LNextNewLinesSs ) (* Can't overflow. *) 
+866	              LNextNewLinesRef := IfteLinesRefArray [ LNextNewLinesSs ] 
+
+Breakpoint 3, TextEdit.InnerFlushTempEdit.IfteAdjustLineMarks (MaxTouchedNodeNo=46, 
+    MaxTouchedNodeCt=1, Bias=1) at TextEdit.m3:867
+867	            ; IF LNextNewLinesRef = NIL 
+868	              THEN INC ( LNextNewLinesSs ) (* Can't overflow. *) 
+866	              LNextNewLinesRef := IfteLinesRefArray [ LNextNewLinesSs ] 
+
+Breakpoint 3, TextEdit.InnerFlushTempEdit.IfteAdjustLineMarks (MaxTouchedNodeNo=46, 
+    MaxTouchedNodeCt=1, Bias=1) at TextEdit.m3:867
+867	            ; IF LNextNewLinesRef = NIL 
+868	              THEN INC ( LNextNewLinesSs ) (* Can't overflow. *) 
+866	              LNextNewLinesRef := IfteLinesRefArray [ LNextNewLinesSs ] 
+
+Breakpoint 3, TextEdit.InnerFlushTempEdit.IfteAdjustLineMarks (MaxTouchedNodeNo=46, 
+    MaxTouchedNodeCt=1, Bias=1) at TextEdit.m3:867
+867	            ; IF LNextNewLinesRef = NIL 
+868	              THEN INC ( LNextNewLinesSs ) (* Can't overflow. *) 
+
+Breakpoint 2, AssertDevel.InnerRuntimeFailureDialog () at AssertDevel.m3:249
+249	  = VAR LResponse : TEXT 

@@ -1,0 +1,17 @@
+11,17c11,15
+<     EBGIN I FA
+<     «suFncCall» THEN A
+<     : = B
+<       ELSIFX ; THEN C := D ELISF Y THEN E : = F
+<     END
+<   END test13_65
+< .
+---
+>     EBGIN I FA «soCnstructo» r
+>     THEN A : = B ELSIFX
+>   ; THEN C := D ELISF Y
+>   THEN E
+> : = F END END test13_65 .
+test13_65.export.m3 not as expected
+######################### F A I L E D #########################
+----------------------------- Failed in /home/rodney/proj/lbe/git/test/13/test13_65

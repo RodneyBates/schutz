@@ -1,0 +1,24 @@
+File_Open_Text "test10_104b.ldl1"
+MouseClickChar 1 9
+SemAccept
+MouseClickChar 7 9
+SemAccept
+SemParse
+MouseClickChar 1 6
+MouseClickChar 16 4
+CursorLeft
+CharType_Char '{'
+CursorRight
+CursorLeft
+CharDelBwd
+CharType_Char '['
+CursorRight
+CursorRight
+CharType_Char ']'
+SemParse
+File_Save_Text "test10_104b.ldl1"
+File_Export_Text "test10_104b.export.ldl1"
+STOP
+File_CloseImage_Text "test10_104b.ldl1"
+STOP
+File_Quit

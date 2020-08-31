@@ -1,0 +1,106 @@
+(* Name: Mounir Cheaib
+   Course: CS810, FALL semester 2004
+   Assignment: 10 *)
+
+
+
+MODULE set_m EXPORTS set
+; IMPORT Word
+; IMPORT Wr
+
+
+; VAR compare : CompareTyp
+
+; TYPE Arr_ref = ARRAY of OF ElemTyp
+; VAR WrT : Wr . T
+; REVEAL T
+    = Public OBJECT
+        «AsIdPlusList»
+
+      ; count : INTEGER
+      OVERRIDES
+        «AsColonEqualBinding»
+
+      ; Init := init_m
+      ; Card := card_m
+      ; isIn := isin_m
+      ; InsertElem := inserel_m
+      ; removeElem := re_elm
+      ; compare := comp_m
+
+      END
+
+; PROCEDURE init_m ( self : T , ; SizeHint := 25 ) : T
+  = BEGIN
+
+      ; OBJECT SizeHint : INTEGER := 25 ; Space : Arr_ref := NIL END
+
+      ; { PROCEDURE ( card_m : INTEGER BEGIN ; card_val := 0 ; INCR := ( card_val ( )
+RETURN AND card_val
+                     END
+
+                     ; PROCEDURE AND Hash ( m : AND T )
+                     : AND Word . T
+
+
+                     ; PROCEDURE AND inserel_m
+                       ( self
+                         : OBJECT
+                           T , Elem : ElemTyp
+                           ) = BEGIN
+
+                         ; Arr_ref := Hash ( Elem : AND Elemtyp )
+                         ; Wr
+                         END
+                       )
+                     . Puttext
+                       ( WrT , " Element is inserted " & Wr . EOL )
+                     END
+
+                     ; PROCEDURE AND isin_m
+                       ( self : OBJECT T , Elem : ElemTyp END )
+                     = BEGIN «Id»
+                     OR «Id»
+                     )
+            ; VAR mx : INTEGER
+            ; VAR low : INTEGER
+            ; VAR Isequal : BOOLEAN
+            ; VAR high : INTEGER
+            ; VAR Lcompare : CompareTyp
+            ; VAR Probe : INTEGER
+            ; IF Elem
+              . ; Space := NIL
+              THEN ; mx := 0
+            ; Isequal := FALSE
+              ELSE ; low := 0
+            ; high := card_val - 1
+            ; LOOP IF low
+              > high THEN ; mx := low
+            ; Isequal := FALSE
+            ; EXIT ELSE «AsIdPlusList»
+            ; Probe := ( low + high ) DRV DIV 2
+            ; Lcompare
+                := compare ( Elem . Space ^ [ Probe ] ) CASE AND Lcompare
+          OF )
+            { compare . less
+              => , high ; = Probe - 1
+              | , compareEqual => OBJECT
+                mx := Probe ; Isequal := TRUE ; EXIT | compareGreater
+              => OVERRIDES
+                low := Probe + 1
+              END      (* CASE *)
+                { «AsConstructorElemList» }
+            }
+        }
+        := «Id»
+    END (*IF *)
+    «Id»
+; BEGIN
+  END (*LOOP*)
+END (*IF*)
+END (*isin_m*)
+
+END «Id»
+.
+
+

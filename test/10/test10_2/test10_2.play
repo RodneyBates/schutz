@@ -1,0 +1,11 @@
+File_Open_Text "test10_2.ldl1"
+SemAnalyze
+Devel_WriteStats_Text "/home/rodney/proj/lbe/working/test/10/test10_2/test10_2Statistics"
+Devel_WriteEstPickle_Text "/home/rodney/proj/lbe/working/test/10/test10_2/test10_2Est.pkl"
+Devel_GenEstModule_Text "/home/rodney/proj/lbe/working/test/10/test10_2/test10_2MakeEst.m3"
+File_Save_Text "test10_2.ldl1"
+File_Export_Text "test10_2.export.ldl1"
+STOP
+File_CloseImage_Text "test10_2.ldl1"
+STOP
+File_Quit

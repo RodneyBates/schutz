@@ -1,0 +1,14 @@
+File_Open_Text "test14_209.m3"
+MouseClickChar 0 9
+SweepSelection 0 10
+EndSweepSelection
+Edit_Cut
+MouseClickChar 0 8
+STOP
+Edit_Paste "  ; Statement3 := 0\n"
+File_Export_Text "test14_209.export.m3"
+File_Save_Text "test14_209.m3"
+STOP
+File_CloseImage_Text "test14_209.m3"
+STOP
+File_Quit

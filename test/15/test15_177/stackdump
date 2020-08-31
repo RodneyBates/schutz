@@ -1,0 +1,17 @@
+(m3gdb) p DumpParseTrialState(ParseInfo,StateList.SlStates[StateList.SlLatest])
+                       Id LineNo = 5
+    0 16_0000000002a38c58                      "OR"  587     0 16_0000000002a38c78                      "OR" FFF
+    1 16_0000000002a38c38                    AsExpr  684     1 16_0000000002a38b28                        Id FFF
+    2 16_0000000002a389f0                       "(" 1058     2 16_0000000002a38a10                       "(" FFF
+    3 16_0000000002a388c0                     "AND"  725     3 16_0000000002a388e0                     "AND" FFF
+    4 16_0000000002a388a0                  Tok__558  412     4 16_0000000002a387d0                        Id FFF
+    5 16_0000000002a38698                      "IF"  439     5 16_0000000002a386b8                      "IF" FFF
+    6 16_0000000002a38568                   "BEGIN"  200     6 16_0000000002a38588                   "BEGIN" FFF
+    7 16_0000000002a382b0             AsDeclList__0   96     7 16_0000000002a384c8                AsDeclList TFF
+    8 16_0000000002a35e30           AsImportList__0   43     8 16_0000000002a38210              AsImportList TFF
+    9 16_0000000002a35cc8                       ";"   25     9 16_0000000002a35ce8                       ";" FFF
+   10 16_0000000002a35bd8                        Id   18    10 16_0000000002a35bf8                        Id FFF
+   11 16_0000000002a35a78                  "MODULE"    8    11 16_0000000002a35a98                  "MODULE" FFF
+   12 16_0000000002a358e0                 Tok__Null    1
+$1 = <void>
+(m3gdb) 

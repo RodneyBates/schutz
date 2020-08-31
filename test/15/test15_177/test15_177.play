@@ -1,0 +1,20 @@
+File_Open_Text "test15_177.m3"
+MouseClickChar 78 7
+SemAccept
+SemParse
+SemParse
+SemParse
+SemAccept
+MouseClickChar 23 2
+SemAccept
+SemParse
+STOP
+File_Save_Text "test15_177.m3"
+File_Export_Text "test15_177.export.m3"
+STOP
+File_CloseImage_Text "test15_177.m3"
+MouseClickChar 18 2
+MouseClickChar 10 2
+MouseClickChar 24 10
+STOP
+File_Quit

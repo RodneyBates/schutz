@@ -1,0 +1,9 @@
+File_Open_Text "test12_138.m3"
+Devel_ReconstructLines
+Devel_VerifyLinesRefs
+File_Save_Text "test12_138.m3"
+File_Export_Text "test12_138.export.m3"
+STOP
+File_CloseImage_Text "test12_138.m3"
+STOP
+File_Quit

@@ -1,0 +1,128 @@
+File_Open_Text "test10_57.m3"
+MouseClickChar 20 2
+CharType_Char 'x'
+CursorDown
+CursorDown
+CharType_Char 'x'
+CursorDown
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharType_Char 'x'
+CharType_Char '\n'
+CharType_Char ';'
+CharType_Char ' '
+CharType_Char 'P'
+CharType_Char 'R'
+CharType_Char 'O'
+CharType_Char 'C'
+CharType_Char 'E'
+CharType_Char 'D'
+CharType_Char 'U'
+CharType_Char 'R'
+CharType_Char 'E'
+CharType_Char ' '
+CharType_Char 'P'
+CharType_Char ' '
+CharType_Char '('
+CharType_Char ' '
+CharType_Char 'F'
+CharType_Char ' '
+CharType_Char ':'
+CharType_Char ' '
+CharType_Char 'C'
+CharType_Char 'H'
+CharType_Char 'A'
+CharType_Char 'R'
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ')'
+CharType_Char ' '
+CharType_Char ':'
+CharType_Char ' '
+CharType_Char 'C'
+CharType_Char 'H'
+CharType_Char 'A'
+CharType_Char 'R'
+CharType_Char ' '
+CharType_Char 'R'
+CharType_Char 'A'
+CharType_Char 'I'
+CharType_Char 'S'
+CharType_Char 'E'
+CharType_Char 'S'
+CharType_Char ' '
+CharType_Char '{'
+CharType_Char ' '
+CharType_Char 'x'
+CharType_Char ' '
+CharType_Char '}'
+CharType_Char '\n'
+CharType_Char '\n'
+CharType_Char '='
+CharType_Char ' '
+CharType_Char 'V'
+CharType_Char 'E'
+CharType_Char 'R'
+CharDelBwd
+CharDelBwd
+CharType_Char 'A'
+CharType_Char 'R'
+CharType_Char ' '
+CharType_Char 'v'
+CharType_Char ' '
+CharType_Char ':'
+CharType_Char ' '
+CharType_Char 'I'
+CharType_Char 'N'
+CharType_Char 'T'
+CharType_Char 'E'
+CharType_Char 'G'
+CharType_Char 'E'
+CharType_Char 'R'
+CharType_Char ' '
+CharType_Char ';'
+CharType_Char ' '
+CharType_Char 'B'
+CharType_Char 'E'
+CharType_Char 'G'
+CharType_Char 'I'
+CharType_Char 'N'
+CharType_Char ' '
+CharType_Char 'R'
+CharType_Char 'A'
+CharType_Char 'I'
+CharType_Char 'S'
+CharType_Char 'E'
+CharType_Char ' '
+CharType_Char 'x'
+CharType_Char ' '
+CharType_Char '('
+CharType_Char ' '
+CharType_Char 'v'
+CharType_Char ' '
+CharType_Char ')'
+CharType_Char ' '
+CharType_Char 'E'
+CharType_Char 'N'
+CharType_Char 'D'
+CharType_Char ' '
+CharType_Char 'P'
+SemParse
+VertScroll 68 38 16
+VertScroll 68 38 15
+VertScroll 68 38 14
+VertScroll 68 38 13
+MouseClickChar 0 6
+MouseClickChar 0 6
+CharType_Char '\n'
+SemParse
+File_Save_Text "test10_57.m3"
+File_Export_Text "test10_57.export.m3"
+STOP
+File_CloseImage_Text "test10_57.m3"
+STOP
+File_Quit

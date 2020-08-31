@@ -1,0 +1,16 @@
+File_Open_Text "test13_183.m3"
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char 'x'
+STOP
+Devel_MergeText
+SemParse
+File_Save_Text "test13_183.m3"
+File_Export_Text "test13_183.export.m3"
+STOP
+File_CloseImage_Text "test13_183.m3"
+STOP
+File_Quit

@@ -1,0 +1,6 @@
+LDL test10_2
+  AsDot -> MEMBER AsE6OrLess ( ( "(" Left : INDENT @ 2 AsExpr ! ")" ) ) 
+           ! "." MEMBER AsE6OrLess ( ( "(" Right : INDENT @ 4 AsExpr ! @ 2 ")" ) ) . 
+
+END test10_2
+ 

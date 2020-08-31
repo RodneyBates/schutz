@@ -1,0 +1,37 @@
+Lost code: KBFocus
+Language loaded:
+Language    Schutz Language Definition Language M3
+  Version     0.0.0.0
+  Date        2020/08/19 20:04:43 GMT
+  Fingerprint 43a8ef2aae73b7d0
+Unique shared strings: 1046
+--------------- Using handwritten grammar ---------------
+Parsing -------------------------------------------------
+0/0 Singleton lists optimized.
+Parse complete, no errors -------------------------------
+5 Lines from WriteText.
+5 Lines from GetNextLine.
+4 TextAttr arrays, 7 TextAttr elements, 1.75 times.
+--------------- Using handwritten grammar ---------------
+Parsing -------------------------------------------------
+0/0 Singleton lists optimized.
+Parse complete, no errors -------------------------------
+5 Lines from WriteText.
+5 Lines from GetNextLine.
+4 TextAttr arrays, 7 TextAttr elements, 1.75 times.
+--------------- Using handwritten grammar ---------------
+Parsing -------------------------------------------------
+0/0 Singleton lists optimized.
+Parse complete, no errors -------------------------------
+5 Lines from WriteText.
+5 Lines from GetNextLine.
+4 TextAttr arrays, 7 TextAttr elements, 1.75 times.
+Parsing -------------------------------------------------
+--------------- Using handwritten grammar ---------------
+0/2 Singleton lists optimized.
+Rbm FmtKind computations: EstDescend = 2, EstUp = 0, EstFwd = 0, FsDescend = 0, FsUp = 0, FsFwd = 0
+RbmMaxLineBreakCt = 2
+Supposedly exact line counts disagree
+5 TextAttr arrays, 12 TextAttr elements, 2.40 times.
+Parse complete, no errors -------------------------------
+Succeeded

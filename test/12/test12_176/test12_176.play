@@ -1,0 +1,14 @@
+File_Open_Text "test12_176.m3"
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CharDelBwd
+SemParse
+File_Save_Text "test12_176.m3"
+File_Export_Text "test12_176.export.m3"
+STOP
+File_CloseImage_Text "test12_176.m3"
+STOP
+File_Quit

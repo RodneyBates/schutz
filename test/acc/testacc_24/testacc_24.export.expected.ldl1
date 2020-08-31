@@ -1,0 +1,6 @@
+LDL test10_24
+ AsStmt
+   = AsAssignStmt | AsBlock | AsCallStmt | AsCaseStmt | AsExitStmt | AsEvalStmt
+     | AsWhileStmt | AsWithStmt | AsLoopStmt AsEmptyStmt
+   .
+END tst10_24

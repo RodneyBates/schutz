@@ -1,0 +1,82 @@
+File_Open_Text "test12_17.m3"
+MouseClickChar 6 11
+SemParse
+CharType_Char 'x'
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char 'x'
+SemParse
+MouseClickChar 28 11
+CharType_Char ' '
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char 'x'
+SemParse
+MouseClickChar 0 13
+CharType_Char ' '
+CharType_Char ' '
+SemParse
+MouseClickChar 8 13
+CharType_Char 'x'
+SemParse
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CharType_Char ' '
+SemParse
+CursorRight
+CharType_Char ' '
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char ' '
+STOP
+SemParse
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char 'z'
+STOP
+SemParse
+MouseClickChar 1 14
+STOP
+SemAccept
+STOP
+SemParse
+MouseClickChar 18 15
+CharType_Char ' '
+STOP
+SemParse
+File_Save_Text "test12_17.m3"
+File_Export_Text "test12_17.export.m3"
+STOP
+File_CloseImage_Text "test12_17.m3"
+STOP
+File_Quit

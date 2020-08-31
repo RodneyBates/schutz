@@ -1,0 +1,44 @@
+File_Open_Text "test10_104c.ldl1"
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char '['
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char ']'
+SemParse
+File_Save_Text "test10_104c.ldl1"
+File_Export_Text "test10_104c.export.ldl1"
+STOP
+File_CloseImage_Text "test10_104c.ldl1"
+STOP
+File_Quit

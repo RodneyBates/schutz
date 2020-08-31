@@ -1,0 +1,262 @@
+$42 = RECORD DiLeftObjRef = 16_0ce218e0; DiRightObjRef = 16_0ce218e0; DiLeftKindSet = {0, 1, 2, 5, 6, 8, 9}; 
+    DiRightKindSet = {0, 1, 2, 5, 6, 8, 9}; DiFromChildNo = 0; DiThruChildNo = 1; DiHeight = 1; 
+    DiAdjKind = AdjKindSame;  END
+$43 = (*16_0ce218e0*) OBJECT KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; 
+    WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE;  END; KTreeSyntTokCt = 5; 
+    KTreeElemCt = 4; EstChildKindSet = {0, 1, 2, 5, 6, 8, 9}; EstTok = 197; EstLeftTok = 24; 
+    EstRightTok = 121; EstKind = EstKindEst; EstHeight = 1; EstSemRef = NIL; EstRepairCost = 0; 
+    EstLeafArrayRef = 16_0ce21908;  END
+Object has no field or method named "EstLeafArrayRef".
+Modula-3 builtin function NARROW is not supported
+size of value and type passed to LOOPHOLE don't agree
+Object has no field or method named "DiLeftObjRef".
+Object has no field or method named "DiLeftObjRef".
+$44 = 16_0ce21908
+$45 = [RECORD LeCumNodeCt = 4; LeChildRef = 16_0cdece6c; LeKindSet = {0, 1, 6}; LeFmtNo = 4;  END,
+    RECORD LeCumNodeCt = 5; LeChildRef = 16_0ce218c8; LeKindSet = {2, 6, 8}; LeFmtNo = 255;  END,
+    RECORD LeCumNodeCt = 6; LeChildRef = 16_0ce218d4; LeKindSet = {1, 5, 6, 9}; LeFmtNo = 2;  END,
+    RECORD LeCumNodeCt = 7; LeChildRef = 16_0ce11ee4; LeKindSet = {1, 5, 6}; LeFmtNo = 0;  END]
+3344	            MslLeaf ( LDownInfo , LResultInfo ) 
+MslLeaf (DownInfo=
+    RECORD DiLeftObjRef = 16_0ce218e0; DiRightObjRef = 16_0ce218e0; DiLeftKindSet = {0, 1, 2, 5, 6, 8, 9}; DiRightKindSet = {0, 1, 2, 5, 6, 8, 9}; DiFromChildNo = 0; DiThruChildNo = 1; DiHeight = 1; DiAdjKind = AdjKindSame;  END, ResultInfo=
+    RECORD RiLeftRef = NIL; RiSeamInsertionRef1 = NIL; RiSeamInsertionRef2 = NIL; RiLeftKindSet = {}; RiSeamInsertionKindSet1 = {}; RiSeamInsertionKindSet2 = {}; RiRightGapOrigChildNo = 0; RiReplaceLeft = FALSE; RiReplaceRight = FALSE; RiReplaceFarRight = FALSE;  END) at EstBuild.m3:1973
+1973	        VAR LLeftElemCt : EstHs . ElemNoTyp 
+1974	      ; VAR LRightElemCt : EstHs . ElemNoTyp 
+1975	      ; VAR LLeftNewElemCt : EstHs . ElemNoTyp 
+1976	      ; VAR LRightNewElemCt : EstHs . ElemNoTyp 
+1977	      ; VAR LFromElemNo : EstHs . ElemNoTyp 
+1978	      ; VAR LLeftElemNo : EstHs . ElemNoTyp 
+1979	      ; VAR LThruElemNo : EstHs . ElemNoTyp 
+1980	      ; VAR LElemNo : EstHs . ElemNoTyp 
+1981	      ; VAR LLeftMustChange : BOOLEAN 
+1982	      ; VAR LRightMustChange : BOOLEAN 
+1983	      ; VAR LFarRightMustChange : BOOLEAN 
+1984	      ; VAR LForceRepack : BOOLEAN 
+1985	      ; VAR LFarRightElemCt : EstHs . ElemNoTyp 
+1993	      ; VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
+1994	      ; VAR LRightGapEdgeInfo : EstHs . EdgeInfoTyp 
+1995	      ; VAR LLeftGapEdgeInfo : EstHs . EdgeInfoTyp 
+1996	      ; VAR LRightLeafArray : EstHs . FullLeafArrayTyp 
+1997	      ; VAR LLeftLeafArray : EstHs . FullLeafArrayTyp 
+2002	          LRightElemCt := DownInfo . DiRightObjRef . KTreeElemCt 
+2003	        ; DownInfo . DiRightObjRef . FetchLeafArray ( LRightLeafArray ) 
+$46 = 4
+2004	        ; Assert 
+$47 = [RECORD LeCumNodeCt = 4; LeChildRef = 16_0cdece6c; LeKindSet = {0, 1, 6}; LeFmtNo = 4;  END, 
+    RECORD LeCumNodeCt = 5; LeChildRef = 16_0ce218c8; LeKindSet = {2, 6, 8}; LeFmtNo = 255;  END, 
+    RECORD LeCumNodeCt = 6; LeChildRef = 16_0ce218d4; LeKindSet = {1, 5, 6, 9}; LeFmtNo = 2;  END, 
+    RECORD LeCumNodeCt = 7; LeChildRef = 16_0ce11ee4; LeKindSet = {1, 5, 6}; LeFmtNo = 0;  END, 
+    RECORD LeCumNodeCt = 0; LeChildRef = NIL; LeKindSet = {}; LeFmtNo = 255;  END, RECORD LeCumNodeCt = 0; 
+    LeChildRef = NIL; LeKindSet = {}; LeFmtNo = 255;  END, RECORD LeCumNodeCt = 0; LeChildRef = NIL; 
+    LeKindSet = {}; LeFmtNo = 255;  END, RECORD LeCumNodeCt = 0; LeChildRef = NIL; LeKindSet = {}; 
+    LeFmtNo = 255;  END]
+2008	        ; LThruElemNo := LRightElemCt - 1 - DownInfo . DiThruChildNo 
+2009	        ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+$48 = 2
+2011	            Assert 
+2015	          ; LLeftElemCt := LRightElemCt 
+2024	        ; LFromElemNo := LLeftElemCt - 1 - DownInfo . DiFromChildNo 
+2027	        ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+$49 = 3
+2029	            LLeftmostKindSet := LRightLeafArray [ LFromElemNo ] . LeKindSet 
+2030	          ; LLeftmostFmtNo := LRightLeafArray [ LFromElemNo ] . LeFmtNo 
+2031	          ; LeftmostNewChildRef 
+$50 = {1, 5, 6}
+$51 = 0
+2041	        ; IF MergeState . MsHeight = 0 
+Previous frame inner to this frame (corrupt stack?)
+2057	        ; LFarRightMustChange 
+2063	        ; MergeState . MsWaitingRightmostKindSet 
+2066	        ; LRightMustChange 
+Can't find Modula-3 identifier: LFarRight
+$52 = TRUE
+2072	        ; IF SetFirstOfGroupAndFmtNo 
+$53 = TRUE
+2074	            IF IsFirstOfGroup 
+2076	              IF NOT EstHs . EstChildKindFirstOfGroup IN LLeftmostKindSet 
+$54 = {1, 5, 6}
+Undefined command: "nn".  Try "help".
+2082	              ELSIF LLeftmostFmtNo # GroupFmtNo 
+#1  0x080d221d in MergeSlice (MergeState=16_0ce26330, EstRef=16_0ce218e0, FromChildNo=0, ToChildNo=2, 
+    SetFirstOfGroupAndFmtNo=TRUE, IsFirstOfGroup=TRUE, GroupFmtNo=0, LeftmostNewChildRef=16_0ce11ee4)
+    at EstBuild.m3:3344
+3344	            MslLeaf ( LDownInfo , LResultInfo ) 
+#0  MslLeaf (DownInfo=
+    RECORD DiLeftObjRef = 16_0ce218e0; DiRightObjRef = 16_0ce218e0; DiLeftKindSet = {0, 1, 2, 5, 6, 8, 9}; DiRightKindSet = {0, 1, 2, 5, 6, 8, 9}; DiFromChildNo = 0; DiThruChildNo = 1; DiHeight = 1; DiAdjKind = AdjKindSame;  END, ResultInfo=
+    RECORD RiLeftRef = NIL; RiSeamInsertionRef1 = NIL; RiSeamInsertionRef2 = NIL; RiLeftKindSet = {}; RiSeamInsertionKindSet1 = {}; RiSeamInsertionKindSet2 = {}; RiRightGapOrigChildNo = 0; RiReplaceLeft = FALSE; RiReplaceRight = FALSE; RiReplaceFarRight = FALSE;  END) at EstBuild.m3:2082
+2082	              ELSIF LLeftmostFmtNo # GroupFmtNo 
+$55 = 0
+2086	              ELSE LLeftMustChange := LFromElemNo < LLeftElemCt - 1 
+$56 = 3
+$57 = 4
+2099	        ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+$58 = FALSE
+2101	            LRightMustChange := LLeftMustChange OR LRightMustChange 
+$59 = FALSE
+$60 = TRUE
+2102	          ; LLeftMustChange := LRightMustChange 
+2103	          ; LLeftNewElemCt := 0 
+2104	          ; LRightNewElemCt := LFromElemNo + 1 - LThruElemNo 
+2111	        ; IF MergeState . MsLeafRow . MsLrObjRef = NIL 
+$61 = 2
+2113	            LFarRightElemCt := MergeState . MsLeafRow . MsLrElemCt 
+2118	        ; MslLSeamInsertionCt2 := EstHs . LeafArrayElemCtMax 
+$62 = 5
+2119	        ; MslLSeamInsertionCt1 := EstHs . LeafArrayElemCtMax 
+2120	        ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindAdj 
+2206	            LCombinedElemCt := LRightNewElemCt + LFarRightElemCt 
+2207	          ; IF ( LCombinedElemCt + EstHs . LeafArrayElemCtMax - 1 ) 
+$63 = 7
+2212	              LForceRepack := TRUE 
+2222	        ; ResultInfo . RiSeamInsertionRef1 := NIL 
+2223	        ; ResultInfo . RiSeamInsertionRef2 := NIL 
+2224	        ; ResultInfo . RiRightGapOrigChildNo := LbeStd . EstChildNoNull 
+2227	        ; IF MergeState . MsLeafRow . MsLrObjRef # NIL 
+2267	            ResultInfo . RiReplaceFarRight := FALSE 
+2271	        ; IF LRightMustChange OR LForceRepack 
+2273	            IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+2275	              LLeftElemNo := LFromElemNo 
+2279	          ; LElemNo := LThruElemNo 
+$64 = 3
+2280	          ; Assert ( LElemNo <= LLeftElemNo , AFT . A_MslLeaf_RightNoElements ) 
+$65 = 2
+2281	          ; WITH WRightLeafElem = LRightLeafArray [ LElemNo ] 
+2282	            DO LEstMiscInfo 
+$66 = RECORD LeCumNodeCt = 6; LeChildRef = 16_0ce218d4; LeKindSet = {1, 5, 6, 9}; LeFmtNo = 2;  END
+2285	            ; LRightGapEdgeInfo . EiTok := LEstMiscInfo . EmiLeftTok 
+2286	            ; LRightGapEdgeInfo . EiEdgeKind := LEstMiscInfo . EmiEdgeKind 
+2287	            ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+2291	              ELSIF EstHs . EstChildKindFirstOfGroup 
+$67 = RECORD LeCumNodeCt = 6; LeChildRef = 16_0ce218d4; LeKindSet = {1, 5, 6, 9}; LeFmtNo = 2;  END
+2294	                LRightGapEdgeInfo . EiFmtNo := WRightLeafElem . LeFmtNo 
+2299	          ; WHILE LElemNo < LLeftElemNo 
+$68 = RECORD EiTok = 24; EiFmtNo = 2; EiEdgeKind = EdgeKindLeadingMod;  END
+$69 = 2
+$70 = 3
+2307	            DO WITH WRightLeafElem = LRightLeafArray [ LElemNo ] 
+2309	                 LKindSet := WRightLeafElem . LeKindSet  
+2310	               ; IF LElemNo = LThruElemNo 
+Can't find Modula-3 identifier: LKindset
+$71 = {1, 5, 6, 9}
+2312	                   LKindSet 
+Breakpoint 8 at 0x80ceb57: file EstBuild.m3, line 2312.
+2315	               ; MslLPrepend 
+$72 = {1, 5, 6, 9}
+MslLPrepend (InsertionRef=16_0ce218d4, KindSet={1, 5, 6, 9}, FmtNo=2, IsLeftOfSeam=TRUE) at EstBuild.m3:1936
+1936	          IF MergeState . MsLeafRow . MsLrElemCt >= MslLSeamInsertionCt2 
+1940	        ; PrependToLeafRow 
+PrependToLeafRow (MergeState=16_0ce26330, InsertionRef=16_0ce218d4, KindSet={1, 5, 6, 9}, FmtNo=2, 
+    IsLeftOfSeam=TRUE) at EstBuild.m3:1003
+1003	  = VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
+1007	      Assert 
+1011	    ; IF MergeState . MsLeafRow . MsLrElemCt = 0 
+1015	        LCumNodeCt 
+1019	      ; IF IsLeftOfSeam 
+1021	          FlushLeadingTokInfoToLeaf ( MergeState ) 
+FlushLeadingTokInfoToLeaf (MergeState=16_0ce26330) at EstBuild.m3:975
+975	      Assert 
+979	    ; MergeState . MsLeafRow . MsLrWidthInfo 
+986	    ; LbeStd . IncLimitedTokCt 
+990	    ; EstHs . MakeWidthInfoNull ( MergeState . MsLeadingWidthInfo ) 
+991	    ; MergeState . MsLeadingSyntTokCt := 0 
+992	    END FlushLeadingTokInfoToLeaf 
+992	    END FlushLeadingTokInfoToLeaf 
+PrependToLeafRow (MergeState=16_0ce26330, InsertionRef=16_0ce218d4, KindSet={1, 5, 6, 9}, FmtNo=2, 
+    IsLeftOfSeam=TRUE) at EstBuild.m3:1025
+1025	        WLeafElem 
+1028	      DO WLeafElem . LeCumNodeCt 
+1030	      ; WLeafElem . LeChildRef := InsertionRef 
+1031	      ; WLeafElem . LeKindSet := KindSet 
+1032	      ; MergeState . MsLeafRow . MsLrKindSet 
+1034	      ; WLeafElem . LeFmtNo := FmtNo 
+1036	    ; IF InsertionRef # NIL 
+1038	        LEstMiscInfo 
+1040	      ; IF MergeState . MsLeafRow . MsLrWidthInfo . WiWidth 
+1046	          IF MergeState . MsLeafRow . MsLrElemCt = 0 
+1051	            MergeState . MsLeafRow . MsLrWidthInfo 
+1063	        ; LbeStd . IncLimitedTokCt 
+1068	      ; PrependSliceTokPair 
+PrependSliceTokPair (PrependLeftTok=24, PrependRightTok=24, ExistingLeftTok=121, ExistingRightTok=18)
+    at EstBuild.m3:272
+272	      Assert 
+Assert (Condition=TRUE, Code=A_PrependSliceTokPairBadPrependNullness) at Assertions.m3:117
+117	      IF Checking AND NOT Condition 
+121	    END Assert 
+121	    END Assert 
+PrependSliceTokPair (PrependLeftTok=24, PrependRightTok=24, ExistingLeftTok=121, ExistingRightTok=18)
+    at EstBuild.m3:277
+277	    ; Assert 
+Assert (Condition=TRUE, Code=A_PrependSliceTokPairBadExistingNullness) at Assertions.m3:117
+117	      IF Checking AND NOT Condition 
+121	    END Assert 
+121	    END Assert 
+PrependSliceTokPair (PrependLeftTok=24, PrependRightTok=24, ExistingLeftTok=121, ExistingRightTok=18)
+    at EstBuild.m3:282
+282	    ; IF PrependLeftTok # LbeStd . TokNull 
+284	        IF ExistingRightTok = LbeStd . TokNull 
+288	      ; ExistingLeftTok := PrependLeftTok 
+290	    END PrependSliceTokPair 
+290	    END PrependSliceTokPair 
+PrependToLeafRow (MergeState=16_0ce26330, InsertionRef=16_0ce218d4, KindSet={1, 5, 6, 9}, FmtNo=2, 
+    IsLeftOfSeam=TRUE) at EstBuild.m3:1074
+1074	      ; MergeState . MsLeftTok := LEstMiscInfo . EmiLeftTok 
+1076	    ; INC ( MergeState . MsLeafRow . MsLrElemCt ) 
+1077	    END PrependToLeafRow 
+1077	    END PrependToLeafRow 
+MslLPrepend (InsertionRef=16_0ce218d4, KindSet={1, 5, 6, 9}, FmtNo=2, IsLeftOfSeam=TRUE) at EstBuild.m3:1942
+1942	        END MslLPrepend 
+1942	        END MslLPrepend 
+MslLeaf (DownInfo=
+    RECORD DiLeftObjRef = 16_0ce218e0; DiRightObjRef = 16_0ce218e0; DiLeftKindSet = {0, 1, 2, 5, 6, 8, 9}; DiRightKindSet = {0, 1, 2, 5, 6, 8, 9}; DiFromChildNo = 0; DiThruChildNo = 1; DiHeight = 1; DiAdjKind = AdjKindSame;  END, ResultInfo=
+    RECORD RiLeftRef = NIL; RiSeamInsertionRef1 = NIL; RiSeamInsertionRef2 = NIL; RiLeftKindSet = {}; RiSeamInsertionKindSet1 = {}; RiSeamInsertionKindSet2 = {}; RiRightGapOrigChildNo = -32768; RiReplaceLeft = FALSE; RiReplaceRight = FALSE; RiReplaceFarRight = FALSE;  END) at EstBuild.m3:2321
+2321	               ; MergeState . MsLeftTok := LEstMiscInfo . EmiLeftTok 
+Continuing.
+
+Breakpoint 6, 0x080d20a5 in MergeSlice (MergeState=16_0ce27250, EstRef=16_0ce21a94, FromChildNo=5, 
+    ToChildNo=6, SetFirstOfGroupAndFmtNo=TRUE, IsFirstOfGroup=TRUE, GroupFmtNo=10, LeftmostNewChildRef=NIL)
+    at EstBuild.m3:1828
+1828	    ( MergeState : MergeStateTyp 
+Continuing.
+
+Breakpoint 6, 0x080d20a5 in MergeSlice (MergeState=16_0ce27250, EstRef=16_0ce21a94, FromChildNo=3, 
+    ToChildNo=4, SetFirstOfGroupAndFmtNo=TRUE, IsFirstOfGroup=TRUE, GroupFmtNo=7, 
+    LeftmostNewChildRef=16_0ce27094) at EstBuild.m3:1828
+1828	    ( MergeState : MergeStateTyp 
+Continuing.
+
+Breakpoint 6, 0x080d20a5 in MergeSlice (MergeState=16_0ce27250, EstRef=16_0ce21a94, FromChildNo=1, 
+    ToChildNo=2, SetFirstOfGroupAndFmtNo=TRUE, IsFirstOfGroup=TRUE, GroupFmtNo=2, LeftmostNewChildRef=NIL)
+    at EstBuild.m3:1828
+1828	    ( MergeState : MergeStateTyp 
+Continuing.
+
+Breakpoint 1, AF () at Assertions.m3:24
+24	      L := 0 
+#1  0x080a743e in Fail (Code=A_GnlTeTfsEstChild__Lost_fixed_child) at Assertions.m3:78
+78	    ; AF ( ) 
+#2  0x080a76ae in Assert (Condition=FALSE, Code=A_GnlTeTfsEstChild__Lost_fixed_child) at Assertions.m3:119
+119	        Fail ( Code ) 
+#3  0x080d9957 in GnlTeTfsEstChild (IsEstList=FALSE) at LineMarks.m3:1353
+1353	            => Assert 
+#4  0x080da179 in GnlTeTraverseFs (FsNodeRef=16_0bccfa4c, FsFmtKind=FmtKindVert) at LineMarks.m3:1531
+1531	            => GnlTeTfsEstChild ( IsEstList := FALSE ) 
+#5  0x080d703f in GnlTeTraverseFsFixedChildren (ParentFsNodeRef=16_0bccf888, FmtKind=FmtKindVert, 
+    InitialFsChildNo=2) at LineMarks.m3:454
+454	              GnlTeTraverseFs 
+#6  0x080daa07 in GnlTraverseEst (EstRef=16_0ce26518, RootAbsNodeNo=10, RootFsNodeRef=16_0bccf888, 
+    EstFmtKind=FmtKindVert, EstIndentPos1=4, EstIndentPosN=4, IsModTok=FALSE, ContainsInsertionRepair=TRUE)
+    at LineMarks.m3:1680
+1680	            => GnlTeTraverseFsFixedChildren 
+$73 = (*16_0ce26518*) OBJECT KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; 
+    WiHasAbsFromPos = FALSE; WiHasNlBefore = TRUE; WiHasNlAfter = TRUE;  END; KTreeSyntTokCt = 4; 
+    KTreeElemCt = 7; EstChildKindSet = {0, 1, 3, 4, 5, 6, 7, 8}; EstTok = 197; EstLeftTok = 24; 
+    EstRightTok = 18; EstKind = EstKindEst; EstHeight = 1; EstSemRef = NIL; EstRepairCost = 0; 
+    EstLeafArrayRef = 16_0ce26540;  END
+Object has no field or method named "EstLeafArrayRef".
+$74 = [RECORD LeCumNodeCt = 1; LeChildRef = 16_0ce2650c; LeKindSet = {3, 6, 8}; LeFmtNo = 255;  END,
+    RECORD LeCumNodeCt = 3; LeChildRef = 16_0ce25f30; LeKindSet = {4, 6}; LeFmtNo = 255;  END,
+    RECORD LeCumNodeCt = 4; LeChildRef = 16_0ce24780; LeKindSet = {4, 6}; LeFmtNo = 255;  END,
+    RECORD LeCumNodeCt = 5; LeChildRef = 16_0ce234d4; LeKindSet = {1, 6, 7}; LeFmtNo = 2;  END,
+    RECORD LeCumNodeCt = 6; LeChildRef = 16_0cdec0a4; LeKindSet = {0, 6}; LeFmtNo = 0;  END,
+    RECORD LeCumNodeCt = 7; LeChildRef = 16_0ce218d4; LeKindSet = {1, 5, 6}; LeFmtNo = 2;  END,
+    RECORD LeCumNodeCt = 8; LeChildRef = 16_0ce11ee4; LeKindSet = {1, 5, 6}; LeFmtNo = 0;  END]

@@ -1,0 +1,160 @@
+File_Open_Text "test13_71.m3"
+MouseClickChar 18 0
+DeleteRestOfLine
+MouseClickChar 49 3
+DeleteRestOfLine
+MouseClickChar 42 3
+DeleteRestOfLine
+MouseClickChar 25 4
+CharDelFwd
+CharDelFwd
+CharType_Char 'x'
+CharType_Char 'x'
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+DeleteRestOfLine
+CursorDown
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelFwd
+CharDelFwd
+CharType_Char 'y'
+CharType_Char 'y'
+DeleteRestOfLine
+CursorLeft
+CursorLeft
+DeleteRestOfLine
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelFwd
+CharDelFwd
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharDelFwd
+CharDelFwd
+CharType_Char 'x'
+CharType_Char 'x'
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+DeleteRestOfLine
+CursorDown
+DeleteRestOfLine
+CursorDown
+DeleteRestOfLine
+BeginKey
+DeleteRestOfLine
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+DeleteRestOfLine
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+DeleteRestOfLine
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+DeleteRestOfLine
+CursorDown
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+DeleteRestOfLine
+CursorDown
+CursorDown
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharType_Char '\n'
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CursorUp
+DeleteRestOfLine
+DeleteRestOfLine
+BeginKey
+STOP
+DeleteRestOfLine
+MouseClickChar 0 21
+MouseClickChar 0 21
+DeleteRestOfLine
+CursorUp
+CursorUp
+CursorUp
+CursorUp
+CursorUp
+CursorUp
+CursorUp
+CursorUp
+CursorUp
+VertScroll 58 37 1
+
+VertScroll 58 37 2
+
+VertScroll 58 37 3
+
+VertScroll 58 37 4
+
+VertScroll 58 37 3
+
+VertScroll 58 37 2
+
+VertScroll 58 37 1
+
+VertScroll 58 37 0
+
+SemParse
+File_Save_Text "test13_71.m3"
+File_Export_Text "test13_71.export.m3"
+STOP
+File_CloseImage_Text "test13_71.m3"
+STOP
+File_Quit
+

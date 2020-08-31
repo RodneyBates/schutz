@@ -1,0 +1,32 @@
+File_Open_Text "test10_65.m3"
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char 'T'
+CharType_Char 'H'
+CharType_Char 'E'
+CharType_Char 'N'
+SemParse
+SemParse
+SemAccept
+SemParse
+VertScroll 71 38 25
+
+VertScroll 71 38 24
+
+File_Save_Text "test10_65.m3"
+File_Export_Text "test10_65.export.m3"
+STOP
+File_CloseImage_Text "test10_65.m3"
+STOP
+File_Quit

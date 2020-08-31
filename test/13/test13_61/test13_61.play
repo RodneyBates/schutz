@@ -1,0 +1,10 @@
+File_Open_Text "test13_61.m3"
+MouseClickChar 9 0
+SemAccept
+SemParse
+File_Save_Text "test13_61.m3"
+File_Export_Text "test13_61.export.m3"
+STOP
+File_CloseImage_Text "test13_61.m3"
+STOP
+File_Quit

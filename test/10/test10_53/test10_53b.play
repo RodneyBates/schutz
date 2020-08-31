@@ -1,0 +1,8 @@
+File_Open_Text "test10_53.m3"
+File_Save_Text "test10_53.m3_"
+File_CloseImage_Text "test10_53.m3_"
+MouseClick 306 207
+File_Open_Text "../../test10_64.m3"
+MouseClick 365 193
+File_CloseImage_Text "../../test10_64.m3_"
+File_Quit

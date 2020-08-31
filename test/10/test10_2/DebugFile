@@ -1,0 +1,3160 @@
+----------------------------------------------------------------------------------------------------------------
+Parsing conflict in state 67
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            CsFixedRule 
+............:
+:
+Ident "::=" Concatenation "." 
+            :
+            Concatenation_Sublist 
+            Tok180 
+            CsReqdChild 
+            Ident 
+            :..........
+                      :
+reduce CsReqdChild ::= Ident. {"."} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            CsAltRule 
+............:
+:
+Ident "::=" Alternation "." 
+            :
+            Alternation_Sublist 
+            CsAtom 
+            Ident 
+            :.....
+                 :
+reduce CsAtom ::= Ident. {"."} ?
+
+
+retained                CsReqdChild ::= Ident. {"."}
+ignored                 CsAtom ::= Ident. {"."}
+
+
+----------------------------------------------------------------------------------------------------------------
+Parsing conflict in state 68
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            CsFixedRule 
+............:
+:
+Ident "::=" Concatenation "." 
+            :
+            Concatenation_Sublist 
+            Tok180 
+            CsReqdChild 
+            String 
+            :..........
+                      :
+reduce CsReqdChild ::= String. {"."} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            CsAltRule 
+............:
+:
+Ident "::=" Alternation "." 
+            :
+            Alternation_Sublist 
+            CsAtom 
+            String 
+            :.....
+                 :
+reduce CsAtom ::= String. {"."} ?
+
+
+retained                CsReqdChild ::= String. {"."}
+ignored                 CsAtom ::= String. {"."}
+
+
+----------------------------------------------------------------------------------------------------------------
+Parsing conflict in state 89
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+"@" Integer IdentOrDontCare 
+:
+FsFixedChild 
+LineBreak 
+"!" 
+:....................
+                    :
+reduce LineBreak ::= "!". {"@"} ?
+read   LineBreak ::= "!"."@" Integer ?
+
+
+ignored                 LineBreak ::= "!". {"@"}
+retained                LineBreak ::= "!"."@" Integer 
+
+
+----------------------------------------------------------------------------------------------------------------
+Parsing conflict in state 211
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsVertSubtree 
+...................................:
+:
+"VERT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"VERT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPresent 
+...................................:
+:
+"PRESENT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"PRESENT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPlural 
+...................................:
+:
+"PLURAL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"PLURAL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondMember 
+...................................:
+:
+"MEMBER" Ident "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"MEMBER"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondNonempty 
+...................................:
+:
+"NONEMPTY" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"NONEMPTY"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsHorizSubtree 
+...................................:
+:
+"HORIZ" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"HORIZ"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsFillSubtree 
+...................................:
+:
+"FILL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"FILL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsDefaultSubtree 
+...................................:
+:
+"(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"("} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+"@" Integer IdentOrDontCare 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"@"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+                               FsFixedChild 
+                               LineBreak 
+...............................:
+:
+"!" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"!"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+                                   IdentOrDontCare 
+                                   DontCare 
+...................................:
+:
+"_" 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"_"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:Ident 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {Ident} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:String 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {String} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:LineBreak 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {LineBreak} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsDefaultSubtree 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsDefaultSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsHorizSubtree 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsHorizSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsVertSubtree 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsVertSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsFillSubtree 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsFillSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsChildPlain 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsChildPlain} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:DontCare 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {DontCare} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPresent 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsCondPresent} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondNonempty 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsCondNonempty} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPlural 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsCondPlural} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondMember 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsCondMember} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChildList_Sublist FsFixedChildList_Sublist 
+:
+FsFixedChild 
+FsHorizSubtree 
+"HORIZ" "(" FsFixedChildList ")" 
+:.........................
+                         :
+reduce FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsFixedChildList_Sublist} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsVertSubtree 
+...................................:
+:
+"VERT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"VERT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPresent 
+...................................:
+:
+"PRESENT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PRESENT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPlural 
+...................................:
+:
+"PLURAL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PLURAL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondMember 
+...................................:
+:
+"MEMBER" Ident "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"MEMBER"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondNonempty 
+...................................:
+:
+"NONEMPTY" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"NONEMPTY"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsHorizSubtree 
+...................................:
+:
+"HORIZ" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"HORIZ"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsFillSubtree 
+...................................:
+:
+"FILL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"FILL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsDefaultSubtree 
+...................................:
+:
+"(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"("} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+"@" Integer IdentOrDontCare 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"@"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+                               FsFixedChild 
+                               LineBreak 
+...............................:
+:
+"!" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"!"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+                                   IdentOrDontCare 
+                                   DontCare 
+...................................:
+:
+"_" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"_"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:Ident 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {Ident} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:String 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {String} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:LineBreak 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {LineBreak} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsDefaultSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsDefaultSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsHorizSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsHorizSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsVertSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsVertSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsFillSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFillSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsChildPlain 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsChildPlain} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:DontCare 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {DontCare} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPresent 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPresent} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondNonempty 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondNonempty} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPlural 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPlural} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondMember 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondMember} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChildList_Sublist FsFixedChildList_Sublist 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFixedChildList_Sublist} ?
+
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"VERT"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"VERT"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"PRESENT"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PRESENT"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"PLURAL"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PLURAL"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"MEMBER"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"MEMBER"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"NONEMPTY"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"NONEMPTY"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"HORIZ"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"HORIZ"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"FILL"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"FILL"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"("}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"("}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"@"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"@"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"!"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"!"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"_"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"_"}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {"."}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"."}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {Ident}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {Ident}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {String}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {String}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {LineBreak}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {LineBreak}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsDefaultSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsDefaultSubtree}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsHorizSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsHorizSubtree}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsVertSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsVertSubtree}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsFillSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFillSubtree}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsChildPlain}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsChildPlain}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {DontCare}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {DontCare}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsCondPresent}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPresent}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsCondNonempty}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondNonempty}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsCondPlural}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPlural}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsCondMember}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondMember}
+
+ignored                 FsHorizSubtree ::= "HORIZ" "(" FsFixedChildList ")". {FsFixedChildList_Sublist}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFixedChildList_Sublist}
+
+
+----------------------------------------------------------------------------------------------------------------
+Parsing conflict in state 214
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsVertSubtree 
+...................................:
+:
+"VERT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"VERT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPresent 
+...................................:
+:
+"PRESENT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"PRESENT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPlural 
+...................................:
+:
+"PLURAL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"PLURAL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondMember 
+...................................:
+:
+"MEMBER" Ident "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"MEMBER"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondNonempty 
+...................................:
+:
+"NONEMPTY" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"NONEMPTY"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsHorizSubtree 
+...................................:
+:
+"HORIZ" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"HORIZ"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsFillSubtree 
+...................................:
+:
+"FILL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"FILL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsDefaultSubtree 
+...................................:
+:
+"(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"("} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+"@" Integer IdentOrDontCare 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"@"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+                               FsFixedChild 
+                               LineBreak 
+...............................:
+:
+"!" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"!"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+                                   IdentOrDontCare 
+                                   DontCare 
+...................................:
+:
+"_" 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"_"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:Ident 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {Ident} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:String 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {String} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:LineBreak 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {LineBreak} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsDefaultSubtree 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsDefaultSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsHorizSubtree 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsHorizSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsVertSubtree 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsVertSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsFillSubtree 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsFillSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsChildPlain 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsChildPlain} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:DontCare 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {DontCare} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPresent 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsCondPresent} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondNonempty 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsCondNonempty} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPlural 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsCondPlural} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondMember 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsCondMember} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChildList_Sublist FsFixedChildList_Sublist 
+:
+FsFixedChild 
+FsVertSubtree 
+"VERT" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsFixedChildList_Sublist} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsVertSubtree 
+...................................:
+:
+"VERT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"VERT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPresent 
+...................................:
+:
+"PRESENT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PRESENT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPlural 
+...................................:
+:
+"PLURAL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PLURAL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondMember 
+...................................:
+:
+"MEMBER" Ident "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"MEMBER"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondNonempty 
+...................................:
+:
+"NONEMPTY" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"NONEMPTY"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsHorizSubtree 
+...................................:
+:
+"HORIZ" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"HORIZ"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsFillSubtree 
+...................................:
+:
+"FILL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"FILL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsDefaultSubtree 
+...................................:
+:
+"(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"("} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+"@" Integer IdentOrDontCare 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"@"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+                               FsFixedChild 
+                               LineBreak 
+...............................:
+:
+"!" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"!"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+                                   IdentOrDontCare 
+                                   DontCare 
+...................................:
+:
+"_" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"_"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:Ident 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {Ident} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:String 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {String} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:LineBreak 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {LineBreak} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsDefaultSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsDefaultSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsHorizSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsHorizSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsVertSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsVertSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsFillSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFillSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsChildPlain 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsChildPlain} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:DontCare 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {DontCare} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPresent 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPresent} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondNonempty 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondNonempty} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPlural 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPlural} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondMember 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondMember} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChildList_Sublist FsFixedChildList_Sublist 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFixedChildList_Sublist} ?
+
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"VERT"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"VERT"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"PRESENT"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PRESENT"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"PLURAL"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PLURAL"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"MEMBER"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"MEMBER"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"NONEMPTY"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"NONEMPTY"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"HORIZ"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"HORIZ"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"FILL"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"FILL"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"("}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"("}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"@"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"@"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"!"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"!"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"_"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"_"}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {"."}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"."}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {Ident}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {Ident}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {String}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {String}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {LineBreak}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {LineBreak}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsDefaultSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsDefaultSubtree}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsHorizSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsHorizSubtree}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsVertSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsVertSubtree}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsFillSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFillSubtree}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsChildPlain}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsChildPlain}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {DontCare}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {DontCare}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsCondPresent}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPresent}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsCondNonempty}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondNonempty}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsCondPlural}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPlural}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsCondMember}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondMember}
+
+ignored                 FsVertSubtree ::= "VERT" "(" FsFixedChildList ")". {FsFixedChildList_Sublist}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFixedChildList_Sublist}
+
+
+----------------------------------------------------------------------------------------------------------------
+Parsing conflict in state 217
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsVertSubtree 
+...................................:
+:
+"VERT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"VERT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPresent 
+...................................:
+:
+"PRESENT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"PRESENT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPlural 
+...................................:
+:
+"PLURAL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"PLURAL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondMember 
+...................................:
+:
+"MEMBER" Ident "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"MEMBER"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondNonempty 
+...................................:
+:
+"NONEMPTY" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"NONEMPTY"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsHorizSubtree 
+...................................:
+:
+"HORIZ" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"HORIZ"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsFillSubtree 
+...................................:
+:
+"FILL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"FILL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsDefaultSubtree 
+...................................:
+:
+"(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"("} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+"@" Integer IdentOrDontCare 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"@"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+                               FsFixedChild 
+                               LineBreak 
+...............................:
+:
+"!" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"!"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+                                   IdentOrDontCare 
+                                   DontCare 
+...................................:
+:
+"_" 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"_"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:Ident 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {Ident} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:String 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {String} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:LineBreak 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {LineBreak} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsDefaultSubtree 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsDefaultSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsHorizSubtree 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsHorizSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsVertSubtree 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsVertSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsFillSubtree 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsFillSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsChildPlain 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsChildPlain} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:DontCare 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {DontCare} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPresent 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsCondPresent} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondNonempty 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsCondNonempty} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPlural 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsCondPlural} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondMember 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsCondMember} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChildList_Sublist FsFixedChildList_Sublist 
+:
+FsFixedChild 
+FsFillSubtree 
+"FILL" "(" FsFixedChildList ")" 
+:........................
+                        :
+reduce FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsFixedChildList_Sublist} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsVertSubtree 
+...................................:
+:
+"VERT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"VERT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPresent 
+...................................:
+:
+"PRESENT" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PRESENT"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondPlural 
+...................................:
+:
+"PLURAL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PLURAL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondMember 
+...................................:
+:
+"MEMBER" Ident "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"MEMBER"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsCondNonempty 
+...................................:
+:
+"NONEMPTY" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"NONEMPTY"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsHorizSubtree 
+...................................:
+:
+"HORIZ" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"HORIZ"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsFillSubtree 
+...................................:
+:
+"FILL" "(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"FILL"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsDefaultSubtree 
+...................................:
+:
+"(" FsFixedChildList ")" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"("} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+"@" Integer IdentOrDontCare 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"@"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+                               FsFixedChild 
+                               LineBreak 
+...............................:
+:
+"!" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"!"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+                                   IdentOrDontCare 
+                                   DontCare 
+...................................:
+:
+"_" 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {"_"} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:Ident 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {Ident} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:String 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {String} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:LineBreak 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {LineBreak} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsDefaultSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsDefaultSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsHorizSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsHorizSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsVertSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsVertSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsFillSubtree 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFillSubtree} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsChildPlain 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsChildPlain} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsListDefaultRule 
+            IdentPlusList "->" "{" FsChild "}" "." 
+                                   FsChildPlain 
+...................................:
+:
+IdentOrDontCare 
+:DontCare 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {DontCare} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPresent 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPresent} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondNonempty 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondNonempty} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondPlural 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPlural} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChild 
+:FsCondMember 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondMember} ?
+
+
+"LDL" Ident RuleList "END" Ident 
+            RuleList_Sublist 
+            Rule 
+            FsFixedDefaultRule 
+            IdentPlusList "->" FsFixedChildList "." 
+                               FsFixedChildList_Sublist 
+...............................:
+:
+FsFixedChildList_Sublist FsFixedChildList_Sublist 
+:
+FsFixedChild 
+FsDefaultSubtree 
+"(" FsFixedChildList ")" 
+:...........................
+                           :
+reduce FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFixedChildList_Sublist} ?
+
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"VERT"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"VERT"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"PRESENT"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PRESENT"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"PLURAL"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"PLURAL"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"MEMBER"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"MEMBER"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"NONEMPTY"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"NONEMPTY"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"HORIZ"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"HORIZ"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"FILL"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"FILL"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"("}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"("}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"@"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"@"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"!"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"!"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"_"}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"_"}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {"."}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {"."}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {Ident}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {Ident}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {String}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {String}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {LineBreak}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {LineBreak}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsDefaultSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsDefaultSubtree}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsHorizSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsHorizSubtree}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsVertSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsVertSubtree}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsFillSubtree}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFillSubtree}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsChildPlain}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsChildPlain}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {DontCare}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {DontCare}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsCondPresent}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPresent}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsCondNonempty}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondNonempty}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsCondPlural}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondPlural}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsCondMember}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsCondMember}
+
+ignored                 FsFillSubtree ::= "FILL" "(" FsFixedChildList ")". {FsFixedChildList_Sublist}
+retained                FsDefaultSubtree ::= "(" FsFixedChildList ")". {FsFixedChildList_Sublist}
+
+

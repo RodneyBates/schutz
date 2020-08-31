@@ -1,0 +1,105 @@
+34c34
+<     ; SizeHint : INTEGER := 25 ; Space : Arr_ref := NIL END
+---
+>       ; SizeHint : INTEGER := 25 ; Space : Arr_ref := NIL END
+39,85c39,87
+<             ; INCR ( card_val ) RETURN card_val
+<               END
+< 
+<             ; PROCEDURE Hash ( m : T
+<             )
+<           : Word . T
+< 
+< 
+<           ; PROCEDURE inserel_m
+<                 ( self :
+<                     T , Elem : ElemTyp
+<                     ) = BEGIN
+< 
+<                   ; Arr_ref := Hash ( Elem : Elemtyp )
+<                   ; Wr
+<               . Puttext
+<                 ( WrT , " Element is inserted " & Wr . EOL )
+<               END
+< 
+<               ; PROCEDURE isin_m ( self : T , Elem : ElemTyp )
+<               = BEGIN ; VAR
+<                 mx : INTEGER
+<               ; VAR low : INTEGER
+<               ; VAR Isequal : BOOLEAN
+<               ; VAR high : INTEGER
+<               ; VAR Lcompare : CompareTyp
+<               ; VAR Probe : INTEGER
+<               ; IF Elem
+<               .
+<                 Space := NIL
+<                 THEN mx := 0
+<               ; Isequal := FALSE
+<                 ELSE ; low := 0
+<               ; high := card_val - 1
+<               ; LOOP IF low > high THEN
+<               ; mx := low
+<               ; Isequal := FALSE
+<               ; EXIT ELSE
+<               ; Probe := ( low + high ) DRV 2
+<               ; Lcompare
+<                   := compare ( Elem . Space ^ [ Probe ] ) CASE Lcompare
+<                      OF compare . less
+<                      => high
+<               ; = Probe - 1
+<                 | compareEqual => mx := Probe
+<               ; Isequal := TRUE
+<               ; EXIT | compareGreater => low := Probe + 1
+---
+>             ; INCR
+>                 ( card_val ) RETURN card_val
+>                      END
+> 
+>                      ; PROCEDURE Hash ( m : T )
+>                      : Word . T
+> 
+> 
+>                      ; PROCEDURE inserel_m
+>                        ( self
+>                          :
+>                            T , Elem : ElemTyp
+>                            ) = BEGIN
+> 
+>                          ; Arr_ref := Hash ( Elem : Elemtyp )
+>                          ; Wr
+>                      . Puttext
+>                        ( WrT , " Element is inserted " & Wr . EOL )
+>                      END
+> 
+>                      ; PROCEDURE isin_m
+>                        ( self : T , Elem : ElemTyp )
+>                      = BEGIN
+>             ; VAR mx : INTEGER
+>             ; VAR low : INTEGER
+>             ; VAR Isequal : BOOLEAN
+>             ; VAR high : INTEGER
+>             ; VAR Lcompare : CompareTyp
+>             ; VAR Probe : INTEGER
+>             ; IF Elem
+>               . Space := NIL
+>               THEN mx := 0
+>             ; Isequal := FALSE
+>               ELSE ; low := 0
+>             ; high := card_val - 1
+>             ; LOOP IF low
+>               > high THEN ; mx := low
+>             ; Isequal := FALSE
+>             ; EXIT ELSE
+>             ; Probe := ( low + high ) DRV 2
+>             ; Lcompare
+>                 := compare ( Elem . Space ^ [ Probe ] ) CASE Lcompare
+>           OF
+>               compare . less
+>               => high ; = Probe - 1
+>               | compareEqual =>
+>                 mx := Probe ; Isequal := TRUE ; EXIT | compareGreater
+>               =>
+>                 low := Probe + 1
+test12_131.export.m3 not as expected
+######################### F A I L E D #########################
+----------------------------- Failed in /home/rodney/proj/lbe/git/test/12/test12_131

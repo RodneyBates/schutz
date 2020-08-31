@@ -1,0 +1,26 @@
+File_Open_Text "test10_124a.ldl0"
+MouseClickChar 9 1
+SemAccept
+MouseClickChar 13 1
+SemAccept
+MouseClickChar 2 2
+SemAccept
+SemAccept
+MouseClickChar 2 4
+SemAccept
+SemAccept
+MouseClickChar 1 6
+SemAccept
+MouseClickChar 1 9
+SemAccept
+MouseClickChar 3 9
+SemAccept
+MouseClickChar 6 9
+SemAccept
+SemParse
+File_Save_Text "test10_124a.ldl0"
+File_Export_Text "test10_124a.export.ldl0"
+STOP
+File_CloseImage_Text "test10_124a.ldl0"
+STOP
+File_Quit

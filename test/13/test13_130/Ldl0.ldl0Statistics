@@ -1,0 +1,45 @@
+Node byte sizes, including header, are:
+        40 EstLeafRefTyp
+        48 EstNonleafRefTyp
+        20 KTreeLeafRefTyp
+        28 KTreeNonleafRefTyp
+        12 ModBlankLineTyp
+        12 ModLexErrTyp
+        12 ModSyntErrTyp
+        12 ModDelTyp
+        20 ModCmntTrailingFixedTyp
+        20 ModCmntTrailingRelativeTyp
+        20 ModCmntLeadingFixedTyp
+        20 ModCmntLeadingRelativeTyp
+        16 ModTextTyp
+        12 EstDummyTokTyp
+         8 EstDummyTempMarkTyp
+        16 SharedStrings . T
+        64 LangUtil . FsNodeRefTyp
+
+Node counts, etc. are:
+       652 EstLeafCt
+         3 EstNonleafCt
+        27 KTreeLeafCt
+         4 KTreeNonleafCt
+       679 LeafArrayCt
+      1817 LeafArrayElemCt
+     29072 LeafArraySize
+         7 NonleafArrayCt
+        31 NonleafArrayElemCt
+       496 NonleafArraySize
+       149 ModBlankLineCt
+         0 ModLexErrCt
+         0 ModSyntErrCt
+         0 ModDelCt
+         0 ModCmntTrailingFixedCt
+         1 ModCmntTrailingRelativeCt
+        16 ModCmntLeadingFixedCt
+        18 ModCmntLeadingRelativeCt
+         0 ModTextCt
+       814 AstCt
+         0 DummyTokCt
+         0 DummyTempMarkCt
+       165 NilCt
+      1544 Unique shared strings
+

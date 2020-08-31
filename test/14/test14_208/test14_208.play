@@ -1,0 +1,68 @@
+File_Open_Text "test14_208.m3"
+MouseClickChar 13 0
+CharType_Char 'M'
+CharType_Char 'O'
+CharType_Char 'D'
+CharType_Char 'U'
+CharType_Char 'L'
+CharType_Char 'E'
+CharType_Char ' '
+CharType_Char 't'
+CharType_Char 'e'
+CharType_Char 's'
+CharType_Char 't'
+CharType_Char '1'
+CharType_Char '4'
+CharType_Char '_'
+CharType_Char '2'
+CharType_Char '0'
+CharType_Char '8'
+CharType_Char ' '
+CharType_Char ';'
+CharType_Char ' '
+CharType_Char 'B'
+CharType_Char 'E'
+CharType_Char 'G'
+CharType_Char 'I'
+CharType_Char 'N'
+CharType_Char ' '
+CharType_Char 'E'
+CharType_Char 'N'
+CharType_Char 'D'
+CharType_Char ' '
+CharType_Char 't'
+CharType_Char 'e'
+CharType_Char 's'
+CharType_Char 't'
+CharType_Char '1'
+CharType_Char '4'
+CharType_Char '_'
+CharType_Char '2'
+CharType_Char '0'
+CharType_Char '8'
+CharType_Char ' '
+CharType_Char '.'
+
+Devel_MergeText
+SemParse
+MouseClickChar 13 0
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+File_Save_Text "empty.m3"
+File_Export_Text "test14_208.export.m3"
+STOP
+File_CloseImage_Text "empty.m3"
+STOP
+File_Quit

@@ -1,0 +1,489 @@
+532	        IF Right . WiNlTrigger = LbeStd . LimitedCharNoInfinity 
+534	          LResult . WiWidth 
+537	        ; IF LResult . WiWidth = LbeStd . LimitedCharNoInfinity 
+$1 = 5
+539	          ELSE LResult . WiNlTrigger := Left . WiNlTrigger 
+563	    ; LResult . WiHasAbsFromPos := Left . WiHasAbsFromPos 
+$2 = 6
+564	    ; LResult . WiHasNlBefore := Left . WiHasNlBefore 
+565	    ; LResult . WiHasNlAfter := Right . WiHasNlAfter 
+566	    ; LResult . WiHasNlWithin 
+568	    ; LResult . WiWholeLineModsOnly 
+570	    ; RETURN LResult 
+$3 = RECORD WiNlTrigger = 6; WiWidth = 5; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; 
+    WiWholeLineModsOnly = FALSE;  END
+#0  WidthInfoCat (Left=
+    RECORD WiNlTrigger = 6; WiWidth = 3; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END, NeedsSep=FALSE, Right=
+    RECORD WiNlTrigger = 254; WiWidth = 2; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END, _result=
+    RECORD WiNlTrigger = 254; WiWidth = 2; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END) at ../common/src/EstUtil.m3:570
+#1  0x00000000004819ab in PrependToLeafRow (MergeState=16_00000000029f7da8, InsertionRef=16_000000000179a6c0, KindSet={2, 6}, 
+    FmtNo=255, IsLeftOfSeam=TRUE) at ../common/src/EstBuild.m3:908
+#2  0x00000000004846a5 in MergeChild (MergeState=16_00000000029f7da8, EstRef=16_000000000179a6c0, KindSet={2, 6}, 
+    IsFirstOfGroup=FALSE, GroupFmtNo=0) at ../common/src/EstBuild.m3:1670
+#3  0x00000000004b209a in MteTeFlushChild (NewFmtNo=0, NewEdgeKind=EdgeKindLeadingMod) at ../common/src/MergeTxt.m3:572
+#4  0x00000000004b0edb in MteTeFlushExceptSlice (NewFmtNo=0, NewEdgeKind=EdgeKindLeadingMod) at ../common/src/MergeTxt.m3:975
+#5  0x00000000004b06a8 in MteTeWaitChildrenToLeft () at ../common/src/MergeTxt.m3:1075
+#6  0x00000000004ae622 in MteTeFinishMerge () at ../common/src/MergeTxt.m3:1553
+#7  0x00000000004a29e0 in MteTraverseEst (EstRef=16_0000000001768a90, KindSet={0, 1, 2, 6}, RootAbsNodeNo=29, 
+    ParentFsNodeRef=16_00000000013a5ae0, RootFsNodeRef=16_00000000012ce958, EstFmtKind=FmtKindUnknown, EstIndentPos1=255, 
+    EstIndentPosN=255, NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5109
+#8  0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#9  0x00000000004a403d in MteTeTfsEstChild (IsEstList=TRUE) at ../common/src/MergeTxt.m3:4515
+#10 0x00000000004a2eb5 in MteTeTraverseFs (FsNodeRef=16_00000000013a5ae0, FsFmtKind=FmtKindUnknown) at ../common/src/MergeTxt.m3:4822
+#11 0x00000000004abb68 in MteTeTraverseFsListChildren (ParentFsNodeRef=16_00000000013a59e8, FmtKind=FmtKindUnknown, FsChildCt=3, 
+    InitialFsChildNo=0) at ../common/src/MergeTxt.m3:2324
+#12 0x00000000004a2940 in MteTraverseEst (EstRef=16_0000000001768b88, KindSet={0, 1, 2, 6}, RootAbsNodeNo=28, 
+    ParentFsNodeRef=16_00000000012d6480, RootFsNodeRef=16_00000000013a59e8, EstFmtKind=FmtKindUnknown, EstIndentPos1=255, 
+    EstIndentPosN=255, NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5088
+#13 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#14 0x00000000004a403d in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4515
+#15 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000012d6480, FsFmtKind=FmtKindUnknown) at ../common/src/MergeTxt.m3:4820
+#16 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000012d6018, FmtKind=FmtKindUnknown, FsChildCt=5, 
+    InitialFsChildNo=4) at ../common/src/MergeTxt.m3:2283
+#17 0x00000000004a2844 in MteTraverseEst (EstRef=16_0000000001768c00, KindSet={0, 1, 2, 4, 6, 7}, RootAbsNodeNo=25, 
+    ParentFsNodeRef=16_00000000013a1428, RootFsNodeRef=16_00000000012d6018, EstFmtKind=FmtKindUnknown, EstIndentPos1=255, 
+    EstIndentPosN=255, NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#18 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#19 0x00000000004a403d in MteTeTfsEstChild (IsEstList=TRUE) at ../common/src/MergeTxt.m3:4515
+#20 0x00000000004a2eb5 in MteTeTraverseFs (FsNodeRef=16_00000000013a1428, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4822
+#21 0x00000000004abb68 in MteTeTraverseFsListChildren (ParentFsNodeRef=16_00000000013a1330, FmtKind=FmtKindVert, FsChildCt=3, 
+    InitialFsChildNo=0) at ../common/src/MergeTxt.m3:2324
+#22 0x00000000004a2940 in MteTraverseEst (EstRef=16_0000000001768cb8, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=13, 
+    ParentFsNodeRef=16_00000000012d57b0, RootFsNodeRef=16_00000000013a1330, EstFmtKind=FmtKindVert, EstIndentPos1=4, EstIndentPosN=4, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5088
+#23 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#24 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4430
+#25 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000012d57b0, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4820
+#26 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000012d55e0, FmtKind=FmtKindVert, FsChildCt=5, 
+    InitialFsChildNo=1) at ../common/src/MergeTxt.m3:2283
+#27 0x00000000004a2844 in MteTraverseEst (EstRef=16_0000000001768db0, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=12, 
+    ParentFsNodeRef=16_00000000013a5ae0, RootFsNodeRef=16_00000000012d55e0, EstFmtKind=FmtKindVert, EstIndentPos1=4, EstIndentPosN=4, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#28 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#29 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=TRUE) at ../common/src/MergeTxt.m3:4430
+#30 0x00000000004a2eb5 in MteTeTraverseFs (FsNodeRef=16_00000000013a5ae0, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4822
+#31 0x00000000004abb68 in MteTeTraverseFsListChildren (ParentFsNodeRef=16_00000000013a59e8, FmtKind=FmtKindVert, FsChildCt=3, 
+    InitialFsChildNo=0) at ../common/src/MergeTxt.m3:2324
+#32 0x00000000004a2940 in MteTraverseEst (EstRef=16_0000000001768e28, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=11, 
+    ParentFsNodeRef=16_00000000013b4290, RootFsNodeRef=16_00000000013a59e8, EstFmtKind=FmtKindVert, EstIndentPos1=4, EstIndentPosN=4, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5088
+#33 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#34 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4430
+#35 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000013b4290, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4820
+#36 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000013b3ec8, FmtKind=FmtKindVert, FsChildCt=6, 
+    InitialFsChildNo=3) at ../common/src/MergeTxt.m3:2283
+#37 0x00000000004a2844 in MteTraverseEst (EstRef=16_0000000001768ea0, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=10, 
+    ParentFsNodeRef=16_00000000013af140, RootFsNodeRef=16_00000000013b3ec8, EstFmtKind=FmtKindVert, EstIndentPos1=2, EstIndentPosN=2, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#38 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#39 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4430
+#40 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000013af140, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4820
+#41 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000013ae420, FmtKind=FmtKindVert, FsChildCt=8, 
+    InitialFsChildNo=4) at ../common/src/MergeTxt.m3:2283
+#42 0x00000000004a2844 in MteTraverseEst (EstRef=16_0000000001769030, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=1, 
+    ParentFsNodeRef=16_00000000012bd878, RootFsNodeRef=16_00000000013ae420, EstFmtKind=FmtKindVert, EstIndentPos1=0, EstIndentPosN=0, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#43 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#44 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4430
+#45 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000012bd878, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4820
+#46 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000012bd698, FmtKind=FmtKindVert, FsChildCt=3, 
+    InitialFsChildNo=1) at ../common/src/MergeTxt.m3:2283
+#47 0x00000000004a2844 in MteTraverseEst (EstRef=16_00000000017690d0, KindSet={}, RootAbsNodeNo=0, ParentFsNodeRef=NIL, 
+    RootFsNodeRef=16_00000000012bd698, EstFmtKind=FmtKindVert, EstIndentPos1=0, EstIndentPosN=0, NewEstRef=NIL, 
+    NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#48 0x00000000004a1977 in MergeTextEdit (Lang=10, EstRootRef=16_00000000017690d0, StartTokMark=
+    RECORD EstNodeNo = 31; EstNodeCt = 1; BlCharPos = 9223372036854775807; Tok = 23; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END, EndTokMark=
+    RECORD EstNodeNo = 35; EstNodeCt = 6; BlCharPos = 9223372036854775807; Tok = 131; FmtNo = 1; Kind = LeftSibFmtNo; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END, BlankLineNo=0, DelFromPos=0, DelToPos=0, InsText=
+    RECORD Text = NIL; Space = 16_000000000176b350; FromSs = 0; ToSs = 12; EventualLengthHint = 80;  END, InsLen=4, InsNlPos=254, 
+    NlIndentPos=254, DelNlShift=254, NewEstRootRef=NIL, NodeNoChange=8388608, MaxTouchedNodeNo=32, NewBolTokMark=
+    RECORD EstNodeNo = 2; EstNodeCt = 1; BlCharPos = 9223372036854775807; Tok = 23; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END, NewLinesCt=1, LeadingBlankLinesIncluded=0, TrailingBlankLinesIncluded=0) at ../common/src/MergeTxt.m3:5243
+#49 0x00000000005e9c9e in InnerFlushTempEdit (ImageRef=16_000000000292bb40, LinesRef=16_0000000001769298, 
+    TempEditRef=16_0000000002a2e968, InsNlPos=254, NlIndentPos=254, DelNlShift=254) at ../src/TextEdit.m3:1567
+#50 0x00000000005f5e4d in GrabTempEditRef (ImageTrans=16_000000000292bb40, Mark=16_00000000029ff070, RmFromPos=11, LmToPos=10, 
+    TempEditRef=16_0000000002a2e968) at ../src/TextEdit.m3:2464
+#51 0x00000000005f6534 in SimpleDeleteChar (ImageTrans=16_000000000292bb40, Mark=16_00000000029ff070, MustRepaintWindow=FALSE)
+    at ../src/TextEdit.m3:2582
+#52 0x00000000005f7e84 in DeleteChar (WindowRef=16_00000000014da080, DeletingBwd=TRUE) at ../src/TextEdit.m3:2818
+#53 0x00000000005fd658 in DeleteRestOfLine (WindowRef=16_00000000014da080) at ../src/TextEdit.m3:3573
+#54 0x0000000000623a7e in DeleteRestOfLineWorkProc (Closure=16_00000000019242c0) at ../src/EditWindow.m3:2188
+#55 0x000000000064d5bc in WorkerThreadApply (Self=16_00000000012be560) at ../src/Worker.m3:549
+#56 0x00007fc403f85fa7 in RunThread (me=16_00000000012fec70) at ../src/thread/PTHREAD/ThreadPThread.m3:475
+#57 0x00007fc403f85c3b in ThreadBase (param=16_00000000012fec70) at ../src/thread/PTHREAD/ThreadPThread.m3:447
+#58 0x00007fc402a1d9ca in start_thread () from /lib/libpthread.so.0
+#59 0x00007fc40277acdd in clone () from /lib/libc.so.6
+#60 0x0000000000000000 in ?? ()
+#2  0x00000000004846a5 in MergeChild (MergeState=16_00000000029f7da8, EstRef=16_000000000179a6c0, KindSet={2, 6}, 
+    IsFirstOfGroup=FALSE, GroupFmtNo=0) at ../common/src/EstBuild.m3:1670
+1670	    ; PrependToLeafRow 
+$4 = (*16_000000000179a6c0*) OBJECT ModTextLeftTokToPos = 0; ModTextFromPos = 6; ModTextToPos = 8; ModTextOrigToPos = 3; 
+    ModTextStringRef = 16_000000000179a6e0;  END
+$5 = (*16_000000000179a6e0*) OBJECT StringNo = 1069; Tok = 23; Value = 16_0000000001542938;  END
+$6 = (*16_0000000001542938*) "C"
+#2  0x00000000004846a5 in MergeChild (MergeState=16_00000000029f7da8, EstRef=16_000000000179a6c0, KindSet={2, 6}, 
+    IsFirstOfGroup=FALSE, GroupFmtNo=0) at ../common/src/EstBuild.m3:1670
+1670	    ; PrependToLeafRow 
+#0  WidthInfoCat (Left=
+    RECORD WiNlTrigger = 6; WiWidth = 3; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END, NeedsSep=FALSE, Right=
+    RECORD WiNlTrigger = 254; WiWidth = 2; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END, _result=
+    RECORD WiNlTrigger = 254; WiWidth = 2; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END) at ../common/src/EstUtil.m3:570
+570	    ; RETURN LResult 
+PrependToLeafRow (MergeState=16_00000000029f7da8, InsertionRef=16_000000000179a6c0, KindSet={2, 6}, FmtNo=255, IsLeftOfSeam=TRUE)
+    at ../common/src/EstBuild.m3:920
+920	        ; LbeStd . IncLimitedTokCt 
+$7 = (*16_00000000029f7da8*) OBJECT MsFsNodeRef = 16_00000000012ce958; MsLastEstRef = 16_0000000001768a90; MsLastFromChildNo = 3; 
+    MsLastToChildNo = 5; MsEstRefToInheritFrom = 16_0000000001768a90; MsHeight = 1; MsLeadingSyntTokCt = 0; MsTrailingSyntTokCt = 0; 
+    MsTrailingNeedsSep = FALSE; MsLeftTok = 18; MsLang = 10; MsEstTok = 183; MsLeadingWidthInfo = RECORD WiNlTrigger = 254; 
+    WiWidth = 0; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; 
+    WiWholeLineModsOnly = FALSE;  END; MsTrailingWidthInfo = RECORD WiNlTrigger = 254; WiWidth = 0; WiHasAbsFromPos = FALSE; 
+    WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END; 
+    MsWaitingRightmostKindSet = {}; MsLeafRow = RECORD MsLrObjRef = NIL; MsLrKindSet = {0, 1, 2, 6, 8}; MsLrLeftTok = 18; 
+    MsLrRightTok = 121; MsLrWidthInfo = RECORD WiNlTrigger = 6; WiWidth = 5; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; 
+    WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END; MsLrSyntTokCt = 1; MsLrElemCt = 2; 
+    MsLrElems = {RECORD LeCumNodeCt = 1; LeChildRef = 16_00000000029e6ac0; LeKindSet = {0, 1, 6}; LeFmtNo = 3;  END, 
+    RECORD LeCumNodeCt = 2; LeChildRef = 16_00000000017689f8; LeKindSet = {1, 2, 6, 8}; LeFmtNo = 1;  END, RECORD LeCumNodeCt = 3; 
+    LeChildRef = 16_000000000179a6c0; LeKindSet = {2, 6}; LeFmtNo = 255;  END, RECORD LeCumNodeCt = 34; 
+    LeChildRef = 16_0000000001768ea0; LeKindSet = {0, 1, 2, 3, 4, 6, 7}; LeFmtNo = 10;  END, RECORD LeCumNodeCt = 35; 
+    LeChildRef = 16_0000000001b45c30; LeKindSet = {2, 6}; LeFmtNo = 255;  END, RECORD LeCumNodeCt = 36; 
+    LeChildRef = 16_0000000001b44468; LeKindSet = {2, 6}; LeFmtNo = 255;  END, RECORD LeCumNodeCt = 37; 
+    LeChildRef = 16_00000000016d7278; LeKindSet = {2, 6}; LeFmtNo = 255;  END, RECORD LeCumNodeCt = 32; 
+    LeChildRef = 16_00000000016d7278; LeKindSet = {2, 6}; LeFmtNo = 255;  END};  END; MsLink = 16_00000000029f7258; 
+    MsNonleafRowRefs = {16_0000000002a446a8, NIL, NIL, NIL, NIL, NIL, NIL, NIL, NIL}; MiUnpatchedTempMarkRange = RECORD From = 32767; 
+    To = 32767;  END; MiLMNewChildRef = 16_00000000029f77e8; MiRMChildRef = NIL; MiRMSliceListElemRef = NIL; 
+    MiParseTempMarkList = NIL; MiNewTempMarkList = NIL; MiTempMarkRangeTo = 0; MiMarkChange = Unchanged; MiChildExists = TRUE;  END
+Breakpoint 5 at 0x4843c9: file ../common/src/EstBuild.m3, line 1609.
+Breakpoint 6 at 0x48476a: file ../common/src/EstBuild.m3, line 1691.
+Breakpoint 7 at 0x47fa4e: file ../common/src/EstBuild.m3, line 267.
+Breakpoint 8 at 0x47f83e: file ../common/src/EstBuild.m3, line 217.
+Breakpoint 9 at 0x48390f: file ../common/src/EstBuild.m3, line 1453.
+Breakpoint 10 at 0x48438c: file ../common/src/EstBuild.m3, line 1588.
+Breakpoint 11 at 0x48adc7: file ../common/src/EstBuild.m3, line 3244.
+Continuing.
+
+Breakpoint 6, MergeSlice (MergeState=16_00000000029f7da8, EstRef=16_0000000001768a90, FromChildNo=0, ToChildNo=1, 
+    SetFirstOfGroupAndFmtNo=TRUE, IsFirstOfGroup=TRUE, GroupFmtNo=0, LeftmostNewChildRef=16_000000000179a6c0, 
+    LeftmostNewKindSet={2, 6}) at ../common/src/EstBuild.m3:1691
+1691	    ( MergeState : MergeStateTyp 
+$8 = (*16_0000000001768ad0*) OBJECT  END
+#1  0x00000000004b1eb8 in MteTeFlushSliceOrChild (NewFmtNo=255, NewEdgeKind=EdgeKindEstChild) at ../common/src/MergeTxt.m3:639
+639	              EstBuild . MergeSlice 
+Can't find Modula-3 identifier: MteTlLMNewChildRef
+$9 = (*16_000000000179a6c0*) OBJECT ModTextLeftTokToPos = 0; ModTextFromPos = 6; ModTextToPos = 8; ModTextOrigToPos = 3; 
+    ModTextStringRef = 16_000000000179a6e0;  END
+#0  MergeSlice (MergeState=16_00000000029f7da8, EstRef=16_0000000001768a90, FromChildNo=0, ToChildNo=1, SetFirstOfGroupAndFmtNo=TRUE, 
+    IsFirstOfGroup=TRUE, GroupFmtNo=0, LeftmostNewChildRef=16_000000000179a6c0, LeftmostNewKindSet={2, 6})
+    at ../common/src/EstBuild.m3:1691
+#1  0x00000000004b1eb8 in MteTeFlushSliceOrChild (NewFmtNo=255, NewEdgeKind=EdgeKindEstChild) at ../common/src/MergeTxt.m3:639
+#2  0x00000000004ae82b in MteTeFinishMerge () at ../common/src/MergeTxt.m3:1582
+#3  0x00000000004a29e0 in MteTraverseEst (EstRef=16_0000000001768a90, KindSet={0, 1, 2, 6}, RootAbsNodeNo=29, 
+    ParentFsNodeRef=16_00000000013a5ae0, RootFsNodeRef=16_00000000012ce958, EstFmtKind=FmtKindUnknown, EstIndentPos1=255, 
+    EstIndentPosN=255, NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5109
+#4  0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#5  0x00000000004a403d in MteTeTfsEstChild (IsEstList=TRUE) at ../common/src/MergeTxt.m3:4515
+#6  0x00000000004a2eb5 in MteTeTraverseFs (FsNodeRef=16_00000000013a5ae0, FsFmtKind=FmtKindUnknown) at ../common/src/MergeTxt.m3:4822
+#7  0x00000000004abb68 in MteTeTraverseFsListChildren (ParentFsNodeRef=16_00000000013a59e8, FmtKind=FmtKindUnknown, FsChildCt=3, 
+    InitialFsChildNo=0) at ../common/src/MergeTxt.m3:2324
+#8  0x00000000004a2940 in MteTraverseEst (EstRef=16_0000000001768b88, KindSet={0, 1, 2, 6}, RootAbsNodeNo=28, 
+    ParentFsNodeRef=16_00000000012d6480, RootFsNodeRef=16_00000000013a59e8, EstFmtKind=FmtKindUnknown, EstIndentPos1=255, 
+    EstIndentPosN=255, NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5088
+#9  0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#10 0x00000000004a403d in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4515
+#11 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000012d6480, FsFmtKind=FmtKindUnknown) at ../common/src/MergeTxt.m3:4820
+#12 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000012d6018, FmtKind=FmtKindUnknown, FsChildCt=5, 
+    InitialFsChildNo=4) at ../common/src/MergeTxt.m3:2283
+#13 0x00000000004a2844 in MteTraverseEst (EstRef=16_0000000001768c00, KindSet={0, 1, 2, 4, 6, 7}, RootAbsNodeNo=25, 
+    ParentFsNodeRef=16_00000000013a1428, RootFsNodeRef=16_00000000012d6018, EstFmtKind=FmtKindUnknown, EstIndentPos1=255, 
+    EstIndentPosN=255, NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#14 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#15 0x00000000004a403d in MteTeTfsEstChild (IsEstList=TRUE) at ../common/src/MergeTxt.m3:4515
+#16 0x00000000004a2eb5 in MteTeTraverseFs (FsNodeRef=16_00000000013a1428, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4822
+#17 0x00000000004abb68 in MteTeTraverseFsListChildren (ParentFsNodeRef=16_00000000013a1330, FmtKind=FmtKindVert, FsChildCt=3, 
+    InitialFsChildNo=0) at ../common/src/MergeTxt.m3:2324
+#18 0x00000000004a2940 in MteTraverseEst (EstRef=16_0000000001768cb8, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=13, 
+    ParentFsNodeRef=16_00000000012d57b0, RootFsNodeRef=16_00000000013a1330, EstFmtKind=FmtKindVert, EstIndentPos1=4, EstIndentPosN=4, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5088
+#19 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#20 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4430
+#21 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000012d57b0, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4820
+#22 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000012d55e0, FmtKind=FmtKindVert, FsChildCt=5, 
+    InitialFsChildNo=1) at ../common/src/MergeTxt.m3:2283
+#23 0x00000000004a2844 in MteTraverseEst (EstRef=16_0000000001768db0, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=12, 
+    ParentFsNodeRef=16_00000000013a5ae0, RootFsNodeRef=16_00000000012d55e0, EstFmtKind=FmtKindVert, EstIndentPos1=4, EstIndentPosN=4, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#24 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#25 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=TRUE) at ../common/src/MergeTxt.m3:4430
+#26 0x00000000004a2eb5 in MteTeTraverseFs (FsNodeRef=16_00000000013a5ae0, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4822
+#27 0x00000000004abb68 in MteTeTraverseFsListChildren (ParentFsNodeRef=16_00000000013a59e8, FmtKind=FmtKindVert, FsChildCt=3, 
+    InitialFsChildNo=0) at ../common/src/MergeTxt.m3:2324
+#28 0x00000000004a2940 in MteTraverseEst (EstRef=16_0000000001768e28, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=11, 
+    ParentFsNodeRef=16_00000000013b4290, RootFsNodeRef=16_00000000013a59e8, EstFmtKind=FmtKindVert, EstIndentPos1=4, EstIndentPosN=4, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5088
+#29 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#30 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4430
+#31 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000013b4290, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4820
+#32 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000013b3ec8, FmtKind=FmtKindVert, FsChildCt=6, 
+    InitialFsChildNo=3) at ../common/src/MergeTxt.m3:2283
+#33 0x00000000004a2844 in MteTraverseEst (EstRef=16_0000000001768ea0, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=10, 
+    ParentFsNodeRef=16_00000000013af140, RootFsNodeRef=16_00000000013b3ec8, EstFmtKind=FmtKindVert, EstIndentPos1=2, EstIndentPosN=2, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#34 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#35 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4430
+#36 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000013af140, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4820
+#37 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000013ae420, FmtKind=FmtKindVert, FsChildCt=8, 
+    InitialFsChildNo=4) at ../common/src/MergeTxt.m3:2283
+#38 0x00000000004a2844 in MteTraverseEst (EstRef=16_0000000001769030, KindSet={0, 1, 2, 3, 4, 6, 7}, RootAbsNodeNo=1, 
+    ParentFsNodeRef=16_00000000012bd878, RootFsNodeRef=16_00000000013ae420, EstFmtKind=FmtKindVert, EstIndentPos1=0, EstIndentPosN=0, 
+    NewEstRef=NIL, NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#39 0x00000000004a62e3 in MteTeTfsEstSubtree (IsModTok=FALSE, LMCharPos=255) at ../common/src/MergeTxt.m3:3704
+#40 0x00000000004a3c20 in MteTeTfsEstChild (IsEstList=FALSE) at ../common/src/MergeTxt.m3:4430
+#41 0x00000000004a2ea2 in MteTeTraverseFs (FsNodeRef=16_00000000012bd878, FsFmtKind=FmtKindVert) at ../common/src/MergeTxt.m3:4820
+#42 0x00000000004abdc7 in MteTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000012bd698, FmtKind=FmtKindVert, FsChildCt=3, 
+    InitialFsChildNo=1) at ../common/src/MergeTxt.m3:2283
+#43 0x00000000004a2844 in MteTraverseEst (EstRef=16_00000000017690d0, KindSet={}, RootAbsNodeNo=0, ParentFsNodeRef=NIL, 
+    RootFsNodeRef=16_00000000012bd698, EstFmtKind=FmtKindVert, EstIndentPos1=0, EstIndentPosN=0, NewEstRef=NIL, 
+    NewSingletonOptKindSet={}, LMCharPos=255) at ../common/src/MergeTxt.m3:5057
+#44 0x00000000004a1977 in MergeTextEdit (Lang=10, EstRootRef=16_00000000017690d0, StartTokMark=
+    RECORD EstNodeNo = 31; EstNodeCt = 1; BlCharPos = 9223372036854775807; Tok = 23; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END, EndTokMark=
+    RECORD EstNodeNo = 35; EstNodeCt = 6; BlCharPos = 9223372036854775807; Tok = 131; FmtNo = 1; Kind = LeftSibFmtNo; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END, BlankLineNo=0, DelFromPos=0, DelToPos=0, InsText=
+    RECORD Text = NIL; Space = 16_000000000176b350; FromSs = 0; ToSs = 12; EventualLengthHint = 80;  END, InsLen=4, InsNlPos=254, 
+    NlIndentPos=254, DelNlShift=254, NewEstRootRef=NIL, NodeNoChange=8388608, MaxTouchedNodeNo=32, NewBolTokMark=
+    RECORD EstNodeNo = 2; EstNodeCt = 1; BlCharPos = 9223372036854775807; Tok = 23; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END, NewLinesCt=1, LeadingBlankLinesIncluded=0, TrailingBlankLinesIncluded=0) at ../common/src/MergeTxt.m3:5243
+#45 0x00000000005e9c9e in InnerFlushTempEdit (ImageRef=16_000000000292bb40, LinesRef=16_0000000001769298, 
+    TempEditRef=16_0000000002a2e968, InsNlPos=254, NlIndentPos=254, DelNlShift=254) at ../src/TextEdit.m3:1567
+#46 0x00000000005f5e4d in GrabTempEditRef (ImageTrans=16_000000000292bb40, Mark=16_00000000029ff070, RmFromPos=11, LmToPos=10, 
+    TempEditRef=16_0000000002a2e968) at ../src/TextEdit.m3:2464
+#47 0x00000000005f6534 in SimpleDeleteChar (ImageTrans=16_000000000292bb40, Mark=16_00000000029ff070, MustRepaintWindow=FALSE)
+    at ../src/TextEdit.m3:2582
+#48 0x00000000005f7e84 in DeleteChar (WindowRef=16_00000000014da080, DeletingBwd=TRUE) at ../src/TextEdit.m3:2818
+#49 0x00000000005fd658 in DeleteRestOfLine (WindowRef=16_00000000014da080) at ../src/TextEdit.m3:3573
+#50 0x0000000000623a7e in DeleteRestOfLineWorkProc (Closure=16_00000000019242c0) at ../src/EditWindow.m3:2188
+#51 0x000000000064d5bc in WorkerThreadApply (Self=16_00000000012be560) at ../src/Worker.m3:549
+#52 0x00007fc403f85fa7 in RunThread (me=16_00000000012fec70) at ../src/thread/PTHREAD/ThreadPThread.m3:475
+#53 0x00007fc403f85c3b in ThreadBase (param=16_00000000012fec70) at ../src/thread/PTHREAD/ThreadPThread.m3:447
+#54 0x00007fc402a1d9ca in start_thread () from /lib/libpthread.so.0
+#55 0x00007fc40277acdd in clone () from /lib/libc.so.6
+#56 0x0000000000000000 in ?? ()
+$10 = RECORD EtiNodeRef = 16_0000000001768a90; EtiParentRef = 16_0000000001768a90; EtiStringRef = NIL; EtiChildCt = 5; 
+    EtiChildNo = 0; EtiChildRelNodeNo = 1; EtiChildLeafElem = RECORD LeCumNodeCt = 5; LeChildRef = 16_0000000001768a78; 
+    LeKindSet = {1, 5, 6}; LeFmtNo = 0;  END; EtiAbsNodeNo = 29; EtiChildFmtNo = 0; EtiIsOptSingletonList = FALSE;  END
+$11 = (*16_0000000001768a90*) OBJECT KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; WiHasAbsFromPos = FALSE; 
+    WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = TRUE; WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 3; 
+    KTreeElemCt = 5; EstChildKindSet = {0, 1, 2, 5, 6, 8}; EstTok = 183; EstLeftTok = 24; EstRightTok = 121; 
+    EstNodeKind = EstNodeKindPlain; EstHeight = 1; EstSemRef = NIL; EstRepairCost = 0; EstLeafArrayRef = 16_0000000001768ad0;  END
+$12 = (*16_0000000001768a78*) OBJECT ModBlankLineCt = 1;  END
+$13 = {RECORD LeCumNodeCt = 1; LeChildRef = 16_00000000029e6ac0; LeKindSet = {0, 1, 6}; LeFmtNo = 3;  END,RECORD LeCumNodeCt = 2; 
+    LeChildRef = 16_00000000017689f8; LeKindSet = {1, 2, 6, 8}; LeFmtNo = 1;  END,RECORD LeCumNodeCt = 3; 
+    LeChildRef = 16_00000000029e5338; LeKindSet = {0, 6}; LeFmtNo = 0;  END,RECORD LeCumNodeCt = 4; LeChildRef = 16_0000000001768a58; 
+    LeKindSet = {2, 6}; LeFmtNo = 255;  END,RECORD LeCumNodeCt = 5; LeChildRef = 16_0000000001768a78; LeKindSet = {1, 5, 6}; 
+    LeFmtNo = 0;  END}
+$14 = RECORD LeCumNodeCt = 1; LeChildRef = 16_00000000029e6ac0; LeKindSet = {0, 1, 6}; LeFmtNo = 3;  END
+$15 = (*16_00000000029e6ac0*) OBJECT StringNo = 1056; Tok = 121; Value = 16_0000000001312958;  END
+$16 = (*16_0000000001312958*) "D"
+$17 = (*16_00000000017689f8*) OBJECT ModDelThruFmtNo = 1; ModDelIsRepair = FALSE;  END
+$18 = (*16_00000000029e5338*) OBJECT StringNo = 1055; Tok = 121; Value = 16_0000000001542938;  END
+$19 = (*16_0000000001542938*) "C"
+Object has no field or method named "Value".
+$20 = (*16_0000000001768a58*) OBJECT ModTextLeftTokToPos = 0; ModTextFromPos = 2; ModTextToPos = 2; ModTextOrigToPos = 4; 
+    ModTextStringRef = NIL;  END
+$21 = (*16_0000000001768a78*) OBJECT ModBlankLineCt = 1;  END
+Range fault on array access
+$22 = 1
+$23 = 0
+$24 = 3
+$25 = 1
+$26 = 0
+$27 = 255
+$28 = 0
+Range fault on array access
+#1  0x00000000004b1eb8 in MteTeFlushSliceOrChild (NewFmtNo=255, NewEdgeKind=EdgeKindEstChild) at ../common/src/MergeTxt.m3:639
+639	              EstBuild . MergeSlice 
+$29 = (*16_0000000001768a90*) OBJECT KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; WiHasAbsFromPos = FALSE; 
+    WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = TRUE; WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 3; 
+    KTreeElemCt = 5; EstChildKindSet = {0, 1, 2, 5, 6, 8}; EstTok = 183; EstLeftTok = 24; EstRightTok = 121; 
+    EstNodeKind = EstNodeKindPlain; EstHeight = 1; EstSemRef = NIL; EstRepairCost = 0; EstLeafArrayRef = 16_0000000001768ad0;  END
+$30 = 0
+Undefined command: "MteTeWaitingToChildNo".  Try "help".
+$31 = 1
+#0  MergeSlice (MergeState=16_00000000029f7da8, EstRef=16_0000000001768a90, FromChildNo=0, ToChildNo=1, SetFirstOfGroupAndFmtNo=TRUE, 
+    IsFirstOfGroup=TRUE, GroupFmtNo=0, LeftmostNewChildRef=16_000000000179a6c0, LeftmostNewKindSet={2, 6})
+    at ../common/src/EstBuild.m3:1691
+1691	    ( MergeState : MergeStateTyp 
+1747	  ; VAR MslEstHeight : EstHs . KTreeHeightTyp 
+1748	  ; VAR MslMsStartingHeight : EstHs . KTreeHeightTyp 
+3188	      VAR LDownInfo : DownInfoTyp 
+3189	    ; VAR LResultInfo : ResultInfoTyp 
+3192	        IF EstRef # NIL AND FromChildNo < ToChildNo 
+3194	          MslEstHeight := EstRef . EstHeight 
+3195	        ; MslMsStartingHeight := MergeState . MsHeight 
+3196	        ; LDownInfo . DiLeftObjRef := EstRef 
+3197	        ; LDownInfo . DiLeftKindSet := EstRef . EstChildKindSet 
+3198	        ; LDownInfo . DiFromChildNo := FromChildNo 
+3199	        ; LDownInfo . DiRightObjRef := EstRef 
+3200	        ; LDownInfo . DiRightKindSet := EstRef . EstChildKindSet 
+3201	        ; LDownInfo . DiThruChildNo := ToChildNo - 1 
+3202	        ; LDownInfo . DiHeight := EstRef . EstHeight 
+3203	        ; LDownInfo . DiAdjKind := AdjKindTyp . AdjKindSame 
+3204	        ; IF EstRef . EstHeight > 1 
+3208	            MslLeaf ( LDownInfo , LResultInfo ) 
+MslLeaf (DownInfo=
+    RECORD DiLeftObjRef = 16_0000000001768a90; DiRightObjRef = 16_0000000001768a90; DiLeftKindSet = {0, 1, 2, 5, 6, 8}; DiRightKindSet = {0, 1, 2, 5, 6, 8}; DiFromChildNo = 0; DiThruChildNo = 0; DiHeight = 1; DiAdjKind = AdjKindSame;  END, ResultInfo=
+    RECORD RiLeftRef = NIL; RiSeamInsertionRef1 = NIL; RiSeamInsertionRef2 = NIL; RiLeftKindSet = {}; RiSeamInsertionKindSet1 = {}; RiSeamInsertionKindSet2 = {}; RiRightGapOrigChildNo = 0; RiReplaceLeft = FALSE; RiReplaceRight = FALSE; RiReplaceFarRight = FALSE;  END)
+    at ../common/src/EstBuild.m3:1751
+1751	      ( DownInfo : DownInfoTyp ; VAR ResultInfo : ResultInfoTyp ) 
+1835	        VAR LLeftElemCt : EstHs . ElemNoTyp 
+1836	      ; VAR LRightElemCt : EstHs . ElemNoTyp 
+1837	      ; VAR LLeftNewElemCt : EstHs . ElemNoTyp 
+1838	      ; VAR LRightNewElemCt : EstHs . ElemNoTyp 
+1839	      ; VAR LFromElemNo : EstHs . ElemNoTyp 
+1840	      ; VAR LLeftElemNo : EstHs . ElemNoTyp 
+1841	      ; VAR LThruElemNo : EstHs . ElemNoTyp 
+1842	      ; VAR LElemNo : EstHs . ElemNoTyp 
+1843	      ; VAR LLeftMustChange : BOOLEAN 
+1844	      ; VAR LRightMustChange : BOOLEAN 
+1845	      ; VAR LFarRightMustChange : BOOLEAN 
+1846	      ; VAR LForceRepack : BOOLEAN 
+1847	      ; VAR LFarRightElemCt : EstHs . ElemNoTyp 
+1855	      ; VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
+1856	      ; VAR LRightGapEdgeInfo : EstHs . EdgeInfoTyp 
+1857	      ; VAR LLeftGapEdgeInfo : EstHs . EdgeInfoTyp 
+1858	      ; VAR LRightLeafArray : EstHs . FullLeafArrayTyp 
+1859	      ; VAR LLeftLeafArray : EstHs . FullLeafArrayTyp 
+1864	          LRightElemCt := DownInfo . DiRightObjRef . KTreeElemCt 
+1865	        ; DownInfo . DiRightObjRef . FetchLeafArray ( LRightLeafArray ) 
+$32 = 5
+1866	        ; Assert 
+1870	        ; LThruElemNo := LRightElemCt - 1 - DownInfo . DiThruChildNo 
+1871	        ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+1873	            Assert 
+1877	          ; LLeftElemCt := LRightElemCt 
+1886	        ; LFromElemNo := LLeftElemCt - 1 - DownInfo . DiFromChildNo 
+1889	        ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+$33 = 4
+$34 = 4
+1891	            LLeftmostKindSet := LRightLeafArray [ LFromElemNo ] . LeKindSet 
+1892	          ; LLeftmostFmtNo := LRightLeafArray [ LFromElemNo ] . LeFmtNo 
+1893	          ; LeftmostNewChildRef 
+$35 = 0
+1895	          ; LeftmostNewKindSet := LLeftmostKindSet 
+Can't find Modula-3 identifier: LetmostNewChildRef
+$36 = (*16_0000000001768a78*) OBJECT ModBlankLineCt = 1;  END
+1905	        ; IF MergeState . MsHeight = 0 
+1921	        ; LFarRightMustChange 
+1927	        ; MergeState . MsWaitingRightmostKindSet 
+1930	        ; LRightMustChange 
+1936	        ; IF SetFirstOfGroupAndFmtNo 
+$37 = TRUE
+1938	            IF IsFirstOfGroup 
+1940	              IF NOT EstHs . EstChildKindFirstOfGroup IN LLeftmostKindSet 
+1946	              ELSIF LLeftmostFmtNo # GroupFmtNo 
+1950	              ELSE LLeftMustChange := LFromElemNo < LLeftElemCt - 1 
+1963	        ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+$38 = FALSE
+1965	            LRightMustChange := LLeftMustChange OR LRightMustChange 
+1966	          ; LLeftMustChange := LRightMustChange 
+1967	          ; LLeftNewElemCt := 0 
+$39 = TRUE
+$40 = TRUE
+1968	          ; LRightNewElemCt := LFromElemNo + 1 - LThruElemNo 
+1975	        ; IF MergeState . MsLeafRow . MsLrObjRef = NIL 
+$41 = 1
+1977	            LFarRightElemCt := MergeState . MsLeafRow . MsLrElemCt 
+1982	        ; MslLSeamInsertionCt2 := EstHs . LeafArrayElemCtMax 
+1983	        ; MslLSeamInsertionCt1 := EstHs . LeafArrayElemCtMax 
+1984	        ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindAdj 
+2070	            LCombinedElemCt := LRightNewElemCt + LFarRightElemCt 
+2071	          ; IF ( LCombinedElemCt + EstHs . LeafArrayElemCtMax - 1 ) 
+$42 = 4
+2076	              LForceRepack := TRUE 
+2086	        ; ResultInfo . RiSeamInsertionRef1 := NIL 
+2087	        ; ResultInfo . RiSeamInsertionRef2 := NIL 
+2088	        ; ResultInfo . RiRightGapOrigChildNo := LbeStd . EstChildNoNull 
+2091	        ; IF MergeState . MsLeafRow . MsLrObjRef # NIL 
+2131	            ResultInfo . RiReplaceFarRight := FALSE 
+2135	        ; IF LRightMustChange OR LForceRepack 
+2137	            IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+2139	              LLeftElemNo := LFromElemNo 
+2143	          ; LElemNo := LThruElemNo 
+2144	          ; Assert ( LElemNo <= LLeftElemNo , AFT . A_MslLeaf_RightNoElements ) 
+$43 = 4
+$44 = 4
+2145	          ; WITH WRightLeafElem = LRightLeafArray [ LElemNo ] 
+2146	            DO LEstMiscInfo 
+$45 = RECORD LeCumNodeCt = 5; LeChildRef = 16_0000000001768a78; LeKindSet = {1, 5, 6}; LeFmtNo = 0;  END
+$46 = (*16_0000000001768a78*) OBJECT ModBlankLineCt = 1;  END
+2149	            ; LRightGapEdgeInfo . EiTok := LEstMiscInfo . EmiLeftTok 
+$47 = RECORD EmiLeftTok = 24; EmiRightTok = 24; EmiTok = 24; EmiSyntTokCt = 0; EmiEdgeKind = EdgeKindLeadingMod; 
+    EmiWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; WiHasAbsFromPos = FALSE; WiHasNlBefore = TRUE; WiHasNlAfter = TRUE; 
+    WiHasNlWithin = FALSE; WiWholeLineModsOnly = TRUE;  END;  END
+2150	            ; LRightGapEdgeInfo . EiEdgeKind := LEstMiscInfo . EmiEdgeKind 
+2151	            ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+2154	                LRightGapEdgeInfo . EiFmtNo := LLeftmostFmtNo 
+2163	          ; WHILE LElemNo < LLeftElemNo 
+2217	          ; IF DownInfo . DiAdjKind = AdjKindTyp . AdjKindSame 
+2219	              LKindSet := LLeftmostKindSet  
+2220	            ; IF LElemNo = LThruElemNo 
+2222	                LKindSet 
+2225	            ; MslLPrepend 
+MslLPrepend (InsertionRef=16_0000000001768a78, KindSet={1, 5, 6}, FmtNo=0, IsLeftOfSeam=TRUE) at ../common/src/EstBuild.m3:1798
+1798	          IF MergeState . MsLeafRow . MsLrElemCt >= MslLSeamInsertionCt2 
+Undefined command: "nn".  Try "help".
+1802	        ; PrependToLeafRow 
+PrependToLeafRow (MergeState=16_00000000029f7da8, InsertionRef=16_0000000001768a78, KindSet={1, 5, 6}, FmtNo=0, IsLeftOfSeam=TRUE)
+    at ../common/src/EstBuild.m3:859
+859	  = VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
+863	      Assert 
+867	    ; IF MergeState . MsLeafRow . MsLrElemCt = 0 
+$48 = 3
+871	        LCumNodeCt 
+875	      ; IF IsLeftOfSeam 
+877	          FlushLeadingTokInfoToLeaf ( MergeState ) 
+$49 = TRUE
+FlushLeadingTokInfoToLeaf (MergeState=16_00000000029f7da8) at ../common/src/EstBuild.m3:831
+831	      Assert 
+835	    ; MergeState . MsLeafRow . MsLrWidthInfo 
+$50 = RECORD WiNlTrigger = 6; WiWidth = 5; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; 
+    WiWholeLineModsOnly = FALSE;  END
+$51 = RECORD WiNlTrigger = 6; WiWidth = 5; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; 
+    WiWholeLineModsOnly = FALSE;  END
+$52 = RECORD WiNlTrigger = 6; WiWidth = 5; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; 
+    WiWholeLineModsOnly = FALSE;  END
+$53 = RECORD WiNlTrigger = 254; WiWidth = 0; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; 
+    WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END
+WidthInfoCat (Left=
+    RECORD WiNlTrigger = 254; WiWidth = 0; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END, NeedsSep=FALSE, Right=
+    RECORD WiNlTrigger = 6; WiWidth = 5; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END, _result=
+    RECORD WiNlTrigger = 6; WiWidth = 5; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END) at ../common/src/EstUtil.m3:505
+505	  = VAR LResult : EstHs . WidthInfoTyp 
+506	  ; VAR LNlWithinAtJoin : BOOLEAN (* Not necessarily properly inside. *) 
+511	IF Left.WiNlTrigger=6 AND Left.WiWidth=3
+$54 = RECORD WiNlTrigger = 0; WiWidth = 0; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; 
+    WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END
+515	      IF Left . WiWidth > 0 
+519	      ELSIF ( Left . WiWidth > 0 OR NeedsSep )  
+523	      ELSE LNlWithinAtJoin := FALSE 
+525	    ; IF Left . WiWidth = LbeStd . LimitedCharNoInfinity 
+532	        IF Right . WiNlTrigger = LbeStd . LimitedCharNoInfinity 
+541	        ELSIF Left . WiWidth + ORD ( NeedsSep ) > Right . WiNlTrigger 
+$55 = FALSE
+$56 = 0
+547	          LResult . WiWidth := Right . WiWidth (* Absolute end point. *)  
+548	        ; IF Left . WiNlTrigger = LbeStd . LimitedCharNoInfinity 
+$57 = RECORD WiNlTrigger = 0; WiWidth = 5; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; 
+    WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END
+550	            IF Left . WiWidth + ORD ( NeedsSep ) < Right . WiNlTrigger 
+552	              LResult . WiNlTrigger 
+563	    ; LResult . WiHasAbsFromPos := Left . WiHasAbsFromPos 
+$58 = RECORD WiNlTrigger = 6; WiWidth = 5; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; 
+    WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END
+564	    ; LResult . WiHasNlBefore := Left . WiHasNlBefore 
+565	    ; LResult . WiHasNlAfter := Right . WiHasNlAfter 
+566	    ; LResult . WiHasNlWithin 
+568	    ; LResult . WiWholeLineModsOnly 
+570	    ; RETURN LResult 
+$59 = RECORD WiNlTrigger = 6; WiWidth = 5; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; 
+    WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END
+Continuing.
+
+Breakpoint 11, FinishMerge (MergeState=16_00000000029f7da8, ResultEstNodeKind=EstNodeKindPlain, ResultEstRef=NIL)
+    at ../common/src/EstBuild.m3:3244
+3244	  = VAR LHeight : EstHs . KTreeHeightTyp 
+The program is running.  Exit anyway? (y or n) 

@@ -1,0 +1,7 @@
+MODULE test14_159
+
+; EXCEPTION E
+
+; BEGIN 
+  END test14_159
+.

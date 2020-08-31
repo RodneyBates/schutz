@@ -1,0 +1,8 @@
+MouseClickChar 27 33
+File_Open_Text "test10_32.m3"
+File_Save_Text "test10_32.m3"
+File_Export_Text "test10_32.export.m3"
+STOP
+File_CloseImage_Text "test10_32.m3"
+STOP
+File_Quit

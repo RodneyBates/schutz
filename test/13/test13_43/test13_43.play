@@ -1,0 +1,148 @@
+File_Open_Text "test13_43.m3"
+CursorDown
+CursorDown
+CursorDown
+CursorDown
+CursorRight
+CursorRight
+InsertModeOff
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+SemParse
+MouseClickChar 64 4
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorDown
+CursorDown
+CursorDown
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+SemParse
+File_Save_Text "test13_43.m3"
+File_Export_Text "test13_43.export.m3"
+STOP
+File_CloseImage_Text "test13_43.m3"
+STOP
+File_Quit

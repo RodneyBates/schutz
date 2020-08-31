@@ -1,0 +1,15 @@
+File_Open_Text "test14_158.m3"
+MouseClickChar 5 19
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+File_Save_Text "test14_158.m3"
+File_Export_Text "test14_158.export.m3"
+STOP
+File_CloseImage_Text "test14_158.m3"
+STOP
+File_Quit

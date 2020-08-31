@@ -1,0 +1,88 @@
+File_Open_Text "test10_68.i3"
+MouseClickChar 2 0
+CharType_Char 'a'
+CharType_Char 'a'
+CharType_Char 'a'
+CharType_Char 'a'
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+CursorDown
+CursorDown
+MouseClickChar 15 2
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+SemParse
+STOP
+MouseClickChar 3 3
+CharDelBwd
+CharDelBwd
+CharDelBwd
+MouseClickChar 35 3

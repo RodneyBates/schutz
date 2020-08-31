@@ -1,0 +1,20 @@
+These tests can't be automated, because they involve actions
+prior to the plaback level. Things to test are:
+
+Empty text file test12_11c.m3 opens
+
+Empty pickle file test12_11c.m3_ opens
+
+Trying to open test12_11a.m3_ (which does not exist) 
+  prompts for test12_11a.m3 (which does) 
+  Afterwards, must delete test12_11a.m3_(which will be created.)
+
+Trying to open test12_11b.m3 (which does not exist) 
+  prompts for test12_11a.m3_ (which does) 
+
+A nonexistent text file opens (use test12_11d.m3) 
+
+A nonexistent Pickle file opens (use test12_11e.m3_) 
+
+Shell script cleanup.sh will remove leftover files after these
+tests, leaving the directory ready for another round. 

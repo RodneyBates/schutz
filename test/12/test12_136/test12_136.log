@@ -1,0 +1,532 @@
+101,112c101,102
+<       IF ( NOT ( IsIn ( SetPassed , Value ) ) )
+<       THEN
+< 
+<         IF ( SetPassed . Used + 1 <= SetPassed . Size )
+< 
+<         THEN
+< 
+<           IF SetPassed . Used # 0
+<           THEN
+< 
+<             WHILE ( i < SetPassed . Used )
+<             DO
+---
+>       IF ( NOT ( IsIn ( SetPassed , Value ) )
+>            ) THEN
+114,115c104
+<               IF Value . compare ( SetPassed . Elements [ i ] , Value )
+<                  = CompareTyp . Greater
+---
+>            IF ( SetPassed . Used + 1 <= SetPassed . Size )
+117c106
+<               THEN
+---
+>       THEN
+119,120c108,109
+<                 EXIT
+<               ;
+---
+>         IF SetPassed . Used # 0
+>         THEN
+122c111,112
+<               ELSE
+---
+>           WHILE ( i < SetPassed . Used )
+>           DO
+124,125c114,115
+<                 i := i + 1
+<               ;
+---
+>             IF Value . compare ( SetPassed . Elements [ i ] , Value )
+>                = CompareTyp . Greater
+127c117
+<               END
+---
+>             THEN
+129,130c119,120
+<             END
+<           ;
+---
+>               EXIT
+>             ;
+132,133c122
+<             FOR j := SetPassed . Used TO i BY - 1
+<             DO
+---
+>             ELSE
+135c124
+<               SetPassed . Elements [ j ] := SetPassed . Elements [ j - 1 ]
+---
+>               i := i + 1
+139,145d127
+<           ;
+< 
+<             SetPassed . Elements [ i ] := Value
+<           ;
+< 
+<             SetPassed . Used := SetPassed . Used + 1
+<           ;
+147,153c129,130
+<             flag := TRUE
+<           ;
+< 
+<           ELSE
+< 
+<             SetPassed . Elements [ 0 ] := Value
+<           ;
+---
+>           END
+>         ;
+155,156c132,133
+<             SetPassed . Used := SetPassed . Used + 1
+<           ;
+---
+>           FOR j := SetPassed . Used TO i BY - 1
+>           DO
+158c135
+<             flag := TRUE
+---
+>             SetPassed . Elements [ j ] := SetPassed . Elements [ j - 1 ]
+162,165d138
+< 
+<         ELSE
+< 
+<           oldsize := SetPassed . Size
+168c141
+<           SetPassed . Size := oldsize * 2
+---
+>           SetPassed . Elements [ i ] := Value
+171c144
+<           newarray := NEW ( REF ARRAY OF ElemTyp , SetPassed . Size )
+---
+>           SetPassed . Used := SetPassed . Used + 1
+174,175c147,148
+<           WHILE ( k < SetPassed . Used )
+<           DO
+---
+>           flag := TRUE
+>         ;
+177,178c150
+<             newarray [ k ] := SetPassed . Elements [ k ]
+<           ;
+---
+>         ELSE
+180,181c152,153
+<             k := k + 1
+<           ;
+---
+>           SetPassed . Elements [ 0 ] := Value
+>         ;
+183c155
+<           END
+---
+>           SetPassed . Used := SetPassed . Used + 1
+186c158
+<           SetPassed . Elements := newarray
+---
+>           flag := TRUE
+189,190c161
+<           WHILE ( i < SetPassed . Used )
+<           DO
+---
+>         END
+192,194c163
+<             IF Value . compare ( SetPassed . Elements [ i ] , Value )
+<                = CompareTyp . Greater
+<             THEN
+---
+>       ELSE
+196c165,166
+<               EXIT
+---
+>         oldsize := SetPassed . Size
+>       ;
+198c168,169
+<             ELSE
+---
+>         SetPassed . Size := oldsize * 2
+>       ;
+200,201c171,172
+<               i := i + 1
+<             ;
+---
+>         newarray := NEW ( REF ARRAY OF ElemTyp , SetPassed . Size )
+>       ;
+203c174,175
+<             END
+---
+>         WHILE ( k < SetPassed . Used )
+>         DO
+205c177
+<           END
+---
+>           newarray [ k ] := SetPassed . Elements [ k ]
+208c180
+<           j := SetPassed . Used
+---
+>           k := k + 1
+211,212c183,184
+<           WHILE ( j >= i )
+<           DO
+---
+>         END
+>       ;
+214,215c186,196
+<             SetPassed . Elements [ j ] := SetPassed . Elements [ j - 1 ]
+<           ;
+---
+>         SetPassed . Elements := newarray
+>       ;
+> 
+>         WHILE ( i < SetPassed . Used )
+>         DO
+> 
+>           IF Value . compare ( SetPassed . Elements [ i ] , Value )
+>              = CompareTyp . Greater
+>           THEN
+> 
+>             EXIT
+217c198,200
+<             j := j - 1
+---
+>           ELSE
+> 
+>             i := i + 1
+221d203
+<         ;
+223,224c205,206
+<           SetPassed . Elements [ i ] := Value
+<         ;
+---
+>         END
+>       ;
+226c208,214
+<           SetPassed . Used := SetPassed . Used + 1
+---
+>         j := SetPassed . Used
+>       ;
+> 
+>         WHILE ( j >= i )
+>         DO
+> 
+>           SetPassed . Elements [ j ] := SetPassed . Elements [ j - 1 ]
+229c217
+<           flag := TRUE
+---
+>           j := j - 1
+232a221
+>       ;
+234c223,227
+<       ELSE
+---
+>         SetPassed . Elements [ i ] := Value
+>       ;
+> 
+>         SetPassed . Used := SetPassed . Used + 1
+>       ;
+236c229
+<         flag := FALSE
+---
+>         flag := TRUE
+240d232
+<     ;
+242c234,238
+<       RETURN flag
+---
+>     ELSE
+> 
+>     flag
+>   :=
+>     FALSE
+245c241,247
+<     END InsertElem
+---
+>     END
+>   ;
+> 
+>     RETURN flag
+>   ;
+> 
+>   END InsertElem
+248c250
+<   PROCEDURE IsIn ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
+---
+> PROCEDURE IsIn ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
+250,251c252
+<   = VAR high : INTEGER := SetPassed . Used - 1
+<   ;
+---
+> = VAR high : INTEGER := SetPassed . Used - 1 ;
+253,254c254
+<     VAR low : INTEGER := 0
+<   ;
+---
+> VAR low : INTEGER := 0 ;
+256,257c256
+<     VAR mid : INTEGER := 0
+<   ;
+---
+> VAR mid : INTEGER := 0 ;
+259c258
+<     BEGIN
+---
+> BEGIN
+261,262c260
+<       IF SetPassed . Used # 0
+<       THEN
+---
+> IF SetPassed . Used # 0 THEN
+264,265c262
+<         WHILE high >= low
+<         DO
+---
+> WHILE high >= low DO
+267,268c264
+<           mid := ( high + low ) DIV 2
+<         ;
+---
+> mid := ( high + low ) DIV 2 ;
+270,271c266
+<           IF Value . compare ( SetPassed . Elements [ mid ] , Value )
+<              = CompareTyp . Equal
+---
+> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Equal
+273,275c268
+<           THEN
+<             RETURN TRUE
+<           ;
+---
+> THEN RETURN TRUE ;
+277c270
+<           ELSE
+---
+> ELSE
+279,280c272
+<             IF Value . compare ( SetPassed . Elements [ mid ] , Value )
+<                = CompareTyp . Less
+---
+> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Less
+282c274
+<             THEN
+---
+> THEN
+284,285c276
+<               low := mid + 1
+<             ;
+---
+> low := mid + 1 ;
+287c278
+<             ELSE
+---
+> ELSE
+289,290c280
+<               high := mid - 1
+<             ;
+---
+> high := mid - 1 ;
+292c282
+<             END
+---
+> END
+294c284
+<           END
+---
+> END
+296c286
+<         END
+---
+> END
+298,299c288
+<       END
+<     ;
+---
+> END ;
+301,302c290
+<       RETURN FALSE
+<     ;
+---
+> RETURN FALSE ;
+304,305c292
+<     END IsIn
+< ;
+---
+> END IsIn ;
+308c295
+<   PROCEDURE RemoveElem ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
+---
+> PROCEDURE RemoveElem ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
+310,311c297
+<   = VAR high : INTEGER := SetPassed . Used - 1
+<   ;
+---
+> = VAR high : INTEGER := SetPassed . Used - 1 ;
+314,315c300
+<     VAR low : INTEGER := 0
+<   ;
+---
+> VAR low : INTEGER := 0 ;
+317,318c302
+<     VAR mid : INTEGER := 0
+<   ;
+---
+> VAR mid : INTEGER := 0 ;
+320,321c304
+<     VAR i : INTEGER := 0
+<   ;
+---
+> VAR i : INTEGER := 0 ;
+323,324c306
+<     VAR flag : BOOLEAN := FALSE
+<   ;
+---
+> VAR flag : BOOLEAN := FALSE ;
+328c310
+<     BEGIN
+---
+> BEGIN
+330,331c312
+<       WHILE high >= low
+<       DO
+---
+> WHILE high >= low DO
+334,335c315
+<         mid := ( high + low ) DIV 2
+<       ;
+---
+> mid := ( high + low ) DIV 2 ;
+337,339c317,318
+<         IF Value . compare ( SetPassed . Elements [ mid ] , Value )
+<            = CompareTyp . Equal
+<         THEN
+---
+> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Equal
+> THEN
+341,342c320
+<           flag := TRUE
+<         ;
+---
+> flag := TRUE ;
+344,345c322
+<           EXIT
+<         ;
+---
+> EXIT ;
+347c324
+<         ELSE
+---
+> ELSE
+349,351c326,327
+<           IF Value . compare ( SetPassed . Elements [ mid ] , Value )
+<              = CompareTyp . Less
+<           THEN
+---
+> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Less
+> THEN
+353,354c329
+<             low := mid + 1
+<           ;
+---
+> low := mid + 1 ;
+356c331
+<           ELSE
+---
+> ELSE
+358,359c333
+<             high := mid - 1
+<           ;
+---
+> high := mid - 1 ;
+361c335
+<           END
+---
+> END
+363c337
+<         END
+---
+> END
+365,366c339
+<       END
+<     ;
+---
+> END ;
+368,369c341
+<       IF flag = TRUE
+<       THEN
+---
+> IF flag = TRUE THEN
+371,372c343
+<         i := mid
+<       ;
+---
+> i := mid ;
+374,375c345
+<         WHILE ( i < SetPassed . Used )
+<         DO
+---
+> WHILE ( i < SetPassed . Used ) DO
+377,378c347
+<           SetPassed . Elements [ i ] := SetPassed . Elements [ i + 1 ]
+<         ;
+---
+> SetPassed . Elements [ i ] := SetPassed . Elements [ i + 1 ] ;
+380,381c349
+<           i := i + 1
+<         ;
+---
+> i := i + 1 ;
+383,384c351
+<         END
+<       ;
+---
+> END ;
+386,387c353
+<         SetPassed . Used := SetPassed . Used - 1
+<       ;
+---
+> SetPassed . Used := SetPassed . Used - 1 ;
+389,390c355
+<       END
+<     ;
+---
+> END ;
+392,393c357
+<       RETURN flag
+<     ;
+---
+> RETURN flag ;
+395,396c359
+<     END RemoveElem
+< ;
+---
+> END RemoveElem ;
+399c362
+<   PROCEDURE Cardinality ( SetPassed : T ) : INTEGER
+---
+> PROCEDURE Cardinality ( SetPassed : T ) : INTEGER
+401c364
+<   = BEGIN
+---
+> = BEGIN
+403,404c366
+<       RETURN SetPassed . Used
+<     ;
+---
+> RETURN SetPassed . Used ;
+406,407c368
+<     END Cardinality
+< ;
+---
+> END Cardinality ;
+410c371
+<   BEGIN
+---
+> BEGIN
+412,413c373
+<   END Set
+< .
+---
+> END Set .
+test12_136.export.m3 not as expected
+######################### F A I L E D #########################
+----------------------------- Failed in /home/rodney/proj/lbe/git/test/12/test12_136

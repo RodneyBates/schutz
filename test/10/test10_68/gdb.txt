@@ -1,0 +1,632 @@
+3746	      | LangUtil . FmtKindTyp . FmtKindVert 
+3748	      => CASE SubtreeFsNodeRef . FsKind <* NOWARN *> 
+$27 = FsKindSubtreeHoriz
+3749	        OF FsKindTyp . FsKindSubtreeVert 
+3756	        | FsKindTyp . FsKindSubtreeHoriz 
+3757	        => LResultIfNotHoriz := LangUtil . FmtKindTyp . FmtKindVert 
+3763	      ; IF LastFmtNoOnLine = EstHs . FmtNoUnknown 
+$28 = FmtKindVert
+$29 = 254
+3765	           PreTraverseLine
+Lang = 10
+CharPos = 9
+ModTextIsToLeftOnLine = FALSE
+PrevTok = 60
+RootFsNodeRef = (*16_0000000001c49260*) OBJECT FsPostNodeNo = 13; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 11; 
+    FsIsInsideList = FALSE; FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; 
+    FsContainsLineBreak = FALSE; FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstFixedVert; FsIndentCode = 0; 
+    FsListSliceThruFmtNo = 255; FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 155; FsSublistTok = 0; 
+    FsPartialTok = 0; FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 
+    64}; FsChildren = 16_0000000001d0e638; FsLdlNodeNo = 1648; FsPlaceholder = 16_0000000001d0e698; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001ce7ec0;  END
+SubtreeFsNodeRef = (*16_0000000001d45270*) OBJECT FsPostNodeNo = 4; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 3; 
+    FsIsInsideList = FALSE; FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; 
+    FsContainsLineBreak = FALSE; FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindSubtreeHoriz; FsIndentCode = 0; 
+    FsListSliceThruFmtNo = 255; FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 0; FsSublistTok = 0; 
+    FsPartialTok = 0; FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 
+    64}; FsChildren = 16_0000000001d48188; FsLdlNodeNo = 1650; FsPlaceholder = NIL; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001d3f028;  END
+ParentFmtKind = FmtKindVert
+CurrentLineIndentPos = 0
+EstTravInfo = RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; 
+    EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; 
+    LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END
+LastFmtNoOnLine = 254
+EstListChildrenToPass = 0
+Breakpoint 8 at 0x7f66e23a18d5: file ../src/TravUtil.m3, line 2497.
+PreTraverseLine (Lang=10, ModTextIsToLeftOnLine=FALSE, EstTravInfo=
+    RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END, RootFsNodeRef=16_0000000001c49260, 
+    StartFmtNo=3, CharPos=9, CurrentLineIndentPos=0, PrevTok=60, LastFmtNoOnLine=254, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:1797
+1797	    ( Lang : LbeStd . LangTyp 
+Lang = 10
+ModTextIsToLeftOnLine = FALSE
+EstTravInfo = RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; 
+    EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; 
+    LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END
+RootFsNodeRef = (*16_0000000001c49260*) OBJECT FsPostNodeNo = 13; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 11; 
+    FsIsInsideList = FALSE; FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; 
+    FsContainsLineBreak = FALSE; FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstFixedVert; FsIndentCode = 0; 
+    FsListSliceThruFmtNo = 255; FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 155; FsSublistTok = 0; 
+    FsPartialTok = 0; FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 
+    64}; FsChildren = 16_0000000001d0e638; FsLdlNodeNo = 1648; FsPlaceholder = 16_0000000001d0e698; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001ce7ec0;  END
+StartFmtNo = 3
+CharPos = 9
+CurrentLineIndentPos = 0
+PrevTok = 60
+LastFmtNoOnLine = 254
+EstListChildrenToPass = 0
+1837	  ; VAR PtlState : PtlStateTyp 
+
+Breakpoint 8, PreTraverseLine (Lang=10, ModTextIsToLeftOnLine=FALSE, EstTravInfo=
+    RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END, RootFsNodeRef=16_0000000001c49260, 
+    StartFmtNo=3, CharPos=9, CurrentLineIndentPos=0, PrevTok=60, LastFmtNoOnLine=254, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:2497
+2497	        LastFmtNoOnLine := EstHs . FmtNoNull  
+2498	      ; EstListChildrenToPass := 0 
+2499	      ; PtlState := PtlStateTyp . PtlStateStart 
+2500	      ; Assert 
+2504	      ; PtlCharPos := CharPos 
+2505	      ; PtlPrevTok := PrevTok 
+2507	      ; IF PtlCharPos < 0 
+2512	      ; Assert 
+2516	      ; PtlTraverseFs ( RootFsNodeRef ) 
+PtlTraverseFs (FsNodeRef=16_0000000001c49260) at ../src/TravUtil.m3:1890
+1890	  ; PROCEDURE PtlTraverseFs ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
+$30 = (*16_0000000001844928*) OBJECT minLogBuckets = 862531141; buckets = NIL; logBuckets = 0; maxEntries = 0; minEntries = 0; 
+    numEntries = 0;  END
+2397	      ; VAR LDelete : BOOLEAN 
+2398	      ; VAR LIsRepair : BOOLEAN
+2401	          CASE FsNodeRef . FsKind <* NOWARN *>
+$31 = (*16_0000000001c49260*) OBJECT FsPostNodeNo = 13; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 11; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstFixedVert; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 155; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = 16_0000000001d0e638; FsLdlNodeNo = 1648; FsPlaceholder = 16_0000000001d0e698; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001ce7ec0;  END
+2476	          => LInitialFsChildNo := PtlTfsInitialFsChildNo ( )  
+2477	          ; PtlTfsTraverseFsFixedChildren ( LInitialFsChildNo ) 
+$32 = 0
+PtlTfsTraverseFsFixedChildren (FromFsChildNo=0) at ../src/TravUtil.m3:2314
+2314	          IF FsNodeRef . FsChildren = NIL 
+2316	          ELSE LFsChildCt := NUMBER ( FsNodeRef . FsChildren ^ ) 
+2318	        ; LFsChildNo := FromFsChildNo 
+$33 = 9
+$34 = 0
+2320	            IF LFsChildNo >= LFsChildCt THEN EXIT END (* IF *) 
+2321	          ; PtlTraverseFs ( FsNodeRef . FsChildren ^ [ LFsChildNo ] ) 
+PtlTraverseFs (FsNodeRef=16_0000000001d45270) at ../src/TravUtil.m3:1890
+1890	  ; PROCEDURE PtlTraverseFs ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
+2397	      ; VAR LDelete : BOOLEAN 
+$35 = (*16_0000000001d45270*) OBJECT FsPostNodeNo = 4; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 3; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindSubtreeHoriz; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 0; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = 16_0000000001d48188; FsLdlNodeNo = 1650; FsPlaceholder = NIL; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001d3f028;  END
+2398	      ; VAR LIsRepair : BOOLEAN
+2401	          CASE FsNodeRef . FsKind <* NOWARN *>
+2476	          => LInitialFsChildNo := PtlTfsInitialFsChildNo ( )  
+2477	          ; PtlTfsTraverseFsFixedChildren ( LInitialFsChildNo ) 
+$36 = 3
+PtlTfsTraverseFsFixedChildren (FromFsChildNo=3) at ../src/TravUtil.m3:2314
+2314	          IF FsNodeRef . FsChildren = NIL 
+2316	          ELSE LFsChildCt := NUMBER ( FsNodeRef . FsChildren ^ ) 
+2318	        ; LFsChildNo := FromFsChildNo 
+$37 = 4
+$38 = 3
+2320	            IF LFsChildNo >= LFsChildCt THEN EXIT END (* IF *) 
+2321	          ; PtlTraverseFs ( FsNodeRef . FsChildren ^ [ LFsChildNo ] ) 
+PtlTraverseFs (FsNodeRef=16_0000000001d4d838) at ../src/TravUtil.m3:1890
+1890	  ; PROCEDURE PtlTraverseFs ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
+2397	      ; VAR LDelete : BOOLEAN 
+2398	      ; VAR LIsRepair : BOOLEAN
+2401	          CASE FsNodeRef . FsKind <* NOWARN *>
+$39 = (*16_0000000001d4d838*) OBJECT FsPostNodeNo = 3; FsFmtNo = 3; FsLeftFmtNo = 3; FsRightFmtNo = 3; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstChildOfFixed; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 121; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = NIL; FsLdlNodeNo = 1660; FsPlaceholder = NIL; FsSingletonOptMin = 0; FsSingletonOptMapRef = NIL; 
+    FsInsTokRef = NIL; FsEstChildNo = 1; FsLeadingChildCt = 255; FsChildIndentCode = 0; FsFirstListElemIndentCode = -32768; 
+    FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; FsIsRightOfEstListChild = FALSE; 
+    FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = NIL; FsLineBreakToReachFmtNo = 255; 
+    FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; FsCondPredicate = RECORD PredicateKind = PredicateKindNull; 
+    PredicateClass = 0;  END; FsCondAltRef = NIL; FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; 
+    FsAltFixedTokSet = 16_0000000001d4fa28; FsAltCardSet = {}; FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 1; 
+    FsAbsentEstChildFormatsEmpty = TRUE; FsFmtNoMapRef = NIL;  END
+2421	          => PtlTfsEstChild ( ) 
+PtlTfsEstChild () at ../src/TravUtil.m3:2257
+2257	      = VAR LDelete : BOOLEAN 
+2258	      ; VAR LIsRepair : BOOLEAN 
+2261	          PtlTfsLeadingMods ( (* VAR *) LDelete , (* VAR *) LIsRepair ) 
+2262	        ; IF PtlState # PtlStateTyp . PtlStateDone 
+$40 = FALSE
+$41 = FALSE
+Undefined command: "pPtlState".  Try "help".
+$42 = PtlStateStart
+2264	            IF EstTravInfo . EtiChildNo < EstTravInfo . EtiChildCt 
+2269	              IF ISTYPE 
+2279	                Assert ( NOT LDelete , AFT . A_PtlTfsEstChild_Deleted ) 
+2280	              ; PtlTfsEstSubtree ( ) 
+PtlTfsEstSubtree () at ../src/TravUtil.m3:1899
+1899	      ; VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
+1902	          IF PtlState # PtlStateTyp . PtlStateDone 
+1904	            PtlState := PtlStateTyp . PtlStateInside 
+1905	          ; LEstMiscInfo 
+1908	          ; WITH WWidthInfo = LEstMiscInfo . EmiWidthInfo 
+$43 = RECORD EmiLeftTok = 121; EmiRightTok = 121; EmiTok = 121; EmiSyntTokCt = 1; EmiEdgeKind = EdgeKindEstChild; 
+    EmiWidthInfo = RECORD WiNlTrigger = 254; WiWidth = 9; WiIsNull = FALSE; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; 
+    WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END;  END
+1909	            DO Assert
+1913	            ; IF WWidthInfo . WiWidth = LbeStd . LimitedCharNoInfinity 
+1917	                LFromPos 
+1919	              ; IF LFromPos > WWidthInfo . WiNlTrigger 
+$44 = 10
+1923	                  IF WWidthInfo . WiNlTrigger = LbeStd . LimitedCharNoInfinity 
+1925	                    PtlCountToPos ( LFromPos ) 
+PtlCountToPos (ToCharPos=10) at ../src/TravUtil.m3:1859
+1859	        IF NOT ModTextIsToLeftOnLine AND ToCharPos > Options . RightMargin 
+$45 = 10
+1861	        ELSIF ToCharPos > PtlCharPos 
+$46 = 9
+1863	          PtlCharPos := ToCharPos 
+1864	        ; PtlPrevTok := LbeStd . Tok__Sep 
+1866	      END PtlCountToPos 
+PtlTfsEstSubtree () at ../src/TravUtil.m3:1926
+1926	                  ; IF PtlState # PtlStateTyp . PtlStateDone 
+$47 = PtlStateInside
+1928	                      PtlCountWidth ( WWidthInfo . WiWidth ) 
+PtlCountWidth (Width=9) at ../src/TravUtil.m3:1871
+1871	        PtlCharPos := EstUtil . WidthSum ( PtlCharPos , Width ) 
+$48 = 9
+$49 = 10
+1872	      ; IF NOT ModTextIsToLeftOnLine AND PtlCharPos > Options . RightMargin 
+$50 = 19
+$51 = FALSE
+$52 = 19
+$53 = 80
+1876	      END PtlCountWidth 
+PtlTfsEstSubtree () at ../src/TravUtil.m3:1933
+1933	                ; PtlPrevTok := LEstMiscInfo . EmiRightTok 
+1938	        ; IncEstChild ( EstTravInfo ) 
+$54 = 121
+1939	        END PtlTfsEstSubtree 
+PtlTfsEstChild () at ../src/TravUtil.m3:2286
+2286	          ; IF PtlState # PtlStateTyp . PtlStateDone 
+2288	              PtlTfsTrailingMods ( ) 
+2291	        END PtlTfsEstChild 
+PtlTraverseFs (FsNodeRef=16_00007f66cfff3430) at ../src/TravUtil.m3:2494
+2494	      END PtlTraverseFs 
+$55 = (*16_0000000001d4d838*) OBJECT FsPostNodeNo = 3; FsFmtNo = 3; FsLeftFmtNo = 3; FsRightFmtNo = 3; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstChildOfFixed; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 121; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = NIL; FsLdlNodeNo = 1660; FsPlaceholder = NIL; FsSingletonOptMin = 0; FsSingletonOptMapRef = NIL; 
+    FsInsTokRef = NIL; FsEstChildNo = 1; FsLeadingChildCt = 255; FsChildIndentCode = 0; FsFirstListElemIndentCode = -32768; 
+    FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; FsIsRightOfEstListChild = FALSE; 
+    FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = NIL; FsLineBreakToReachFmtNo = 255; 
+    FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; FsCondPredicate = RECORD PredicateKind = PredicateKindNull; 
+    PredicateClass = 0;  END; FsCondAltRef = NIL; FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; 
+    FsAltFixedTokSet = 16_0000000001d4fa28; FsAltCardSet = {}; FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 1; 
+    FsAbsentEstChildFormatsEmpty = TRUE; FsFmtNoMapRef = NIL;  END
+PtlTfsTraverseFsFixedChildren (FromFsChildNo=3) at ../src/TravUtil.m3:2322
+2322	          ; IF PtlState = PtlStateTyp . PtlStateDone 
+2325	              INC ( LFsChildNo ) 
+$56 = 3
+2320	            IF LFsChildNo >= LFsChildCt THEN EXIT END (* IF *) 
+$57 = 4
+$58 = 4
+2328	        END PtlTfsTraverseFsFixedChildren 
+PtlTraverseFs (FsNodeRef=16_0000000000000004) at ../src/TravUtil.m3:2494
+2494	      END PtlTraverseFs 
+PtlTfsTraverseFsFixedChildren (FromFsChildNo=0) at ../src/TravUtil.m3:2322
+2322	          ; IF PtlState = PtlStateTyp . PtlStateDone 
+$59 = PtlStateInside
+2325	              INC ( LFsChildNo ) 
+$60 = 0
+2320	            IF LFsChildNo >= LFsChildCt THEN EXIT END (* IF *) 
+$61 = 9
+2321	          ; PtlTraverseFs ( FsNodeRef . FsChildren ^ [ LFsChildNo ] ) 
+$62 = (*16_0000000001c49260*) OBJECT FsPostNodeNo = 13; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 11; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstFixedVert; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 155; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = 16_0000000001d0e638; FsLdlNodeNo = 1648; FsPlaceholder = 16_0000000001d0e698; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001ce7ec0;  END
+#0  PtlTfsTraverseFsFixedChildren (FromFsChildNo=0) at ../src/TravUtil.m3:2321
+2321	          ; PtlTraverseFs ( FsNodeRef . FsChildren ^ [ LFsChildNo ] ) 
+PtlTraverseFs (FsNodeRef=16_0000000001d45340) at ../src/TravUtil.m3:1890
+1890	  ; PROCEDURE PtlTraverseFs ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
+2397	      ; VAR LDelete : BOOLEAN 
+2398	      ; VAR LIsRepair : BOOLEAN
+2401	          CASE FsNodeRef . FsKind <* NOWARN *>
+$63 = FsKindLineBreakReqd
+2433	          => PtlTfsLeadingMods ( (* VAR *) LDelete , (* VAR *) LIsRepair ) 
+2435	            OF PtlStateTyp . PtlStateStart 
+2437	            => PtlState := PtlStateTyp . PtlStateInside 
+Undefined command: "2437".  Try "help".
+$64 = PtlStateInside
+2438	            ; IF NOT LDelete 
+$65 = FALSE
+$66 = FALSE
+$67 = FsKindLineBreakReqd
+2440	                IF ModTextIsToLeftOnLine 
+2443	                  PtlState := PtlStateTyp . PtlStateDone 
+2446	            ; LastFmtNoOnLine := FsNodeRef . FsFmtNo  
+2494	      END PtlTraverseFs 
+PtlTfsTraverseFsFixedChildren (FromFsChildNo=0) at ../src/TravUtil.m3:2322
+2322	          ; IF PtlState = PtlStateTyp . PtlStateDone 
+2323	            THEN EXIT 
+2328	        END PtlTfsTraverseFsFixedChildren 
+PtlTraverseFs (FsNodeRef=16_0000000000000002) at ../src/TravUtil.m3:2494
+2494	      END PtlTraverseFs 
+PreTraverseLine (Lang=10, ModTextIsToLeftOnLine=FALSE, EstTravInfo=
+    RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; EtiChildNo = 2; EtiChildRelNodeNo = 3; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7d668; LeCumNodeCt = 6; LeKindSet = {}; LeFmtNo = 7;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 7; EtiIsOptSingletonList = FALSE;  END, RootFsNodeRef=16_0000000001c49260, 
+    StartFmtNo=3, CharPos=9, CurrentLineIndentPos=0, PrevTok=60, LastFmtNoOnLine=4, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:2517
+2517	      END PreTraverseLine 
+$68 = 4
+$69 = 0
+FmtKindForFsSubtreeTraversing (Lang=10, CharPos=9, ModTextIsToLeftOnLine=FALSE, PrevTok=60, RootFsNodeRef=16_0000000001c49260, 
+    SubtreeFsNodeRef=16_0000000001d45270, ParentFmtKind=FmtKindVert, CurrentLineIndentPos=0, EstTravInfo=
+    RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END, LastFmtNoOnLine=4, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:3779
+3779	      ; IF PreTraversedFsSubtreeFits 
+$70 = (*16_0000000001d45270*) OBJECT FsPostNodeNo = 4; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 3; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindSubtreeHoriz; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 0; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = 16_0000000001d48188; FsLdlNodeNo = 1650; FsPlaceholder = NIL; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001d3f028;  END
+PreTraversedFsSubtreeFits (SubtreeFsNodeRef=16_0000000001d45270, LastFmtNoOnLine=4, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:3236
+3236	  = VAR LFits : BOOLEAN 
+3239	      IF LastFmtNoOnLine = EstHs . FmtNoNull 
+3243	        LFits := SubtreeFsNodeRef . FsRightFmtNo <= LastFmtNoOnLine  
+$71 = 3
+$72 = 4
+3244	      ; IF SubtreeFsNodeRef . FsIsInsideList
+$73 = TRUE
+$74 = FALSE
+3253	      ; RETURN LFits
+FmtKindForFsSubtreeTraversing (Lang=10, CharPos=9, ModTextIsToLeftOnLine=FALSE, PrevTok=60, RootFsNodeRef=16_0000000001c49260, 
+    SubtreeFsNodeRef=16_0000000001d45270, ParentFmtKind=FmtKindVert, CurrentLineIndentPos=0, EstTravInfo=
+    RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END, LastFmtNoOnLine=4, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:3784
+3784	        THEN RETURN LangUtil . FmtKindTyp . FmtKindHoriz  
+0x00007f66e23a5955	3785	        ELSE RETURN LResultIfNotHoriz 
+Run till exit from #0  0x00007f66e23a5955 in FmtKindForFsSubtreeTraversing (Lang=10, CharPos=9, ModTextIsToLeftOnLine=FALSE, 
+    PrevTok=60, RootFsNodeRef=16_0000000001c49260, SubtreeFsNodeRef=16_0000000001d45270, ParentFmtKind=FmtKindVert, 
+    CurrentLineIndentPos=0, EstTravInfo=
+    RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END, LastFmtNoOnLine=4, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:3785
+Value returned is $75 = FmtKindHoriz
+3877	              RETURN
+Can't find Modula-3 identifier: p
+$76 = FmtKindVert
+#0  DoTakeLineBreak (Lang=10, CharPos=9, ModTextIsToLeftOnLine=FALSE, PrevTok=60, RootFsNodeRef=16_0000000001c49260, 
+    LineBreakFsNodeRef=16_0000000001d4d768, ParentFmtKind=FmtKindVert, CurrentLineIndentPos=0, EstTravInfo=
+    RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END, LastFmtNoOnLine=4, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:3877
+#1  0x00007f66e23cc67b in GnlTeTfsLineBreakInterior (FsKind=FsKindLineBreakOpt) at ../src/LineMarks.m3:1342
+#2  0x00007f66e23cc876 in GnlTeTfsLineBreak (FsKind=FsKindLineBreakOpt) at ../src/LineMarks.m3:1406
+#3  0x00007f66e23c9ee2 in GnlTeTraverseFs (FsNodeRef=16_0000000000000001, FsFmtKind=FmtKindVert) at ../src/LineMarks.m3:1651
+#4  0x00007f66e23c95e9 in GnlTeTraverseFsFixedChildren (ParentFsNodeRef=16_0000000001d45270, FmtKind=FmtKindVert, 
+    InitialFsChildNo=1) at ../src/LineMarks.m3:490
+#5  0x00007f66e23cceab in GnlTeTfsFsSubtree () at ../src/LineMarks.m3:1563
+#6  0x00007f66e23c9f1b in GnlTeTraverseFs (FsNodeRef=16_0000000000000001, FsFmtKind=FmtKindVert) at ../src/LineMarks.m3:1664
+#7  0x00007f66e23c95e9 in GnlTeTraverseFsFixedChildren (ParentFsNodeRef=16_0000000001c49260, FmtKind=FmtKindVert, 
+    InitialFsChildNo=0) at ../src/LineMarks.m3:490
+#8  0x00007f66e23c8f10 in GnlTraverseEst (EstRef=16_0000000001e52eb8, KindSet={}, RootAbsNodeNo=0, 
+    FsRuleNodeRef=16_0000000000000001, EstFmtKind=FmtKindVert, EstIndentPos1=60, EstIndentPosN=0, IsModTok=FALSE)
+    at ../src/LineMarks.m3:1800
+#9  0x00007f66e23c9c53 in GnlTeTfsEstSubtree (IsModTok=FALSE) at ../src/LineMarks.m3:605
+#10 0x00007f66e23ccb18 in GnlTeTfsEstChild (IsEstList=FALSE) at ../src/LineMarks.m3:1468
+#11 0x00007f66e23c9ef5 in GnlTeTraverseFs (FsNodeRef=16_0000000000000001, FsFmtKind=FmtKindVert) at ../src/LineMarks.m3:1655
+#12 0x00007f66e23c95e9 in GnlTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000018c5898, FmtKind=FmtKindVert, 
+    InitialFsChildNo=1) at ../src/LineMarks.m3:490
+#13 0x00007f66e23c8f10 in GnlTraverseEst (EstRef=16_0000000001e52f48, KindSet={}, RootAbsNodeNo=0, 
+    FsRuleNodeRef=16_0000000000000001, EstFmtKind=FmtKindVert, EstIndentPos1=60, EstIndentPosN=0, IsModTok=FALSE)
+    at ../src/LineMarks.m3:1800
+#14 0x00007f66e23c7dab in GetNextLine (Lang=1, EstRef=16_0000000001e52f48, StartMark=
+    RECORD EstNodeNo = 2; EstNodeCt = 1; BlCharPos = 2147483647; Tok = 23; FmtNo = 1; Kind = Plain; StartAtEnd = TRUE; IsImpliedNewLine = FALSE;  END, ExistingMark=
+    RECORD EstNodeNo = -2147483648; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 255; Kind = Null; StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END, DidHitExistingMark=Cannot access memory at address 0x0
+) at ../src/LineMarks.m3:1842
+#15 0x0000000000458728 in VerifyEditedLine (ImageRef=16_0000000001c7ba00, EstRoot=16_0000000001e52f48, StartBolTokMark=
+    RECORD EstNodeNo = 2; EstNodeCt = 1; BlCharPos = 2147483647; Tok = 23; FmtNo = 1; Kind = Plain; StartAtEnd = TRUE; IsImpliedNewLine = FALSE;  END, ExpectedLineCt=0, ExpectedAtEndOfImage=FALSE, ExpectedString=
+    RECORD Text = 16_00000000019132e8; Space = NIL; FromSs = 0; ToSs = 19; EventualLengthHint = 0;  END, RegeneratedString=
+    RECORD Text = NIL; Space = 16_0000000001e53f80; FromSs = 0; ToSs = 9; EventualLengthHint = 80;  END, 
+    RegeneratedTextAttrArrayRef=16_0000000001e53f60, RegeneratedLineErrArrayRef=NIL, EndBolTokMark=
+    RECORD EstNodeNo = 2; EstNodeCt = 1; BlCharPos = 2147483647; Tok = 23; FmtNo = 1; Kind = Plain; StartAtEnd = TRUE; IsImpliedNewLine = FALSE;  END, FailureOccurred=FALSE) at ../src/TextEdit.m3:197
+#16 0x000000000045a98f in BruteForceVerifyAllLinesRefs (ImageRef=16_0000000001c7ba00, RepairIsOK=TRUE) at ../src/TextEdit.m3:540
+#17 0x000000000045ea5a in InnerFlushTempEdit (ImageRef=16_0000000001c7ba00, LinesRef=16_00000000019102a8, 
+    TempEditRef=16_0000000001919ae0, InsNlPos=254, NlIndentPos=254, DelNlShift=254) at ../src/TextEdit.m3:1779
+#18 0x00000000004678c3 in GrabTempEditRef (ImageTrans=16_0000000001c7ba00, Mark=16_0000000001910058, RmFromPos=19, LmToPos=18, 
+    TempEditRef=16_0000000001919ae0) at ../src/TextEdit.m3:2464
+#19 0x0000000000468031 in SimpleDeleteChar (ImageTrans=16_0000000001c7ba00, Mark=16_0000000001910058, MustRepaintWindow=FALSE)
+    at ../src/TextEdit.m3:2582
+#20 0x000000000046a068 in DeleteChar (WindowRef=16_0000000001b20080, DeletingBwd=TRUE) at ../src/TextEdit.m3:2877
+#21 0x00000000004903f2 in CharDelBwdWorkProc (Closure=16_00000000019d1ed0) at ../src/EditWindow.m3:2158
+#22 0x00000000004b83e9 in WorkerThreadApply (Self=16_00000000018c6808) at ../src/Worker.m3:549
+#23 0x00007f66e0b16ee5 in RunThread (me=16_000000000189f9f0) at ../src/thread/PTHREAD/ThreadPThread.m3:571
+#24 0x00007f66e0b16b85 in ThreadBase (param=16_000000000189f9f0) at ../src/thread/PTHREAD/ThreadPThread.m3:544
+#25 0x00007f66deffc6fa in start_thread () from /lib/x86_64-linux-gnu/libpthread.so.0
+#26 0x00007f66e07e8b5d in clone () from /lib/x86_64-linux-gnu/libc.so.6
+#0  DoTakeLineBreak (Lang=10, CharPos=9, ModTextIsToLeftOnLine=FALSE, PrevTok=60, RootFsNodeRef=16_0000000001c49260, 
+    LineBreakFsNodeRef=16_0000000001d4d768, ParentFmtKind=FmtKindVert, CurrentLineIndentPos=0, EstTravInfo=
+    RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END, LastFmtNoOnLine=4, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:3877
+3877	              RETURN
+$77 = (*16_0000000001c49260*) OBJECT FsPostNodeNo = 13; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 11; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstFixedVert; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 155; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = 16_0000000001d0e638; FsLdlNodeNo = 1648; FsPlaceholder = 16_0000000001d0e698; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001ce7ec0;  END
+$78 = (*16_0000000001d4d768*) OBJECT FsPostNodeNo = 2; FsFmtNo = 2; FsLeftFmtNo = 2; FsRightFmtNo = 2; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindLineBreakOpt; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = True; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 0; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = NIL; FsLdlNodeNo = 1659; FsPlaceholder = NIL; FsSingletonOptMin = 0; FsSingletonOptMapRef = NIL; 
+    FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 255; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = TRUE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = NIL; 
+    FsLineBreakToReachFmtNo = 3; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; FsFmtNoMapRef = NIL;  END
+$79 = 16_0000000001d0e638
+$80 = {16_0000000001d45270,16_0000000001d45340,16_0000000001d45410,16_0000000001d454e0,16_0000000001d455b0,16_0000000001d45680,
+    16_0000000001d45750,16_0000000001d45820,16_0000000001d458f0}
+$81 = (*16_0000000001d45270*) OBJECT FsPostNodeNo = 4; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 3; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindSubtreeHoriz; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 0; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = 16_0000000001d48188; FsLdlNodeNo = 1650; FsPlaceholder = NIL; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001d3f028;  END
+$82 = {16_0000000001d0e768,16_0000000001d4d698,16_0000000001d4d768,16_0000000001d4d838}
+$83 = (*16_0000000001d0e768*) OBJECT FsPostNodeNo = 0; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 0; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstChildOfFixed; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 163; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {0, 0}; FsChildren = NIL; 
+    FsLdlNodeNo = 1651; FsPlaceholder = NIL; FsSingletonOptMin = 0; FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; 
+    FsEstChildNo = 0; FsLeadingChildCt = 255; FsChildIndentCode = 0; FsFirstListElemIndentCode = -32768; 
+    FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = TRUE; FsIsInFirstLine = TRUE; FsIsRightOfEstListChild = FALSE; 
+    FsEstChildOpt = OptOptional; FsPadChild = 0; FsEstDescendantRef = NIL; FsLineBreakToReachFmtNo = 255; 
+    FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; FsCondPredicate = RECORD PredicateKind = PredicateKindNull; 
+    PredicateClass = 0;  END; FsCondAltRef = NIL; FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; 
+    FsAltFixedTokSet = 16_0000000001d459c0; FsAltCardSet = {}; FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 1; 
+    FsAbsentEstChildFormatsEmpty = TRUE; FsFmtNoMapRef = NIL;  END
+$84 = (*16_0000000001d4d698*) OBJECT FsPostNodeNo = 1; FsFmtNo = 1; FsLeftFmtNo = 1; FsRightFmtNo = 1; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindInsTok; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = False; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 60; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = NIL; FsLdlNodeNo = 1655; FsPlaceholder = NIL; FsSingletonOptMin = 0; FsSingletonOptMapRef = NIL; 
+    FsInsTokRef = 16_0000000001d198f8; FsEstChildNo = -32768; FsLeadingChildCt = 255; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = TRUE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = NIL; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; FsFmtNoMapRef = NIL;  END
+$85 = (*16_0000000001d4d768*) OBJECT FsPostNodeNo = 2; FsFmtNo = 2; FsLeftFmtNo = 2; FsRightFmtNo = 2; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindLineBreakOpt; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = True; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 0; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = NIL; FsLdlNodeNo = 1659; FsPlaceholder = NIL; FsSingletonOptMin = 0; FsSingletonOptMapRef = NIL; 
+    FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 255; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = TRUE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = NIL; 
+    FsLineBreakToReachFmtNo = 3; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; FsFmtNoMapRef = NIL;  END
+$86 = (*16_0000000001d4d838*) OBJECT FsPostNodeNo = 3; FsFmtNo = 3; FsLeftFmtNo = 3; FsRightFmtNo = 3; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstChildOfFixed; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 121; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = NIL; FsLdlNodeNo = 1660; FsPlaceholder = NIL; FsSingletonOptMin = 0; FsSingletonOptMapRef = NIL; 
+    FsInsTokRef = NIL; FsEstChildNo = 1; FsLeadingChildCt = 255; FsChildIndentCode = 0; FsFirstListElemIndentCode = -32768; 
+    FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; FsIsRightOfEstListChild = FALSE; 
+    FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = NIL; FsLineBreakToReachFmtNo = 255; 
+    FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; FsCondPredicate = RECORD PredicateKind = PredicateKindNull; 
+    PredicateClass = 0;  END; FsCondAltRef = NIL; FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; 
+    FsAltFixedTokSet = 16_0000000001d4fa28; FsAltCardSet = {}; FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 1; 
+    FsAbsentEstChildFormatsEmpty = TRUE; FsFmtNoMapRef = NIL;  END
+$87 = (*16_0000000001d4d768*) OBJECT FsPostNodeNo = 2; FsFmtNo = 2; FsLeftFmtNo = 2; FsRightFmtNo = 2; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindLineBreakOpt; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = True; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 0; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = NIL; FsLdlNodeNo = 1659; FsPlaceholder = NIL; FsSingletonOptMin = 0; FsSingletonOptMapRef = NIL; 
+    FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 255; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = TRUE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = NIL; 
+    FsLineBreakToReachFmtNo = 3; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; FsFmtNoMapRef = NIL;  END
+#0  DoTakeLineBreak (Lang=10, CharPos=9, ModTextIsToLeftOnLine=FALSE, PrevTok=60, RootFsNodeRef=16_0000000001c49260, 
+    LineBreakFsNodeRef=16_0000000001d4d768, ParentFmtKind=FmtKindVert, CurrentLineIndentPos=0, EstTravInfo=
+    RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END, LastFmtNoOnLine=4, EstListChildrenToPass=0)
+    at ../src/TravUtil.m3:3877
+3877	              RETURN
+$88 = FmtKindVert
+$89 = 3
+$90 = 4
+GnlTeTfsLineBreakInterior (FsKind=FsKindLineBreakOpt) at ../src/LineMarks.m3:1357
+1357	              GnlTeTfsBuildFmtNoMark ( ) 
+$91 = FmtKindVert
+#0  GnlTeTfsLineBreakInterior (FsKind=FsKindLineBreakOpt) at ../src/LineMarks.m3:1357
+1357	              GnlTeTfsBuildFmtNoMark ( ) 
+#1  0x00007f66e23cc876 in GnlTeTfsLineBreak (FsKind=FsKindLineBreakOpt) at ../src/LineMarks.m3:1406
+1406	                   GnlTeTfsLineBreakInterior ( FsKind ) 
+#2  0x00007f66e23c9ee2 in GnlTeTraverseFs (FsNodeRef=16_0000000000000001, FsFmtKind=FmtKindVert) at ../src/LineMarks.m3:1651
+1651	            => GnlTeTfsLineBreak ( FsNodeRef . FsKind ) 
+#3  0x00007f66e23c95e9 in GnlTeTraverseFsFixedChildren (ParentFsNodeRef=16_0000000001d45270, FmtKind=FmtKindVert, 
+    InitialFsChildNo=1) at ../src/LineMarks.m3:490
+490	              GnlTeTraverseFs 
+#4  0x00007f66e23cceab in GnlTeTfsFsSubtree () at ../src/LineMarks.m3:1563
+1563	          ; GnlTeTraverseFsFixedChildren 
+#5  0x00007f66e23c9f1b in GnlTeTraverseFs (FsNodeRef=16_0000000000000001, FsFmtKind=FmtKindVert) at ../src/LineMarks.m3:1664
+1664	            => GnlTeTfsFsSubtree ( ) 
+#6  0x00007f66e23c95e9 in GnlTeTraverseFsFixedChildren (ParentFsNodeRef=16_0000000001c49260, FmtKind=FmtKindVert, 
+    InitialFsChildNo=0) at ../src/LineMarks.m3:490
+490	              GnlTeTraverseFs 
+#7  0x00007f66e23c8f10 in GnlTraverseEst (EstRef=16_0000000001e52eb8, KindSet={}, RootAbsNodeNo=0, 
+    FsRuleNodeRef=16_0000000000000001, EstFmtKind=FmtKindVert, EstIndentPos1=60, EstIndentPosN=0, IsModTok=FALSE)
+    at ../src/LineMarks.m3:1800
+1800	            => GnlTeTraverseFsFixedChildren 
+#8  0x00007f66e23c9c53 in GnlTeTfsEstSubtree (IsModTok=FALSE) at ../src/LineMarks.m3:605
+605	          ; GnlTraverseEst 
+#9  0x00007f66e23ccb18 in GnlTeTfsEstChild (IsEstList=FALSE) at ../src/LineMarks.m3:1468
+1468	                     GnlTeTfsEstSubtree ( IsModTok := IsModTok ) 
+#10 0x00007f66e23c9ef5 in GnlTeTraverseFs (FsNodeRef=16_0000000000000001, FsFmtKind=FmtKindVert) at ../src/LineMarks.m3:1655
+1655	            => GnlTeTfsEstChild ( IsEstList := FALSE ) 
+#11 0x00007f66e23c95e9 in GnlTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000018c5898, FmtKind=FmtKindVert, 
+    InitialFsChildNo=1) at ../src/LineMarks.m3:490
+490	              GnlTeTraverseFs 
+#12 0x00007f66e23c8f10 in GnlTraverseEst (EstRef=16_0000000001e52f48, KindSet={}, RootAbsNodeNo=0, 
+    FsRuleNodeRef=16_0000000000000001, EstFmtKind=FmtKindVert, EstIndentPos1=60, EstIndentPosN=0, IsModTok=FALSE)
+    at ../src/LineMarks.m3:1800
+1800	            => GnlTeTraverseFsFixedChildren 
+#0  GnlTeTfsLineBreakInterior (FsKind=FsKindLineBreakOpt) at ../src/LineMarks.m3:1357
+1357	              GnlTeTfsBuildFmtNoMark ( ) 
+#1  0x00007f66e23cc876 in GnlTeTfsLineBreak (FsKind=FsKindLineBreakOpt) at ../src/LineMarks.m3:1406
+1406	                   GnlTeTfsLineBreakInterior ( FsKind ) 
+#2  0x00007f66e23c9ee2 in GnlTeTraverseFs (FsNodeRef=16_0000000000000001, FsFmtKind=FmtKindVert) at ../src/LineMarks.m3:1651
+1651	            => GnlTeTfsLineBreak ( FsNodeRef . FsKind ) 
+#3  0x00007f66e23c95e9 in GnlTeTraverseFsFixedChildren (ParentFsNodeRef=16_0000000001d45270, FmtKind=FmtKindVert, 
+    InitialFsChildNo=1) at ../src/LineMarks.m3:490
+490	              GnlTeTraverseFs 
+#4  0x00007f66e23cceab in GnlTeTfsFsSubtree () at ../src/LineMarks.m3:1563
+1563	          ; GnlTeTraverseFsFixedChildren 
+$92 = FmtKindVert
+$93 = 9
+$94 = FALSE
+Can't find Modula-3 identifier: lang
+$95 = 10
+Can't find Modula-3 identifier: GbnlPrevTok
+$96 = 60
+$97 = (*16_0000000001c49260*) OBJECT FsPostNodeNo = 13; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 11; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindEstFixedVert; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 155; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = 16_0000000001d0e638; FsLdlNodeNo = 1648; FsPlaceholder = 16_0000000001d0e698; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001ce7ec0;  END
+$98 = (*16_0000000001d45270*) OBJECT FsPostNodeNo = 4; FsFmtNo = 0; FsLeftFmtNo = 0; FsRightFmtNo = 3; FsIsInsideList = FALSE; 
+    FsIsInsideCondFmt = FALSE; FsIsInsideFill = FALSE; FsIsAutonomous = FALSE; FsContainsLineBreak = FALSE; 
+    FsDeletableItemsAreToRight = TRUE; FsPad1 = 0; FsKind = FsKindSubtreeHoriz; FsIndentCode = 0; FsListSliceThruFmtNo = 255; 
+    FsFormatsEmpty = Unknown; FsHasLineBreak = FeUnknown; FsPad2 = 0; FsTok = 0; FsSublistTok = 0; FsPartialTok = 0; 
+    FsTrailingTok = 0; FsEmptyListTok = 0; FsSingletonListTok = 0; FsPluralListTok = 0; FsOptionIds = {64, 64}; 
+    FsChildren = 16_0000000001d48188; FsLdlNodeNo = 1650; FsPlaceholder = NIL; FsSingletonOptMin = 0; 
+    FsSingletonOptMapRef = NIL; FsInsTokRef = NIL; FsEstChildNo = -32768; FsLeadingChildCt = 0; FsChildIndentCode = -32768; 
+    FsFirstListElemIndentCode = -32768; FsSameLineEstChildFmtNo = 255; FsEstChildIsOptional = FALSE; FsIsInFirstLine = FALSE; 
+    FsIsRightOfEstListChild = FALSE; FsEstChildOpt = OptRequired; FsPadChild = 0; FsEstDescendantRef = 16_0000000001d0e768; 
+    FsLineBreakToReachFmtNo = 255; FsEstListHasSeps = FALSE; FsEstListHasBookends = FALSE; 
+    FsCondPredicate = RECORD PredicateKind = PredicateKindNull; PredicateClass = 0;  END; FsCondAltRef = NIL; 
+    FsCondDoParse = TRUE; FsAltListTokSet = NIL; FsAltStarListTokSet = NIL; FsAltFixedTokSet = NIL; FsAltCardSet = {}; 
+    FsAltParseTokSets = NIL; FsAltTok = 0; FsAltFragCt = 0; FsAbsentEstChildFormatsEmpty = FALSE; 
+    FsFmtNoMapRef = 16_0000000001d3f028;  END
+$99 = FmtKindVert
+$100 = 0
+Can't find Modula-3 identifier: GnlEstTravInfo
+$101 = RECORD EtiNodeRef = 16_0000000001e52eb8; EtiParentRef = 16_0000000001e52eb8; EtiStringRef = NIL; EtiChildCt = 4; 
+    EtiChildNo = 1; EtiChildRelNodeNo = 2; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c7bff8; LeCumNodeCt = 7; 
+    LeKindSet = {}; LeFmtNo = 3;  END; EtiAbsNodeNo = 1; EtiChildFmtNo = 3; EtiIsOptSingletonList = FALSE;  END
+Record has no field named "EtiNode".
+$102 = (*16_0000000001e52eb8*) OBJECT KTreeEstChildCtLeftOfNl = 0; KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; 
+    WiIsNull = FALSE; WiHasAbsFromPos = TRUE; WiHasNlBefore = TRUE; WiHasNlAfter = FALSE; WiHasNlWithin = TRUE; 
+    WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 11; KTreeElemCt = 4; EstSemRef = NIL; EstTok = 155; EstLeftTok = 23; 
+    EstRightTok = 121; EstNodeKind = EstNodeKindPlain; EstHeight = 1; EstRepairCost = 0; EstChildKindSet = {}; 
+    EstLeafArrayRef = 16_0000000001e52ef0;  END
+#4  0x00007f66e23cceab in GnlTeTfsFsSubtree () at ../src/LineMarks.m3:1563
+1563	          ; GnlTeTraverseFsFixedChildren 
+$103 = FmtKindVert
+$104 = FmtKindVert
+The program is running.  Exit anyway? (y or n) 

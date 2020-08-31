@@ -1,0 +1,21 @@
+File_Open_Text "test13_59.m3"
+MouseClickChar 12 3
+SemAccept
+MouseClickChar 6 4
+SemAccept
+MouseClickChar 10 5
+MouseClickChar 11 5
+SemAccept
+MouseClickChar 10 6
+SemAccept
+MouseClickChar 11 7
+SemAccept
+SemAccept
+SemAccept
+SemAccept
+SemAccept
+MouseClickChar 11 7
+CursorRight
+CursorRight
+SemAccept
+SemParse

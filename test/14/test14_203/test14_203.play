@@ -1,0 +1,121 @@
+File_Open_Text "test14_203.m3"
+MouseClickChar 8 5
+DeleteRestOfLine
+CharType_Char 'E'
+CharType_Char 'N'
+CharType_Char 'D'
+CharType_Char ' '
+CharType_Char '('
+CharType_Char '*'
+CharType_Char ' '
+CharType_Char 'I'
+CharType_Char 'F'
+CharType_Char ' '
+CharType_Char '*'
+CharType_Char ')'
+Devel_MergeText
+MouseClickChar 1 5
+CharType_Char ' '
+CursorLeft
+DeleteRestOfLine
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharDelBwd
+CharType_Char 'E'
+CharType_Char 'N'
+CharType_Char 'D'
+CharType_Char ' '
+CharType_Char '('
+CharType_Char '*'
+CharType_Char ' '
+CharType_Char 'I'
+CharType_Char 'F'
+CharType_Char ' '
+CharType_Char '*'
+CharType_Char ')'
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+Devel_MergeText
+CursorLeft
+CursorLeft
+DeleteRestOfLine
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharType_Char ' '
+CharDelBwd
+CharType_Char 'E'
+CharType_Char 'N'
+CharType_Char 'D'
+CharType_Char ' '
+CharType_Char '('
+CharType_Char '*'
+CharType_Char ' '
+CharType_Char 'I'
+CharType_Char 'F'
+CharType_Char ' '
+CharType_Char '*'
+CharType_Char ')'
+CharType_Char ' '
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CursorLeft
+CharType_Char '\n'
+CharDelBwd
+CharDelBwd
+CharType_Char 'K'
+CharDelBwd
+DeleteRestOfLine
+CursorRight
+CharType_Char ' '
+CursorLeft
+CursorLeft
+CharType_Char ' '
+MouseClickChar 1 5
+CharType_Char 'E'
+CharType_Char 'N'
+CharType_Char 'D'
+CharType_Char ' '
+SemParse
+File_Save_Text "test14_203.m3"
+File_Export_Text "test14_203.export.m3"
+STOP
+File_CloseImage_Text "test14_203.m3"
+STOP
+File_Quit

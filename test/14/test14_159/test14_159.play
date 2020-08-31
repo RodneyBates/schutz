@@ -1,0 +1,27 @@
+File_Open_Text "test14_159.m3"
+MouseClickChar 8 4
+CharType_Char '('
+CharType_Char '*'
+CharType_Char ' '
+CharType_Char 't'
+CharType_Char 'e'
+CharType_Char 's'
+CharType_Char 't'
+CharType_Char '1'
+CharType_Char '4'
+CharType_Char '_'
+CharType_Char '1'
+CharType_Char '5'
+CharType_Char '9'
+CharType_Char ' '
+CharType_Char '*'
+CharType_Char ')'
+CharType_Char ' '
+STOP 
+SemParse
+File_Save_Text "test14_159.m3"
+File_Export_Text "test14_159.export.m3"
+STOP
+File_CloseImage_Text "test14_159.m3"
+STOP
+File_Quit

@@ -1,0 +1,17 @@
+File_Open_Text "test12_175.m3"
+CursorDown
+CharType_Char '('
+CharType_Char '*'
+CursorDown
+CursorDown
+CursorLeft
+CursorLeft
+CharType_Char '*'
+CharType_Char ')'
+SemParse
+File_Save_Text "test12_175.m3"
+File_Export_Text "test12_175.export.m3"
+STOP
+File_CloseImage_Text "test12_175.m3"
+STOP
+File_Quit

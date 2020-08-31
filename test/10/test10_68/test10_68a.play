@@ -1,0 +1,227 @@
+File_Open_Text "test10_68.i3"
+MouseClickChar 2 0
+CharType_Char 'a'
+CharType_Char 'a'
+CharType_Char 'a'
+CharType_Char 'a'
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+SemParse
+CursorDown
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+CharType_Char 's'
+SemParse
+STOP
+MouseClickChar 3 3
+CharDelBwd
+CharDelBwd
+CharDelBwd
+MouseClickChar 35 3
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharDelBwd
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+CharType_Char 'c'
+STOP 
+SemParse
+HorizScroll 1
+HorizScroll 2
+HorizScroll 3
+HorizScroll 4
+HorizScroll 5
+HorizScroll 6
+HorizScroll 7
+HorizScroll 8
+HorizScroll 9
+HorizScroll 10
+HorizScroll 11
+HorizScroll 12
+HorizScroll 13
+HorizScroll 14
+HorizScroll 15
+HorizScroll 16
+HorizScroll 17
+HorizScroll 18
+HorizScroll 19
+HorizScroll 20
+HorizScroll 21
+HorizScroll 22
+HorizScroll 23
+HorizScroll 24
+HorizScroll 25
+HorizScroll 26
+HorizScroll 27
+HorizScroll 28
+HorizScroll 29
+HorizScroll 30
+HorizScroll 31
+HorizScroll 32
+HorizScroll 33
+HorizScroll 34
+HorizScroll 35
+HorizScroll 36
+HorizScroll 37
+HorizScroll 38
+HorizScroll 37
+HorizScroll 36
+HorizScroll 35
+HorizScroll 34
+HorizScroll 33
+HorizScroll 32
+HorizScroll 31
+HorizScroll 30
+HorizScroll 29
+HorizScroll 28
+HorizScroll 27
+HorizScroll 26
+HorizScroll 25
+HorizScroll 24
+HorizScroll 23
+HorizScroll 22
+HorizScroll 21
+HorizScroll 20
+HorizScroll 19
+HorizScroll 18
+HorizScroll 17
+HorizScroll 16
+HorizScroll 15
+HorizScroll 14
+HorizScroll 13
+HorizScroll 12
+HorizScroll 11
+HorizScroll 66
+HorizScroll 65
+HorizScroll 64
+HorizScroll 63
+HorizScroll 62
+HorizScroll 61
+HorizScroll 60
+HorizScroll 59
+HorizScroll 58
+HorizScroll 57
+HorizScroll 56
+HorizScroll 55
+HorizScroll 54
+HorizScroll 53
+HorizScroll 52
+HorizScroll 51
+HorizScroll 50
+HorizScroll 49
+HorizScroll 48
+HorizScroll 47
+HorizScroll 46
+HorizScroll 45
+HorizScroll 43
+HorizScroll 42
+HorizScroll 37
+HorizScroll 36
+HorizScroll 35
+HorizScroll 33
+HorizScroll 32
+HorizScroll 31
+HorizScroll 29
+HorizScroll 28
+HorizScroll 26
+HorizScroll 24
+HorizScroll 23
+HorizScroll 22
+HorizScroll 21
+HorizScroll 20
+HorizScroll 18
+HorizScroll 17
+HorizScroll 15
+HorizScroll 14
+HorizScroll 12
+HorizScroll 11
+HorizScroll 9
+HorizScroll 8
+HorizScroll 7
+HorizScroll 6
+HorizScroll 5
+HorizScroll 3
+HorizScroll 2
+HorizScroll 1
+HorizScroll 0
+VertScroll 43 38 5
+
+Prior
+Prior
+File_Save_Text "test10_68.i3"
+File_Export_Text "test10_68.export.i3"
+STOP
+File_CloseImage_Text "test10_68.i3"
+STOP
+File_Quit

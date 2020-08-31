@@ -1,0 +1,11 @@
+File_Open_Text "test11_66.m3"
+MouseClickChar 7 0
+CharType_Char 'x'
+CharType_Char 'x'
+SemParse
+File_Save_Text "test11_66.m3"
+File_Export_Text "test11_66.export.m3"
+STOP
+File_CloseImage_Text "test11_66.m3"
+STOP
+File_Quit

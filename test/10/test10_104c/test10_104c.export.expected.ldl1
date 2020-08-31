@@ -1,0 +1,9 @@
+LDL M3 VERSION 0 . 0 . 0 . 0
+
+ AsInterface
+   :: Safetyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : [ AsUnsafe ]
+      ; Imports : [ AsImportList ]
+   .
+
+END M3
+

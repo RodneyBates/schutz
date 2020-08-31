@@ -1,0 +1,5 @@
+Non automated test:
+- Open test13_15.m3
+- Type some character inside 'MODULE'
+- Delete the just-typed character
+- Observe correct text attributes. 
