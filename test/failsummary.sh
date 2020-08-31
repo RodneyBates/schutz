@@ -1,4 +1,4 @@
-failed="ScheutzFailedFileNames"
+failed="SchutzFailedFileNames"
 find . -name FAILED > $failed
 if [ -s $failed ]
 then 
