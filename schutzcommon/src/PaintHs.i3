@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -518,7 +518,7 @@ INTERFACE PaintHs
         ; IpVerUpdKind : VerUpdKindTyp := 0 
         ; IpVerState : VerStateTyp := VerStateTyp . VerStateNull 
         ; IpHistoryText : TEXT := NIL  
-        ; IpLineCt : LbeStd . LineNoTyp := 0 
+        ; IpLineCtDisplay : LbeStd . LineNoTyp := 0 
           (* ^This is maintained only approximately during incremental
              reparsing.  It is used only for scrollbar thumb positioning. 
           *)

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -840,7 +840,7 @@ MODULE PaintHs
     ; Ip . IpVerUpdKind := 0 
     ; Ip . IpVerState := VerStateTyp . VerStateNull 
     ; Ip . IpHistoryText := NIL  
-    ; Ip . IpLineCt := 0 
+    ; Ip . IpLineCtDisplay := 0 
     ; Ip . IpLineCtIsExact := FALSE  
     ; Ip . IpLastCommand := NIL 
     ; Ip . IpCrashCommand := NIL 

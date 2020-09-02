@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -33,10 +33,11 @@ MODULE LineNumbers
         fail.  *) 
 
 (* VISIBLE: *) 
-; PROCEDURE LineCt ( ImageRef : PaintHs . ImageTransientTyp ) 
+; PROCEDURE LineCtExport ( ImageRef : PaintHs . ImageTransientTyp ) 
   : LbeStd . LineNoTyp 
   RAISES { AssertionFailure , Thread . Alerted }
-  (* Count of lines as would be written to a text file. *)  
+  (* Count of lines as would be exported to a text file, i.e., with
+     proposed but not accepted syntactic corrections removed. *)  
 
   = PROCEDURE WriteProc 
       ( <* UNUSED *> ImageRef : PaintHs . ImageTransientTyp 
@@ -50,17 +51,17 @@ MODULE LineNumbers
   ; BEGIN (* LineCt *) 
       LCLineCt := 0 
     (* No need to TextEdit.FlushEdit.  It would not affect the line count. 
-       And we dont' even necessarily have that module. *) 
+       And we don't even necessarily have that module. *) 
     ; WriteTrv . WriteText ( ImageRef , WriteProc , DoGenerateText := TRUE )
     ; RETURN LCLineCt 
-    END LineCt  
+    END LineCtExport  
 
 (* VISIBLE: *) 
 ; PROCEDURE LineCtDisplay 
     ( ImageRef : PaintHs . ImageTransientTyp ) : LbeStd . LineNoTyp 
   RAISES { AssertionFailure , Thread . Alerted } 
   (* Count of lines as would appear in a window.  This can differ
-     from LineCt in case of repairs shown in a window but not in a file. 
+     from LineCtExport in case of repairs shown in a window but not in a file. 
   *)  
   (* Compute line count by repeated invocation of LineMarks . GetNextLine *) 
 
@@ -228,7 +229,7 @@ MODULE LineNumbers
       => LNodeNo := LineMark . LmTokMark . EstNodeNo 
       END (* CASE *) 
     ; LineNo 
-        := ( ImageRef . ItPers . IpLineCt * LNodeNo ) 
+        := ( ImageRef . ItPers . IpLineCtDisplay * LNodeNo ) 
            DIV EstUtil . EstNodeCt ( ImageRef . ItPers . IpEstRoot )   
     ; IsExact := LNodeNo = 0 
     END EstimateLineNo 

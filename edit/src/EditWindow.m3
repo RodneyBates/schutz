@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -1351,7 +1351,7 @@ MODULE EditWindow
         IF Window . WrImageRef = NIL 
         THEN LLineCt := MAX ( 0 , Window . EwSouthEastChar . v ) 
         ELSE 
-          LLineCt := Window . WrImageRef . ItPers . IpLineCt  
+          LLineCt := Window . WrImageRef . ItPers . IpLineCtDisplay  
         END (*IF *) 
       (* Set properties of a scroller in the order:
          Min, Max, Thumb, Value.  Min is left at its default of zero. *) 

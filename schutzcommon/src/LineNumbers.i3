@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -18,17 +18,18 @@ INTERFACE LineNumbers
 ; IMPORT LbeStd 
 ; IMPORT Assertions 
 
-; PROCEDURE LineCt ( ImageRef : PaintHs . ImageTransientTyp ) 
+; PROCEDURE LineCtExport ( ImageRef : PaintHs . ImageTransientTyp ) 
   : LbeStd . LineNoTyp 
   RAISES { Assertions . AssertionFailure , Thread . Alerted } 
-  (* Count of lines as would be written to a text file. *)  
+  (* Count of lines as would be exported to a text file, i.e., with
+     proposed but not accepted syntactic corrections removed. *)  
 
 ; PROCEDURE LineCtDisplay 
     ( ImageRef : PaintHs . ImageTransientTyp ) 
   : LbeStd . LineNoTyp 
   RAISES { Assertions . AssertionFailure , Thread . Alerted } 
   (* Count of lines as would appear in a window.  This can differ
-     from LineCt in case of repairs shown in a window but not in a file. 
+     from LineCtExport in case of repairs shown in a window but not in a file. 
   *)  
   (* Compute line count by repeated invocation of LineMarks . GetNextLine *) 
 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -265,7 +265,6 @@ MODULE Files
   ; VAR LPickleIdInfoRef : LbeStd . PickleIdInfoRefTyp 
   ; VAR LResult : PaintHs . ImageTransientTyp 
   ; VAR LImagePers : PaintHs . ImagePersistentTyp 
-  ; VAR LLineCtDisplay : LbeStd . LineNoTyp 
   ; VAR LSuffixInfo : SuffixInfo . T 
   ; VAR LSuffix : TEXT 
   ; VAR LMsg : TEXT 
@@ -318,12 +317,8 @@ MODULE Files
         ; Options . OpeningImageRef := LResult 
         ; LImagePers . IpLang := LSuffixInfo . Lang 
         ; LResult . ItLangIdRef := LangUtil . LangIdRef ( LSuffixInfo . Lang ) 
-        ; LImagePers . IpLineCt := LineNumbers . LineCt ( LResult ) 
-; LLineCtDisplay := LineNumbers . LineCtDisplay ( LResult ) 
-; Assert
-   ( LLineCtDisplay = LImagePers . IpLineCt 
-   , AFT . A_Files_ReadNamedImageFile_InconsistentLineCounts  
-   ) 
+        ; LImagePers . IpLineCtDisplay
+            := LineNumbers . LineCtDisplay ( LResult ) 
         ; LImagePers . IpLineCtIsExact := TRUE 
         ; LImagePers . IpIsParsed 
             := NOT EstHs . EstChildKindContainsSyntMod 
@@ -436,7 +431,7 @@ MODULE Files
           , (* VAR *) LImagePers . IpEstRoot 
           , InsertNilFixedChildren := Options . InsertNilFixedChildren
           )  
-      ; LImagePers . IpLineCt := LineNumbers . LineCt ( LResult )
+      ; LImagePers . IpLineCtDisplay := LineNumbers . LineCtDisplay ( LResult )
       ; LImagePers . IpLineCtIsExact := TRUE 
       ; LImagePers . IpIsParsed := TRUE  
       ; LImagePers . IpIsAnalyzed := FALSE   
@@ -460,7 +455,7 @@ MODULE Files
     VAR LResult : PaintHs . ImageTransientTyp 
   ; VAR LImagePers : PaintHs . ImagePersistentTyp 
   ; VAR LLineCtDisplay : LbeStd . LineNoTyp 
-  ; VAR LLineCt : LbeStd . LineNoTyp 
+  ; VAR LLineCtExport : LbeStd . LineNoTyp 
   ; VAR LScannerIf : ScannerIf . ScanIfTyp 
   ; VAR LWrT : Wr . T 
 
@@ -484,8 +479,8 @@ MODULE Files
         , (* VAR *) LImagePers . IpEstRoot 
         , InsertNilFixedChildren := Options . InsertNilFixedChildren
         ) 
-    ; LLineCt := LineNumbers . LineCt ( LResult ) 
-    ; LImagePers . IpLineCt := LLineCt 
+    ; LLineCtDisplay := LineNumbers . LineCtDisplay ( LResult ) 
+    ; LImagePers . IpLineCtDisplay := LLineCtDisplay 
 
 (* Extra evidence to aid in debugging: *) 
 ; LWrT := FileWr . Open ( "WriteDisplay" ) 
@@ -493,20 +488,15 @@ MODULE Files
 ; Wr . Close ( LWrT ) 
 
     ; Assertions . MessageText 
-        ( Fmt . Int ( LLineCt ) & " Lines from WriteText." ) 
-    ; LLineCtDisplay := LineNumbers . LineCtDisplay ( LResult ) 
+        ( Fmt . Int ( LLineCtDisplay ) & " Lines displayed in window." ) 
+    ; LLineCtExport := LineNumbers . LineCtExport ( LResult ) 
     ; Assertions . MessageText 
-        ( Fmt . Int ( LLineCtDisplay ) & " Lines from GetNextLine." ) 
-    ; IF LLineCtDisplay # LImagePers . IpLineCt 
+        ( Fmt . Int ( LLineCtExport ) & " Lines without syntax corrections." ) 
+    ; IF LLineCtDisplay # LLineCtExport 
       THEN 
-        Assertions . MessageText ( "Inconsistent line counts." ) 
+        Assertions . MessageText
+          ( "Proposed syntax error corrections will change line counts." ) 
       END (* IF *) 
-    ; Assert
-        ( TRUE OR LLineCtDisplay = LImagePers . IpLineCt 
-(* REVIEWME: ^ Why/why not? *)   
-          AND LLineCtDisplay = LLineCt 
-        , AFT . A_Files_OpenTextRdT_InconsistentLineCounts  
-        ) 
     ; LImagePers . IpLineCtIsExact := TRUE 
     ; LImagePers . IpIsParsed := TRUE  
     ; LImagePers . IpIsAnalyzed := FALSE   

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -1356,14 +1356,14 @@ MODULE Display
         Don't come here at all.  Do the adjustment below, instead. *) 
           IF WindowRef . WrVertScroll 
              + NonblankLineCtInWindow 
-             # LImagePers . IpLineCt 
+             # LImagePers . IpLineCtDisplay 
           THEN 
            Assertions . MessageText 
              ( "Supposedly exact line counts disagree" ) 
           END (* IF *) 
-        ELSE (* Adjust IpLineCt *) 
-          LImageLineCt := LImagePers . IpLineCt 
-        ; LImagePers . IpLineCt 
+        ELSE (* Adjust IpLineCtDisplay *) 
+          LImageLineCt := LImagePers . IpLineCtDisplay 
+        ; LImagePers . IpLineCtDisplay 
             := WindowRef . WrVertScroll + NonblankLineCtInWindow  
         ; LImagePers . IpLineCtIsExact := TRUE
         (* Go thru other windows and proportion any estimated
@@ -1379,7 +1379,7 @@ MODULE Display
                             but might overflow. *) 
                      ( FLOAT ( LWindowRef . WrVertScroll ) 
                        / FLOAT ( LImageLineCt - NonblankLineCtInWindow ) 
-                       * FLOAT ( LImagePers . IpLineCt 
+                       * FLOAT ( LImagePers . IpLineCtDisplay 
                                  - NonblankLineCtInWindow 
                                )  
                      ) 
@@ -1390,13 +1390,13 @@ MODULE Display
           ; LWindowRef := LWindowRef . WrImageLink 
           END (* WHILE *) 
         END (* IF *) 
-      ELSE (* WrVertScroll is only estimated.  Even if IpLineCt is
+      ELSE (* WrVertScroll is only estimated.  Even if IpLineCtDisplay is
               also only estimated, update WrVertScroll to match it,
-              because adjusting IpLineCt would require adjustments
+              because adjusting IpLineCtDisplay would require adjustments
               to WrVertScroll of other windows. *) 
         WindowRef . WrVertScroll 
           := MAX ( 0 
-                 , LImagePers . IpLineCt 
+                 , LImagePers . IpLineCtDisplay 
                    - NonblankLineCtInWindow  
                  ) 
       ; WindowRef . WrVertScrollIsExact
@@ -3863,9 +3863,9 @@ MODULE Display
         ; TempMark . DisconnectMarksFromLinesRefs ( ImageRef ) 
         ; ReconstructLinesAndPaint ( ImageRef ) 
         (* By here, we should be past assertion failures.  Make changes. *)
-        ; LImagePers. IpLineCt 
+        ; LImagePers. IpLineCtDisplay 
             := MAX ( 0 
-                   , LImagePers . IpLineCt + LParseInfo . PiLineCtIncr 
+                   , LImagePers . IpLineCtDisplay + LParseInfo . PiLineCtIncr 
                    )   
         ; LImagePers . IpLineCtIsExact := FALSE 
         ; NoteImageSavedState ( ImageRef , FALSE ) 
