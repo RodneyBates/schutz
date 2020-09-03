@@ -1,4 +1,5 @@
 File_Open_Text "test12_131.m3"
+STOP
 SemParse
 MouseClickChar 54 3
 Next

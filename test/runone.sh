@@ -16,7 +16,7 @@ else
   if test -f bases ; then BASES=`cat bases`; else BASES="`basename $ABSPATH`"; fi 
   if test -f suffixes ; then SUFFIXES=`cat suffixes`; else SUFFIXES="i3 m3 ig mg ldl0 ldl1"; fi 
   esall=0
-  rm -f SUCCEEDED FAILED 
+  rm -f SUCCEEDED FAILED NOTRUN 
   for BASE in $BASES
   do
     CMD="$LBE -P $BASE.play -i -t 0"

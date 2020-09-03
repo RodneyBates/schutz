@@ -11,7 +11,7 @@
 ./runone.sh test14_180
 ./runone.sh test14_195
 ./runone.sh test14_203
-# ./runone.sh test14_208
+../dontrun.sh test14_208
 ./runone.sh test14_209
 ./runone.sh test14_230
 ./runone.sh test14_231

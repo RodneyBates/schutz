@@ -3,7 +3,7 @@
 ./runone.sh testacc_64
 ./runone.sh testacc_124a
 
-#./runone.sh testacc_134
+../dontrun.sh testacc_134
 
 ./runone.sh testacc_90
 

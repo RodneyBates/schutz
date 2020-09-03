@@ -1,16 +1,16 @@
 ./runone.sh test12_11
 ./runone.sh test12_15
 ./runone.sh test12_17
-#./runone.sh test12_20  # No .play file. 
+../dontrun.sh test12_20  # No .play file. 
 ./runone.sh test12_28
-#./runone.sh test12_30  # No .play file. 
+../dontrun.sh test12_30  # No .play file. 
 ./runone.sh test12_40
-#./runone.sh test12_53  # No .play file. 
+../dontrun.sh test12_53  # No .play file. 
 ./runone.sh test12_65
 ./runone.sh test12_87
 ./runone.sh test12_90
 ./runone.sh test12_105
-#./runone.sh test12_127 #looping. 
+../dontrun.sh test12_127 #looping. 
 ./runone.sh test12_129
 ./runone.sh test12_131
 ./runone.sh test12_136

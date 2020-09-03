@@ -1,4 +1,4 @@
-(cd accident; ./runall.sh) 
+(cd acc; ./runall.sh) 
 (cd 10; ./runall.sh) 
 (cd 11; ./runall.sh) 
 (cd 12; ./runall.sh) 
