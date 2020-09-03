@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -68,7 +68,8 @@ INTERFACE EstUtil
 ; PROCEDURE EstMiscInfo 
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : EstHs . EstMiscInfoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { AssertionFailure }
+(* MAYBE: Make this result a VAR parameter? *)
 
 ; PROCEDURE EstEdgeKind  
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 

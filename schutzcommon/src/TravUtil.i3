@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -316,11 +316,12 @@ INTERFACE TravUtil
     ) 
   : LangUtil . FmtKindTyp 
   RAISES { AssertionFailure } 
-  (* Use when descending toward a line mark. *)
+  (* Use when descending into an Est, toward a line mark. *)
 
 ; PROCEDURE FmtKindForEstTraversing 
     ( Lang : LbeStd . LangTyp 
     ; CharPos : LbeStd . LimitedCharNoSignedTyp 
+      (* ^Can be unknown, and this could propagate to result. *)  
     ; ModTextIsToLeftOnLine : BOOLEAN 
       (* ^Irrelevant if CharPos = LbeStd . LimitedCharNoUnknown. *) 
     ; PrevTok : LbeStd . TokTyp 
@@ -336,8 +337,10 @@ INTERFACE TravUtil
 
 ; PROCEDURE FmtKindForFsSubtreeDescending   
     ( Lang : LbeStd . LangTyp 
-    ; ParentFsNodeRef : LangUtil . FsNodeRefTyp 
+    ; RootFsNodeRef : LangUtil . FsNodeRefTyp 
+      (* PRE: RootFsNodeRef.FsKind IN TravUtil.FsKindSetFsRoot. *)
     ; SubtreeFsNodeRef : LangUtil . FsNodeRefTyp 
+      (* PRE: SubtreeFsNodeRef.FsKind IN TravUtil.FsKindSetSubtree. *)
     ; ParentFmtKind : LangUtil . FmtKindTyp 
     ; IndentPosIfVert : LbeStd . LimitedCharNoTyp 
       (* ^Within the parent Est, assuming it is vertical. *) 
@@ -349,7 +352,7 @@ INTERFACE TravUtil
     ) 
   : LangUtil . FmtKindTyp 
   RAISES { AssertionFailure } 
-  (* Use when descending toward a line mark. *)
+  (* Use when descending into an FsSubtree, preferably toward a line mark. *)
 
 ; PROCEDURE FmtKindForFsSubtreeTraversing  
     ( Lang : LbeStd . LangTyp 
@@ -357,7 +360,9 @@ INTERFACE TravUtil
     ; ModTextIsToLeftOnLine : BOOLEAN 
     ; PrevTok : LbeStd . TokTyp 
     ; RootFsNodeRef : LangUtil . FsNodeRefTyp 
+      (* PRE: RootFsNodeRef.FsKind IN TravUtil.FsKindSetFsRoot. *)
     ; SubtreeFsNodeRef : LangUtil . FsNodeRefTyp 
+      (* PRE: SubtreeFsNodeRef.FsKind IN TravUtil.FsKindSetSubtree. *)
     ; ParentFmtKind : LangUtil . FmtKindTyp 
     ; CurrentLineIndentPos : LbeStd . LimitedCharNoTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
@@ -366,7 +371,9 @@ INTERFACE TravUtil
     ) 
   : LangUtil . FmtKindTyp 
   RAISES { AssertionFailure } 
-  (* Use when info about the current line is known. *) 
+  (* Use when traversing into the Fs subtree from one end or the other,
+     when info about the current line is known. *) 
+(* CHECK: Works Bwd?  Do we need it to? *) 
 
 ; PROCEDURE PassEstListChild 
     ( VAR (* IN OUT *) EstListChildrenToPass : LbeStd . EstChildNoTyp ) 

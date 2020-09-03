@@ -1,7 +1,6 @@
-
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -3277,7 +3276,7 @@ MODULE TravUtil
     ) 
   : LangUtil . FmtKindTyp 
   RAISES { AssertionFailure } 
-  (* Use when descending toward a line mark. *)
+  (* Use when descending into an Est, toward a line mark. *)
 
   = VAR LResultIfNotHoriz : LangUtil . FmtKindTyp 
 
@@ -3332,9 +3331,9 @@ MODULE TravUtil
           ELSIF TEstRef . KTreeWidthInfo . WiHasNlBefore 
           THEN (* Est begins on an unconditional Nl.  CharPos is unneeded. *)
             IF TEstRef . KTreeWidthInfo . WiHasAbsFromPos 
-            THEN (* WiHasNlBefore precludes triggering, and WiWidth, previously
-                    found to be <= RightMargin, is the absolute ending
-                    position. *)
+            THEN (* WiHasNlBefore precludes its being triggered, and WiWidth,
+                    previously found to be <= RightMargin, is the absolute
+                    ending position. *)
               RETURN LangUtil . FmtKindTyp . FmtKindHoriz  
             ELSE (* WiHasNlBefore AND NOT WiHasAbsFromPos.  This can happen when
                     the Est starts with a BolRelativeCmnt.  WidthInfo could 
@@ -3351,7 +3350,7 @@ MODULE TravUtil
               END (* IF *) 
             END (* IF *) 
           ELSIF StartMarkIsKnownNl 
-          THEN 
+          THEN (* From above, no Nl before. *)
             IF StartMark . Kind IN Marks . MarkKindSetFmtNo 
             THEN (* Descending towards a line break, which implies it is taken,
                     and all containing Est & Fs Subtrees are non-horizontal. *)
@@ -3381,7 +3380,7 @@ TRUE OR
 ; PROCEDURE FmtKindForEstTraversing 
     ( Lang : LbeStd . LangTyp 
     ; CharPos : LbeStd . LimitedCharNoSignedTyp 
-      (* Can be unknown, and this could propagate to result. *)  
+      (* ^Can be unknown, and this could propagate to result. *)  
     ; ModTextIsToLeftOnLine : BOOLEAN 
       (* ^Irrelevant if CharPos = LbeStd . LimitedCharNoUnknown. *) 
     ; PrevTok : LbeStd . TokTyp 
@@ -3405,8 +3404,8 @@ TRUE OR
       ELSE 
         TYPECASE EstRef 
         OF ModHs . ModRefTyp (* Including NIL *)  
-        , SharedStrings . T 
-        => (* These can't contain line breaks, so the result should be dead. *) 
+           , SharedStrings . T 
+        => (* These can't contain line breaks, so the result will be dead. *) 
            RETURN LangUtil . FmtKindTyp . FmtKindHoriz 
 
         | EstHs . EstRefTyp ( TEstRef )  
@@ -3416,7 +3415,7 @@ TRUE OR
           (* FsKindInsTok and FsKindAstString could occur as the root of the Fs 
              tree for a ModTok, if we make these trees have no 
              FsKindEstFixed node on top.  Since such trees cannot 
-             contain line breaks, the FmtKind should be dead here. *) 
+             contain line breaks, the FmtKind will be dead here. *) 
            => RETURN LangUtil . FmtKindTyp . FmtKindHoriz 
 
            | FsKindTyp . FsKindEstListVert 
@@ -3448,16 +3447,17 @@ TRUE OR
 
           (* Hereafter, we have ruled out a properly interior Nl. *) 
           ELSIF TEstRef . KTreeWidthInfo . WiHasNlBefore 
-          THEN (* The Est begins with a new line, so CharPos is unneeded. *) 
+          THEN (* The Est begins with an unconditional new line, so CharPos
+                  is unneeded. *) 
             IF TEstRef . KTreeWidthInfo . WiHasAbsFromPos 
-            THEN (* WiHasNlBefore precludes triggering, so WiWidth is the 
-                    absolute ending position, and we previously found that 
-                    that fits. *) 
+            THEN (* WiHasNlBefore precludes its being triggered, so WiWidth
+                    is the absolute ending position, and we previously found
+                    that that fits. *) 
               RETURN LangUtil . FmtKindTyp . FmtKindHoriz 
             ELSE (* WiHasNlBefore AND NOT WiHasAbsFromPos.  This can happen when
                     the Est starts with a BolRelativeCmnt.  WidthInfo could 
-                    still have a NlTrigger,  if something with an absolute from 
-                    position follows it. *) 
+                    still have a NlTrigger, if something with an absolute
+                    from-position follows the comment. *)
               IF FirstLineIndentPos = LbeStd . LimitedCharNoUnknown 
               THEN (* This should no longer be possible. *) 
                 RETURN LangUtil . FmtKindTyp . FmtKindUnknown 
@@ -3477,7 +3477,7 @@ TRUE OR
                (* ^ In this case, things could have shifted left or right when
                     the ModText was inserted, and CharPos no longer can be
                     relied on to duplicate whether the Est did fit before it was
-                    inserted.  But all the line breaks on the rest of the line
+                    inserted.  But all the line breaks left of the ModText
                     will have been deleted, so we can treat it as not fitting.
                     If TEstRef does contain any undeleted line breaks, this 
                     assumption will be justified.  If not, the FmtKind will
@@ -3516,7 +3516,8 @@ TRUE OR
 (* VISIBLE: *) 
 ; PROCEDURE FmtKindForFsSubtreeDescending   
     ( Lang : LbeStd . LangTyp 
-    ; ParentFsNodeRef : LangUtil . FsNodeRefTyp 
+    ; RootFsNodeRef : LangUtil . FsNodeRefTyp
+      (* PRE: RootFsNodeRef.FsKind IN TravUtil.FsKindSetFsRoot. *)
     ; SubtreeFsNodeRef : LangUtil . FsNodeRefTyp 
       (* PRE: Must be an FS subtree kind. *) 
     ; ParentFmtKind : LangUtil . FmtKindTyp 
@@ -3530,10 +3531,10 @@ TRUE OR
     ) 
   : LangUtil . FmtKindTyp 
   RAISES { AssertionFailure } 
-  (* Use when descending into an Est, preferably toward a line mark. *)
+  (* Use when descending into an FsSubtree, preferably toward a line mark. *)
 
   = VAR LResultIfNotHoriz : LangUtil . FmtKindTyp 
-  ; VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
+  ; VAR LEstChildMiscInfo : EstHs . EstMiscInfoTyp 
   ; VAR LLastFmtNoOnLine : EstHs . FmtNoTyp 
   ; VAR LEstListChildrenToPass : LbeStd . EstChildNoTyp 
 
@@ -3559,36 +3560,38 @@ TRUE OR
       ; IF StartMarkIsKnownNl 
         THEN 
           IF StartMark . Kind IN Marks . MarkKindSetFmtNo 
-          THEN (* Descending towards a line break, which implies it is taken,
-                  and all containing Est & Fs Subtrees are non-horizontal. *)
+          THEN (* Descending towards an undeleted line break, which implies it
+          is taken, and all containing Est & Fs Subtrees are non-horizontal. *)
             RETURN LResultIfNotHoriz 
           ELSE (* We are descending towards a Nl of a Mod, somewhere in the 
-                  current Est child subtree. *) 
-            LEstMiscInfo 
+                  current Est child subtree. *)
+(* CHEDK: Could it be a zero-width mod? *)
+            LEstChildMiscInfo 
               := EstUtil . EstMiscInfo 
                    ( Lang , EstTravInfo . EtiChildLeafElem . LeChildRef ) 
-          ; IF LEstMiscInfo . EmiWidthInfo . WiWidth > Options . RightMargin 
+          ; IF LEstChildMiscInfo . EmiWidthInfo . WiWidth > Options . RightMargin 
             THEN (* This case includes infinite width, which in turn includes 
                     containment of any properly interior Nl in the 
                     descended-into Est child.  If WiWidth is relative, this is 
                     conservatively correct in assuming CharPos = 0. *) 
               RETURN LResultIfNotHoriz 
-            ELSE (* The descended-to Est _child_ will fit on a line, starting at
-                    zero.  This implies all Nls within are at one end or 
+            ELSE (* The descended-to Est *child* would fit on a line, starting
+                    at zero.  This implies all Nls within are at one end or 
                     the other. *)  
-              IF LEstMiscInfo . EmiWidthInfo . WiHasNlBefore
+              IF LEstChildMiscInfo . EmiWidthInfo . WiHasNlBefore
               THEN 
-                IF LEstMiscInfo . EmiWidthInfo . WiHasNlAfter 
+                IF LEstChildMiscInfo . EmiWidthInfo . WiHasNlAfter 
                 THEN (* WiHasNlBefore AND WiHasNlAfter. *)  
-                  IF LEstMiscInfo . EmiWidthInfo . WiWidth = 0 
+                  IF LEstChildMiscInfo . EmiWidthInfo . WiWidth = 0 
                   THEN (* Est child contains only whole-line mods: 
-                          [Nl, zero-width, Nl] *) 
+                          [Nl, whole-line-mod*, Nl] *) 
                     IF NonzeroWidthItemIsToLeft 
                          ( Lang , SubtreeFsNodeRef , EstTravInfo )
+                       (* i.e., left of the Est child. *) 
                     THEN (* FsSubtree: Stuff, [Nl, zero-width, Nl], ? *) 
                       RETURN LResultIfNotHoriz
                       (* ^Correct if NonzeroWidthItemIsToRight, else dead. *) 
-                    ELSE (* FsSubtree: empty, [Nl, whole-line-mods, Nl], ?  
+                    ELSE (* FsSubtree: empty, [Nl, whole-line-mod*, Nl], ?  
                             Must & can pretraverse, starting at left of the 
                             descended-into Est child, which is at the left of 
                             the FsSubtree. *)
@@ -3601,7 +3604,7 @@ TRUE OR
                       PreTraverseLine 
                         ( Lang 
                         , ModTextIsToLeftOnLine := FALSE 
-                        , RootFsNodeRef := ParentFsNodeRef 
+                        , RootFsNodeRef := RootFsNodeRef 
                         , EstTravInfo := EstTravInfo 
                         , StartFmtNo := EstTravInfo . EtiChildFmtNo 
                         , CharPos := 0 
@@ -3631,15 +3634,17 @@ TRUE OR
                                     or stuff, [Nl, stuff, Nl], empty 
                                     or stuff, [Nl, stuff, Nl], stuff *) 
                       RETURN LResultIfNotHoriz 
-                    ELSE (* FsSubtree: empty Nl, stuff, Nl] empty.
+                    ELSE (* FsSubtree: empty, [ Nl, stuff, Nl], empty.
                             Only the interior of the Est child matters. *) 
-                      IF LEstMiscInfo . EmiWidthInfo . WiNlTrigger 
+                      IF LEstChildMiscInfo . EmiWidthInfo . WiNlTrigger 
                          # LbeStd . LimitedCharNoInfinity
                          (* Absolute width, following a Nl.  We already 
                             verified that this fits. *) 
                          OR EstUtil . CharPosPlusWidthInfo 
-                              ( IndentPosIfVert , LEstMiscInfo . EmiWidthInfo ) 
-                             <= Options . RightMargin
+                              ( IndentPosIfVert
+                              , LEstChildMiscInfo . EmiWidthInfo
+                              ) 
+                            <= Options . RightMargin
                             (* Relative width fits after IndentPosIfVert. *)   
                       THEN RETURN LangUtil . FmtKindTyp . FmtKindHoriz 
                       ELSE RETURN LResultIfNotHoriz 
@@ -3648,7 +3653,7 @@ TRUE OR
                   END (* IF *) 
 
                 ELSE (* WiHasNlBefore AND NOT WiHasNlAfter. *) 
-                  IF LEstMiscInfo . EmiWidthInfo . WiWidth = 0 
+                  IF LEstChildMiscInfo . EmiWidthInfo . WiWidth = 0 
                   THEN (* Descended-into Est child: [Nl, empty]. *) 
                     IF NonzeroWidthItemIsToLeft 
                          ( Lang , SubtreeFsNodeRef , EstTravInfo )
@@ -3663,7 +3668,7 @@ TRUE OR
                       PreTraverseLine 
                         ( Lang 
                         , ModTextIsToLeftOnLine := FALSE 
-                        , RootFsNodeRef := ParentFsNodeRef 
+                        , RootFsNodeRef := RootFsNodeRef 
                         , EstTravInfo := EstTravInfo 
                         , StartFmtNo := SubtreeFsNodeRef . FsLeftFmtNo 
                         , CharPos := 0 
@@ -3692,12 +3697,14 @@ TRUE OR
                     ELSE (* Fs subtree: empty, [Nl, stuff], ? 
                             Only the interior of the descended-into Est child 
                             matters. *) 
-                      IF LEstMiscInfo . EmiWidthInfo . WiNlTrigger 
+                      IF LEstChildMiscInfo . EmiWidthInfo . WiNlTrigger 
                          # LbeStd . LimitedCharNoInfinity
                          (* Absolute width, following a Nl.  We already 
                             verified that this fits. *) 
                          OR EstUtil . CharPosPlusWidthInfo 
-                              ( IndentPosIfVert , LEstMiscInfo . EmiWidthInfo ) 
+                              ( IndentPosIfVert , LEstChildMiscInfo
+                              . EmiWidthInfo
+                              ) 
                              <= Options . RightMargin
                             (* Relative width fits after IndentPosIfVert. *)   
                       THEN RETURN LangUtil . FmtKindTyp . FmtKindHoriz 
@@ -3716,7 +3723,7 @@ TRUE OR
               END (* IF *) 
             END (* IF *) 
           END (* IF *) 
-        ELSE (* Not descending towards a new line. *) 
+        ELSE (* Not descending towards a new line.  Shouldn't happen. *) 
           RETURN LangUtil . FmtKindTyp . FmtKindUnknown  
         END (* IF *) 
       END (* IF *) 
@@ -3729,8 +3736,9 @@ TRUE OR
     ; ModTextIsToLeftOnLine : BOOLEAN 
     ; PrevTok : LbeStd . TokTyp 
     ; RootFsNodeRef : LangUtil . FsNodeRefTyp 
+      (* PRE: RootFsNodeRef.FsKind IN TravUtil.FsKindSetFsRoot. *)
     ; SubtreeFsNodeRef : LangUtil . FsNodeRefTyp 
-      (* PRE: Must be an FS subtree kind. *) 
+      (* PRE: SubtreeFsNodeRef.FsKind IN TravUtil.FsKindSetSubtree. *)
     ; ParentFmtKind : LangUtil . FmtKindTyp 
     ; CurrentLineIndentPos : LbeStd . LimitedCharNoTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
@@ -3739,22 +3747,17 @@ TRUE OR
     ) 
   : LangUtil . FmtKindTyp 
   RAISES { AssertionFailure } 
-  (* Use when traversing into the Fs subtree from one end or the other. *) 
+  (* Use when traversing into the Fs subtree from one end or the other,
+     when info about the current line is known. *) 
 (* CHECK: Works Bwd?  Do we need it to? *) 
 
   = VAR LResultIfNotHoriz : LangUtil . FmtKindTyp 
 
   ; BEGIN (* FmtKindForFsSubtreeTraversing *) 
-      CASE ParentFmtKind 
-      OF LangUtil . FmtKindTyp . FmtKindUnknown 
-      => RETURN LangUtil . FmtKindTyp . FmtKindUnknown 
-
-      | LangUtil . FmtKindTyp . FmtKindHoriz 
-      => RETURN LangUtil . FmtKindTyp . FmtKindHoriz  
-
-      | LangUtil . FmtKindTyp . FmtKindVert 
-      , LangUtil . FmtKindTyp . FmtKindFill 
-      => CASE SubtreeFsNodeRef . FsKind <* NOWARN *> 
+      IF ParentFmtKind = LangUtil . FmtKindTyp . FmtKindHoriz 
+      THEN RETURN LangUtil . FmtKindTyp . FmtKindHoriz  
+      ELSE
+        CASE SubtreeFsNodeRef . FsKind <* NOWARN *> 
         OF FsKindTyp . FsKindSubtreeVert 
           (* If one of these has no line breaks at all (there are none in the
              Fs rule), or all are deleted, we will let code below give it
@@ -3793,7 +3796,7 @@ TRUE OR
         THEN RETURN LangUtil . FmtKindTyp . FmtKindHoriz  
         ELSE RETURN LResultIfNotHoriz 
         END (* IF *) 
-      END (* CASE *) 
+      END (* if *) 
     END FmtKindForFsSubtreeTraversing
 
 (* VISIBLE: *) 
