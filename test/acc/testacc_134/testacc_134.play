@@ -1,7 +1,9 @@
-File_Open_Text "test11_134.m3"
+File_Open_Text "testacc_134.m3"
+STOP
 CursorRight
 CharDelBwd
 CharType_Char 'M'
+STOP
 SemParse
 CursorRight
 CursorRight
@@ -13,12 +15,14 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char 'e'
+STOP
 SemParse
 CursorRight
 CursorRight
 CharDelBwd
 CharDelBwd
 CharDelBwd
+STOP
 SemParse
 CursorDown
 CursorLeft
@@ -27,6 +31,7 @@ CursorLeft
 CursorLeft
 CharDelBwd
 CharType_Char 'P'
+STOP
 SemParse
 CursorDown
 CursorLeft
@@ -34,11 +39,13 @@ CursorLeft
 CursorLeft
 CharDelBwd
 CharType_Char ';'
+STOP
 SemParse
 CursorRight
 CursorRight
 CharDelBwd
 CharType_Char 'I'
+STOP
 SemParse
 CursorRight
 CursorRight
@@ -49,12 +56,14 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char 'a'
+STOP
 SemParse
 CursorRight
 CursorRight
 CursorRight
 CharDelBwd
 CharDelBwd
+STOP
 SemParse
 MouseClickChar 15 2
 CharDelBwd
@@ -65,6 +74,7 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char 'b'
+STOP
 SemParse
 CursorRight
 CursorRight
@@ -73,10 +83,12 @@ CursorRight
 CursorRight
 CursorRight
 CharDelBwd
+STOP
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char ','
+STOP
 SemParse
 CursorRight
 CharDelBwd
@@ -363,9 +375,8 @@ CharDelBwd
 CharType_Char '.'
 STOP
 SemParse
-File_Save_Text "test11_134.m3"
-File_Export_Text "test11_134.export.m3"
+File_Export_Text "testacc_134.export.m3"
 STOP
-File_CloseImage_Text "test11_134.m3"
+File_CloseImage_Text "testacc_134.m3"
 STOP
 File_Quit
