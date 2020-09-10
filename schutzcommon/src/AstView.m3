@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -21,7 +21,7 @@ MODULE AstView
    point to the single list child.  NodeNo will reflect the convention that
    a singleton-optimized list has a node number, even though it is not present
    in the Est. Clients will have to figure out for themselves what the Ast
-   token is for this list.  It depends on both the langauge and Fs predicates
+   token is for this list.  It depends on both the language and Fs predicates
    surrounding the FsEstChild that the list is a child of.  
 
    Fetching the child of this AstRefTyp value will return another value
@@ -474,7 +474,7 @@ MODULE AstView
   RAISES { Assertions . AssertionFailure } 
   (* Count of Ast children of Parent, but not more than Max.  This is 
      O(ChildCt), and the Max limitation merely allows a caller to make it
-     faster, if it is not interested whether the cound exceeds Max.
+     faster, if it is not interested whether the count exceeds Max.
   *) 
 
   = VAR LChildRef : AstRefTyp 
