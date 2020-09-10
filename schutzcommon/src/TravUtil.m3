@@ -3773,21 +3773,21 @@ TRUE OR
         END (* CASE *) 
 
       ; IF LastFmtNoOnLine = EstHs . FmtNoUnknown 
-         THEN 
-           PreTraverseLine
-             ( Lang 
-             , ModTextIsToLeftOnLine 
-             , EstTravInfo 
-             , RootFsNodeRef 
-             , EstTravInfo . EtiChildFmtNo 
-             , CharPos 
-             , CurrentLineIndentPos
-             , PrevTok 
+        THEN 
+          PreTraverseLine
+            ( Lang 
+            , ModTextIsToLeftOnLine 
+            , EstTravInfo 
+            , RootFsNodeRef 
+            , EstTravInfo . EtiChildFmtNo 
+            , CharPos 
+            , CurrentLineIndentPos
+            , PrevTok 
 
-             , (* VAR *) LastFmtNoOnLine 
-             , (* VAR *) EstListChildrenToPass 
-             )
-         END (* IF *)    
+            , (* VAR *) LastFmtNoOnLine 
+            , (* VAR *) EstListChildrenToPass 
+            )
+        END (* IF *)    
       ; IF PreTraversedFsSubtreeFits 
              ( SubtreeFsNodeRef 
              , LastFmtNoOnLine 
