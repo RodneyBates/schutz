@@ -9,22 +9,22 @@ Unique shared strings: 1046
 Parsing -------------------------------------------------
 0/0 Singleton lists optimized.
 Parse complete, no errors -------------------------------
-5 Lines from WriteText.
-5 Lines from GetNextLine.
+5 Lines displayed in window.
+5 Lines without syntax corrections.
 4 TextAttr arrays, 7 TextAttr elements, 1.75 times.
 --------------- Using handwritten grammar ---------------
 Parsing -------------------------------------------------
 0/0 Singleton lists optimized.
 Parse complete, no errors -------------------------------
-5 Lines from WriteText.
-5 Lines from GetNextLine.
+5 Lines displayed in window.
+5 Lines without syntax corrections.
 4 TextAttr arrays, 7 TextAttr elements, 1.75 times.
 --------------- Using handwritten grammar ---------------
 Parsing -------------------------------------------------
 0/0 Singleton lists optimized.
 Parse complete, no errors -------------------------------
-5 Lines from WriteText.
-5 Lines from GetNextLine.
+5 Lines displayed in window.
+5 Lines without syntax corrections.
 4 TextAttr arrays, 7 TextAttr elements, 1.75 times.
 Parsing -------------------------------------------------
 --------------- Using handwritten grammar ---------------

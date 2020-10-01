@@ -3,7 +3,7 @@ STOP
 CursorRight
 CharDelBwd
 CharType_Char 'M'
-STOP
+
 SemParse
 CursorRight
 CursorRight
@@ -15,14 +15,14 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char 'e'
-STOP
+
 SemParse
 CursorRight
 CursorRight
 CharDelBwd
 CharDelBwd
 CharDelBwd
-STOP
+
 SemParse
 CursorDown
 CursorLeft
@@ -31,7 +31,7 @@ CursorLeft
 CursorLeft
 CharDelBwd
 CharType_Char 'P'
-STOP
+
 SemParse
 CursorDown
 CursorLeft
@@ -39,13 +39,13 @@ CursorLeft
 CursorLeft
 CharDelBwd
 CharType_Char ';'
-STOP
+
 SemParse
 CursorRight
 CursorRight
 CharDelBwd
 CharType_Char 'I'
-STOP
+
 SemParse
 CursorRight
 CursorRight
@@ -63,7 +63,7 @@ CursorRight
 CursorRight
 CharDelBwd
 CharDelBwd
-STOP
+
 SemParse
 MouseClickChar 15 2
 CharDelBwd
@@ -74,7 +74,7 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char 'b'
-STOP
+
 SemParse
 CursorRight
 CursorRight
@@ -83,12 +83,12 @@ CursorRight
 CursorRight
 CursorRight
 CharDelBwd
-STOP
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char ','
-STOP
+
 SemParse
 CursorRight
 CharDelBwd
@@ -97,7 +97,7 @@ MouseClickChar 34 2
 MouseClickChar 33 1
 CharDelBwd
 CharType_Char 'c'
-STOP
+
 SemParse
 CursorDown
 CursorLeft
@@ -134,11 +134,11 @@ CursorLeft
 CursorLeft
 CharDelBwd
 CharType_Char ';'
-STOP
+
 SemParse
 CursorRight
 CharDelBwd
-STOP
+
 SemParse
 CursorRight
 CharDelBwd

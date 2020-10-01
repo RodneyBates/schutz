@@ -9,10 +9,9 @@ Unique shared strings: 1046
 Parsing -------------------------------------------------
 0/31 Singleton lists optimized.
 Parse complete, with errors -----------------------------
-7 Lines from WriteText.
-8 Lines from GetNextLine.
-Inconsistent line counts.
-Supposedly exact line counts disagree
+8 Lines displayed in window.
+7 Lines without syntax corrections.
+Proposed syntax error corrections will change line counts.
 8 TextAttr arrays, 31 TextAttr elements, 3.88 times.
 Parsing -------------------------------------------------
 --------------- Using handwritten grammar ---------------
@@ -25,10 +24,9 @@ Parse complete, no errors -------------------------------
 Parsing -------------------------------------------------
 0/31 Singleton lists optimized.
 Parse complete, with errors -----------------------------
-7 Lines from WriteText.
-8 Lines from GetNextLine.
-Inconsistent line counts.
-Supposedly exact line counts disagree
+8 Lines displayed in window.
+7 Lines without syntax corrections.
+Proposed syntax error corrections will change line counts.
 8 TextAttr arrays, 31 TextAttr elements, 3.88 times.
 Parsing -------------------------------------------------
 --------------- Using handwritten grammar ---------------
