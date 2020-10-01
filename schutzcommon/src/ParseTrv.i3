@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -12,8 +12,8 @@ INTERFACE ParseTrv
    It feeds the Parser with a stream of tokens with attached Est fragments 
    as semantics data.  Some of the tokens are nonterminals, with whole Est 
    subtrees attached.  It invokes scanning incrementally, as needed.  It 
-   also reads characters from a file for batch parsing, presenting the same
-   interface to the Parser as for reparsing an Est.   
+   also can read characters from a file for batch parsing, presenting the
+   same interfaces to the Parser and scanner as for reparsing an Est.   
 *) 
 
 ; IMPORT Assertions 

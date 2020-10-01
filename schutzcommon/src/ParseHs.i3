@@ -55,7 +55,16 @@ INTERFACE ParseHs
 
 ; CONST TempMarkRangeNull 
     = TempMarkRangeTyp 
-        { From := LbeStd . MarkNoNull , To := LbeStd . MarkNoNull } 
+        { From := LbeStd . MarkNoNull , To := LbeStd . MarkNoNull }
+
+; CONST TempMarkRangeEmpty 
+    = TempMarkRangeTyp 
+        { From := FIRST ( LbeStd . MarkNoTyp )
+        , To := FIRST ( LbeStd . MarkNoTyp )
+        }
+
+; PROCEDURE RangeIsEmpty ( Range : TempMarkRangeTyp ) : BOOLEAN
+  (* It can be empty either by From = MarkNoNull, or by To <= FROM *)  
 
 ; PROCEDURE TempMarkRangeImage ( Range : TempMarkRangeTyp ) : TEXT 
 
@@ -64,7 +73,7 @@ INTERFACE ParseHs
 ; TYPE TokInfoTyp 
     = RECORD 
         TiSliceListRMRoot : SliceListElemRefTyp := NIL
-        (* This is only to simplify debugging.  It duplcates TiInfo
+        (* This is only to simplify debugging.  It duplicates TiInfo
            whenever ISTYPE(TiInfo,SliceListElemRefTyp), otherwise NIL.
         *)  
       ; TiInfo : REFANY := NIL 
@@ -125,7 +134,8 @@ INTERFACE ParseHs
          that uses them.  Also, rename as PtsStateKindTyp. 
 *) 
 ; TYPE ParseTravStateKindTyp 
-    = { PtsKindBlanksThenLeadingMods 
+    = { PtsKindNull
+      , PtsKindBlanksThenLeadingMods 
       , PtsKindBlanksThenLexErrChars 
       , PtsKindBlanksThenAstString 
       , PtsKindBlanksThenModCmnt 
@@ -213,7 +223,7 @@ INTERFACE ParseHs
         ; PtseRescanToPos : LbeStd . LimitedCharNoTyp 
           (* ^When rescanning a string or blanks, its position on line. *) 
         ; PtseLastFmtNoOnLine : EstHs . FmtNoTyp := EstHs . FmtNoNull 
-        ; PtseStateKind : ParseTravStateKindTyp 
+        ; PtseStateKind : ParseTravStateKindTyp
         ; PtseModTextIsToLeftOnLine : BOOLEAN 
         END (* OBJECT  ParseTravStateGenerarRefTyp *) 
 
@@ -339,12 +349,16 @@ INTERFACE ParseHs
     = RECORD 
         ObjRef : LbeStd . EstRootTyp := NIL 
       ; KindSet : EstHs . EstChildKindSetTyp := EstHs . EstChildKindSetEmpty  
-      ; FullTempMarkRange : TempMarkRangeTyp := TempMarkRangeNull 
-      ; PatchTempMarkRange : TempMarkRangeTyp := TempMarkRangeNull 
+      ; FullTempMarkRange : TempMarkRangeTyp := TempMarkRangeNull
+        (* ^Only temp marks within the deferred item.  Plain and BlankLine
+            patching will have already been done on them. *)
+      ; PatchTempMarkRange : TempMarkRangeTyp := TempMarkRangeNull
+        (* ^Only temp marks that need *FmtNo patching, which must be left
+            to the parser. *)
       ; Tok : LbeStd . TokTyp := LbeStd . Tok__Null 
       ; SyntTokCt : LbeStd . LimitedTokCtTyp := 0 
       ; IsInsertionRepair : BOOLEAN := FALSE 
-      ; IsInterior : BOOLEAN := FALSE 
+      ; IsInterior : BOOLEAN := FALSE
       END 
 
 ; TYPE DeferredInfoRefTyp = REF DeferredInfoTyp 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -34,6 +34,18 @@ MODULE ParseHs
       ; RETURN LNewTempMarkList 
       END (* IF *) 
     END CopyOfTempMarkList 
+
+; PROCEDURE RangeIsEmpty ( Range : TempMarkRangeTyp ) : BOOLEAN
+  (* It can be empty either by From = MarkNoNull, or by To <= From *)
+
+  = BEGIN
+      IF Range . From = LbeStd . MarkNoNull
+      THEN RETURN TRUE
+      ELSIF Range . To <= Range . From
+      THEN RETURN TRUE
+      ELSE RETURN FALSE
+      END (* IF *) 
+    END RangeIsEmpty 
 
 (* VISIBLE: *) 
 ; PROCEDURE TempMarkRangeImage ( Range : TempMarkRangeTyp ) : TEXT 

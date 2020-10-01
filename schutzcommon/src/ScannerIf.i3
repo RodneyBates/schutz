@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -12,7 +12,9 @@ INTERFACE ScannerIf
    It's a bit strange, but allows incremental scanning to skip around.
    There are some assumptions about restartability of scanning, which not
    all languages conform to.  But all reasonable languages do. :-)
-*) 
+*)
+
+(* These are all exported by ParseTrav.m3. *) 
 
 ; IMPORT LbeStd 
 ; IMPORT Strings 
@@ -47,9 +49,9 @@ INTERFACE ScannerIf
 
 ; PROCEDURE ConsumeChars 
     ( ScanIf : ScanIfTyp 
-    ; VAR ScanState : LbeStd . ScanStateTyp 
-          (* ^An in out parameter. ParseTrav can change the state 
-             among LbeStd . SsIdle and the various comment states. *) 
+    ; VAR (* IN OUT *) ScanState : LbeStd . ScanStateTyp 
+          (* ParseTrav can change the state among LbeStd . SsIdle
+             and the various comment states. *) 
     ; ConsumedCt : Strings . StringSsTyp 
       (* ^Number of characters consumed. *) 
     ; VAR DeliverString : Strings . StringTyp 
