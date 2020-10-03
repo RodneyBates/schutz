@@ -621,7 +621,7 @@ MODULE Parser
   ; BEGIN (* SetOrigTempMarks *) 
       IF NOT LMustCopy 
       THEN 
-        IF PatchRange . From = LbeStd . MarkNoNull 
+        IF ParseHs . RangeIsEmpty ( PatchRange ) 
         THEN (* Check the full range for copy requirements. *) 
           LMustCopy := SotmMustCopy ( FullRange . From , FullRange . To )  
         ELSE (* Check the full range minus the patch range. *) 
@@ -637,7 +637,7 @@ MODULE Parser
                ( ParseTempMarkList , FullRange . To ) 
       END (* IF *)
     (* Now we are ready to set elements from OrigTempMarkList *) 
-    ; IF PatchRange . From = LbeStd . MarkNoNull 
+    ; IF ParseHs . RangeIsEmpty ( PatchRange ) 
       THEN
         LLength := FullRange . To - FullRange . From  
       ; IF LLength > 0 
@@ -741,7 +741,7 @@ MODULE Parser
   = VAR LMarkChange : MarkChangeTyp 
 
   ; BEGIN 
-      IF TempMarkRange . From # LbeStd . MarkNoNull 
+      IF NOT ParseHs . RangeIsEmpty ( TempMarkRange ) 
       THEN 
         Assert 
           ( TempMarkRange . To <= MergeInfo . MiTempMarkRangeTo 
@@ -776,7 +776,7 @@ MODULE Parser
           ; WNewTempMarkRec . LineNo := WOrigTempMarkRec . LineNo  
           END (* WITH WParseTempMarkRec , WNewTempMarkRec *) 
         END (* FOR *) 
-      END (* IF From # LbeStd . MarkNoNull *) 
+      END (* IF NOT Null. *) 
     END PatchTempMarkFmtNosAndCoords
 
 ; PROCEDURE PatchTempMarkKindAndEstRefs
@@ -793,7 +793,7 @@ MODULE Parser
 
   ; BEGIN 
       Assert 
-        ( TempMarkRange . From # LbeStd . MarkNoNull 
+        ( NOT ParseHs . RangeIsEmpty ( TempMarkRange ) 
         , AFT . A_PatchTempMarkKindAndEstRefs_Empty_mark_range
         ) 
     ; Assert 
@@ -835,7 +835,7 @@ MODULE Parser
   RAISES { AssertionFailure } 
 
   = BEGIN 
-      IF MergeInfo . MiUnpatchedTempMarkRange . From # LbeStd . MarkNoNull 
+      IF NOT ParseHs . RangeIsEmpty ( MergeInfo . MiUnpatchedTempMarkRange ) 
       THEN
         PatchTempMarkKindAndEstRefs 
           ( ParseInfo 
@@ -877,7 +877,7 @@ MODULE Parser
   RAISES { AssertionFailure } 
 
   = BEGIN 
-      IF MergeInfo . MiUnpatchedTempMarkRange . From # LbeStd . MarkNoNull  
+      IF NOT ParseHs . RangeIsEmpty ( MergeInfo . MiUnpatchedTempMarkRange ) 
       THEN 
         Assert 
           ( EstRef # NIL 
@@ -911,7 +911,7 @@ MODULE Parser
     RAISES { AssertionFailure } 
 
     = BEGIN 
-        IF MergeInfo . MiUnpatchedTempMarkRange . From = LbeStd . MarkNoNull
+        IF ParseHs . RangeIsEmpty ( MergeInfo . MiUnpatchedTempMarkRange ) 
         THEN
           MergeInfo . MiUnpatchedTempMarkRange := TempMarkRange
         ELSE 
@@ -933,8 +933,7 @@ MODULE Parser
     ; VAR LRightLeafElem : EstHs . LeafElemTyp 
 
     ; BEGIN 
-        IF MergeInfo . MiUnpatchedTempMarkRange . From 
-           # LbeStd . MarkNoNull  
+        IF NOT ParseHs . RangeIsEmpty ( MergeInfo . MiUnpatchedTempMarkRange ) 
         THEN 
           Assert 
             ( SliceListElemRef ^ . SleIsSlice 
@@ -1022,7 +1021,7 @@ MODULE Parser
           := LangUtil . TokClass ( ParseInfo . PiLang , TokInfo . TiTok ) 
              = LbeStd . TokClassTyp . TokClassConstTerm 
       ; LTempMarksExist 
-          := TokInfo . TiPatchTempMarkRange . From # LbeStd . MarkNoNull 
+          := NOT ParseHs . RangeIsEmpty ( TokInfo . TiPatchTempMarkRange )
       ; LSliceListElemRef := TokInfo . TiInfo (* Implied NARROW, always OK. *) 
       ; WHILE LSliceListElemRef # NIL 
         DO Assert 
@@ -1843,9 +1842,8 @@ MODULE Parser
             , AFT . A_RedAstStringOrEstChild_Mismatched_est_child 
             ) 
         ; Assert 
-            ( RedOldBuildStackElemRef . BseTokInfo . TiPatchTempMarkRange 
-              . From 
-              = LbeStd . MarkNoNull 
+            ( ParseHs.RangeIsEmpty
+                ( RedOldBuildStackElemRef . BseTokInfo . TiPatchTempMarkRange ) 
             , AFT . A_RedAstStringOrEstChild_UnpatchedTempMark
             ) 
         ; RedEstChildBuildStackElemRef := RedOldBuildStackElemRef 
@@ -1872,8 +1870,7 @@ MODULE Parser
             ( NOT FsNodeRef . FsIsInsideList 
             , AFT . A_RedAstStringOrEstChild_Child_of_list_is_absent 
             ) 
-        ; IF RedMergeInfo . MiUnpatchedTempMarkRange . From 
-             # LbeStd . MarkNoNull  
+        ; IF NOT ParseHs . RangeIsEmpty ( RedMergeInfo . MiUnpatchedTempMarkRange ) 
           THEN (* Merge an EstDummyTempMarkTyp node. *)   
             LChild := NEW ( ModHs . EstDummyTempMarkTyp ) 
           ; Assertions . MessageText 
