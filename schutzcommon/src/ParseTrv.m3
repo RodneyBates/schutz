@@ -624,7 +624,7 @@ EXPORTS ParseTrv , ScannerIf
           ; Wr . PutText ( DsWrT , Msg )  
           ; Wr . PutText ( DsWrT , Wr . EOL ) 
         END (* TRY EXCEPT *)    
-      END DsDisplayEst 
+      END DsDisplayEst
 
   ; BEGIN (* DumpStacks *) 
       VAR LSeFsTopRef , LSeFsRef , LXLinkSeFsRef : ParseHs . StackElemFsTyp  
@@ -3883,10 +3883,8 @@ END ;
                   ) 
               END (* IF *) 
             ; NpsDeliverState := DeliverStateTyp . DsTokFound
-(* This was not here earlier:
             ; NpsResultStateEstRef . PtseStateKind 
-                := ParseHs . ParseTravStateKindTyp . PtsKindDoneWithFsNode
-*)
+                := ParseHs . ParseTravStateKindTyp . PtsKindTrailingMods
             
             | DeliverStateTyp . DsTokFound 
             => LDeferredInfo := NpsGetDeferredInfoRef ( ) 
