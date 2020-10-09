@@ -1015,7 +1015,7 @@ END
         END (* IF *) 
       END NpsCheckNextTempMarkForInsTok 
 
-  ; PROCEDURE NpsIncludeTempMark ( )
+  ; PROCEDURE NpsIncludeTempMark ( ) RAISES { AssertionFailure } 
     (* Include the next temp mark into NpsTempMarkRange and advance to the
        next temp mark. *)  
 
@@ -1024,7 +1024,7 @@ END
         THEN 
           NpsTempMarkRange . From := NpsNextTempMarkSs
         ELSE Assert
-               ( NpsTempMarkRange . From = NpsNextTempMarkSs
+               ( NpsTempMarkRange . To = NpsNextTempMarkSs
                , AFT . A_NpsIncludeTempMark_Discontiguous 
                )
         END (* IF *) 
