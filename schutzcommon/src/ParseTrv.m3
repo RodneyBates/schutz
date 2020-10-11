@@ -1599,7 +1599,45 @@ END
         NpsBiasTempMarks ( NpsResultStateRef . PtsScanInfo . SiTokBegPos ) 
       ; WITH WSif = ParseInfo . PiScanIf 
         DO IF LangUtil . TokClass ( ParseInfo . PiLang , WSif . SifTok ) 
-              = LbeStd . TokClassTyp . TokClassVarTerm 
+              = LbeStd . TokClassTyp . TokClassConstTerm
+           THEN (* Insertion token. *) 
+             LStringRef := NIL 
+           ; LChildKindSet := EstHs . EstChildKindSetEmpty 
+           ; NpsAppendTempMarkRange 
+               ( (* VAR *) ToRange 
+                 := NpsResultStateRef . PtsTokInfo . TiPatchTempMarkRange 
+               )
+             (* ^Arrange for the Parser to patch leftovers as FmtNo
+                 tempmarks. *)
+           ; CASE NpsDeliverState <* NOWARN *>
+             OF DeliverStateTyp . DsStarting 
+             => (* This is the token we will deliver. *) 
+               NpsAppendTempMarkRange 
+                 ( (* VAR *) ToRange 
+                   := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
+                 ) 
+             ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+             ; NpsResultStateRef . PtsTokInfo . TiTok := WSif . SifTok 
+             ; NpsResultStateRef . PtsPrevTokAfter := WSif . SifTok  
+             ; NpsAccumNode ( LStringRef , LChildKindSet , SyntTokCt := 1 ) 
+             ; NpsDeliverState := DeliverStateTyp . DsTokFound
+
+             | DeliverStateTyp . DsTokFound 
+             => (* This is the following token.  It means no (more) trailing 
+                   mods, so defer it and deliver what went before. *) 
+               LDeferredInfo := NpsGetDeferredInfoRef ( ) 
+             ; LDeferredInfo . Tok := WSif . SifTok 
+             ; LDeferredInfo . SyntTokCt := 1 
+             ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
+             ; LDeferredInfo . PatchTempMarkRange := NpsTempMarkRange 
+             ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
+             ; LDeferredInfo . ObjRef := LStringRef  
+             ; LDeferredInfo . KindSet := LChildKindSet 
+             ; NpsDeliverState := DeliverStateTyp . DsDeliver 
+             END (* CASE *) 
+
+           ELSIF LangUtil . TokClass ( ParseInfo . PiLang , WSif . SifTok ) 
+                  = LbeStd . TokClassTyp . TokClassVarTerm 
            THEN (* This is an Ast String token, possibly a placeholder. 
                    Use the string supplied by scanner. *) 
              LStringRef 
@@ -1617,7 +1655,6 @@ END
              ; LChildKindSet 
                  := LChildKindSet + EstHs . EstChildKindSetContainsTempMark 
              END (* IF *) 
-           
            ; CASE NpsDeliverState <* NOWARN *>
              OF DeliverStateTyp . DsStarting 
              => (* This is the token we will deliver. *) 
@@ -1628,7 +1665,6 @@ END
              ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
              ; NpsResultStateRef . PtsTokInfo . TiTok := WSif . SifTok 
              ; NpsResultStateRef . PtsPrevTokAfter := WSif . SifTok  
-             ; NpsResultStateRef . PtsTokInfo . TiIsInsertionRepair := FALSE  
              ; NpsAccumNode ( LStringRef , LChildKindSet , SyntTokCt := 1 ) 
              ; NpsDeliverState := DeliverStateTyp . DsTokFound
              
@@ -1639,8 +1675,6 @@ END
                LDeferredInfo := NpsGetDeferredInfoRef ( ) 
              ; LDeferredInfo . Tok := WSif . SifTok 
              ; LDeferredInfo . SyntTokCt := 1 
-             ; LDeferredInfo . IsInsertionRepair := FALSE 
-             ; LDeferredInfo . IsInterior := FALSE
              ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
              ; LDeferredInfo . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty 
              ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
@@ -1649,31 +1683,20 @@ END
              ; NpsDeliverState := DeliverStateTyp . DsDeliver 
              END (* CASE *)
              
-           ELSE (* Either a fixed terminal or a nonterminal placeholder. *) 
-             IF LangUtil . TokClass ( ParseInfo . PiLang , WSif . SifTok )  
-                IN LbeStd . TokClassSetNTPlaceholder  
-             THEN (* Nonterminal placeholder. *)  
-               LStringRef 
-                 := LangUtil . DisplayStringForTok 
-                      ( ParseInfo . PiLang , WSif . SifTok ) 
-             ; LChildKindSet := EstHs . EstChildKindSetEstChildNonNIL 
-             ELSE (* Insertion token. *) 
-               LStringRef := NIL 
-             ; LChildKindSet := EstHs . EstChildKindSetEmpty 
-             ; NpsAppendTempMarkRange 
-                 ( (* VAR *) ToRange 
-                   := NpsResultStateRef . PtsTokInfo . TiPatchTempMarkRange 
-                 ) 
-             END (* IF *)
-
+           ELSIF LangUtil . TokClass ( ParseInfo . PiLang , WSif . SifTok )  
+                 IN LbeStd . TokClassSetNTPlaceholder  
+           THEN (* Nonterminal placeholder. *)  
+             LStringRef 
+               := LangUtil . DisplayStringForTok 
+                    ( ParseInfo . PiLang , WSif . SifTok ) 
+           ; LChildKindSet := EstHs . EstChildKindSetEstChildNonNIL 
            ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
              THEN 
                NpsPatchTmEstRefs ( LStringRef , MarkKindTyp . Plain ) 
-               (* ^Patch leftover TempMarks in the new nonterminal placeholder. *)
+               (* ^Patch leftover TempMarks into the new NT placeholder. *)
              ; LChildKindSet 
                  := LChildKindSet + EstHs . EstChildKindSetContainsTempMark 
-             END (* IF *) 
-
+             END (* IF *)
            ; CASE NpsDeliverState <* NOWARN *>
              OF DeliverStateTyp . DsStarting 
              => (* This is the token we will deliver. *) 
@@ -1686,29 +1709,25 @@ END
              ; NpsResultStateRef . PtsPrevTokAfter := WSif . SifTok  
              ; NpsAccumNode ( LStringRef , LChildKindSet , SyntTokCt := 1 ) 
              ; NpsDeliverState := DeliverStateTyp . DsTokFound
-             
+
              | DeliverStateTyp . DsTokFound 
              => (* This is the following token.  It means no (more) trailing 
-                   mods, so defer it and deliver what went before. *) 
+                   mods, so defer it and deliver what has come before. *) 
                LDeferredInfo := NpsGetDeferredInfoRef ( ) 
              ; LDeferredInfo . Tok := WSif . SifTok 
              ; LDeferredInfo . SyntTokCt := 1 
-             ; LDeferredInfo . IsInsertionRepair := FALSE 
-             ; LDeferredInfo . IsInterior := FALSE 
              ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
-             ; IF LStringRef = NIL 
-               THEN (* Insertion token. *) 
-                 LDeferredInfo . PatchTempMarkRange := NpsTempMarkRange 
-               ELSE (* Nonterminal placeholder. *) 
-                 LDeferredInfo . PatchTempMarkRange 
-                   := ParseHs . TempMarkRangeEmpty 
-               END (* IF *) 
+             ; LDeferredInfo . PatchTempMarkRange
+                 := ParseHs . TempMarkRangeEmpty 
              ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
              ; LDeferredInfo . ObjRef := LStringRef  
              ; LDeferredInfo . KindSet := LChildKindSet 
              ; NpsDeliverState := DeliverStateTyp . DsDeliver 
-             END (* CASE *) 
-           END (* IF *) 
+             END (* CASE *)
+             
+           ELSE CantHappen
+                 ( AFT . A_NpsDeliverRescannedTok_bad_tok_kind )
+           END (* IF *)
         END (* WITH *) 
       END NpsDeliverRescannedTok 
 
@@ -5134,9 +5153,7 @@ END ;
 
     = BEGIN (* NpsStateMachine *) 
         WHILE NpsDeliverState # DeliverStateTyp . DsDeliver 
-        DO NpsNewStateInform ( )
-        
-        ; CASE NpsResultStateKind ( ) 
+        DO CASE NpsResultStateKind ( ) 
            OF ParseHs . ParseTravStateKindTyp . PtsKindEndOfImage 
            => NpsDeliverEndOfImage ( ) 
            | ParseHs . ParseTravStateKindTyp . PtsKindNewEst 
