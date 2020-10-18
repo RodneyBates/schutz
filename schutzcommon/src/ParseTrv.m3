@@ -29,16 +29,19 @@ EXPORTS ParseTrv , ScannerIf
 ; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure
 ; IMPORT Coroutine 
 ; IMPORT EstHs 
-; IMPORT EstUtil 
+; IMPORT EstUtil
+; IMPORT FileWr 
 ; IMPORT LangUtil 
-; FROM LangUtil IMPORT FsKindTyp 
+; FROM LangUtil IMPORT FsKindTyp
+; IMPORT Layout 
 ; IMPORT LbeStd 
 ; IMPORT Marks 
 ; FROM Marks IMPORT MarkKindTyp 
 ; IMPORT Misc 
 ; IMPORT MessageCodes 
 ; IMPORT ModHs 
-; IMPORT Options 
+; IMPORT Options
+; IMPORT OSError 
 ; IMPORT ParseHs 
 ; IMPORT PortTypes 
 ; IMPORT ScannerIfRep 
@@ -450,7 +453,141 @@ EXPORTS ParseTrv , ScannerIf
       := DepthPad + RefanyPad + 1 + FsKindPad + PostPad + TokPad + 4 
 ; VAR NoFsPrefix := Misc . Blanks ( NoFsPrefixLen ) 
 ; VAR NILPrefixLen := NoFsPrefixLen - DepthPad - 4
-; VAR NILPrefix := Misc . Blanks ( NILPrefixLen ) 
+; VAR NILPrefix := Misc . Blanks ( NILPrefixLen )
+
+(* Traversing and dumping the graph of parse traverse states. *) 
+
+; TYPE StateVisitorTyp 
+       = PROCEDURE
+           ( READONLY ParseInfo : ParseHs . ParseInfoTyp
+           ; StateRef : ParseHs . ParseTravStateRefTyp
+           ; Depth : INTEGER 
+           )
+
+; PROCEDURE TraverseStates
+    ( READONLY ParseInfo : ParseHs . ParseInfoTyp ; Visitor : StateVisitorTyp ) 
+
+  = PROCEDURE TsRecurse
+      ( FromStateRef , ToStateRef : ParseHs . ParseTravStateEstRefTyp
+      ; Depth : INTEGER
+      )
+  
+    = VAR LStateRef , LAdvanceStateRef : ParseHs . ParseTravStateEstRefTyp 
+    ; BEGIN
+        LStateRef := FromStateRef 
+      ; LOOP (* Thru' advances at this level. *) 
+          LAdvanceStateRef := LStateRef . PtsAdvanceStateRef
+        ; Assert
+            ( LAdvanceStateRef # NIL
+            , AFT . A_TsRecurse_NIL_advance_state
+            )
+        ; Visitor ( ParseInfo , LStateRef , Depth ) 
+        ; IF LAdvanceStateRef = ToStateRef
+          THEN (* This is all we were asked to do. *)
+            Assert
+              ( Depth > 0
+              , AFT . A_TsRecurse_ToState_at_zero_depth
+              )
+          ; EXIT  
+          ELSIF LAdvanceStateRef = LStateRef 
+          THEN (* We've visited End of image. *)
+            Assert
+              ( Depth = 0
+              , AFT . A_TsRecurse_EOI_at_depth_GT_0
+              )
+          ; EXIT 
+          ELSE
+            IF LStateRef . PtseDescendStateRef # NIL
+            THEN
+              TsRecurse
+                ( LStateRef . PtseDescendStateRef , LAdvanceStateRef , Depth + 1 ) 
+            END (* IF *)
+          END (* IF *)
+        ; LStateRef := LAdvanceStateRef 
+        END (* LOOP *) 
+      END TsRecurse 
+
+  ; BEGIN (* TraverseStates *) 
+      TsRecurse ( ParseInfo . PiInitTravStateRef , NIL , 0 ) 
+    END TraverseStates
+
+; PROCEDURE DumpState
+    ( LayoutWrT : Layout . T ; StateRef : ParseHs . ParseTravStateEstRefTyp )
+
+  = CONST SeqNoPad = 2
+  ; VAR LStartPos : INTEGER 
+  
+  ; BEGIN
+      LStartPos := Layout . CharNo ( LayoutWrT )
+    ; Layout . PutText
+        ( LayoutWrT , Fmt . Pad ( Fmt . Int ( StateRef . PtsSeqNo ) , SeqNoPad ) )
+    ; Layout . PutChar ( LayoutWrT , ' ' )
+    ; Layout . PutText
+        ( LayoutWrT , LbeStd . NumIdTokImage ( StateRef . PtsTokInfo . TiTok ) )
+    ; Layout . PutChar ( LayoutWrT , ' ' )
+    ; Layout . PutText
+        ( LayoutWrT
+        , ParseHs . TempMarkRangeImage
+            ( StateRef . PtsTokInfo . TiFullTempMarkRange ) 
+        )
+    ; Layout . PutChar ( LayoutWrT , ' ' )
+    ; Layout . PutText
+        ( LayoutWrT
+        , ParseHs . TempMarkRangeImage
+           ( StateRef . PtsTokInfo . TiPatchTempMarkRange )
+        )
+    ; Layout . PutChar ( LayoutWrT , ' ' )
+    ; Layout . PutChar ( LayoutWrT , '[' )
+    ; Layout . PutText ( LayoutWrT , Fmt . Int ( StateRef . PtseTokTempMarkSs ) )
+    ; Layout . PutChar ( LayoutWrT , ']' )
+    ; Layout . PutChar ( LayoutWrT , ' ' )
+    ; Layout . PutText
+        ( LayoutWrT , Fmt . Bool ( StateRef . PtsTokInfo . TiIsInterior ) )
+    ; Layout . PutChar ( LayoutWrT , ' ' )
+    ; Layout . PutText
+        ( LayoutWrT , Fmt . Bool ( StateRef . PtsTokInfo . TiIsInsertionRepair ) )
+    ; Layout . PutEol ( LayoutWrT ) 
+    END DumpState
+
+(* This is here for debugging. *) 
+; <* UNUSED *> PROCEDURE DumpStateGraph
+    ( FileName : TEXT ; READONLY ParseInfo : ParseHs . ParseInfoTyp )
+
+  = VAR DsgWrT : Wr . T
+  ; VAR DsgLayoutWrT : Layout . T
+
+  ; PROCEDURE Visit  
+      ( <* UNUSED *> READONLY ParseInfo : ParseHs . ParseInfoTyp
+      ; StateRef : ParseHs . ParseTravStateRefTyp
+      ; Depth : INTEGER 
+      )
+    = CONST IndentAmt = 2
+    ; CONST DepthPad = 2
+    
+    ; BEGIN
+        Layout . PutText
+          ( DsgLayoutWrT , Fmt . Pad ( Fmt . Int ( Depth ) , DepthPad ) )
+      ; Layout . PutChar ( DsgLayoutWrT , ' ' ) 
+      ; Layout . PutText
+          ( DsgLayoutWrT , Fmt . Pad ( " " , Depth * IndentAmt ) )
+      ; DumpState ( DsgLayoutWrT , StateRef ) 
+      END Visit 
+  
+  ; BEGIN (* DumpStateGraph *)
+      TRY 
+        DsgWrT := FileWr . Open ( FileName )
+      EXCEPT OSError . E ( Code ) 
+      => Assertions . MessageText
+           ( "DumpStateGraph: unable to open file \"" & FileName & "\".")
+      ; RETURN 
+      END (* EXCEPT *)
+    ; DsgLayoutWrT := NEW ( Layout . T ) 
+    ; DsgLayoutWrT := Layout . Init ( DsgLayoutWrT , DsgWrT )
+    ; TraverseStates ( ParseInfo , Visit )
+    ; Wr . Close ( DsgWrT ) 
+    END DumpStateGraph 
+
+(* Dumping the Est and Fs stacks of a parse traverse Est state. *) 
 
 ; PROCEDURE DumpStacks ( PtsEstRef : ParseHs . ParseTravStateEstRefTyp ) 
   (* This is here to be called from within a debugger. *) 
@@ -1603,12 +1740,6 @@ END
            THEN (* Insertion token. *) 
              LStringRef := NIL 
            ; LChildKindSet := EstHs . EstChildKindSetEmpty 
-           ; NpsAppendTempMarkRange 
-               ( (* VAR *) ToRange 
-                 := NpsResultStateRef . PtsTokInfo . TiPatchTempMarkRange 
-               )
-             (* ^Arrange for the Parser to patch leftovers as FmtNo
-                 tempmarks. *)
            ; CASE NpsDeliverState <* NOWARN *>
              OF DeliverStateTyp . DsStarting 
              => (* This is the token we will deliver. *) 
@@ -1616,6 +1747,12 @@ END
                  ( (* VAR *) ToRange 
                    := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
                  ) 
+             ; NpsAppendTempMarkRange 
+                 ( (* VAR *) ToRange 
+                   := NpsResultStateRef . PtsTokInfo . TiPatchTempMarkRange 
+                 )
+               (* ^Arrange for the Parser to patch leftovers as FmtNo
+                   tempmarks. *)
              ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
              ; NpsResultStateRef . PtsTokInfo . TiTok := WSif . SifTok 
              ; NpsResultStateRef . PtsPrevTokAfter := WSif . SifTok  
@@ -1638,7 +1775,7 @@ END
 
            ELSIF LangUtil . TokClass ( ParseInfo . PiLang , WSif . SifTok ) 
                   = LbeStd . TokClassTyp . TokClassVarTerm 
-           THEN (* This is an Ast String token, possibly a placeholder. 
+           THEN (* This is an Ast String token. 
                    Use the string supplied by scanner. *) 
              LStringRef 
                := SharedStrings . FromString
@@ -1685,7 +1822,8 @@ END
              
            ELSIF LangUtil . TokClass ( ParseInfo . PiLang , WSif . SifTok )  
                  IN LbeStd . TokClassSetNTPlaceholder  
-           THEN (* Nonterminal placeholder. *)  
+           THEN (* Nonterminal placeholder.  Use a luanguage-supplied string
+                   for the token. *)  
              LStringRef 
                := LangUtil . DisplayStringForTok 
                     ( ParseInfo . PiLang , WSif . SifTok ) 
@@ -5751,7 +5889,8 @@ END ;
     ; LStackElemFsNodeRef . SeFsPredicate := FALSE
     ; LStackElemFsNodeRef . SeFsSeEstRef := LStackElemEstNodeRef 
     ; LStateRef . PtseStackFsRef := LStackElemFsNodeRef 
-; GStateCt := 0 
+; GStateCt := 0
+    ; ParseInfo . PiInitTravStateRef := LStateRef 
     ; RETURN LStateRef 
     END InitParseEst 
 

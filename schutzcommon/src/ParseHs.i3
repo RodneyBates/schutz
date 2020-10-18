@@ -207,13 +207,13 @@ INTERFACE ParseHs
 ; TYPE ParseTravStateEstRefTyp 
     = ParseTravStateRefTyp 
         OBJECT 
-          PtseStackEstRef : StackElemEstTyp 
-        ; PtseStackFsRef : StackElemFsTyp 
-        ; PtseDescendStateRef : ParseTravStateEstRefTyp 
+          PtseStackEstRef : StackElemEstTyp := NIL 
+        ; PtseStackFsRef : StackElemFsTyp := NIL 
+        ; PtseDescendStateRef : ParseTravStateEstRefTyp := NIL  
           (* ^Like PtsAdvanceState, but for Descend operation. *) 
-        ; PtseStringRef : SharedStrings . T 
+        ; PtseStringRef : SharedStrings . T := NIL 
           (* ^When rescanning a string, this points to it. *) 
-        ; PtseDeferredInfoRef : DeferredInfoRefTyp 
+        ; PtseDeferredInfoRef : DeferredInfoRefTyp := NIL 
         ; PtseEstListChildrenToPass : LbeStd . EstChildNoTyp := 0 
         ; PtsePrevTokBefore : LbeStd . TokTyp 
           (* ^Before any rescanning. *) 
@@ -365,7 +365,8 @@ INTERFACE ParseHs
 
 ; TYPE ParseInfoTyp 
     = RECORD 
-        PiFile : Rd . T 
+        PiInitTravStateRef : ParseTravStateRefTyp := NIL 
+      ; PiFile : Rd . T 
       ; PiScanIf : ScannerIf . ScanIfTyp 
       ; PiTempMarkListRef : TempMarkArrayRefTyp 
       ; PiString : Strings . StringTyp 

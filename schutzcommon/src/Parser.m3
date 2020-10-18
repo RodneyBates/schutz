@@ -507,7 +507,14 @@ MODULE Parser
             Wr . PutText 
               ( Options . TraceWrT 
               , "(Repair) " 
-              )           
+              )
+          ELSE
+            Wr . PutText
+              ( Options . TraceWrT
+              , "(SeqNo="
+                & Fmt . Int ( ParseTrialState . PtsParseTravStateRef . PtsSeqNo )
+                & ")"
+              ) 
           END (* IF *) 
         ; Wr . PutText 
             ( Options . TraceWrT 
@@ -744,7 +751,9 @@ MODULE Parser
       IF NOT ParseHs . RangeIsEmpty ( TempMarkRange ) 
       THEN 
         Assert 
-          ( TempMarkRange . To <= MergeInfo . MiTempMarkRangeTo 
+          (
+TRUE OR
+            TempMarkRange . To <= MergeInfo . MiTempMarkRangeTo 
           , AFT . A_PatchTempMarkFmtNosAndCoords_BeyondRange 
           ) 
       ; FOR RTempMarkSs := TempMarkRange . From 
@@ -797,7 +806,9 @@ MODULE Parser
         , AFT . A_PatchTempMarkKindAndEstRefs_Empty_mark_range
         ) 
     ; Assert 
-        ( TempMarkRange . To <= MergeInfo . MiTempMarkRangeTo 
+        (
+TRUE OR
+          TempMarkRange . To <= MergeInfo . MiTempMarkRangeTo 
         , AFT . A_PatchTempMarkKindAndEstRefs_BeyondRange 
         ) 
     ; FOR RTempMarkSs := TempMarkRange . From 
@@ -864,8 +875,9 @@ MODULE Parser
              , 0 
              , MergeInfo . MiTempMarkRangeTo 
              ) 
+      ; MergeInfo . MiNewTempMarkList := NIL (* Abandon the unneeded copy. *) 
       | MarkChangeTyp . Unchanged 
-      => (* Abandon MergeInfo . MiNewTempMarkList *)  
+      => MergeInfo . MiNewTempMarkList := NIL (* Abandon the unneeded copy. *) 
       END (* CASE *)
     END FinishMergeInfo 
 
@@ -3133,6 +3145,9 @@ TRUE OR
       ; TokInfo . TiIsInterior := FALSE 
       ; TokInfo . TiIsInsertionRepair := TRUE  
       ; TokInfo . TiSyntTokCt := 1 
+      ; TokInfo . TiFullTempMarkRange := ParseHs . TempMarkRangeEmpty 
+      ; TokInfo . TiFullTempMarkRange . From := 47 
+      ; TokInfo . TiFullTempMarkRange . To := 47 
       ; TokInfo . TiPatchTempMarkRange := ParseHs . TempMarkRangeNull 
       END RepBuildTokInsertionRepairSlice 
 

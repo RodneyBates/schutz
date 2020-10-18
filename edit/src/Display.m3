@@ -3789,7 +3789,8 @@ MODULE Display
   ; VAR LOldEstRef : LbeStd . EstRootTyp 
   ; VAR LNewEstRef : LbeStd . EstRootTyp 
   ; VAR LScannerIf : ScannerIf . ScanIfTyp 
-  ; VAR LOldTempMarkList : ParseHs . TempMarkArrayRefTyp 
+  ; VAR LOldTempMarkList : ParseHs . TempMarkArrayRefTyp
+  ; VAR LInitialParseTravStateRef : ParseHs . ParseTravStateRefTyp 
 
   ; BEGIN (* Reparse *) 
       IF ImageRef # NIL 
@@ -3828,10 +3829,12 @@ MODULE Display
     := NEW ( ParseHs . TempMarkArrayRefTyp 
            , NUMBER ( LParseInfo . PiTempMarkListRef ^ ) 
            ) 
-; LOldTempMarkList ^ := LParseInfo . PiTempMarkListRef ^ 
+; LOldTempMarkList ^ := LParseInfo . PiTempMarkListRef ^
+        ; LInitialParseTravStateRef
+            := ParseTrv . InitParseEst ( LParseInfo , LOldEstRef )
         ; Parser . Parse 
             ( LParseInfo 
-            , ParseTrv . InitParseEst ( LParseInfo , LOldEstRef ) 
+            , LInitialParseTravStateRef 
             , LNewEstRef  
             ) 
         ; IF Options . TreeBrowsing 

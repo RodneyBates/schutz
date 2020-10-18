@@ -1,7 +1,7 @@
 
 ## -----------------------------------------------------------------------1- ##
 ## This file is part of the Schutz semantic editor.                          ##
-## Copyright 1988..2017, Rodney M. Bates.                                    ##
+## Copyright 1988..2020, Rodney M. Bates.                                    ##
 ## rodney.m.bates@acm.org                                                    ##
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
@@ -54,6 +54,7 @@ ERRORFILES = \
   TreeBrowse.m3 \
   PaintHs.m3 \
   GrammarGen.m3 \
+  Layout.m3 \
   ../../edit/src/Ui.m3 \
   ../../edit/src/Display.m3 \
   ../../edit/src/TempMark.m3 \
