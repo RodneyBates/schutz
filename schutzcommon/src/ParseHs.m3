@@ -15,23 +15,24 @@ MODULE ParseHs
 (* VISIBLE: *) 
 ; PROCEDURE CopyOfTempMarkList 
     ( OldTempMarkList : TempMarkArrayRefTyp 
-    ; ToSs : LbeStd . MarkNoTyp 
-      (* In the copy, marks at and above this subscript will be null. *) 
+    ; CopyNumber : LbeStd . MarkNoTyp := LbeStd . MarkNoMax 
+      (* In the copy, marks beyond CopyNumber will be null. *) 
     ) 
   : TempMarkArrayRefTyp 
 
-  = VAR LNewTempMarkList : TempMarkArrayRefTyp 
+  = VAR LNewTempMarkListRef : TempMarkArrayRefTyp
+  ; VAR LNumber , LCopyNumber: INTEGER 
 
   ; BEGIN 
       IF OldTempMarkList = NIL 
       THEN RETURN NIL 
-      ELSE 
-	LNewTempMarkList 
-	  := NEW ( TempMarkArrayRefTyp , NUMBER ( OldTempMarkList ^ ) )
-      (* Values specified in types will initialize as needed. *) 
-      ; SUBARRAY ( LNewTempMarkList ^ , 0 , ToSs ) 
-	  := SUBARRAY ( OldTempMarkList ^ , 0 , ToSs ) 
-      ; RETURN LNewTempMarkList 
+      ELSE
+        LNumber := NUMBER ( OldTempMarkList ^ )
+      ; LNewTempMarkListRef := NEW ( TempMarkArrayRefTyp , LNumber )
+      ; LCopyNumber := MIN ( CopyNumber , LNumber ) 
+      ; SUBARRAY ( LNewTempMarkListRef ^ , 0 , LCopyNumber ) 
+	  := SUBARRAY ( OldTempMarkList ^ , 0 , LCopyNumber ) 
+      ; RETURN LNewTempMarkListRef 
       END (* IF *) 
     END CopyOfTempMarkList 
 

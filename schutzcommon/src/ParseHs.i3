@@ -42,8 +42,8 @@ INTERFACE ParseHs
 
 ; PROCEDURE CopyOfTempMarkList 
     ( OldTempMarkList : TempMarkArrayRefTyp 
-    ; ToSs : LbeStd . MarkNoTyp 
-      (* In the copy, marks at and above this subscript will be null. *) 
+    ; CopyNumber : LbeStd . MarkNoTyp := LbeStd . MarkNoMax 
+      (* In the copy, marks beyond CopyNumber will be null. *) 
     ) 
   : TempMarkArrayRefTyp 
 

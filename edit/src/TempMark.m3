@@ -2263,7 +2263,7 @@ MODULE TempMark
          verified that the next mark belongs in the current token, 
          and thus that at least one mark will be built. *) 
       (* Call this when RbmTokBegPos is set for the token in question, 
-         and RbmCharPos is the To position of the token. *) 
+         and RbmCharPos is the To-position of the token. *)
 
       = VAR LPos : LbeStd . LimitedCharNoSignedTyp 
 

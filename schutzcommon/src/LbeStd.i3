@@ -547,10 +547,10 @@ INTERFACE LbeStd
 
 (* Marked points *) 
 
-; CONST MarkNoMax = 32768 
+; CONST MarkNoMax = 32767 
 
-; TYPE MarkNoTyp = [ 0 .. MarkNoMax - 1 ] 
-; TYPE MarkNoSignedTyp = [ - 1 .. MarkNoMax - 1 ] 
+; TYPE MarkNoTyp = [ 0 .. MarkNoMax ] 
+; TYPE MarkNoSignedTyp = [ - 1 .. MarkNoMax ] 
 
 ; CONST MarkNoNull = LAST ( MarkNoTyp ) 
 

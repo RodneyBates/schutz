@@ -60,7 +60,8 @@ MODULE Parser
            leading to this state was a shift *) 
       END (* RECORD  ParseTrialStateTyp *) 
 
-; VAR GNullParseTrialState : ParseTrialStateTyp 
+; VAR GNullParseTrialState : ParseTrialStateTyp
+      (* ^Just use the field values of ParseTrialStateTyp. *)
 
 ; CONST StateListStaticMax = 4 
 ; VAR StateListMax : PortTypes . Int32Typ := 1 (* StateListStaticMax *)  
@@ -442,7 +443,7 @@ MODULE Parser
 ; <* UNUSED *> 
   PROCEDURE DumpParseTrialState 
     ( READONLY ParseInfo : ParseHs . ParseInfoTyp 
-    ; State : ParseTrialStateTyp 
+    ; READONLY State : ParseTrialStateTyp 
     ) 
   (* This is here to be called within a debugger. *) 
 
@@ -625,7 +626,9 @@ MODULE Parser
   ; VAR LLength : INTEGER 
   ; VAR LMustCopy : BOOLEAN := ForceCopy 
 
-  ; BEGIN (* SetOrigTempMarks *) 
+  ; BEGIN (* SetOrigTempMarks *)
+RETURN
+;
       IF NOT LMustCopy 
       THEN 
         IF ParseHs . RangeIsEmpty ( PatchRange ) 
@@ -668,12 +671,6 @@ MODULE Parser
       END (* IF *) 
     END SetOrigTempMarks   
 
-; TYPE MarkChangeTyp 
-    = { Unchanged (* No changes to a temp mark have occurred. *)  
-      , NullChanged (* Only formerly Null marks have been changed. *) 
-      , NonnullChanged (* A formerly nonnull mark has been changed. *) 
-      } 
-
 (* For building during parsing, we need a number of additional fields
    associated with the merge state.  We put them in a MergeInfoTyp.  
 *) 
@@ -684,10 +681,9 @@ MODULE Parser
       ; MiLMNewChildRef : LbeStd . EstRootTyp := NIL 
       ; MiRMChildRef : LbeStd . EstRootTyp 
       ; MiRMSliceListElemRef : ParseHs . SliceListElemRefTyp 
-      ; MiParseTempMarkList : ParseHs . TempMarkArrayRefTyp 
-      ; MiNewTempMarkList : ParseHs . TempMarkArrayRefTyp 
+      ; MiParseTempMarkListRef : ParseHs . TempMarkArrayRefTyp 
+      ; MiNewTempMarkListRef : ParseHs . TempMarkArrayRefTyp 
       ; MiTempMarkRangeTo : LbeStd . MarkNoTyp 
-      ; MiMarkChange : MarkChangeTyp 
       ; MiChildExists : BOOLEAN 
       END (* MergeInfoTyp *) 
 
@@ -704,15 +700,9 @@ MODULE Parser
     ; MergeInfo . MiLMNewChildRef := NIL  
     ; MergeInfo . MiChildExists := FALSE 
     ; MergeInfo . MiRMChildRef := NIL  
-    ; MergeInfo . MiRMSliceListElemRef := NIL  
-    ; MergeInfo . MiMarkChange := MarkChangeTyp . Unchanged 
-    ; MergeInfo . MiParseTempMarkList 
-        := ParseTrialState . PtsTempMarkListRef 
-    ; MergeInfo . MiNewTempMarkList 
-        := ParseHs . CopyOfTempMarkList  
-             ( ParseTrialState . PtsTempMarkListRef 
-             , ToSs := MergeInfo . MiTempMarkRangeTo 
-             ) 
+    ; MergeInfo . MiRMSliceListElemRef := NIL
+    ; MergeInfo . MiParseTempMarkListRef := ParseTrialState . PtsTempMarkListRef 
+    ; MergeInfo . MiNewTempMarkListRef := NIL 
     END InitMergeInfo 
 
 (* We have to patch the FmtNo of temp marks while visiting the
@@ -721,7 +711,6 @@ MODULE Parser
    a RightSibFmtNo or ChildFmtNo mark, we don't know which kind,
    nor do we have the EstRef.  So there are two patch procedures,
    one to patch FmtNos and the other to patch Kind and EstRef.
-   Both interact with the MiMarkChange stuff. 
 
    PatchTempMarkFmtNosAndCoords is called only from within MergeSliceList, 
    so could be nested inside it, but putting both here makes the
@@ -735,6 +724,19 @@ MODULE Parser
    And cars run on water, world hunger is eliminated, and pigs fly. 
 *)    
 
+; PROCEDURE EnsureNewTempMarkList
+    ( ExistingTempMarkListRef : ParseHs . TempMarkArrayRefTyp 
+    ; VAR NewTempMarkListRef : ParseHs . TempMarkArrayRefTyp 
+    )
+
+  = BEGIN
+      IF NewTempMarkListRef = NIL
+      THEN
+        NewTempMarkListRef
+          := ParseHs . CopyOfTempMarkList ( ExistingTempMarkListRef ) 
+      END (* IF *)
+    END EnsureNewTempMarkList
+    
 ; PROCEDURE PatchTempMarkFmtNosAndCoords
     ( READONLY ParseInfo : ParseHs . ParseInfoTyp  
     ; MergeInfo : MergeInfoTyp (* Fields may change. *) 
@@ -742,50 +744,25 @@ MODULE Parser
     ; FmtNo : EstHs . FmtNoTyp
     ) 
   RAISES { AssertionFailure } 
-  (* Patch FmtNo fields of TempMarks in the InsTok.  Also copy the 
-     CharPos and LineNo fields from the original. *) 
+  (* Patch FmtNo fields of TempMarks in TempMarkRange.  *) 
 
-  = VAR LMarkChange : MarkChangeTyp 
-
-  ; BEGIN 
+  = BEGIN 
       IF NOT ParseHs . RangeIsEmpty ( TempMarkRange ) 
       THEN 
-        Assert 
-          (
-TRUE OR
-            TempMarkRange . To <= MergeInfo . MiTempMarkRangeTo 
-          , AFT . A_PatchTempMarkFmtNosAndCoords_BeyondRange 
-          ) 
-      ; FOR RTempMarkSs := TempMarkRange . From 
-            TO TempMarkRange . To - 1 
-        DO WITH 
-            WOrigTempMarkRec 
-            = ParseInfo . PiTempMarkListRef ^ [ RTempMarkSs ] 
-          , WParseTempMarkRec
-            = MergeInfo . MiParseTempMarkList  ^ [ RTempMarkSs ] 
-          , WNewTempMarkRec 
-            = MergeInfo . MiNewTempMarkList ^ [ RTempMarkSs ] 
-          DO
-            IF FmtNo = WParseTempMarkRec . TokMark . FmtNo    
-            THEN LMarkChange := MarkChangeTyp . Unchanged 
-            ELSIF WParseTempMarkRec . TokMark . Kind 
-                  = MarkKindTyp . Null
-            THEN 
-              LMarkChange := MarkChangeTyp . NullChanged  
-            ; WNewTempMarkRec . TokMark . Kind := MarkKindTyp . Changed 
-              (* To combine a FmtNo change here with a later Kind and/or
-                 EstRef change, done in PatchTempMarkKindAndEstRefs,
-                 into a NullChanged state. *)     
-            ELSE LMarkChange := MarkChangeTyp . NonnullChanged 
-            END (* IF *)
-          ; MergeInfo . MiMarkChange 
-              := MAX ( MergeInfo . MiMarkChange , LMarkChange )  
-          ; WNewTempMarkRec . TokMark . FmtNo := FmtNo    
-          ; WNewTempMarkRec . CharPos := WOrigTempMarkRec . CharPos 
-          ; WNewTempMarkRec . LineNo := WOrigTempMarkRec . LineNo  
-          END (* WITH WParseTempMarkRec , WNewTempMarkRec *) 
+        FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
+        DO IF MergeInfo . MiParseTempMarkListRef ^ [ RTempMarkSs ]
+              . TokMark . FmtNo
+              # FmtNo 
+          THEN
+            EnsureNewTempMarkList
+              ( MergeInfo . MiParseTempMarkListRef
+              , (* VAR *) MergeInfo . MiNewTempMarkListRef
+              )
+          ; MergeInfo . MiNewTempMarkListRef ^ [ RTempMarkSs ] . TokMark . FmtNo
+              := FmtNo
+          END (* IF *)
         END (* FOR *) 
-      END (* IF NOT Null. *) 
+      END (* IF NOT empty. *) 
     END PatchTempMarkFmtNosAndCoords
 
 ; PROCEDURE PatchTempMarkKindAndEstRefs
@@ -796,44 +773,35 @@ TRUE OR
     ; EstRef : LbeStd . EstRootTyp 
     ) 
   RAISES { AssertionFailure } 
-  (* Patch Kind and EstRef fields of TempMarks in the InsTok. *) 
+  (* Patch Kind and EstRef fields of TempMarks in TempMarkRange. *) 
 
-  = VAR LMarkChange : MarkChangeTyp 
+  = VAR LChanged : BOOLEAN
 
   ; BEGIN 
-      Assert 
-        ( NOT ParseHs . RangeIsEmpty ( TempMarkRange ) 
-        , AFT . A_PatchTempMarkKindAndEstRefs_Empty_mark_range
-        ) 
-    ; Assert 
-        (
-TRUE OR
-          TempMarkRange . To <= MergeInfo . MiTempMarkRangeTo 
-        , AFT . A_PatchTempMarkKindAndEstRefs_BeyondRange 
-        ) 
-    ; FOR RTempMarkSs := TempMarkRange . From 
-          TO TempMarkRange . To - 1 
-      DO WITH 
-          WParseTempMarkRec
-          = MergeInfo . MiParseTempMarkList  ^ [ RTempMarkSs ] 
-        , WNewTempMarkRec 
-          = MergeInfo . MiNewTempMarkList ^ [ RTempMarkSs ] 
-        DO
-          IF MarkKind = WParseTempMarkRec . TokMark . Kind   
-             AND EstRef = WParseTempMarkRec . EstRef     
-             AND WNewTempMarkRec . TokMark . Kind # MarkKindTyp . Changed 
-          THEN LMarkChange := MarkChangeTyp . Unchanged 
-          ELSIF WParseTempMarkRec . TokMark . Kind 
-                = MarkKindTyp . Null
-          THEN LMarkChange := MarkChangeTyp . NullChanged 
-          ELSE LMarkChange := MarkChangeTyp . NonnullChanged 
-          END (* IF *)
-        ; MergeInfo . MiMarkChange 
-            := MAX ( MergeInfo . MiMarkChange , LMarkChange )  
-        ; WNewTempMarkRec . TokMark . Kind := MarkKind  
-        ; WNewTempMarkRec . EstRef := EstRef     
-        END (* WITH WParseTempMarkRec , WNewTempMarkRec *) 
-      END (* FOR *) 
+      IF NOT ParseHs . RangeIsEmpty ( TempMarkRange ) 
+      THEN 
+        FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
+        DO WITH 
+            WParseTempMarkRec 
+            = MergeInfo . MiParseTempMarkListRef ^ [ RTempMarkSs ] 
+          DO IF WParseTempMarkRec . TokMark . Kind # MarkKind    
+                OR WParseTempMarkRec . EstRef # EstRef 
+            THEN 
+              EnsureNewTempMarkList
+                ( MergeInfo . MiParseTempMarkListRef
+                , (* VAR *) MergeInfo . MiNewTempMarkListRef
+                )
+            ; WITH 
+                WNewTempMarkRec 
+                = MergeInfo . MiNewTempMarkListRef ^ [ RTempMarkSs ] 
+              DO
+                WNewTempMarkRec . TokMark . Kind := MarkKind    
+              ; WNewTempMarkRec . EstRef := EstRef
+              END (* WITH *) 
+            END (* IF *)
+          END (* WITH *) 
+        END (* FOR *)
+      END (* IF NOT empty. *) 
     END PatchTempMarkKindAndEstRefs
 
 ; PROCEDURE FinishMergeInfo 
@@ -856,29 +824,21 @@ TRUE OR
           , EstRef := EstRef 
           ) 
       ; KindSet := KindSet + EstHs . EstChildKindSetContainsTempMark 
-      END (* IF *) 
-    ; CASE MergeInfo . MiMarkChange 
-      OF MarkChangeTyp . NonnullChanged 
-      => (* Use the copy. *) 
-        ParseTrialState . PtsTempMarkListRef 
-          := MergeInfo . MiNewTempMarkList 
-      | MarkChangeTyp . NullChanged 
-      => (* Didn't need the copy, but copy its contents back to the
-            original. *) 
-        SUBARRAY 
-          ( ParseTrialState . PtsTempMarkListRef ^ 
-          , 0 
-          , MergeInfo . MiTempMarkRangeTo 
-          ) 
-          := SUBARRAY 
-             ( MergeInfo . MiNewTempMarkList ^ 
-             , 0 
-             , MergeInfo . MiTempMarkRangeTo 
-             ) 
-      ; MergeInfo . MiNewTempMarkList := NIL (* Abandon the unneeded copy. *) 
-      | MarkChangeTyp . Unchanged 
-      => MergeInfo . MiNewTempMarkList := NIL (* Abandon the unneeded copy. *) 
-      END (* CASE *)
+      END (* IF *)
+    ; IF MergeInfo . MiNewTempMarkListRef # NIL
+      THEN
+        Assert
+          ( ParseTrialState . PtsTempMarkListRef ^
+            = MergeInfo . MiParseTempMarkListRef ^ 
+          , AFT . A_FinishMergeInfo_unequal_cached_temp_mark_list
+          )
+      ; Assert
+          ( ParseTrialState . PtsTempMarkListRef ^
+            # MergeInfo . MiNewTempMarkListRef ^ 
+          , AFT . A_FinishMergeInfo_nonNIL_but_unchanged_temp_mark_list
+          )
+      ; ParseTrialState . PtsTempMarkListRef := MergeInfo . MiNewTempMarkListRef 
+      END (* IF *)
     END FinishMergeInfo 
 
 ; PROCEDURE FlushRightSibTempMarksForChild  
