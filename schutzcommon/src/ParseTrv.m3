@@ -4051,9 +4051,10 @@ END ;
                   , SyntTokCt := 1 
                   ) 
               END (* IF *) 
-            ; NpsDeliverState := DeliverStateTyp . DsTokFound
+            ; TravUtil . IncEstChild ( NpsSeEstRef . SeEstTravInfo )  
             ; NpsResultStateEstRef . PtseStateKind 
                 := ParseHs . ParseTravStateKindTyp . PtsKindTrailingMods
+            ; NpsDeliverState := DeliverStateTyp . DsTokFound
             
             | DeliverStateTyp . DsTokFound 
             => LDeferredInfo := NpsGetDeferredInfoRef ( ) 
@@ -4069,6 +4070,9 @@ END ;
             ; LDeferredInfo . ObjRef
                 := LStringRef 
             ; LDeferredInfo . KindSet := LKindSet  
+            ; TravUtil . IncEstChild ( NpsSeEstRef . SeEstTravInfo )  
+            ; NpsResultStateEstRef . PtseStateKind 
+                := ParseHs . ParseTravStateKindTyp . PtsKindTrailingMods
             ; NpsDeliverState := DeliverStateTyp . DsDeliver 
             END (* CASE *) 
           END (* WITH *) 
@@ -5460,7 +5464,7 @@ END ;
       ; NpsNextTempMarkIsRelevant := FALSE 
       END NpsInitNps 
 
-; VAR SeqNoToStop : INTEGER := 8  
+; VAR SeqNoToStop : INTEGER := 9
 
   ; PROCEDURE NpsParseFromEst ( ) RAISES { AssertionFailure } 
 
@@ -5620,7 +5624,7 @@ END ;
           ; NpsResultStateRef := NpsResultStateEstRef 
           ; NpsResultStateStreamRef := NIL (* Force RT error if used. *) 
           ; InitTokInfo ( NpsResultStateRef . PtsTokInfo )  
-          ; NpsInitNps ( ) 
+          ; NpsInitNps ( )
           ; NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange
               := ParseHs . TempMarkRangeEmpty 
           ; NpsResultStateEstRef . PtsTokInfo . TiPatchTempMarkRange
