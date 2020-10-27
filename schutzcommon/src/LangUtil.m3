@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -1103,10 +1103,12 @@ MODULE LangUtil
         THEN 
           RETURN LbeStd . NumIdTokImage ( Tok ) 
         ELSE 
-          RETURN LSpelling
+          RETURN LSpelling & "(" & LbeStd . NumTokImage ( Tok ) & ")"
         END (* IF *) 
       ELSE 
-        RETURN LbeStd . NumIdTokImage ( Tok ) 
+        RETURN
+          LbeStd . NumIdTokImage ( Tok )
+          & "(" & LbeStd . NumTokImage ( Tok ) & ")"
       END (* IF *)
     END TokImage
 
@@ -1155,7 +1157,7 @@ MODULE LangUtil
           END (* IF *) 
         END (* IF *) 
 
-      (* Try to use actual Ldl node.  This is quistionable, because some Ldl
+      (* Try to use actual Ldl node.  This is questionable, because some Ldl
          nodes have multiple tokens pointing to them. 
       *) 
       ; IF WLangInfo . TokMapRef # NIL 

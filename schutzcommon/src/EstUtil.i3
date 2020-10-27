@@ -99,7 +99,15 @@ INTERFACE EstUtil
     ; KTreeRef : EstHs . KTreeRefTyp 
     ; VAR SliceEdgeInfoPair : EstHs . SliceEdgeInfoPairTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { AssertionFailure }
+
+; PROCEDURE VarTermImage
+    ( NodeRef : LbeStd . EstRootTyp
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
+    )
+  : TEXT
+  (* Token, StringNo, and the string, with escapes. 
+     "", if NodRef is not a non-NIL SharedString.T. *)
 
 ; PROCEDURE EstNodeImage 
     ( NodeRef : LbeStd . EstRootTyp 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -16,7 +16,8 @@ MODULE EstUtil
 ; IMPORT LangUtil 
 ; FROM LangUtil IMPORT PredicateKindTyp 
 ; IMPORT LbeStd 
-; IMPORT MessageCodes 
+; IMPORT MessageCodes
+; IMPORT Misc 
 ; IMPORT ModHs 
 ; IMPORT PortTypes 
 ; IMPORT SharedStrings 
@@ -296,6 +297,33 @@ MODULE EstUtil
       ELSE RETURN FALSE 
       END 
     END IsModTok 
+
+(* VISIBLE: *) 
+; PROCEDURE VarTermImage
+    ( NodeRef : LbeStd . EstRootTyp
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
+    )
+  : TEXT
+  (* Token, StringNo, and the string, with escapes. 
+     "", if NodRef is not a non-NIL SharedString.T. *)
+
+  = BEGIN
+      TYPECASE NodeRef
+      OF NULL => RETURN "" 
+      | SharedStrings . T ( TSharedString )
+      => RETURN
+          "{"
+          & LangUtil . TokImage
+              ( SharedStrings . Tok ( TSharedString ) , Lang ) 
+          & "," 
+          & SharedStrings . StringNoImage
+              ( SharedStrings . StringNo ( TSharedString ) ) 
+          & ","
+          & Misc . QuoteText ( SharedStrings . ToText ( TSharedString ) ) 
+          & "}" 
+      ELSE RETURN ""
+      END (* TYPECASE *) 
+    END VarTermImage 
 
 (* VISIBLE: *) 
 ; PROCEDURE EstNodeImage 

@@ -93,7 +93,7 @@ MODULE Parser
         & ")" 
     END RepairId 
 
-; CONST TraceFileName = LbeStd . AppName & "ParseTrace" 
+; CONST TraceFileName = LbeStd . AppName & "ParseTrace"
 
 ; PROCEDURE WriteTraceParseBegin ( ) RAISES { Thread . Alerted } 
 
@@ -117,7 +117,9 @@ MODULE Parser
         => (* Just give up writing trace. *) 
         END (* TRY EXCEPT *) 
       END (* IF *) 
-    END WriteTraceParseBegin 
+    END WriteTraceParseBegin
+
+; VAR WriteTrials : BOOLEAN := FALSE (* Maybe change this in a debugger. *)
 
 ; PROCEDURE WriteParseTraceText ( Msg : TEXT ) 
   RAISES { Thread . Alerted } 
@@ -218,11 +220,11 @@ MODULE Parser
       ; Wr . PutText ( Options . TraceWrT , ", SeqNo " ) 
       ; Wr . PutText 
           ( Options . TraceWrT , Fmt . Int ( FromStateRef . PtsSeqNo ) ) 
-      ; Wr . PutText ( Options . TraceWrT , ", Tok " ) 
+      ; Wr . PutText ( Options . TraceWrT , ", " ) 
       ; Wr . PutText 
           ( Options . TraceWrT 
-          , LangUtil . TokImage 
-              ( FromStateRef . PtsTokInfo . TiTok , ParseInfo . PiLang )
+          , ParseHs . TokInfoImage 
+              ( FromStateRef . PtsTokInfo , ParseInfo . PiLang )
           ) 
       ; Wr . PutText ( Options . TraceWrT , Wr . EOL ) 
       ; Wr . PutText ( Options . TraceWrT , "        to   " ) 
@@ -232,11 +234,11 @@ MODULE Parser
           ) 
       ; Wr . PutText ( Options . TraceWrT , ", SeqNo " ) 
       ; Wr . PutText ( Options . TraceWrT , Fmt . Int ( LResult . PtsSeqNo ) ) 
-      ; Wr . PutText ( Options . TraceWrT , ", Tok " ) 
+      ; Wr . PutText ( Options . TraceWrT , ", " ) 
       ; Wr . PutText 
           ( Options . TraceWrT 
-          , LangUtil . TokImage 
-              ( LResult . PtsTokInfo . TiTok , ParseInfo . PiLang )
+          , ParseHs . TokInfoImage 
+              ( LResult . PtsTokInfo , ParseInfo . PiLang )
           ) 
       ; Wr . PutText ( Options . TraceWrT , ", from LRState " ) 
       ; Wr . PutText ( Options . TraceWrT , Fmt . Int ( LRState ) ) 
@@ -291,10 +293,8 @@ MODULE Parser
         Wr . PutText 
           ( LWrT 
           , Fmt . Pad 
-              ( LangUtil . TokImage 
-                  ( State . PtsTokInfo . TiTok 
-                  , ParseInfo . PiLang 
-                  ) 
+              ( ParseHs . TokInfoImage 
+                  ( State . PtsTokInfo , ParseInfo . PiLang ) 
               , TokPad  
               )  
           )
@@ -355,7 +355,7 @@ MODULE Parser
           ; Wr . PutText 
               ( LWrT 
               , Fmt . Pad 
-                  ( LangUtil . TokImage 
+                  ( LangUtil . TokImage
                       ( LPse ^ . PseTok , ParseInfo . PiLang ) 
                   , TokPad  
                   )  
@@ -396,10 +396,8 @@ MODULE Parser
               ; Wr . PutText 
                   ( LWrT 
                   , Fmt . Pad 
-                      ( LangUtil . TokImage 
-                          ( LBse ^ . BseTokInfo . TiTok 
-                          , ParseInfo . PiLang 
-                          ) 
+                      ( ParseHs . TokInfoImage 
+                          ( LBse ^ . BseTokInfo , ParseInfo . PiLang )
                       , TokPad  
                       )  
                   )
@@ -520,11 +518,11 @@ MODULE Parser
         ; Wr . PutText 
             ( Options . TraceWrT 
             , "Shift "
-              & LangUtil . TokImage ( TokInfo . TiTok , ParseInfo . PiLang ) 
+              & ParseHs . TokInfoImage ( TokInfo , ParseInfo . PiLang ) 
               & ", to LRState = " 
               & Fmt . Int ( ShiftLRState )  
               & ", Delete = " 
-              & Fmt . Bool ( Delete ) 
+              & Misc . BooleanImageShort ( Delete ) 
               & ", Full = " 
               & ParseHs . TempMarkRangeImage ( TokInfo . TiFullTempMarkRange ) 
               & ", Patch = " 
@@ -2353,14 +2351,14 @@ TRUE OR
           ; Wr . PutText 
               ( Options . TraceWrT 
               , ", Tok = " 
-                & LangUtil . TokImage 
-                    ( LB . BseTokInfo . TiTok  , ParseInfo . PiLang ) 
+                & ParseHs . TokInfoImage 
+                    ( LB . BseTokInfo , ParseInfo . PiLang ) 
                 & ", " 
-                & Fmt . Bool ( LB . BseTokInfo . TiIsInterior )  
+                & Misc . BooleanImageShort ( LB . BseTokInfo . TiIsInterior )  
                 & ", " 
-                & Fmt . Bool ( LB . BseWasInsertedByParser )  
+                & Misc . BooleanImageShort ( LB . BseWasInsertedByParser )  
                 & ", " 
-                & Fmt . Bool ( LB . BseWasDeletedByParser )  
+                & Misc . BooleanImageShort ( LB . BseWasDeletedByParser )  
                 & Wr . EOL 
               ) 
           ; LB := LB ^ . BseLink 
@@ -2431,10 +2429,8 @@ TRUE OR
           ; Wr . PutText ( Options . TraceWrT , ", Tok " )
           ; Wr . PutText 
               ( Options . TraceWrT 
-                  , LangUtil . TokImage 
-                      ( BuildStackTopRef . BseTokInfo . TiTok 
-                      , ParseInfo . PiLang 
-                      )
+                  , ParseHs . TokInfoImage 
+                      ( BuildStackTopRef . BseTokInfo , ParseInfo . PiLang )
              ) 
           ; Wr . PutText ( Options . TraceWrT , ", " )
           ELSE 
@@ -3106,8 +3102,6 @@ TRUE OR
       ; TokInfo . TiIsInsertionRepair := TRUE  
       ; TokInfo . TiSyntTokCt := 1 
       ; TokInfo . TiFullTempMarkRange := ParseHs . TempMarkRangeEmpty 
-      ; TokInfo . TiFullTempMarkRange . From := 47 
-      ; TokInfo . TiFullTempMarkRange . To := 47 
       ; TokInfo . TiPatchTempMarkRange := ParseHs . TempMarkRangeNull 
       END RepBuildTokInsertionRepairSlice 
 
@@ -3169,15 +3163,18 @@ TRUE OR
         ELSE 
           LCost 
             := ParseInfo . PiGram . InsertionCostRef ^ 
-                 [ LContTok - ParseInfo . PiGram . FirstTerminal ] 
-        ; WriteParseTraceText 
-            ( RepairId ( ParseInfo ) 
-              & "Try continuation Tok "
-              & LangUtil . TokImage ( LContTok , ParseInfo . PiLang ) 
-              & " at insertion cost " 
-              & LbeStd . RepairCostImage ( LCost ) 
-              & Wr . EOL  
-            )  
+                 [ LContTok - ParseInfo . PiGram . FirstTerminal ]
+        ; IF WriteTrials
+          THEN 
+            WriteParseTraceText 
+              ( RepairId ( ParseInfo ) 
+                & "Try continuation Tok "
+                & LangUtil . TokImage ( LContTok , ParseInfo . PiLang ) 
+                & " at insertion cost " 
+                & LbeStd . RepairCostImage ( LCost ) 
+                & Wr . EOL  
+              )
+          END (* IF *)
         ; LOOP (* Parsing actions through accept or one shift. *) 
             LAction 
               := LRTable . Action ( ParseInfo . PiGram , LLRState , LContTok ) 
@@ -3389,14 +3386,18 @@ TRUE OR
               EXIT (* Single tokens. *) 
             END (* IF *) 
           ; INC ( ParseInfo . PiAttemptedRepairActionCt ) 
-          ; WriteParseTraceText 
-              ( RepairId ( ParseInfo ) 
-                & "Try inserting single Tok "
-                & LangUtil . TokImage ( LTokInfo . TiTok , ParseInfo . PiLang ) 
-                & " at cost " 
-                & LbeStd . RepairCostImage ( LCost ) 
-                & Wr . EOL  
-              )  
+          ; IF WriteTrials
+            THEN
+              WriteParseTraceText 
+                ( RepairId ( ParseInfo ) 
+                  & "Try inserting single Tok "
+                  & ParseHs . TokInfoImage
+                      ( LTokInfo , ParseInfo . PiLang ) 
+                  & " at cost " 
+                  & LbeStd . RepairCostImage ( LCost ) 
+                  & Wr . EOL  
+                )
+            END (* IF *) 
           ; LStateList := LStateListAfterDeletions 
           ; LOOP (* Thru parsing actions that are possible when the proposed
                     to-be-inserted token is treated as the lookahead. 
@@ -3490,8 +3491,8 @@ TRUE OR
                     WriteParseTraceText 
                       ( RepairId ( ParseInfo ) 
                         & "Single Tok "
-                        & LangUtil . TokImage 
-                            ( LTokInfo . TiTok , ParseInfo . PiLang ) 
+                        & ParseHs . TokInfoImage 
+                            ( LTokInfo , ParseInfo . PiLang ) 
                         & " succeeded at total cost " 
                         & LbeStd . RepairCostImage ( LCost ) 
                         & " < best cost " 
@@ -3499,7 +3500,7 @@ TRUE OR
                         & " with parse check " 
                         & LbeStd . LimitedTokCtImage ( LActualParseCheck ) 
                         & ", Accept = " 
-                        & Fmt . Bool ( LAccepted ) 
+                        & Misc . BooleanImageShort ( LAccepted ) 
                         & Wr . EOL  
                       )  
                   ; RepBestCost := LCost 
@@ -3599,7 +3600,7 @@ TRUE OR
                       WriteParseTraceText 
                         ( RepairId ( ParseInfo ) 
                           & "Continuation Tok "
-                          & LangUtil . TokImage 
+                          & LangUtil . TokImage
                               ( LContTok , ParseInfo . PiLang ) 
                           & " succeeded at total cost " 
                          & LbeStd . RepairCostImage ( LCost ) 
@@ -3608,7 +3609,7 @@ TRUE OR
                           & " with parse check " 
                           & LbeStd . LimitedTokCtImage ( LActualParseCheck ) 
                           & ", Accept = " 
-                          & Fmt . Bool ( LAccepted ) 
+                          & Misc . BooleanImageShort ( LAccepted ) 
                           & Wr . EOL  
                         )  
                     ; RepBestCost := LCost 
@@ -3680,8 +3681,8 @@ TRUE OR
               THEN
                 WriteParseTraceText 
                   ( "Deleting Tok "
-                    & LangUtil . TokImage 
-                        ( LTokInfo . TiTok , ParseInfo . PiLang ) 
+                    & ParseHs . TokInfoImage 
+                        ( LTokInfo , ParseInfo . PiLang ) 
                     & " would cost " 
                     & LbeStd . RepairCostImage ( LCostOfDeletions ) 
                     & ", no better than best cost of " 
@@ -3690,16 +3691,19 @@ TRUE OR
                   )  
               ; EXIT (* From loop thru deletions *) 
               ELSE 
-                INC ( ParseInfo . PiAttemptedRepairActionCt ) 
-              ; WriteParseTraceText 
-                  ( RepairId ( ParseInfo ) 
-                    & "Try deleting Tok " 
-                    & LangUtil . TokImage 
-                        ( LTokInfo . TiTok , ParseInfo . PiLang ) 
-                    & " at deletions-only cost " 
-                    & LbeStd . RepairCostImage ( LCostOfDeletions ) 
-                    & Wr . EOL  
-                  ) 
+                INC ( ParseInfo . PiAttemptedRepairActionCt )
+              ; IF WriteTrials
+                THEN 
+                  WriteParseTraceText 
+                    ( RepairId ( ParseInfo ) 
+                      & "Try deleting Tok " 
+                      & ParseHs . TokInfoImage 
+                          ( LTokInfo , ParseInfo . PiLang ) 
+                      & " at deletions-only cost " 
+                      & LbeStd . RepairCostImage ( LCostOfDeletions ) 
+                      & Wr . EOL  
+                    )
+                END (* IF *) 
               ; RepConstructAntideletion 
                   ( (* IN OUT *) LTokInfo , (* IN OUT *) WStateAfterDeletions )
               ; WStateAfterDeletions . PtsParseTravStateRef 
@@ -3741,14 +3745,14 @@ TRUE OR
                     WriteParseTraceText 
                       ( RepairId ( ParseInfo ) 
                         & "Deleting Tok " 
-                        & LangUtil . TokImage 
-                            ( LTokInfo . TiTok , ParseInfo . PiLang ) 
+                        & ParseHs . TokInfoImage 
+                            ( LTokInfo , ParseInfo . PiLang ) 
                         & " succeeded at total parse cost " 
                         & LbeStd . RepairCostImage ( LCost ) 
                         & " better than previous best cost of " 
                         & LbeStd . RepairCostImage ( RepBestCost ) 
                         & ", Accept = " 
-                        & Fmt . Bool ( LAccepted ) 
+                        & Misc . BooleanImageShort ( LAccepted ) 
                         & Wr . EOL  
                       ) 
                   ; RepBestCost := LCost 

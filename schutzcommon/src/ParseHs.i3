@@ -99,7 +99,16 @@ INTERFACE ParseHs
       ; TiSyntTokCt : LbeStd . LimitedTokCtTyp := 0 
       ; TiIsInterior : BITS 1 FOR BOOLEAN := FALSE 
       ; TiIsInsertionRepair : BITS 1 FOR BOOLEAN := FALSE 
-      END (* RECORD TokInfoTyp *) 
+      END (* RECORD TokInfoTyp *)
+
+; PROCEDURE TokInfoSharedString
+    ( READONLY TokInfo : TokInfoTyp ; Lang : LbeStd . LangTyp )
+  : SharedStrings . T
+  (* NIL if TokInfo is not for a VarTerm. *)
+
+; PROCEDURE TokInfoImage
+    ( READONLY TokInfo : TokInfoTyp ; Lang : LbeStd . LangTyp )
+  : TEXT
 
 (* Info needed for both Est traversal and file/keyboard scanning *) 
 (* Everything in ScanInfoTyp is relative to NEW TOKENS. *) 
@@ -189,7 +198,7 @@ INTERFACE ParseHs
        PtsAdvanceStateRef : ParseTravStateRefTyp 
       (* ^If an advance operation from this state has been done, 
           this will point to the state it leads to, so that state does not 
-          have to be recomputed, if the advance is repeated. *) 
+          have to be recomputed, should the advance be repeated. *) 
       ; PtsTokInfo : TokInfoTyp 
       ; PtsPrevTokAfter : LbeStd . TokTyp (* After any scanning. *) 
       ; PtsNonCmntSeenOnLine : BOOLEAN 
@@ -276,7 +285,7 @@ INTERFACE ParseHs
       END (* OBJECT  StackElemFsTyp *) 
 
 (* The slice list.  A right-to-left, linear linked list of nodes 
-   which hold slices of real Est lists, or just single Est subtrees. *) 
+   that hold slices of real Est lists, or just single Est subtrees. *) 
 
 ; TYPE SliceListElemRefTyp = REF SliceListElemTyp 
 ; TYPE SliceListElemTyp 

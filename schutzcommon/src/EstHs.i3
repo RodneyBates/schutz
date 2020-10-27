@@ -225,7 +225,7 @@ INTERFACE EstHs
         (* ^The empty Est node that follows a trailing separator. *) 
 (* TODO: As of 2012-8-3, this mechanism is unused, being replaced by
          EstNodeKindTrail.  But traversers are still checking for
-         it, in case it is instated. *) 
+         it, in case it should be reinstated. *) 
 ; CONST EstChildKindMax = 12 
 
 ; TYPE EstChildKindTyp = [ EstChildKindMin .. EstChildKindMax ] 

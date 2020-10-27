@@ -10,7 +10,11 @@ MODULE ParseHs
 
 (* Data structures for (re)parsing. *) 
 
-; IMPORT LbeStd 
+; IMPORT EstHs
+; IMPORT EstUtil
+; IMPORT LangUtil 
+; IMPORT LbeStd
+; IMPORT SharedStrings 
 
 (* VISIBLE: *) 
 ; PROCEDURE CopyOfTempMarkList 
@@ -59,6 +63,80 @@ MODULE ParseHs
         & LbeStd . MarkNoImage ( Range . To ) 
         & ")"
     END TempMarkRangeImage 
+
+(* VISIBLE: *) 
+; PROCEDURE TokInfoSharedString
+    ( READONLY TokInfo : TokInfoTyp ; Lang : LbeStd . LangTyp )
+  : SharedStrings . T
+  (* NIL if TokInfo is not for a VarTerm. *)
+
+  = VAR LSliceListElemRef : SliceListElemRefTyp
+  ; VAR LStartChildNo : LbeStd . EstChildNoTyp 
+  ; VAR LChildNo : LbeStd . EstChildNoTyp 
+  ; VAR LChildRelNodeNo : LbeStd . EstNodeNoTyp
+  ; VAR LTok : LbeStd . TokTyp 
+  ; VAR LLeafElem : EstHs . LeafElemTyp 
+
+  ; BEGIN
+      LTok := LangUtil . VarTermTok ( Lang , TokInfo . TiTok )
+    ; LSliceListElemRef := TokInfo . TiSliceListRMRoot
+    ; WHILE LSliceListElemRef # NIL
+      DO IF LSliceListElemRef . SleIsSlice
+        THEN
+          LStartChildNo := LSliceListElemRef . SleFrom
+        ; LOOP 
+            EstUtil . NextInKindSet
+               ( LSliceListElemRef . SleNodeRef
+               , LSliceListElemRef . SleFrom 
+               , EstHs . EstChildKindSetEstChild
+               , (* VAR *) LChildNo 
+               , (* VAR *) LChildRelNodeNo 
+               , (* VAR *) LLeafElem
+               )
+          ; IF LChildRelNodeNo >=LSliceListElemRef . SleTo
+            THEN EXIT
+            ELSE 
+              TYPECASE LLeafElem . LeChildRef 
+              OF NULL =>
+              | SharedStrings . T ( TSharedString )
+              => IF SharedStrings . Tok ( TSharedString ) = LTok
+(* FIXME: Check for a modtok, here and sigle est case. *) 
+                THEN RETURN TSharedString
+                END (* IF *)
+              ELSE
+              END (* TYPECASE *)
+            ; LStartChildNo := LChildNo
+            END (* IF *) 
+          END (* LOOP *)
+        ELSE (* Single Est. *) 
+          TYPECASE LSliceListElemRef . SleNodeRef
+          OF NULL =>
+          | SharedStrings . T ( TSharedString )
+          => IF SharedStrings . Tok ( TSharedString ) = LTok
+             THEN RETURN TSharedString
+             END (* IF *) 
+          ELSE
+          END (* TYPECASE *) 
+        END (* IF *)
+      ; LSliceListElemRef := LSliceListElemRef . SlePredLink
+      END (* LOOP *)
+    ; RETURN NIL 
+    END TokInfoSharedString
+
+(* VISIBLE: *) 
+; PROCEDURE TokInfoImage
+    ( READONLY TokInfo : TokInfoTyp ; Lang : LbeStd . LangTyp )
+  : TEXT
+
+  = VAR LSharedString : SharedStrings . T
+
+  ; BEGIN
+      LSharedString := TokInfoSharedString ( TokInfo , Lang )
+    ; IF LSharedString = NIL
+      THEN RETURN LangUtil . TokImage ( TokInfo . TiTok , Lang )
+      ELSE RETURN EstUtil . VarTermImage ( LSharedString , Lang ) 
+      END (* END *) 
+    END TokInfoImage 
 
 (* VISIBLE: *) 
 ; PROCEDURE ParseTravStateKindImage ( Kind : ParseTravStateKindTyp ) : TEXT 

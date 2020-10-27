@@ -30,7 +30,6 @@ EXPORTS ParseTrv , ScannerIf
 ; IMPORT Coroutine 
 ; IMPORT EstHs 
 ; IMPORT EstUtil
-; IMPORT FileWr 
 ; IMPORT LangUtil 
 ; FROM LangUtil IMPORT FsKindTyp
 ; IMPORT Layout 
@@ -48,7 +47,8 @@ EXPORTS ParseTrv , ScannerIf
 ; FROM ScannerIfRep IMPORT ScanResumeKindTyp 
 ; IMPORT SharedStrings 
 ; IMPORT Strings 
-; IMPORT TravUtil 
+; IMPORT TravUtil
+; IMPORT VersionedFiles 
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -512,7 +512,10 @@ EXPORTS ParseTrv , ScannerIf
     END TraverseStates
 
 ; PROCEDURE DumpState
-    ( LayoutWrT : Layout . T ; StateRef : ParseHs . ParseTravStateEstRefTyp )
+    ( LayoutWrT : Layout . T
+    ; StateRef : ParseHs . ParseTravStateEstRefTyp
+    ; READONLY ParseInfo : ParseHs . ParseInfoTyp
+    )
 
   = CONST SeqNoPad = 2
   ; VAR LStartPos : INTEGER 
@@ -523,7 +526,9 @@ EXPORTS ParseTrv , ScannerIf
         ( LayoutWrT , Fmt . Pad ( Fmt . Int ( StateRef . PtsSeqNo ) , SeqNoPad ) )
     ; Layout . PutChar ( LayoutWrT , ' ' )
     ; Layout . PutText
-        ( LayoutWrT , LbeStd . NumIdTokImage ( StateRef . PtsTokInfo . TiTok ) )
+        ( LayoutWrT
+        , ParseHs . TokInfoImage ( StateRef . PtsTokInfo , ParseInfo . PiLang )
+        )
     ; Layout . PutChar ( LayoutWrT , ' ' )
     ; Layout . PutText
         ( LayoutWrT
@@ -542,10 +547,15 @@ EXPORTS ParseTrv , ScannerIf
     ; Layout . PutChar ( LayoutWrT , ']' )
     ; Layout . PutChar ( LayoutWrT , ' ' )
     ; Layout . PutText
-        ( LayoutWrT , Fmt . Bool ( StateRef . PtsTokInfo . TiIsInterior ) )
+        ( LayoutWrT
+        , Misc . BooleanImageShort ( StateRef . PtsTokInfo . TiIsInterior )
+        )
     ; Layout . PutChar ( LayoutWrT , ' ' )
     ; Layout . PutText
-        ( LayoutWrT , Fmt . Bool ( StateRef . PtsTokInfo . TiIsInsertionRepair ) )
+        ( LayoutWrT
+        , Misc . BooleanImageShort
+            ( StateRef . PtsTokInfo . TiIsInsertionRepair )
+        )
     ; Layout . PutEol ( LayoutWrT ) 
     END DumpState
 
@@ -557,7 +567,7 @@ EXPORTS ParseTrv , ScannerIf
   ; VAR DsgLayoutWrT : Layout . T
 
   ; PROCEDURE Visit  
-      ( <* UNUSED *> READONLY ParseInfo : ParseHs . ParseInfoTyp
+      ( READONLY ParseInfo : ParseHs . ParseInfoTyp
       ; StateRef : ParseHs . ParseTravStateRefTyp
       ; Depth : INTEGER 
       )
@@ -570,12 +580,12 @@ EXPORTS ParseTrv , ScannerIf
       ; Layout . PutChar ( DsgLayoutWrT , ' ' ) 
       ; Layout . PutText
           ( DsgLayoutWrT , Fmt . Pad ( " " , Depth * IndentAmt ) )
-      ; DumpState ( DsgLayoutWrT , StateRef ) 
+      ; DumpState ( DsgLayoutWrT , StateRef , ParseInfo ) 
       END Visit 
   
   ; BEGIN (* DumpStateGraph *)
       TRY 
-        DsgWrT := FileWr . Open ( FileName )
+        DsgWrT := VersionedFiles . OpenWrite ( FileName )
       EXCEPT OSError . E ( Code ) 
       => Assertions . MessageText
            ( "DumpStateGraph: unable to open file \"" & FileName & "\".")
@@ -655,7 +665,9 @@ EXPORTS ParseTrv , ScannerIf
     ; VAR LChildEstRef : LbeStd . EstRootTyp 
     ; VAR LStringRef : SharedStrings . T 
     ; VAR LEstParentRef : EstHs . EstRefTyp 
-    ; VAR LTok , LChildTok : LbeStd . TokTyp 
+    ; VAR LTok , LChildTok : LbeStd . TokTyp
+(* TODO: Fix ParseHs.TokInfoImage so it will take a Tok and an EstRef
+         as separate params, then use it here. *)
 
     ; <* FATAL Thread . Alerted , Wr . Failure *>
       BEGIN 
@@ -5448,7 +5460,7 @@ END ;
       ; NpsNextTempMarkIsRelevant := FALSE 
       END NpsInitNps 
 
-; VAR SeqNoToStop : INTEGER := 10  
+; VAR SeqNoToStop : INTEGER := 8  
 
   ; PROCEDURE NpsParseFromEst ( ) RAISES { AssertionFailure } 
 
@@ -5597,7 +5609,14 @@ END ;
 ; LToStateEstRef := NpsResultStateRef 
           ELSE (* Must actually compute the advance successor *) 
             NpsResultStateEstRef 
-              := RefToNewCopyOfParseTravStateEst ( LFromStateEstRef ) 
+              := RefToNewCopyOfParseTravStateEst ( LFromStateEstRef )
+; IF LFromStateEstRef . PtsSeqNo = SeqNoToStop
+  THEN
+    VAR I := 0
+  ; BEGIN
+      I := 1
+    END
+  END
           ; NpsResultStateRef := NpsResultStateEstRef 
           ; NpsResultStateStreamRef := NIL (* Force RT error if used. *) 
           ; InitTokInfo ( NpsResultStateRef . PtsTokInfo )  
