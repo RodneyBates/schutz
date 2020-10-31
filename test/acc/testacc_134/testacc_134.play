@@ -56,7 +56,7 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char 'a'
-STOP
+
 SemParse
 CursorRight
 CursorRight
@@ -68,6 +68,7 @@ SemParse
 MouseClickChar 15 2
 CharDelBwd
 CharType_Char ','
+
 SemParse
 CursorRight
 CursorRight
@@ -143,6 +144,7 @@ SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'T'
+
 SemParse
 CursorRight
 CursorRight
@@ -150,24 +152,30 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char ' '
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'T'
+
 SemParse
 CursorRight
 CharDelBwd
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char '='
+
 SemParse
 CursorRight
 CharDelBwd
+STOP
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'R'
+
 SemParse
 CursorDown
 CursorLeft
@@ -183,14 +191,16 @@ CursorLeft
 CursorLeft
 CharDelBwd
 CharType_Char ';'
-STOP
+
 SemParse
 CursorRight
 CharDelBwd
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'T'
+
 SemParse
 CursorRight
 CursorRight
@@ -198,30 +208,38 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char ' '
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'A'
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char ' '
+
 SemParse
 CharDelBwd
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char '='
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char ' '
+
 SemParse
 CharDelBwd
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'A'
+
 SemParse
 CursorRight
 CursorRight
@@ -230,10 +248,12 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char ' '
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'x'
+
 SemParse
 CursorRight
 CursorRight
@@ -241,28 +261,34 @@ CursorRight
 CharDelBwd
 CharDelBwd
 CharDelBwd
+
 SemParse
 CursorRight
 CursorRight
 CursorRight
 CharDelBwd
 CharType_Char ' '
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'O'
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'F'
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char ' '
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'y'
+
 SemParse
 CursorRight
 CursorRight
@@ -270,6 +296,7 @@ CursorRight
 CharDelBwd
 CharDelBwd
 CharDelBwd
+
 SemParse
 CursorDown
 CursorLeft
@@ -299,16 +326,20 @@ CursorLeft
 CharDelBwd
 CharType_Char ';'
 STOP
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char ' '
+
 SemParse
 CharDelBwd
+
 SemParse
 CursorRight
 CharDelBwd
 CharType_Char 'B'
+
 SemParse
 CursorRight
 CursorRight
@@ -316,6 +347,7 @@ CursorRight
 CursorRight
 CharDelBwd
 CharType_Char 'N'
+
 SemParse
 CursorDown
 CursorLeft
