@@ -29,7 +29,7 @@ EXPORTS Main
 ; IMPORT Assertions 
 ; FROM Assertions IMPORT AssertionFailure 
 ; IMPORT Files
-; IMPORT GrammarGen    (* Not "used, but types declared within 
+; IMPORT GrammarGen    (* Not "used", but types declared within 
                                        are needed by pickles. *)
 ; IMPORT LangMap 
 ; IMPORT LangUtil 
@@ -37,11 +37,11 @@ EXPORTS Main
 ; IMPORT LbeStd 
 ; IMPORT Ldl0Bundle 
 ; IMPORT Ldl0Scanner   (* Not "used", but must register itself. *)
-; IMPORT Ldl0Semantics (* Not "used, but types declared within 
+; IMPORT Ldl0Semantics (* Not "used", but types declared within 
                                        are needed by pickles. *)
 ; IMPORT Ldl1Bundle 
 ; IMPORT Ldl1Scanner   (* Not "used", but must register itself. *)
-; IMPORT Ldl1Semantics (* Not "used, but types declared within 
+; IMPORT Ldl1Semantics (* Not "used", but types declared within 
                                        are needed by pickles. *)
 ; IMPORT LdlSemantics 
 ; IMPORT Messages  
@@ -119,6 +119,7 @@ EXPORTS Main
     ; DL ( "    --version                :Display version and exit." ) 
     ; DL ( "    -h                      " ) 
     ; DL ( "    --help                   :Display help text and exit." ) 
+    ; DL ( "    --crash                  :Make runtime errors crash normally." ) 
     ; DL ( "    -d <display>            " ) 
     ; DL ( "    --display <display>      :Display on <display>." ) 
     ; DL ( "    -g <geometry>     " ) 
@@ -175,12 +176,12 @@ EXPORTS Main
     ; Options . DebugLevel := DefaultDebugLevel 
     ; Options . SetDerivedDebugOptions ( )    
     ; Options . EnablePickleWrite := TRUE  
-    ; Options . DoOptimizeSingletonLists := FALSE 
+    ; Options . DoOptimizeSingletonLists := FALSE
+    ; Options . Crash := FALSE 
     ; Assertions . Callback := Worker . Failure   
  (* ; Assertions . Callback := AssertDevel . AssertDialogCommandLine *) 
  (* ; Assertions . Callback := Assertions . NeverRaise *) 
     ; AssertDevel . DoStop := TRUE 
-    ; RTProcess . RegisterExitor ( AssertDevel . RuntimeFailureDialog ) 
     END SetDefaults 
 
 ; PROCEDURE GetArgs ( ) : BOOLEAN (* True iff should continue. *) 
@@ -251,6 +252,10 @@ EXPORTS Main
                      ) 
           ; Options . SetDerivedDebugOptions ( ) 
           ; IF GaBadArgs THEN EXIT END 
+          ELSIF Text . Equal ( Params . Get ( GaArgNo ) , "--crash" ) 
+          THEN 
+            Options . Crash := TRUE 
+          ; INC ( GaArgNo ) 
           ELSIF Text . Equal ( Params . Get ( GaArgNo ) , "-d" ) 
                 OR Text . Equal ( Params . Get ( GaArgNo ) , "--display" ) 
           THEN 
@@ -342,6 +347,9 @@ EXPORTS Main
           ; INC ( GaArgNo ) 
           END (* IF *) 
         END (* LOOP *) 
+      ; IF NOT Options . Crash
+        THEN RTProcess . RegisterExitor ( AssertDevel . RuntimeFailureDialog )
+        END (* IF *) 
       ; IF GaHelp OR GaBadArgs 
         THEN 
           DisplayVersion ( ) 
@@ -365,7 +373,7 @@ EXPORTS Main
                  ) 
         ; RETURN TRUE  
         END (* IF *) 
-      END (* Block *) 
+      END (* Block *)
     END GetArgs 
 
 (* TODO: Make manual language loading and tree browsing devel gui functions. *) 
@@ -409,8 +417,16 @@ EXPORTS Main
         ELSE UiDevel . ShowDebugOptions ( )
         END (* IF *)
       ELSE Assertions . TerminatingNormally := TRUE 
-      END (* IF *) 
-    END Work 
+      END (* IF *)
+    END Work
+
+; <* UNUSED *> PROCEDURE CauseRuntimeError ( ) 
+  RAISES { AssertionFailure } <* NOWARN *>
+  (* This is here for use in debugging. *) 
+
+  = BEGIN 
+      <* NOWARN *> EVAL VAL ( - 1 , CARDINAL ) 
+    END CauseRuntimeError 
 
 ; BEGIN (* Lbe *) 
     StackSize ( WantedThreadStackSize ) 

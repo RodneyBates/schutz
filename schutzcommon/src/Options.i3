@@ -34,7 +34,8 @@ INTERFACE Options
 ; VAR ParseTracing : BOOLEAN 
 ; VAR AllowProceedAfterAssert : BOOLEAN 
 ; VAR AllowTerminateAfterAssert : BOOLEAN 
-; VAR PreferGeneratedGrammar : BOOLEAN := FALSE 
+; VAR PreferGeneratedGrammar : BOOLEAN := FALSE
+; VAR Crash : BOOLEAN := FALSE 
 
 ; PROCEDURE SetDerivedDebugOptions ( ) 
 

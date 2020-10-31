@@ -3817,7 +3817,8 @@ MODULE Display
               , "Before BuildMarkList" 
               ) 
           END (* IF *) 
-        ; TempMark . BuildTempMarkList ( ImageRef , LParseInfo ) 
+        ; TempMark . BuildTempMarkList ( ImageRef , LParseInfo )
+          (* ^Sets LParseInfo.PiTempMarkListRef. *)
         ; IF Options . TreeBrowsing 
           THEN
             TreeBrowse . Browse 
