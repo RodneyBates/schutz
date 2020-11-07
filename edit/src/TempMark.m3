@@ -412,7 +412,8 @@ MODULE TempMark
               LOOP 
                 WITH 
                   WTempMark 
-                  = ParseInfo . PiTempMarkListRef ^ [ BtmTempMarkNextElemNo ] 
+                  = ParseInfo . PiOrigTempMarkListRef
+                    ^ [ BtmTempMarkNextElemNo ] 
                 DO 
                   WTempMark . TokMark . EstNodeNo := BtmTmEstNodeNo
                 ; WTempMark . EstRef := BtmTmEstRef  
@@ -1819,18 +1820,18 @@ MODULE TempMark
       VAR LMarkFound : BOOLEAN 
 
     ; BEGIN (* Block  BuildTempMarkList *) 
-        ParseInfo . PiTempMarkListRef := NIL 
+        ParseInfo . PiOrigTempMarkListRef := NIL 
       ; ParseInfo . PiRegularTempMarkCt := LbeStd . MarkNoNull 
       ; IF ImageRef # NIL 
         THEN 
           BtmTempMarkCt := ImageRef . ItPers . IpMarkCt 
         ; IF BtmTempMarkCt > 0 
           THEN 
-            ParseInfo . PiTempMarkListRef 
+            ParseInfo . PiOrigTempMarkListRef 
               := NEW ( ParseHs . TempMarkArrayRefTyp , BtmTempMarkCt ) 
-          ; FOR RI := 0 TO NUMBER ( ParseInfo . PiTempMarkListRef ^ ) - 1 
+          ; FOR RI := 0 TO NUMBER ( ParseInfo . PiOrigTempMarkListRef ^ ) - 1 
             DO 
-              WITH WTempMark = ParseInfo . PiTempMarkListRef ^ [ RI ] 
+              WITH WTempMark = ParseInfo . PiOrigTempMarkListRef ^ [ RI ] 
               DO WTempMark . EstRef := NIL  
               ; WTempMark . TokMark . Kind := MarkKindTyp . Null 
               ; WTempMark . TokMark . FmtNo := EstHs . FmtNoNull 
@@ -2022,9 +2023,9 @@ MODULE TempMark
           RbmLineMarkMeat := RbmLineMarkMeat . LmRightLink 
         ; WITH 
             WNewTempMark 
-            = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+            = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
           , WOldTempMark 
-            = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo - 1 ] 
+            = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo - 1 ] 
           DO RETURN 
                WNewTempMark . TokMark . Kind 
                   # WOldTempMark . TokMark . Kind 
@@ -2235,7 +2236,7 @@ MODULE TempMark
             LOOP 
               WITH 
                 WTempMark 
-                = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
               DO Assert 
                    ( WTempMark . TokMark . Kind # MarkKindTyp . BlankLine 
                    , AFT . A_RbmTeSqueezeTrailingTempMarks_BlankLine 
@@ -2275,7 +2276,7 @@ MODULE TempMark
             LOOP 
               WITH 
                 WTempMark 
-                = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
               DO Assert 
                    ( WTempMark . TokMark . Kind # MarkKindTyp . BlankLine 
                    , AFT . A_RbmTeBuildSomeMarksForTok_BlankLine 
@@ -2319,7 +2320,7 @@ MODULE TempMark
           THEN 
             WITH 
               WTempMark 
-              = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+              = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
             DO 
                IF CurrentEstRef = WTempMark . EstRef  
                THEN 
@@ -2347,7 +2348,7 @@ MODULE TempMark
             => 
                Assert 
                  ( String 
-                   = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                   = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                      . EstRef 
                  , AFT . A_RbmTeLeafString_DescendNoTempMark 
                  ) 
@@ -2634,7 +2635,7 @@ MODULE TempMark
                         , EstRef 
                             := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                         , StartMark 
-                            := ParseInfo . PiTempMarkListRef 
+                            := ParseInfo . PiOrigTempMarkListRef 
                                ^ [ RbmTempMarkElemNo ]  
                                  . TokMark 
                         , StartMarkIsKnownNl := FALSE 
@@ -2753,7 +2754,7 @@ MODULE TempMark
                    ) 
               ; Assert 
                   ( ModBlankLine 
-                    = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                    = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                       . EstRef 
                   , AFT . A_RbmTeTfsBlankLine_MarkedModMismatch 
                   ) 
@@ -2772,7 +2773,7 @@ MODULE TempMark
               ; LOOP (* Thru temp marks in this blank line *) 
                   WITH 
                     WTempMark 
-                    = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                    = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                   DO Assert 
                        ( RbmTempMarkElemNo < RbmTempMarkElemCt 
                          AND WTempMark . TokMark . Kind 
@@ -2942,7 +2943,7 @@ MODULE TempMark
                    ) 
               ; Assert 
                     ( ModCmnt 
-                      = ParseInfo . PiTempMarkListRef ^ 
+                      = ParseInfo . PiOrigTempMarkListRef ^ 
                         [ RbmTempMarkElemNo ] 
                         . EstRef  
                     , AFT . A_RbmTeTfsLeadingModsNoDel_MarkedModMismatch 
@@ -3464,7 +3465,7 @@ MODULE TempMark
               OF RbmStateDescend 
               => WITH 
                    WTempMark 
-                   = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                   = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                  DO (* The next temp mark should denote this InsTok. *) 
 (* CHECK: Sheesh.  Is all this really necessary? *) 
                     CASE WTempMark . TokMark . Kind <* NOWARN *> 
@@ -3519,7 +3520,7 @@ MODULE TempMark
                 THEN 
                   WITH 
                     WTempMark 
-                    = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                    = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                   DO (* If next temp mark applies to this InsTok, do the 
                         building of all marks within. *) 
                      CASE WTempMark . TokMark . Kind 
@@ -3529,7 +3530,7 @@ MODULE TempMark
                                = WTempMark . EstRef 
                         THEN 
                           RbmTeBuildSomeMarksForTok 
-                            ( RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef ) 
+                            ( RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef )
                         END (* IF *) 
                      | MarkKindTyp . RightSibFmtNo 
                      => IF WTempMark . TokMark . FmtNo = FsNodeRef . FsFmtNo 
@@ -3878,7 +3879,7 @@ MODULE TempMark
 (* CHECK^ On this. *) 
                         , RbmTeEstTravInfo 
                         , StartMark 
-                            := ParseInfo . PiTempMarkListRef ^ 
+                            := ParseInfo . PiOrigTempMarkListRef ^ 
                                  [ RbmTempMarkElemNo ]  
                                . TokMark 
                         , StartMarkIsKnownNl := FALSE 
@@ -3986,7 +3987,7 @@ MODULE TempMark
 
         = BEGIN   
             WITH WTempMark 
-                 = ParseInfo . PiTempMarkListRef <* NOWARN *> 
+                 = ParseInfo . PiOrigTempMarkListRef <* NOWARN *> 
                    ^ [ RbmTempMarkElemNo ] 
             DO 
               IF RbmTeEstTravInfo . EtiChildNo 
@@ -4254,7 +4255,7 @@ MODULE TempMark
             RbmTeDoneWEst := FALSE 
           ; WITH 
               WTempMark 
-              = ParseInfo . PiTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+              = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
             DO 
               IF RbmTeEstTravInfo . EtiNodeRef = WTempMark . EstRef 
               THEN (* The next temp mark denotes the Est parent node. *) 
@@ -4536,7 +4537,7 @@ FALSE AND             WTempMark . EstRef
         IF NewEstRef # NIL 
         THEN 
           RbmImagePers := ImageRef . ItPers 
-        ; RbmTempMarkElemCt := NUMBER ( ParseInfo . PiTempMarkListRef ^ ) 
+        ; RbmTempMarkElemCt := NUMBER ( ParseInfo . PiOrigTempMarkListRef ^ ) 
         ; Assert 
             ( RbmTempMarkElemCt > 0 
             , AFT . A_RebuildMarkList_EmptyTempMarkList 

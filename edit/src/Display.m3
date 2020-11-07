@@ -3789,7 +3789,6 @@ MODULE Display
   ; VAR LOldEstRef : LbeStd . EstRootTyp 
   ; VAR LNewEstRef : LbeStd . EstRootTyp 
   ; VAR LScannerIf : ScannerIf . ScanIfTyp 
-  ; VAR LOldTempMarkList : ParseHs . TempMarkArrayRefTyp
   ; VAR LInitialParseTravStateRef : ParseHs . ParseTravStateRefTyp 
 
   ; BEGIN (* Reparse *) 
@@ -3818,7 +3817,7 @@ MODULE Display
               ) 
           END (* IF *) 
         ; TempMark . BuildTempMarkList ( ImageRef , LParseInfo )
-          (* ^Sets LParseInfo.PiTempMarkListRef. *)
+          (* ^Sets LParseInfo.PiOrigTempMarkListRef. *)
         ; IF Options . TreeBrowsing 
           THEN
             TreeBrowse . Browse 
@@ -3826,11 +3825,6 @@ MODULE Display
               , "After BuildMarkList, before parse" 
               ) 
           END (* IF *) 
-; LOldTempMarkList
-    := NEW ( ParseHs . TempMarkArrayRefTyp 
-           , NUMBER ( LParseInfo . PiTempMarkListRef ^ ) 
-           ) 
-; LOldTempMarkList ^ := LParseInfo . PiTempMarkListRef ^
         ; LInitialParseTravStateRef
             := ParseTrv . InitParseEst ( LParseInfo , LOldEstRef )
         ; Parser . Parse 

@@ -1084,12 +1084,12 @@ END
 
     = BEGIN (* NpsCheckNextTempMarkForEstLeaf *) 
         IF NpsNextTempMarkSs 
-           >= NUMBER ( ParseInfo . PiTempMarkListRef ^ ) 
+           >= NUMBER ( ParseInfo . PiOrigTempMarkListRef ^ ) 
         THEN (* No TempMarks left *) 
           NpsNextTempMarkIsRelevant := FALSE 
         ELSE 
           WITH WTempMark 
-               = ParseInfo . PiTempMarkListRef ^ [ NpsNextTempMarkSs ]
+               = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
           DO 
             NpsNextTempMarkIsRelevant
               := WTempMark . TokMark . Kind 
@@ -1109,11 +1109,11 @@ END
     ; BEGIN (* NpsCheckNextTempMarkForInsTok *) 
         NpsNextTempMarkIsRelevant := FALSE
       ; IF NpsNextTempMarkSs 
-           < NUMBER ( ParseInfo . PiTempMarkListRef ^ ) 
+           < NUMBER ( ParseInfo . PiOrigTempMarkListRef ^ ) 
         THEN (* Some TempMarks left *) 
           WITH 
             WTempMark 
-            = ParseInfo . PiTempMarkListRef ^ [ NpsNextTempMarkSs ] 
+            = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ] 
             , WTravInfo = NpsSeEstRef . SeEstTravInfo  
           DO IF WTempMark . TokMark . FmtNo = FmtNo 
             THEN
@@ -1187,22 +1187,21 @@ END
     *)
 
     = BEGIN 
-        IF ParseInfo . PiParseKind 
-           = LbeStd . ParseKindTyp . ParseKindTrav 
-           AND NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange )  
-        THEN (* Rebias temp marks in the token. *) 
-          FOR RTempMarkSs := NpsTempMarkRange . From 
-              TO NpsTempMarkRange . To - 1  
-          DO WITH 
-               WCharPos  
-               = ParseInfo . PiTempMarkListRef ^ [ RTempMarkSs ] . CharPos 
-             DO 
-               WCharPos := WCharPos - TokBegPos 
-               (* Reconvert to token-relative. *) 
-(* TODO: ^Overflows/saturation. *) 
-             END (* WITH *) 
-          END (* FOR *) 
-        END (* IF *) 
+        IF ParseInfo . PiParseKind # LbeStd . ParseKindTyp . ParseKindTrav
+        THEN RETURN
+        END (* IF *)
+      ; IF TokBegPos = 0 THEN RETURN END (* IF *) 
+      ; IF ParseHs . RangeIsEmpty ( NpsTempMarkRange ) THEN RETURN END (* IF *)
+      
+      ; FOR RTempMarkSs := NpsTempMarkRange . From 
+            TO NpsTempMarkRange . To - 1  
+        DO WITH 
+             WCharPos  
+             = ParseInfo . PiTravTempMarkListRef ^ [ RTempMarkSs ] . CharPos 
+           DO WCharPos := WCharPos - TokBegPos 
+(* TODO:                           ^Overflows/saturation. *) 
+           END (* WITH *) 
+        END (* FOR *) 
       END NpsBiasTempMarks 
 
   ; PROCEDURE NpsPatchTmEstRefs 
@@ -1216,12 +1215,13 @@ END
         IF ParseInfo . PiParseKind 
            = LbeStd . ParseKindTyp . ParseKindTrav 
            AND NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
-        THEN 
+        THEN
+(* TODO: Assert we are not in descend-only-by-parser-request sequence. (How?) *)
           FOR RTempMarkSs := NpsTempMarkRange . From 
               TO NpsTempMarkRange . To - 1 
           DO WITH 
                WTempMark 
-               = ParseInfo . PiTempMarkListRef ^ [ RTempMarkSs ] 
+               = ParseInfo . PiTravTempMarkListRef ^ [ RTempMarkSs ] 
              DO WTempMark . EstRef := NodeRef 
              ; WTempMark . TokMark . Kind := Kind 
              END (* WITH *) 
@@ -1266,7 +1266,9 @@ END
        AND 2. You want to skip marks deeper inside whole subtrees. 
     *) 
 
-    = PROCEDURE NpsStmTraverse 
+    = VAR NpsStmTempMarkNumber : INTEGER
+    
+    ; PROCEDURE NpsStmTraverse 
         ( EstRef : EstHs . EstRefTyp 
         ; TraverseFromChildNo : LbeStd . EstChildNoTyp 
         ; TraverseToChildNo : LbeStd . EstChildNoTyp 
@@ -1282,12 +1284,11 @@ END
 
         = BEGIN (* NpsStmTSkipExactMatches *) 
             LOOP (* Thru temp marks that match this child. *) 
-              IF NpsNextTempMarkSs 
-                  >= NUMBER ( ParseInfo . PiTempMarkListRef ^ ) 
+              IF NpsNextTempMarkSs >= NpsStmTempMarkNumber 
               THEN EXIT 
               ELSE 
                 WITH WTempMark 
-                     = ParseInfo . PiTempMarkListRef ^ [ NpsNextTempMarkSs ] 
+                     = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
                 DO 
                   IF NpsStmTLeafElem . LeChildRef # WTempMark . EstRef 
                   THEN 
@@ -1320,8 +1321,7 @@ END
         ; BEGIN (* Block for NpsStmTraverse *) 
             IF EstRef # NIL 
                AND TraverseFromChildNo < TraverseToChildNo  
-               AND NpsNextTempMarkSs 
-                   < NUMBER ( ParseInfo . PiTempMarkListRef ^ ) 
+               AND NpsNextTempMarkSs < NpsStmTempMarkNumber 
             THEN 
               NpsStmTChildNo := TraverseFromChildNo 
             ; LOOP (* Thru Est children. *) 
@@ -1335,8 +1335,7 @@ END
                   ) 
               ; IF NpsStmTChildNo >= TraverseToChildNo THEN EXIT END (* IF *) 
               ; NpsStmTSkipExactMatches ( ) 
-              ; IF NpsNextTempMarkSs 
-                   >= NUMBER ( ParseInfo . PiTempMarkListRef ^ ) 
+              ; IF NpsNextTempMarkSs >= NpsStmTempMarkNumber 
                 THEN 
                   EXIT 
                 END (* IF *) 
@@ -1348,16 +1347,14 @@ END
                   | EstHs . EstRefTyp ( TEstRef ) 
                   => LGrandchildCt := TEstRef . KTreeChildCt ( ) 
                   ; NpsStmTraverse ( TEstRef , 0 , LGrandchildCt , Depth + 1 ) 
-                  ; IF NpsNextTempMarkSs 
-                       >= NUMBER ( ParseInfo . PiTempMarkListRef ^ ) 
+                  ; IF NpsNextTempMarkSs >= NpsStmTempMarkNumber 
                     THEN 
                       EXIT 
                     END (* IF *) 
                   ELSE (* No grandchildren. *) 
                   END (* TYPECASE *) 
                 ; NpsStmTSkipExactMatches ( ) 
-                ; IF NpsNextTempMarkSs 
-                     >= NUMBER ( ParseInfo . PiTempMarkListRef ^ ) 
+                ; IF NpsNextTempMarkSs >= NpsStmTempMarkNumber 
                   THEN 
                     EXIT 
                   END (* IF *) 
@@ -1372,7 +1369,8 @@ END
         Assert 
           ( ToChildNo <= EstUtil . EstChildCt ( EstRef ) 
           , AFT . A_NpsSkipTempMarksForSubtrees__ToChildNo_exceeds_child_count
-          )  
+          )
+      ; NpsStmTempMarkNumber := NUMBER ( ParseInfo . PiOrigTempMarkListRef ^ ) 
       ; NpsStmTraverse ( EstRef , FromChildNo , ToChildNo , Depth := 0 ) 
       ; NpsAppendTempMarkRange 
           ( (* VAR *) ToRange 
@@ -1906,14 +1904,16 @@ END
          NpsResultStateRef . PtsScanInfo . SiTokBegScanState 
          NpsResultStateRef . PtsScanInfo . SiScanState 
          PtsPrevTokAfter  
-         and, when traversing an Est, 
-         calling NpsPassNewLine 
+         and, when traversing an Est, calling NpsPassNewLine 
     *) 
 
     = PROCEDURE NpsDssIncludeTempMarks 
         ( ToPos : LbeStd . LimitedCharNoTyp ) 
       (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
-      RAISES { AssertionFailure } 
+      RAISES { AssertionFailure }
+      (* Include any temp marks that are in the string, and bias them
+         line-relative, during reparsing.  They will be rebiased after
+         rescanning. *)
 
       = VAR LAbsCharPos : LbeStd . LimitedCharNoTyp  
 
@@ -1928,12 +1928,18 @@ END ;
             ELSE 
               WITH 
                 WTempMark 
-                = ParseInfo . PiTempMarkListRef ^ [ NpsNextTempMarkSs ] 
-              DO LAbsCharPos 
-                   := EstUtil . WidthSum 
-                        ( WTempMark . CharPos 
-                        , NpsResultStateEstRef . PtseStringFromPos 
-                        )  
+                = ParseInfo . PiTravTempMarkListRef ^ [ NpsNextTempMarkSs ] 
+              DO
+                Assert
+                  ( WTempMark
+                    = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
+                  , AFT . A_NpsDssIncludeTempMarks_not_original 
+                  ) 
+              ; LAbsCharPos 
+                  := EstUtil . WidthSum 
+                       ( WTempMark . CharPos 
+                       , NpsResultStateEstRef . PtseStringFromPos 
+                       )  
               ; IF LAbsCharPos >= ToPos  
                  THEN 
                    EXIT
@@ -2521,21 +2527,18 @@ END ;
            OR SharedStrings . Length ( NpsResultStateEstRef . PtseStringRef ) 
               = 0  
         THEN (* The ModText has an empty string. *) 
-          (* Include all TempMarks of the empty TextMod.  BuildTempMarks
-             will have ensured that they exist only on TextMods
+          (* Patch and include all TempMarks of the empty TextMod.
+             BuildTempMarks will have ensured that they exist only on TextMods
              of a line containing nothing but empty TextMods.  In this
              special case, we will end up calling NpsAccumScannedBlankLine, 
              which will produce a BlankLine and patch the TempMarks to it. *)  
           WHILE NpsNextTempMarkIsRelevant 
-          DO 
-             WITH WTempMark 
-                  = ParseInfo . PiTempMarkListRef ^ [ NpsNextTempMarkSs ] 
+          DO WITH WTempMark 
+                  = ParseInfo . PiTravTempMarkListRef ^ [ NpsNextTempMarkSs ] 
             DO 
               WTempMark . CharPos 
                 := EstUtil . WidthSumSigned  
-                     ( WTempMark . CharPos 
-                     , ModTextRef . ModTextFromPos 
-                     ) 
+                     ( WTempMark . CharPos , ModTextRef . ModTextFromPos ) 
             END (* WITH *) 
           ; NpsIncludeTempMark ( ) 
           ; NpsCheckNextTempMarkForEstLeaf 
@@ -2732,7 +2735,7 @@ END ;
     = VAR LDeferredInfo : ParseHs . DeferredInfoRefTyp
     
     ; BEGIN (* NpsInsTok *) 
-        (* NpsTempMarkRange may contain eftover TempMarks from proposed
+        (* NpsTempMarkRange may contain leftover TempMarks from proposed
            insertion repairs alone on a line. *) 
         IF NpsResultStateRef . PtsScanInfo . SiScanState = LbeStd . SsIdle 
         THEN (* Need not scan, deliver the token *) 
@@ -3725,12 +3728,9 @@ END ;
                     THEN 
                       EXIT 
                     ELSE 
-                      WITH WTempMark 
-                           = ParseInfo . PiTempMarkListRef
-                             ^ [ NpsNextTempMarkSs ] 
-                      DO
-                        WTempMark . CharPos := 0 
-                      END (* WITH *) 
+                      ParseInfo . PiTravTempMarkListRef
+                      ^ [ NpsNextTempMarkSs ] . CharPos
+                      := 0
                     ; NpsIncludeTempMark ( ) 
                     END (* IF *) 
                   END (* LOOP *) 
@@ -3971,8 +3971,9 @@ END ;
           ; IF NOT NpsNextTempMarkIsRelevant 
             THEN EXIT 
             ELSE 
-              ParseInfo . PiTempMarkListRef ^ [ NpsNextTempMarkSs ] . CharPos
-                := 0 
+              ParseInfo . PiTravTempMarkListRef
+              ^ [ NpsNextTempMarkSs ] . CharPos
+              := 0 
             ; NpsIncludeTempMark ( ) 
             END (* IF *) 
           (* These temp marks will be held as additional leftovers in
@@ -4831,7 +4832,7 @@ END ;
         END (* WITH *) 
       END NpsPushEstPlain
 
-  ; PROCEDURE NpsPatchTempMarksForModTok 
+  ; PROCEDURE NpsRangeTempMarksForModTok 
       ( ModTok : EstHs . EstRefTyp 
       ; Tok : LbeStd . TokTyp 
       ; RangeToSearch : ParseHs . TempMarkRangeTyp 
@@ -4853,20 +4854,20 @@ END ;
         ; IF NOT ParseHs . RangeIsEmpty ( RangeToSearch )
              AND LangUtil . TokClass ( ParseInfo . PiLang , Tok )  
                  = LbeStd . TokClassTyp . TokClassConstTerm 
-             AND ParseInfo . PiTempMarkListRef # NIL 
+             AND ParseInfo . PiOrigTempMarkListRef # NIL 
           THEN 
             LTempMarkSs := RangeToSearch . From 
           ; LOOP (* Thru' marks that are not ChildFmtNo. *)
               IF LTempMarkSs >= RangeToSearch . To 
-              THEN EXIT (* Outer. *)
+              THEN EXIT (* Outer loop. *)
               ELSE
                 WITH W1stTempMark 
-                     = ParseInfo . PiTempMarkListRef ^ [ LTempMarkSs ]
+                     = ParseInfo . PiOrigTempMarkListRef ^ [ LTempMarkSs ]
                 DO IF W1stTempMark . TokMark . Kind = MarkKindTyp . ChildFmtNo  
                    THEN
                      Assert
                        ( W1stTempMark . EstRef = ModTok 
-                       , AFT . A_NpsPatchTempMarksForModTok_BadChildFmtNoOnModTok 
+                       , AFT . A_NpsRangeTempMarksForModTok_BadChildFmtNoOnModTok 
                        ) 
                    ; WPatchRange . From := LTempMarkSs 
                    ; INC ( LTempMarkSs ) 
@@ -4875,14 +4876,15 @@ END ;
                        THEN EXIT (* Inner. *)
                        ELSE
                          WITH WLaterTempMark
-                              = ParseInfo . PiTempMarkListRef ^ [ LTempMarkSs ]
+                              = ParseInfo . PiOrigTempMarkListRef
+                                ^ [ LTempMarkSs ]
                          DO
                            IF WLaterTempMark . TokMark . Kind 
                               = MarkKindTyp . ChildFmtNo  
                            THEN 
                              Assert
                                ( WLaterTempMark . EstRef = ModTok 
-                               , AFT . A_NpsPatchTempMarksForModTok_BadChildFmtNoOnModTok2 
+                               , AFT . A_NpsRangeTempMarksForModTok_BadChildFmtNoOnModTok2 
                                ) 
                            ; INC ( LTempMarkSs )
                            (* And go around inner loop. *)
@@ -4901,7 +4903,7 @@ END ;
             END (* LOOP *) 
           END (* IF *) 
         END (* WITH *) 
-      END NpsPatchTempMarksForModTok 
+      END NpsRangeTempMarksForModTok 
 
   ; PROCEDURE NpsListCardTok 
       ( EstRef : LbeStd . EstRootTyp 
@@ -5052,7 +5054,7 @@ END ;
               ) 
           (* ^Any RightSib TempMarks pointing to the ModTok belong to a 
               following InsTok. *)
-          ; NpsPatchTempMarksForModTok
+          ; NpsRangeTempMarksForModTok
               ( LModTok , LTok , RangeToSearch := NpsTempMarkRange )
             (* ^May put some into TiPatchTempMarkRange. *)
           ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
@@ -5283,7 +5285,7 @@ END ;
       ; NpsDeliverState := DeliverStateTyp . DsDeliver 
       ; Assert
           ( NpsNextTempMarkSs 
-            = NUMBER ( ParseInfo . PiTempMarkListRef ^ ) 
+            = NUMBER ( ParseInfo . PiOrigTempMarkListRef ^ ) 
           , AFT . A_NpsDeliverEndOfImage_Wrong_temp_mark_count_at_Eoi
           ) 
       END NpsDeliverEndOfImage
@@ -5871,14 +5873,16 @@ END ;
 
   ; BEGIN (* InitParseEst *) 
       Assert ( EstRef # NIL , AFT . A_InitParseEstReparseNILEst ) 
-    ; ParseInfo . PiParseKind := LbeStd . ParseKindTyp . ParseKindTrav 
+    ; ParseInfo . PiParseKind := LbeStd . ParseKindTyp . ParseKindTrav
+    ; ParseInfo . PiTravTempMarkListRef
+        := ParseHs . CopyOfTempMarkList ( ParseInfo . PiOrigTempMarkListRef )
     ; ParseInfo . PiDeferredInfoRef := NIL 
     ; ParseInfo . PiLineCtIncr := 0 
     ; ParseInfo . PiSeqNo := 1 
     ; ParseInfo . PiLineNo := 0 
     ; LStateRef := NEW ( ParseHs . ParseTravStateEstRefTyp ) 
     ; LStateRef . PtsSeqNo := 0 
-    ; InitTokInfo ( LStateRef . PtsTokInfo ) 
+    ; InitTokInfo ( LStateRef . PtsTokInfo )
     ; LStateRef . PtsTokInfo . TiFullTempMarkRange
         := ParseHs . TempMarkRangeEmpty
     ; LStateRef . PtsTokInfo . TiPatchTempMarkRange

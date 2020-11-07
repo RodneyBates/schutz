@@ -2953,7 +2953,7 @@ TRUE OR
                       := WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
                          . TiFullTempMarkRange 
                   , PatchRange := ParseHs . TempMarkRangeNull 
-                  , OrigTempMarkList := ParseInfo . PiTempMarkListRef 
+                  , OrigTempMarkList := ParseInfo . PiTravTempMarkListRef 
                   , (* VAR *) ParseTempMarkList 
                               := WParseTrialState . PtsTempMarkListRef 
                   , ForceCopy := FALSE 
@@ -2989,7 +2989,7 @@ TRUE OR
             ; SetOrigTempMarks   
                 ( FullRange := LTokInfo . TiFullTempMarkRange 
                 , PatchRange := LTokInfo . TiPatchTempMarkRange 
-                , OrigTempMarkList := ParseInfo . PiTempMarkListRef 
+                , OrigTempMarkList := ParseInfo . PiTravTempMarkListRef 
                 , (* VAR *) ParseTempMarkList 
                             := WParseTrialState . PtsTempMarkListRef 
                 , ForceCopy := FALSE 
@@ -3284,7 +3284,7 @@ TRUE OR
         ; SetOrigTempMarks 
             ( FullRange := TokInfo . TiFullTempMarkRange 
             , PatchRange := TokInfo . TiPatchTempMarkRange 
-            , OrigTempMarkList := ParseInfo . PiTempMarkListRef 
+            , OrigTempMarkList := ParseInfo . PiTravTempMarkListRef 
             , (* VAR *) ParseTempMarkList 
                         := ParseTrialState . PtsTempMarkListRef 
             , ForceCopy := FALSE 
@@ -3916,7 +3916,8 @@ TRUE OR
                , Comment := "Initial"
                ) 
       ; WParseTrialState . PtsJustShifted := TRUE 
-      ; WParseTrialState . PtsTempMarkListRef := ParseInfo . PiTempMarkListRef 
+      ; WParseTrialState . PtsTempMarkListRef
+          := ParseInfo . PiTravTempMarkListRef 
       END (* WITH WParseTrialState *) 
     ; LStateList . SlLastShiftedAstStates [ LStateList . SlLatest ] 
         := GNullParseTrialState 
@@ -3964,18 +3965,20 @@ TRUE OR
           , PatchRange 
               := WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
                  . TiPatchTempMarkRange 
-          , OrigTempMarkList := ParseInfo . PiTempMarkListRef 
+          , OrigTempMarkList := ParseInfo . PiTravTempMarkListRef 
           , (* VAR *) ParseTempMarkList 
                       := WParseTrialState . PtsTempMarkListRef 
           , ForceCopy := FALSE 
-          )  
-      ; Reduce 
-          ( ParseInfo 
-          , LRTable . AcceptProdNo ( ParseInfo . PiGram ) 
-          , LStateList 
-          , Repairing := FALSE   
-          ) 
-      ; Assert 
+          )
+      END (* WITH *)
+    ; Reduce 
+        ( ParseInfo 
+        , LRTable . AcceptProdNo ( ParseInfo . PiGram ) 
+        , LStateList 
+        , Repairing := FALSE   
+        ) 
+    ; WITH WParseTrialState = LStateList . SlStates [ LStateList . SlLatest ] 
+      DO Assert 
            ( WParseTrialState . PtsParseStackTopRef 
              . PseDeepestBuildStackElemRef 
              = NIL 
@@ -4007,7 +4010,7 @@ TRUE OR
             , AFT . A_Parse_Slice 
             ) 
         ; NewTreeRef := WSliceListElemRef . SleNodeRef 
-        ; ParseInfo . PiTempMarkListRef 
+        ; ParseInfo . PiTravTempMarkListRef 
             := WParseTrialState . PtsTempMarkListRef        
         END (* WITH WSliceListElemRef *) 
       END (* WITH WParseTrialState *) 

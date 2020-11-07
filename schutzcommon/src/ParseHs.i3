@@ -219,7 +219,7 @@ INTERFACE ParseHs
           PtseStackEstRef : StackElemEstTyp := NIL 
         ; PtseStackFsRef : StackElemFsTyp := NIL 
         ; PtseDescendStateRef : ParseTravStateEstRefTyp := NIL  
-          (* ^Like PtsAdvanceState, but for Descend operation. *) 
+          (* ^Like PtsAdvanceState, but for Descend operation. *)
         ; PtseStringRef : SharedStrings . T := NIL 
           (* ^When rescanning a string, this points to it. *) 
         ; PtseDeferredInfoRef : DeferredInfoRefTyp := NIL 
@@ -377,7 +377,16 @@ INTERFACE ParseHs
         PiInitTravStateRef : ParseTravStateRefTyp := NIL 
       ; PiFile : Rd . T 
       ; PiScanIf : ScannerIf . ScanIfTyp 
-      ; PiTempMarkListRef : TempMarkArrayRefTyp 
+      ; PiOrigTempMarkListRef : TempMarkArrayRefTyp
+        (* ^As built by BuildTempMarks.  Immutable. *)
+      ; PiTravTempMarkListRef : TempMarkArrayRefTyp
+        (* ^During ParseTrv, this starts out a copy of PiOrigTempMarkList, 
+            but ParseTrv may patch its CharPos, NodeRef, and Kind fields.
+            For a complete parse, there is only one possible sequence of such
+            patches, because they occur only on syntactic alterations,
+            including suggested repairs, and these are always descended-to,
+            never advanced-over, even when Parser requested an advance.
+        *) 
       ; PiString : Strings . StringTyp 
       ; PiAttemptedRepairCt : CARDINAL := 0 
       ; PiAttemptedRepairActionCt : CARDINAL := 0 

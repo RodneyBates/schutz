@@ -2669,7 +2669,7 @@ ReadSelections (* q.v. *) ( Window , Time )
     ; LParseInfo . PiScanIf := ScanIf 
     ; LParseInfo . PiGram := LangUtil . Gram ( Lang ) 
     ; LParseInfo . PiInsertNilFixedChildren := FALSE 
-    ; LParseInfo . PiTempMarkListRef := NIL 
+    ; LParseInfo . PiOrigTempMarkListRef := NIL 
     ; Parser . Parse 
         ( LParseInfo 
         , ParseTrv . InitParseKbd ( LParseInfo , PosRelTo ) 

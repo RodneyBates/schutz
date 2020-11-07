@@ -359,7 +359,7 @@ MODULE Files
     ; LParseInfo . PiGram := LangUtil . Gram ( Lang ) 
     ; LParseInfo . PiInsertNilFixedChildren 
         := InsertNilFixedChildren
-    ; LParseInfo . PiTempMarkListRef := NIL 
+    ; LParseInfo . PiOrigTempMarkListRef := NIL 
     ; Messages . TextOnly 
         ( "Parsing -------------------------------------------------" 
         , Kind := MessageCodes . KindTyp . MkInformation 
