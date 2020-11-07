@@ -46,22 +46,22 @@ MODULE Parser
 
 ; TYPE MarkKindTyp = Marks . MarkKindTyp 
 
-; TYPE ParseTrialStateTyp 
+; TYPE TrialStateTyp 
     = RECORD 
-        PtsParseStackTopRef : ParseHs . ParseStackElemRefTyp := NIL 
-      ; PtsBuildStackTopRef : ParseHs . BuildStackElemRefTyp := NIL 
-      ; PtsWaitingBuildStackElemRef : ParseHs . BuildStackElemRefTyp := NIL  
+        TsParseStackTopRef : ParseHs . ParseStackElemRefTyp := NIL 
+      ; TsBuildStackTopRef : ParseHs . BuildStackElemRefTyp := NIL 
+      ; TsWaitingBuildStackElemRef : ParseHs . BuildStackElemRefTyp := NIL  
       (* ^List of a syntactic error and antideletion token insertions 
           waiting to be merged in front of the next token shifted: *) 
-      ; PtsParseTravStateRef : ParseHs . ParseTravStateRefTyp := NIL 
-      ; PtsTempMarkListRef : ParseHs . TempMarkArrayRefTyp := NIL  
-      ; PtsJustShifted : BOOLEAN := FALSE 
-        (* PtsJustShifted is true if the last parsing operation 
+      ; TsParseTravStateRef : ParseHs . ParseTravStateRefTyp := NIL 
+      ; TsTempMarkListRef : ParseHs . TempMarkArrayRefTyp := NIL  
+      ; TsJustShifted : BOOLEAN := FALSE 
+        (* TsJustShifted is true if the last parsing operation 
            leading to this state was a shift *) 
-      END (* RECORD  ParseTrialStateTyp *) 
+      END (* RECORD  TrialStateTyp *) 
 
-; VAR GNullParseTrialState : ParseTrialStateTyp
-      (* ^Just use the field values of ParseTrialStateTyp. *)
+; VAR GNullTrialState : TrialStateTyp
+      (* ^Just use the field values of TrialStateTyp. *)
 
 ; CONST StateListStaticMax = 4 
 ; VAR StateListMax : PortTypes . Int32Typ := 1 (* StateListStaticMax *)  
@@ -75,10 +75,10 @@ MODULE Parser
       (* The circular buffer always has at least one element, so 
          when ( SlLatest + 1 ) MOD StateListMax = SlOldest, the 
          buffer is full, not empty. *) 
-      ; SlStates : ARRAY StateListElemNoTyp OF ParseTrialStateTyp 
-      ; SlLastShiftedAstStates : ARRAY StateListElemNoTyp OF ParseTrialStateTyp 
+      ; SlStates : ARRAY StateListElemNoTyp OF TrialStateTyp 
+      ; SlLastShiftedAstStates : ARRAY StateListElemNoTyp OF TrialStateTyp 
       (* ^Most recent shift of an Ast NT, that is followed only by reduces. 
-          PtsParseStackTopRef = NIL if no such exists.  1-to-1 correspondence
+          TsParseStackTopRef = NIL if no such exists.  1-to-1 correspondence
           of array elements to SlStates. *) 
       END (* RECORD  StateListElemTyp *) 
 
@@ -439,28 +439,28 @@ MODULE Parser
       END DumpStacks 
 
 ; <* UNUSED *> 
-  PROCEDURE DumpParseTrialState 
+  PROCEDURE DumpTrialState 
     ( READONLY ParseInfo : ParseHs . ParseInfoTyp 
-    ; READONLY State : ParseTrialStateTyp 
+    ; READONLY State : TrialStateTyp 
     ) 
   (* This is here to be called within a debugger. *) 
 
   = BEGIN 
-      DumpParseTrvState ( ParseInfo , State . PtsParseTravStateRef ) 
+      DumpParseTrvState ( ParseInfo , State . TsParseTravStateRef ) 
     ; DumpStacks 
         ( ParseInfo 
-        , PseTopRef := State . PtsParseStackTopRef 
-        , BseTopRef := State . PtsBuildStackTopRef 
+        , PseTopRef := State . TsParseStackTopRef 
+        , BseTopRef := State . TsBuildStackTopRef 
         , DumpAll := TRUE 
         ) 
-    END DumpParseTrialState 
+    END DumpTrialState 
 
 ; PROCEDURE Shift 
     ( READONLY ParseInfo : ParseHs . ParseInfoTyp 
     ; TokInfo : ParseHs . TokInfoTyp 
     ; ShiftLRState : LbeStd . LRStateTyp 
-    ; VAR (* IN OUT *) ParseTrialState : ParseTrialStateTyp 
-    ; VAR (* IN OUT *) LastShifted : ParseTrialStateTyp 
+    ; VAR (* IN OUT *) TrialState : TrialStateTyp 
+    ; VAR (* IN OUT *) LastShifted : TrialStateTyp 
     ; Delete : BOOLEAN (* Arrange to delete this token *) 
     ) 
   RAISES { Thread . Alerted } 
@@ -481,14 +481,14 @@ MODULE Parser
         ; LBuildStackElemRef 
             := NEW 
                  ( ParseHs . BuildStackElemRefTyp 
-                 , BseLink := ParseTrialState . PtsBuildStackTopRef 
+                 , BseLink := TrialState . TsBuildStackTopRef 
                  , BseTokInfo := BuildStackElemRef . BseTokInfo 
                  , BseWasInsertedByParser 
                      := BuildStackElemRef . BseWasInsertedByParser 
                  , BseWasDeletedByParser 
                      := BuildStackElemRef . BseWasDeletedByParser 
                  ) 
-        ; ParseTrialState . PtsBuildStackTopRef := LBuildStackElemRef 
+        ; TrialState . TsBuildStackTopRef := LBuildStackElemRef 
         END (* IF *) 
       END ShiftWaitingBuildStackElems 
 
@@ -511,7 +511,7 @@ MODULE Parser
             Wr . PutText
               ( Options . TraceWrT
               , "(SeqNo="
-                & Fmt . Int ( ParseTrialState . PtsParseTravStateRef . PtsSeqNo )
+                & Fmt . Int ( TrialState . TsParseTravStateRef . PtsSeqNo )
                 & ")"
               ) 
           END (* IF *) 
@@ -542,28 +542,28 @@ MODULE Parser
         THEN (* Save the pre-shift state, in case we need to back up and 
                 descend from it after a series of reductions leads to a
                 postponed parsing error. *) 
-          LastShifted := ParseTrialState  
-        ELSE LastShifted := GNullParseTrialState  
+          LastShifted := TrialState  
+        ELSE LastShifted := GNullTrialState  
         END (* IF *) 
       ; LParseStackElemRef := NEW ( ParseHs . ParseStackElemRefTyp ) 
       ; LParseStackElemRef . PseTok := TokInfo . TiTok 
       ; LParseStackElemRef . PseLRState := ShiftLRState 
       ; LParseStackElemRef . PseDeepestBuildStackElemRef 
-          := ParseTrialState . PtsBuildStackTopRef 
+          := TrialState . TsBuildStackTopRef 
       ; ShiftWaitingBuildStackElems 
-          ( ParseTrialState . PtsWaitingBuildStackElemRef ) 
-      ; ParseTrialState . PtsWaitingBuildStackElemRef := NIL 
-      ; ParseTrialState . PtsBuildStackTopRef 
+          ( TrialState . TsWaitingBuildStackElemRef ) 
+      ; TrialState . TsWaitingBuildStackElemRef := NIL 
+      ; TrialState . TsBuildStackTopRef 
           := NEW 
                ( ParseHs . BuildStackElemRefTyp 
                , BseTokInfo := TokInfo 
                , BseWasInsertedByParser := Delete 
                , BseWasDeletedByParser := FALSE 
-               , BseLink := ParseTrialState . PtsBuildStackTopRef 
+               , BseLink := TrialState . TsBuildStackTopRef 
                ) 
-      ; LParseStackElemRef . PseLink := ParseTrialState . PtsParseStackTopRef 
-      ; ParseTrialState . PtsParseStackTopRef := LParseStackElemRef 
-      ; ParseTrialState . PtsJustShifted := TRUE 
+      ; LParseStackElemRef . PseLink := TrialState . TsParseStackTopRef 
+      ; TrialState . TsParseStackTopRef := LParseStackElemRef 
+      ; TrialState . TsJustShifted := TRUE 
       END (* Block  Shift body block *) 
     END Shift 
 
@@ -686,20 +686,20 @@ RETURN
       END (* MergeInfoTyp *) 
 
 ; PROCEDURE InitMergeInfo 
-    ( READONLY ParseTrialState : ParseTrialStateTyp 
+    ( READONLY TrialState : TrialStateTyp 
     ; VAR MergeInfo : MergeInfoTyp 
     ) 
 
   =  BEGIN 
       MergeInfo . MiTempMarkRangeTo 
-        := ParseTrialState . PtsParseTravStateRef . PtsTokInfo 
+        := TrialState . TsParseTravStateRef . PtsTokInfo 
            . TiFullTempMarkRange . To 
     ; MergeInfo . MiUnpatchedTempMarkRange := ParseHs . TempMarkRangeNull 
     ; MergeInfo . MiLMNewChildRef := NIL  
     ; MergeInfo . MiChildExists := FALSE 
     ; MergeInfo . MiRMChildRef := NIL  
     ; MergeInfo . MiRMSliceListElemRef := NIL
-    ; MergeInfo . MiParseTempMarkListRef := ParseTrialState . PtsTempMarkListRef 
+    ; MergeInfo . MiParseTempMarkListRef := TrialState . TsTempMarkListRef 
     ; MergeInfo . MiNewTempMarkListRef := NIL 
     END InitMergeInfo 
 
@@ -804,7 +804,7 @@ RETURN
 
 ; PROCEDURE FinishMergeInfo 
     ( READONLY ParseInfo : ParseHs . ParseInfoTyp  
-    ; VAR ParseTrialState : ParseTrialStateTyp 
+    ; VAR TrialState : TrialStateTyp 
     ; MergeInfo : MergeInfoTyp (* Fields can change. *) 
     ; EstRef : LbeStd . EstRootTyp 
     ; VAR KindSet : EstHs . EstChildKindSetTyp 
@@ -826,16 +826,16 @@ RETURN
     ; IF MergeInfo . MiNewTempMarkListRef # NIL
       THEN
         Assert
-          ( ParseTrialState . PtsTempMarkListRef ^
+          ( TrialState . TsTempMarkListRef ^
             = MergeInfo . MiParseTempMarkListRef ^ 
           , AFT . A_FinishMergeInfo_unequal_cached_temp_mark_list
           )
       ; Assert
-          ( ParseTrialState . PtsTempMarkListRef ^
+          ( TrialState . TsTempMarkListRef ^
             # MergeInfo . MiNewTempMarkListRef ^ 
           , AFT . A_FinishMergeInfo_nonNIL_but_unchanged_temp_mark_list
           )
-      ; ParseTrialState . PtsTempMarkListRef := MergeInfo . MiNewTempMarkListRef 
+      ; TrialState . TsTempMarkListRef := MergeInfo . MiNewTempMarkListRef 
       END (* IF *)
     END FinishMergeInfo 
 
@@ -1365,14 +1365,14 @@ RETURN
     (* This is here to be called within a debugger. *) 
 
     = BEGIN
-        WITH WParseTrialState = StateList . SlStates [ StateList . SlLatest ] 
+        WITH WTrialState = StateList . SlStates [ StateList . SlLatest ] 
         DO 
           DumpStacks 
             ( ParseInfo 
-            , WParseTrialState . PtsParseStackTopRef 
+            , WTrialState . TsParseStackTopRef 
             , RedOldParseStackElemRef 
             , RedDeepestParseStackElemRef 
-            , WParseTrialState . PtsBuildStackTopRef
+            , WTrialState . TsBuildStackTopRef
             , RedOldBuildStackElemRef 
             , RedDeepestBuildStackElemRef 
             , DumpAll
@@ -2263,7 +2263,7 @@ TRUE OR
       END RedTraverseFsTree 
 
   ; PROCEDURE RedWriteTraceBefore 
-      ( READONLY ParseTrialState : ParseTrialStateTyp 
+      ( READONLY TrialState : TrialStateTyp 
       ; READONLY ReduceInfo : LRTable . ReduceInfoTyp 
       ; Repairing : BOOLEAN 
       ) 
@@ -2313,7 +2313,7 @@ TRUE OR
 
         ; Wr . PutText 
             ( Options . TraceWrT , "  ParseStack:" & Wr . EOL ) 
-        ; LP := ParseTrialState . PtsParseStackTopRef 
+        ; LP := TrialState . TsParseStackTopRef 
         ; WHILE LP # NIL AND LP # RedDeepestParseStackElemRef 
           DO
             Wr . PutText ( Options . TraceWrT , "   " ) 
@@ -2340,7 +2340,7 @@ TRUE OR
 
         ; Wr . PutText 
             ( Options . TraceWrT , "  BuildStack:" & Wr . EOL ) 
-        ; LB := ParseTrialState . PtsBuildStackTopRef 
+        ; LB := TrialState . TsBuildStackTopRef 
         ; WHILE LB # NIL AND LB # RedDeepestBuildStackElemRef 
           DO
             Wr . PutText ( Options . TraceWrT , "   " ) 
@@ -2456,7 +2456,7 @@ TRUE OR
 
       (* If this is the first reduce after a shift, advance the parse 
          state list. *) 
-        IF StateList . SlStates [ StateList . SlLatest ] . PtsJustShifted 
+        IF StateList . SlStates [ StateList . SlLatest ] . TsJustShifted 
         THEN 
           LOldLatest := StateList . SlLatest 
         ; StateList . SlLatest 
@@ -2468,13 +2468,13 @@ TRUE OR
           END (* IF *) 
         ; StateList . SlStates [ StateList . SlLatest ] 
             := StateList . SlStates [ LOldLatest ] 
-        ; StateList . SlStates [ StateList . SlLatest ] . PtsJustShifted 
+        ; StateList . SlStates [ StateList . SlLatest ] . TsJustShifted 
             := FALSE 
         END (* IF *) 
 
       (* Now do the real reduce. *) 
       ; WITH 
-          WParseTrialState = StateList . SlStates [ StateList . SlLatest ] 
+          WTrialState = StateList . SlStates [ StateList . SlLatest ] 
         , WReduceInfo = ParseInfo . PiGram . ReduceInfoRef ^ [ ProdNo ] 
         DO 
           LNewParseStackElemRef := NEW ( ParseHs . ParseStackElemRefTyp ) 
@@ -2510,16 +2510,16 @@ TRUE OR
             IF WReduceInfo . RhsLen = 0 
             THEN (* Reduce empty to some nonterminal. *) 
               LNewParseStackElemRef . PseLink 
-                := WParseTrialState . PtsParseStackTopRef 
+                := WTrialState . TsParseStackTopRef 
             ; LNewParseStackElemRef . PseDeepestBuildStackElemRef 
-                := WParseTrialState . PtsBuildStackTopRef 
+                := WTrialState . TsBuildStackTopRef 
             (* Needed only for tracing: *) 
             ; RedDeepestParseStackElemRef 
-                := WParseTrialState . PtsParseStackTopRef 
+                := WTrialState . TsParseStackTopRef 
             ; RedDeepestBuildStackElemRef 
-                := WParseTrialState . PtsBuildStackTopRef 
+                := WTrialState . TsBuildStackTopRef 
             ELSE (* Reduce nonempty right side. *) 
-              LParseStackElemRef := WParseTrialState . PtsParseStackTopRef 
+              LParseStackElemRef := WTrialState . TsParseStackTopRef 
             ; FOR I := 2 TO WReduceInfo . RhsLen 
               DO LParseStackElemRef := LParseStackElemRef . PseLink 
               END (* FOR *) 
@@ -2535,7 +2535,7 @@ TRUE OR
           (* Here PseLink and PseDeepestBuildStackElemRef 
              are set for the new Parse stack element, and 
              build stack is completely done. *) 
-          ; RedWriteTraceBefore ( WParseTrialState , WReduceInfo , Repairing ) 
+          ; RedWriteTraceBefore ( WTrialState , WReduceInfo , Repairing ) 
           ; LNewBuildStackElemRef := NIL 
             (* ^Just for call to RedWriteTraceAfter *) 
 
@@ -2546,8 +2546,8 @@ TRUE OR
 (* TODO: Eliminate this case. *) 
             LNewBuildStackElemRef := NEW ( ParseHs . BuildStackElemRefTyp ) 
           ; LNewBuildStackElemRef . BseLink 
-              := WParseTrialState . PtsBuildStackTopRef
-          ; WParseTrialState . PtsBuildStackTopRef := LNewBuildStackElemRef 
+              := WTrialState . TsBuildStackTopRef
+          ; WTrialState . TsBuildStackTopRef := LNewBuildStackElemRef 
           ; LNewSliceListElemRef := NEW ( ParseHs . SliceListElemRefTyp ) 
           ; LNewSliceListElemRef . SlePredLink := NIL 
           ; LNewSliceListElemRef . SleNodeRef 
@@ -2567,14 +2567,14 @@ TRUE OR
             ; WTokInfo . TiPatchTempMarkRange := ParseHs . TempMarkRangeNull 
             END (* WITH WTokInfo *) 
           ; LNewParseStackElemRef . PseLink 
-              := WParseTrialState . PtsParseStackTopRef 
+              := WTrialState . TsParseStackTopRef 
           ; LNewParseStackElemRef . PseDeepestBuildStackElemRef 
               := LNewBuildStackElemRef 
           (* Needed only for tracing: *) 
           ; RedDeepestParseStackElemRef 
-              := WParseTrialState . PtsParseStackTopRef 
+              := WTrialState . TsParseStackTopRef 
           ; RedDeepestBuildStackElemRef 
-              := WParseTrialState . PtsBuildStackTopRef 
+              := WTrialState . TsBuildStackTopRef 
 
           ELSE (* Must traverse Fs tree, and maybe build an Est node. *) 
             LFsKind := LFsNodeRef . FsKind 
@@ -2595,11 +2595,11 @@ TRUE OR
           ; IF WReduceInfo . RhsLen = 0 
             THEN (* Build for empty right side. *)
               RedDeepestParseStackElemRef 
-                := WParseTrialState . PtsParseStackTopRef  
+                := WTrialState . TsParseStackTopRef  
             ; RedDeepestBuildStackElemRef 
-                := WParseTrialState . PtsBuildStackTopRef  
+                := WTrialState . TsBuildStackTopRef  
             ELSE 
-              LParseStackElemRef := WParseTrialState . PtsParseStackTopRef 
+              LParseStackElemRef := WTrialState . TsParseStackTopRef 
             ; FOR I := 2 TO WReduceInfo . RhsLen 
               DO LParseStackElemRef := LParseStackElemRef . PseLink 
               END (* FOR *) 
@@ -2609,7 +2609,7 @@ TRUE OR
             ; RedDeepestBuildStackElemRef 
                 := LParseStackElemRef . PseDeepestBuildStackElemRef 
             END (* IF *) 
-          ; RedWriteTraceBefore ( WParseTrialState , WReduceInfo , Repairing ) 
+          ; RedWriteTraceBefore ( WTrialState , WReduceInfo , Repairing ) 
           ; LNewParseStackElemRef . PseLink := RedDeepestParseStackElemRef 
           ; LNewParseStackElemRef . PseDeepestBuildStackElemRef 
               := RedDeepestBuildStackElemRef 
@@ -2621,7 +2621,7 @@ TRUE OR
              on it. 
           *) 
           (* It might be nice to figure out here whether 
-             PtsTempMarkListRef will need to be copied.
+             TsTempMarkListRef will need to be copied.
              But that would require a complete prepass, with 
              another instance of the whole FsTree recursive 
              traversal business.
@@ -2632,23 +2632,23 @@ TRUE OR
           *)
           ; IF LangUtil . TokClass 
                  ( ParseInfo . PiLang 
-                 , WParseTrialState . PtsParseStackTopRef . PseTok 
+                 , WTrialState . TsParseStackTopRef . PseTok 
                  ) 
                = LbeStd . TokClassTyp . TokClassPartial 
             THEN (* RM token of RHS is a list partial token.  We already 
                     started a merge in a previous reduction to it.  Fetch 
                     its MergeInfo for use in the current reduction. *)  
               Assert 
-                ( WParseTrialState . PtsBuildStackTopRef . BseTokInfo . TiTok 
-                  = WParseTrialState . PtsParseStackTopRef . PseTok 
+                ( WTrialState . TsBuildStackTopRef . BseTokInfo . TiTok 
+                  = WTrialState . TsParseStackTopRef . PseTok 
                 , AFT . A_Parse_Reduce_Build_stack_partial_token_mismatch 
                 ) 
             ; RedMergeInfo 
-                := WParseTrialState . PtsBuildStackTopRef . BseTokInfo . TiInfo 
+                := WTrialState . TsBuildStackTopRef . BseTokInfo . TiInfo 
               (* ^Implied NARROW, always OK. *) 
             ELSE (* Start a new merge. *) 
               RedMergeInfo := NEW ( MergeInfoTyp ) 
-            ; InitMergeInfo ( WParseTrialState , RedMergeInfo ) 
+            ; InitMergeInfo ( WTrialState , RedMergeInfo ) 
             ; EVAL EstBuild . InitMergeState 
                      ( RedMergeInfo  
                      , ParseInfo . PiLang 
@@ -2660,8 +2660,8 @@ TRUE OR
           ; LNewBuildStackElemRef := NEW ( ParseHs . BuildStackElemRefTyp ) 
           ; RedModDelRef := NIL 
           ; LNewBuildStackElemRef . BseLink := RedDeepestBuildStackElemRef 
-          ; RedOldParseStackElemRef := WParseTrialState . PtsParseStackTopRef 
-          ; RedOldBuildStackElemRef := WParseTrialState . PtsBuildStackTopRef 
+          ; RedOldParseStackElemRef := WTrialState . TsParseStackTopRef 
+          ; RedOldBuildStackElemRef := WTrialState . TsBuildStackTopRef 
           ; RedEstChildBuildStackElemRef := NIL 
           ; IF ParseInfo . PiGram . IsGenerated 
             THEN
@@ -2732,7 +2732,7 @@ TRUE OR
                 END (* IF *) 
               ; FinishMergeInfo 
                   ( (* READONLY *) ParseInfo 
-                  , (* VAR *) WParseTrialState 
+                  , (* VAR *) WTrialState 
                   , RedMergeInfo 
                   , LNewSliceListElemRef . SleNodeRef 
                   , (* VAR *) LNewSliceListElemRef . SleKindSet 
@@ -2747,7 +2747,7 @@ TRUE OR
             END (* WITH WTokInfo *) 
           ; LNewBuildStackElemRef . BseWasInsertedByParser := FALSE 
           ; LNewBuildStackElemRef . BseWasDeletedByParser := FALSE 
-          ; WParseTrialState . PtsBuildStackTopRef := LNewBuildStackElemRef 
+          ; WTrialState . TsBuildStackTopRef := LNewBuildStackElemRef 
           END (* IF traversing Fs tree. *) 
         ; LNewParseStackElemRef . PseTok := WReduceInfo . LhsTok 
         ; IF LNewParseStackElemRef . PseLink # NIL 
@@ -2763,13 +2763,13 @@ TRUE OR
               := ParseInfo . PiGram . StartStateNo 
             (* The right value here is uncertain, but it is dead. *) 
           END (* IF *) 
-        ; WParseTrialState . PtsParseStackTopRef := LNewParseStackElemRef 
+        ; WTrialState . TsParseStackTopRef := LNewParseStackElemRef 
         ; RedWriteTraceAfter 
             ( LNewBuildStackElemRef 
             , LNewParseStackElemRef 
-            , WParseTrialState . PtsParseTravStateRef . PtsTokInfo . TiTok 
+            , WTrialState . TsParseTravStateRef . PtsTokInfo . TiTok 
             ) 
-        END (* WITH WParseTrialState *) 
+        END (* WITH WTrialState *) 
       END (* Block  Reduce body block *) 
     END Reduce 
 
@@ -2808,12 +2808,12 @@ TRUE OR
     ; ErrCode := LbeStd . ErrCodeNull 
     ; Accepted := FALSE 
     ; LTokInfo 
-        := StateList . SlStates [ StateList . SlLatest ] . PtsParseTravStateRef
+        := StateList . SlStates [ StateList . SlLatest ] . TsParseTravStateRef
            . PtsTokInfo 
     ; LLRState 
         := StateList . SlStates 
              [ StateList . SlLatest ] 
-           . PtsParseStackTopRef . PseLRState 
+           . TsParseStackTopRef . PseLRState 
     ; LAction 
         := LRTable . Action 
              ( ParseInfo . PiGram , LLRState , LTokInfo . TiTok ) 
@@ -2826,21 +2826,21 @@ TRUE OR
         ELSIF LAction = LRTable . StateNoNull 
         THEN (* No legal action. *)  
           WITH 
-            WParseTrialState 
+            WTrialState 
             = StateList . SlStates [ StateList . SlLatest ] 
           DO IF LTokInfo . TiIsInterior
              THEN (* An Ast NT is next.  Try a lower subtree *)
-               WParseTrialState . PtsParseTravStateRef 
+               WTrialState . TsParseTravStateRef 
                  := NextParseTravState 
                       ( ParseInfo 
-                      , WParseTrialState . PtsParseTravStateRef 
+                      , WTrialState . TsParseTravStateRef 
                       , ParseTrv . SuccKindTyp . SuccKindDescend 
                       , LLRState  
                       , Comment := "Ast gave error" 
                       ) 
              ; StateList . SlLastShiftedAstStates [ StateList . SlLatest ] 
-                 := GNullParseTrialState 
-             ; LTokInfo := WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
+                 := GNullTrialState 
+             ; LTokInfo := WTrialState . TsParseTravStateRef . PtsTokInfo 
              ; LAction 
                  := LRTable . Action 
                       ( ParseInfo . PiGram , LLRState , LTokInfo . TiTok ) 
@@ -2848,23 +2848,23 @@ TRUE OR
                WITH WLastShift 
                     = StateList . SlLastShiftedAstStates 
                         [ StateList . SlLatest ] 
-               DO IF WLastShift . PtsParseStackTopRef # NIL 
+               DO IF WLastShift . TsParseStackTopRef # NIL 
                  THEN (* This was just a deferred error after shifting an Ast
                          NT.  Restore to before that shift and descend. *) 
-                   WParseTrialState := WLastShift 
-                 ; WParseTrialState . PtsParseTravStateRef 
+                   WTrialState := WLastShift 
+                 ; WTrialState . TsParseTravStateRef 
                      := NextParseTravState 
                           ( ParseInfo 
-                          , WParseTrialState . PtsParseTravStateRef 
+                          , WTrialState . TsParseTravStateRef 
                           , ParseTrv . SuccKindTyp . SuccKindDescend 
                           , LLRState 
                           , Comment := "Ast would give error"
                           ) 
-                 ; WLastShift := GNullParseTrialState 
+                 ; WLastShift := GNullTrialState 
                  ; LLRState 
-                     := WParseTrialState . PtsParseStackTopRef . PseLRState 
+                     := WTrialState . TsParseStackTopRef . PseLRState 
                  ; LTokInfo 
-                     := WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
+                     := WTrialState . TsParseTravStateRef . PtsTokInfo 
                  ; LAction 
                      := LRTable . Action 
                           ( ParseInfo . PiGram , LLRState , LTokInfo . TiTok )
@@ -2875,7 +2875,7 @@ TRUE OR
                  END (* IF *) 
                END (* WITH *) 
              END (* IF *) 
-          END (* WITH WParseTrialState *) 
+          END (* WITH WTrialState *) 
         ELSIF LAction >= ParseInfo . PiGram . FirstReduceAction 
         THEN (* Reduce only. *) 
           Reduce 
@@ -2887,12 +2887,12 @@ TRUE OR
         ; LLRState 
             := StateList . SlStates 
                  [ StateList . SlLatest ] 
-               . PtsParseStackTopRef . PseLRState 
+               . TsParseStackTopRef . PseLRState 
         ; LAction 
             := LRTable . Action 
                  ( ParseInfo . PiGram , LLRState , LTokInfo . TiTok ) 
         ELSE (* Shift or shift-reduce. *)  
-          WITH WParseTrialState 
+          WITH WTrialState 
                = StateList . SlStates [ StateList . SlLatest ] 
           DO 
             IF LTokInfo . TiIsInterior 
@@ -2909,7 +2909,7 @@ TRUE OR
             ; LParseTravState2 (* Trial state after the shift. *)  
                 := NextParseTravState 
                      ( ParseInfo 
-                     , WParseTrialState . PtsParseTravStateRef 
+                     , WTrialState . TsParseTravStateRef 
                      , ParseTrv . SuccKindTyp . SuccKindAdvance 
                      , LRState := LAction 
                      , Comment := "Checking Ast" 
@@ -2921,18 +2921,18 @@ TRUE OR
             ; IF LAction2 = LRTable . StateNoNull 
               THEN (* Shifting the NT would lead to an error.
                       Instead, descend. *) 
-                WParseTrialState . PtsParseTravStateRef 
+                WTrialState . TsParseTravStateRef 
                   := NextParseTravState 
                        ( ParseInfo 
-                       , WParseTrialState . PtsParseTravStateRef 
+                       , WTrialState . TsParseTravStateRef 
                        , ParseTrv . SuccKindTyp . SuccKindDescend 
                        , LLRState 
                        , Comment := "Ast would give error"
                        ) 
               ; StateList . SlLastShiftedAstStates [ StateList . SlLatest ] 
-                  := GNullParseTrialState 
+                  := GNullTrialState 
               ; LTokInfo 
-                  := WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
+                  := WTrialState . TsParseTravStateRef . PtsTokInfo 
               ; LAction 
                   := LRTable . Action 
                        ( ParseInfo . PiGram , LLRState , LTokInfo . TiTok )
@@ -2942,7 +2942,7 @@ TRUE OR
                   , LTokInfo 
                   , ShiftLRState := LAction 
                     (* See comment on Shift call below. *) 
-                  , ParseTrialState := WParseTrialState 
+                  , TrialState := WTrialState 
                   , LastShifted 
                       := StateList . SlLastShiftedAstStates 
                            [ StateList . SlLatest ]
@@ -2950,16 +2950,16 @@ TRUE OR
                   ) 
               ; SetOrigTempMarks   
                   ( FullRange 
-                      := WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
+                      := WTrialState . TsParseTravStateRef . PtsTokInfo 
                          . TiFullTempMarkRange 
                   , PatchRange := ParseHs . TempMarkRangeNull 
                   , OrigTempMarkList := ParseInfo . PiTravTempMarkListRef 
                   , (* VAR *) ParseTempMarkList 
-                              := WParseTrialState . PtsTempMarkListRef 
+                              := WTrialState . TsTempMarkListRef 
                   , ForceCopy := FALSE 
                   )  
               (* Now consume the shifted nonterminal input token. *) 
-              ; WParseTrialState . PtsParseTravStateRef := LParseTravState2
+              ; WTrialState . TsParseTravStateRef := LParseTravState2
               ; LbeStd . IncLimitedTokCt 
                   ( LParseCheck , LTokInfo . TiSyntTokCt ) 
               ; IF MaxParseCheck < LbeStd . ParseCheckInfinity 
@@ -2980,7 +2980,7 @@ TRUE OR
                      be the right state to enter after the shift, but it 
                      will be ignored when the reduce is done later in this 
                      procedure, without using the parse tables in between. *) 
-                , ParseTrialState := WParseTrialState 
+                , TrialState := WTrialState 
                 , LastShifted 
                     := StateList . SlLastShiftedAstStates 
                          [ StateList . SlLatest ]
@@ -2991,14 +2991,14 @@ TRUE OR
                 , PatchRange := LTokInfo . TiPatchTempMarkRange 
                 , OrigTempMarkList := ParseInfo . PiTravTempMarkListRef 
                 , (* VAR *) ParseTempMarkList 
-                            := WParseTrialState . PtsTempMarkListRef 
+                            := WTrialState . TsTempMarkListRef 
                 , ForceCopy := FALSE 
                 )  
             (* Now consume the input token. *) 
-            ; WParseTrialState . PtsParseTravStateRef 
+            ; WTrialState . TsParseTravStateRef 
                 := NextParseTravState 
                      ( ParseInfo 
-                     , WParseTrialState . PtsParseTravStateRef 
+                     , WTrialState . TsParseTravStateRef 
                      , ParseTrv . SuccKindTyp . SuccKindAdvance 
                      , LRState := LAction 
                      , Comment := "Terminal shifted" 
@@ -3006,7 +3006,7 @@ TRUE OR
             ; LbeStd . IncLimitedTokCt 
                 ( LParseCheck , LTokInfo . TiSyntTokCt ) 
             ; LTokInfo 
-                := WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
+                := WTrialState . TsParseTravStateRef . PtsTokInfo 
             ; IF LAction >= ParseInfo . PiGram . FirstReadRedAction 
               THEN (* Shift-reduce, and we already did the shift. *) 
                 Reduce 
@@ -3016,7 +3016,7 @@ TRUE OR
                   , Repairing  
                   ) 
               END (* IF *) 
-            (* WParseTrialState is now invalid. *) 
+            (* WTrialState is now invalid. *) 
             ; IF MaxParseCheck < LbeStd . ParseCheckInfinity 
                  AND LParseCheck >= MaxParseCheck 
               THEN 
@@ -3024,13 +3024,13 @@ TRUE OR
               ELSE  
                 LLRState 
                   := StateList . SlStates [ StateList . SlLatest ] 
-                     . PtsParseStackTopRef . PseLRState 
+                     . TsParseStackTopRef . PseLRState 
               ; LAction 
                   := LRTable . Action 
                        ( ParseInfo . PiGram , LLRState , LTokInfo . TiTok ) 
               END (* IF *) 
             END (* IF *) 
-          END (* WITH WParseTrialState *) 
+          END (* WITH WTrialState *) 
         END (* IF *) 
       END (* LOOP *) 
     ; ActualParseCheck := LParseCheck 
@@ -3151,7 +3151,7 @@ TRUE OR
         LLRState 
           := StateList . SlStates 
                [ StateList . SlLatest ] 
-             . PtsParseStackTopRef . PseLRState 
+             . TsParseStackTopRef . PseLRState 
       ; LContTok := LRTable . Continuation ( ParseInfo . PiGram , LLRState )
       ; IF LContTok < ParseInfo . PiGram . FirstTerminal  
            OR ParseInfo . PiGram . InsertionCostRef = NIL 
@@ -3228,7 +3228,7 @@ TRUE OR
             ; LLRState 
                 := StateList . SlStates 
                      [ StateList . SlLatest ] 
-                   . PtsParseStackTopRef . PseLRState 
+                   . TsParseStackTopRef . PseLRState 
             ; LContTok 
                 := LRTable . Continuation ( ParseInfo . PiGram , LLRState )
             ; LCost 
@@ -3245,7 +3245,7 @@ TRUE OR
 
   ; PROCEDURE RepConstructAntideletion 
       ( VAR (* IN OUT *) TokInfo : ParseHs . TokInfoTyp 
-      ; VAR (* IN OUT *) ParseTrialState : ParseTrialStateTyp 
+      ; VAR (* IN OUT *) TrialState : TrialStateTyp 
       ) 
     RAISES { AssertionFailure } 
     (* Construct antideletion insertion mod *) 
@@ -3267,7 +3267,7 @@ TRUE OR
         THEN 
         ELSE 
           LMergeInfo := NEW ( MergeInfoTyp ) 
-        ; InitMergeInfo ( ParseTrialState , (* VAR *) LMergeInfo ) 
+        ; InitMergeInfo ( TrialState , (* VAR *) LMergeInfo ) 
         ; EVAL EstBuild . InitMergeState 
                  ( LMergeInfo  
                  , ParseInfo . PiLang 
@@ -3286,7 +3286,7 @@ TRUE OR
             , PatchRange := TokInfo . TiPatchTempMarkRange 
             , OrigTempMarkList := ParseInfo . PiTravTempMarkListRef 
             , (* VAR *) ParseTempMarkList 
-                        := ParseTrialState . PtsTempMarkListRef 
+                        := TrialState . TsTempMarkListRef 
             , ForceCopy := FALSE 
             )
         ; MergeSliceList 
@@ -3310,14 +3310,14 @@ TRUE OR
                + EstHs . EstChildKindSetModTok 
         ; FinishMergeInfo 
             ( (* READONLY *) ParseInfo 
-            , (* VAR *) ParseTrialState 
+            , (* VAR *) TrialState 
             , LMergeInfo 
             , LSliceListElemRef ^ . SleNodeRef 
             , (* VAR *) LSliceListElemRef ^ . SleKindSet 
             )  
         ; LNewBuildStackElemRef := NEW ( ParseHs . BuildStackElemRefTyp ) 
         ; LNewBuildStackElemRef . BseLink 
-            := ParseTrialState . PtsWaitingBuildStackElemRef 
+            := TrialState . TsWaitingBuildStackElemRef 
         ; LNewBuildStackElemRef . BseTokInfo := TokInfo 
         ; LNewBuildStackElemRef . BseTokInfo . TiPatchTempMarkRange 
             := ParseHs . TempMarkRangeNull 
@@ -3327,7 +3327,7 @@ TRUE OR
           (* ^Just to simplify debugging. *) 
         ; LNewBuildStackElemRef . BseWasDeletedByParser := TRUE 
         ; LNewBuildStackElemRef . BseWasInsertedByParser := FALSE 
-        ; ParseTrialState . PtsWaitingBuildStackElemRef 
+        ; TrialState . TsWaitingBuildStackElemRef 
             := LNewBuildStackElemRef 
         END (* IF NOT TiIsInsertionRepair *) 
       END RepConstructAntideletion 
@@ -3406,7 +3406,7 @@ TRUE OR
                 := LRTable . Action 
                      ( ParseInfo . PiGram 
                      , LStateList . SlStates [ LStateList . SlLatest ] 
-                       . PtsParseStackTopRef . PseLRState 
+                       . TsParseStackTopRef . PseLRState 
                      , LTokInfo . TiTok 
                      ) 
             ; IF LAction = ParseInfo . PiGram . AcceptAction 
@@ -3433,7 +3433,7 @@ TRUE OR
                   := LRTable . Action 
                        ( ParseInfo . PiGram 
                        , LStateList . SlStates [ LStateList . SlLatest ] 
-                         . PtsParseStackTopRef . PseLRState 
+                         . TsParseStackTopRef . PseLRState 
                        , LTokInfo . TiTok 
                        ) 
               (* And go around to try this new parse action. *) 
@@ -3646,21 +3646,21 @@ TRUE OR
           (* Don't delete a whole Est subtree. Descend to a single token. *)  
             LOOP 
               LTokInfo 
-                := WStateAfterDeletions . PtsParseTravStateRef . PtsTokInfo 
+                := WStateAfterDeletions . TsParseTravStateRef . PtsTokInfo 
             ; IF LTokInfo . TiIsInterior 
               THEN (* Interior node, try a lower subtree *) 
-                WStateAfterDeletions . PtsParseTravStateRef 
+                WStateAfterDeletions . TsParseTravStateRef 
                   := NextParseTravState 
                        ( ParseInfo 
-                       , WStateAfterDeletions . PtsParseTravStateRef 
+                       , WStateAfterDeletions . TsParseTravStateRef 
                        , ParseTrv . SuccKindTyp . SuccKindDescend 
-                       , WStateAfterDeletions . PtsParseStackTopRef 
+                       , WStateAfterDeletions . TsParseStackTopRef 
                          . PseLRState 
                        , Comment := "Deletion repair, descend" 
                        ) 
               ; LStateListAfterDeletions . SlLastShiftedAstStates 
                   [ LStateListAfterDeletions . SlLatest ] 
-                  := GNullParseTrialState 
+                  := GNullTrialState 
               ELSE EXIT
               END (* IF *) 
             END (* LOOP *) 
@@ -3706,12 +3706,12 @@ TRUE OR
                 END (* IF *) 
               ; RepConstructAntideletion 
                   ( (* IN OUT *) LTokInfo , (* IN OUT *) WStateAfterDeletions )
-              ; WStateAfterDeletions . PtsParseTravStateRef 
+              ; WStateAfterDeletions . TsParseTravStateRef 
                   := NextParseTravState 
                        ( ParseInfo 
-                       , WStateAfterDeletions . PtsParseTravStateRef 
+                       , WStateAfterDeletions . TsParseTravStateRef 
                        , ParseTrv . SuccKindTyp . SuccKindAdvance 
-                       , WStateAfterDeletions . PtsParseStackTopRef 
+                       , WStateAfterDeletions . TsParseStackTopRef 
                          . PseLRState 
                        , Comment := "Successor to deleted token" 
                        ) (* Consume. *) 
@@ -3789,7 +3789,7 @@ TRUE OR
       ; LNewBuildStackElemRef := NEW ( ParseHs . BuildStackElemRefTyp ) 
       ; LNewBuildStackElemRef . BseLink 
           := ErrorStateList . SlStates [ LStateListSs ] 
-             . PtsWaitingBuildStackElemRef   
+             . TsWaitingBuildStackElemRef   
       ; LNewBuildStackElemRef . BseWasDeletedByParser := TRUE 
       ; LNewBuildStackElemRef . BseWasInsertedByParser := FALSE 
       ; WITH WTokInfo = LNewBuildStackElemRef . BseTokInfo 
@@ -3811,7 +3811,7 @@ TRUE OR
         ; LStartStateList . SlOldest := 0 
         ; LStartStateList . SlStates [ 0 ] 
             := ErrorStateList . SlStates [ LStateListSs ] 
-        ; LStartStateList . SlStates [ 0 ] . PtsWaitingBuildStackElemRef
+        ; LStartStateList . SlStates [ 0 ] . TsWaitingBuildStackElemRef
             := LNewBuildStackElemRef 
         ; RepRepairsAtPoint 
             ( (* READONLY *) LStartStateList , LRepairPointCt ) 
@@ -3824,11 +3824,11 @@ TRUE OR
           END (* IF *) 
         END (* LOOP *) 
       (* Now back down the (reduced) stack *) 
-      ; WITH WParseTrialState = ErrorStateList . SlStates [ LStateListSs ] 
-        DO LParseStackTopRef := WParseTrialState . PtsParseStackTopRef 
-        ; LBuildStackElemRef := WParseTrialState . PtsBuildStackTopRef 
-        ; LParseTravStateRef := WParseTrialState . PtsParseTravStateRef 
-        END (* WITH WParseTrialState *) 
+      ; WITH WTrialState = ErrorStateList . SlStates [ LStateListSs ] 
+        DO LParseStackTopRef := WTrialState . TsParseStackTopRef 
+        ; LBuildStackElemRef := WTrialState . TsBuildStackTopRef 
+        ; LParseTravStateRef := WTrialState . TsParseTravStateRef 
+        END (* WITH WTrialState *) 
       ; LExtraParseCheck := LRepairPointCt 
       ; WHILE LParseStackTopRef # NIL 
               AND LRepairPointCt < Options . SimpleRepairPointCt 
@@ -3855,11 +3855,11 @@ TRUE OR
         ; LParseStackTopRef := LParseStackTopRef . PseLink 
         ; LStartStateList . SlLatest := 0 
         ; LStartStateList . SlOldest := 0 
-        ; WITH WParseTrialState = LStartStateList . SlStates [ 0 ] 
-          DO WParseTrialState . PtsParseStackTopRef := LParseStackTopRef 
-          ; WParseTrialState . PtsBuildStackTopRef := LBuildStackElemRef 
-          ; WParseTrialState . PtsParseTravStateRef := LParseTravStateRef 
-          END (* WITH WParseTrialState *) 
+        ; WITH WTrialState = LStartStateList . SlStates [ 0 ] 
+          DO WTrialState . TsParseStackTopRef := LParseStackTopRef 
+          ; WTrialState . TsBuildStackTopRef := LBuildStackElemRef 
+          ; WTrialState . TsParseTravStateRef := LParseTravStateRef 
+          END (* WITH WTrialState *) 
         ; RepRepairsAtPoint ( LStartStateList , LExtraParseCheck ) 
         ; INC ( LRepairPointCt ) 
         END (* WHILE *) 
@@ -3897,17 +3897,17 @@ TRUE OR
     ; ParseInfo . PiAttemptedRepairCt := 0 
     ; LStateList . SlOldest := 0 
     ; LStateList . SlLatest := 0 
-    ; WITH WParseTrialState = LStateList . SlStates [ LStateList . SlLatest ] 
+    ; WITH WTrialState = LStateList . SlStates [ LStateList . SlLatest ] 
       DO 
         LParseStackElemRef := NEW ( ParseHs . ParseStackElemRefTyp ) 
-      ; WParseTrialState . PtsParseStackTopRef := LParseStackElemRef 
+      ; WTrialState . TsParseStackTopRef := LParseStackElemRef 
       ; LParseStackElemRef . PseLink := NIL 
       ; LParseStackElemRef . PseTok := LbeStd . Tok__Null (* Irrelevant. *) 
       ; LParseStackElemRef . PseLRState := ParseInfo . PiGram . StartStateNo 
       ; LParseStackElemRef . PseDeepestBuildStackElemRef := NIL 
-      ; WParseTrialState . PtsBuildStackTopRef := NIL 
-      ; WParseTrialState . PtsWaitingBuildStackElemRef := NIL 
-      ; WParseTrialState . PtsParseTravStateRef (* For 1st token. *) 
+      ; WTrialState . TsBuildStackTopRef := NIL 
+      ; WTrialState . TsWaitingBuildStackElemRef := NIL 
+      ; WTrialState . TsParseTravStateRef (* For 1st token. *) 
           := NextParseTravState 
                ( ParseInfo 
                , ParseTravStateRef (* For BOI. *) 
@@ -3915,12 +3915,12 @@ TRUE OR
                , LParseStackElemRef . PseLRState 
                , Comment := "Initial"
                ) 
-      ; WParseTrialState . PtsJustShifted := TRUE 
-      ; WParseTrialState . PtsTempMarkListRef
+      ; WTrialState . TsJustShifted := TRUE 
+      ; WTrialState . TsTempMarkListRef
           := ParseInfo . PiTravTempMarkListRef 
-      END (* WITH WParseTrialState *) 
+      END (* WITH WTrialState *) 
     ; LStateList . SlLastShiftedAstStates [ LStateList . SlLatest ] 
-        := GNullParseTrialState 
+        := GNullTrialState 
     ; LOOP 
         LRMachine 
           ( ParseInfo 
@@ -3947,27 +3947,27 @@ TRUE OR
         ; IF LAccepted THEN EXIT END (* IF *) 
         END (* IF *) 
       END (* LOOP *) 
-    ; WITH WParseTrialState = LStateList . SlStates [ LStateList . SlLatest ] 
+    ; WITH WTrialState = LStateList . SlStates [ LStateList . SlLatest ] 
       DO 
         Shift 
           ( ParseInfo 
-          , WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
+          , WTrialState . TsParseTravStateRef . PtsTokInfo 
           , ShiftLRState := ParseInfo . PiGram . AcceptAction 
-          , ParseTrialState := WParseTrialState 
+          , TrialState := WTrialState 
           , LastShifted 
               := LStateList . SlLastShiftedAstStates [ LStateList . SlLatest ]
           , Delete := FALSE 
           ) 
       ; SetOrigTempMarks   
           ( FullRange 
-              := WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
+              := WTrialState . TsParseTravStateRef . PtsTokInfo 
                  . TiFullTempMarkRange 
           , PatchRange 
-              := WParseTrialState . PtsParseTravStateRef . PtsTokInfo 
+              := WTrialState . TsParseTravStateRef . PtsTokInfo 
                  . TiPatchTempMarkRange 
           , OrigTempMarkList := ParseInfo . PiTravTempMarkListRef 
           , (* VAR *) ParseTempMarkList 
-                      := WParseTrialState . PtsTempMarkListRef 
+                      := WTrialState . TsTempMarkListRef 
           , ForceCopy := FALSE 
           )
       END (* WITH *)
@@ -3977,27 +3977,27 @@ TRUE OR
         , LStateList 
         , Repairing := FALSE   
         ) 
-    ; WITH WParseTrialState = LStateList . SlStates [ LStateList . SlLatest ] 
+    ; WITH WTrialState = LStateList . SlStates [ LStateList . SlLatest ] 
       DO Assert 
-           ( WParseTrialState . PtsParseStackTopRef 
+           ( WTrialState . TsParseStackTopRef 
              . PseDeepestBuildStackElemRef 
              = NIL 
            , AFT . A_Parse_ExtraBuildStackSegmentUponAccept 
            ) 
       ; Assert 
-          ( WParseTrialState . PtsParseStackTopRef . PseTok 
+          ( WTrialState . TsParseStackTopRef . PseTok 
             = LbeStd . Tok__Augment 
           , AFT . A_Parse_Not_augment_upon_accept 
           ) 
       ; Assert 
-          ( WParseTrialState . PtsParseStackTopRef ^ . PseLink ^ . PseLink 
+          ( WTrialState . TsParseStackTopRef ^ . PseLink ^ . PseLink 
             = NIL 
           , AFT . A_Parse_Extra_parse_stack_elements_upon_accept 
           ) 
       ; WITH 
           WSliceListElemRef 
           = NARROW 
-              ( WParseTrialState . PtsBuildStackTopRef . BseTokInfo . TiInfo  
+              ( WTrialState . TsBuildStackTopRef . BseTokInfo . TiInfo  
               , ParseHs . SliceListElemRefTyp 
               ) 
         DO
@@ -4011,9 +4011,9 @@ TRUE OR
             ) 
         ; NewTreeRef := WSliceListElemRef . SleNodeRef 
         ; ParseInfo . PiTravTempMarkListRef 
-            := WParseTrialState . PtsTempMarkListRef        
+            := WTrialState . TsTempMarkListRef        
         END (* WITH WSliceListElemRef *) 
-      END (* WITH WParseTrialState *) 
+      END (* WITH WTrialState *) 
     ; WriteTraceParseEnd ( ) 
     ; Assertions . MessageText
         ( Fmt . Int ( GSingletonListOptCt ) 
