@@ -1832,7 +1832,7 @@ END
              
            ELSIF LangUtil . TokClass ( ParseInfo . PiLang , WSif . SifTok )  
                  IN LbeStd . TokClassSetNTPlaceholder  
-           THEN (* Nonterminal placeholder.  Use a luanguage-supplied string
+           THEN (* Nonterminal placeholder.  Use a language-supplied string
                    for the token. *)  
              LStringRef 
                := LangUtil . DisplayStringForTok 
@@ -1911,9 +1911,9 @@ END
         ( ToPos : LbeStd . LimitedCharNoTyp ) 
       (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
       RAISES { AssertionFailure }
-      (* Include any temp marks that are in the string, and bias them
-         line-relative, during reparsing.  They will be rebiased after
-         rescanning. *)
+      (* Include any temp marks that are in the string delivered to the
+         scanner, up to ToPos, and bias them line-relative, during reparsing.
+         They will be rebiased after rescanning. *)
 
       = VAR LAbsCharPos : LbeStd . LimitedCharNoTyp  
 
@@ -3717,7 +3717,7 @@ END ;
                 THEN (* Proposed (by an earlier parse) insertion repair. *) 
                 (* The repair could have temp marks.  BuildTempMarks will allow
                    this to happen only if the line has nothing but repairs
-                   and this is the last one.   Make the temp marks absolute at
+                   and this is the last one.  Make the temp marks absolute at
                    the beginning of the (next) line and include them in 
                    NpsTempMarkRange.  They will be applied to the next item. 
                 *)

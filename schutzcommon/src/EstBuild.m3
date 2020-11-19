@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -69,7 +69,8 @@ MODULE EstBuild
       END (* RECORD *) 
 
 ; REVEAL MergeStateTyp 
-    = BRANDED Brand 
+    = MergeStatePublicTyp
+      BRANDED Brand 
       OBJECT 
         MsFsNodeRef : LangUtil . FsNodeRefTyp 
       ; MsLastEstRef : LbeStd . EstRootTyp 
@@ -94,7 +95,6 @@ MODULE EstBuild
       ; MsTrailingNeedsSep : BOOLEAN 
       ; MsLeftTok : LbeStd . TokTyp 
       ; MsLang : LbeStd . LangTyp 
-      ; MsEstTok : LbeStd . TokTyp 
 
       ; MsTrailingWidthInfo : EstHs . WidthInfoTyp 
         (* ^Width contributions of things with no explicit presence in the
@@ -133,7 +133,7 @@ MODULE EstBuild
    for the pointer when it is finally created.  Furthermore, the level
    above has had its pointer deleted, that pointed to the old node
    below (if there was one), from which the info at this level was
-   unpacked. When a row is unpacked, so are all higher rows too.  *)
+   unpacked.  When a row is unpacked, so are all higher rows too.  *)
 
 ; VAR FreePool : MergeStateTyp := NIL 
 ; VAR FreePoolCt : PortTypes . Int32Typ 
@@ -3273,7 +3273,8 @@ MODULE EstBuild
             := EstHs . EstChildKindSetEmpty 
         END (* IF *) 
       (* Save things for next time. *) 
-      ; MergeState . MsLastEstRef := EstRef 
+      ; MergeState . MsLastEstRef := EstRef
+(* FIXME: ^This can't be right, if FromChildNo > 0 *)
       ; MergeState . MsLastFromChildNo := FromChildNo 
       ; MergeState . MsLastToChildNo := ToChildNo 
       END (* Block *) 
@@ -3286,7 +3287,6 @@ MODULE EstBuild
     ; VAR ResultEstRef : EstHs . EstRefTyp 
     ) 
   RAISES { AssertionFailure }   
-
 
   = VAR LHeight : EstHs . KTreeHeightTyp 
   ; VAR LInsertionRef : EstHs . KTreeRefTyp 

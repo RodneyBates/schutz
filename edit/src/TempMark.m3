@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -2023,9 +2023,9 @@ MODULE TempMark
           RbmLineMarkMeat := RbmLineMarkMeat . LmRightLink 
         ; WITH 
             WNewTempMark 
-            = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+            = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
           , WOldTempMark 
-            = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo - 1 ] 
+            = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo - 1 ] 
           DO RETURN 
                WNewTempMark . TokMark . Kind 
                   # WOldTempMark . TokMark . Kind 
@@ -2217,7 +2217,7 @@ MODULE TempMark
                 ) 
             ; WKindSet := WKindSet - EstHs . EstChildKindSetContainsTempMark 
             (* Update the cached copy too.  This may not matter, but as
-               complicated as everyting is here, it is good defensive
+               complicated as everything is here, it is good defensive
                consistency. *) 
             END (* IF *) 
           END (* WITH *) 
@@ -2236,7 +2236,7 @@ MODULE TempMark
             LOOP 
               WITH 
                 WTempMark 
-                = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
               DO Assert 
                    ( WTempMark . TokMark . Kind # MarkKindTyp . BlankLine 
                    , AFT . A_RbmTeSqueezeTrailingTempMarks_BlankLine 
@@ -2276,7 +2276,7 @@ MODULE TempMark
             LOOP 
               WITH 
                 WTempMark 
-                = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
               DO Assert 
                    ( WTempMark . TokMark . Kind # MarkKindTyp . BlankLine 
                    , AFT . A_RbmTeBuildSomeMarksForTok_BlankLine 
@@ -2320,7 +2320,7 @@ MODULE TempMark
           THEN 
             WITH 
               WTempMark 
-              = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+              = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
             DO 
                IF CurrentEstRef = WTempMark . EstRef  
                THEN 
@@ -2348,7 +2348,7 @@ MODULE TempMark
             => 
                Assert 
                  ( String 
-                   = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                   = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                      . EstRef 
                  , AFT . A_RbmTeLeafString_DescendNoTempMark 
                  ) 
@@ -2635,7 +2635,7 @@ MODULE TempMark
                         , EstRef 
                             := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                         , StartMark 
-                            := ParseInfo . PiOrigTempMarkListRef 
+                            := ParseInfo . PiFinalTempMarkListRef 
                                ^ [ RbmTempMarkElemNo ]  
                                  . TokMark 
                         , StartMarkIsKnownNl := FALSE 
@@ -2754,7 +2754,7 @@ MODULE TempMark
                    ) 
               ; Assert 
                   ( ModBlankLine 
-                    = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                    = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                       . EstRef 
                   , AFT . A_RbmTeTfsBlankLine_MarkedModMismatch 
                   ) 
@@ -2773,7 +2773,7 @@ MODULE TempMark
               ; LOOP (* Thru temp marks in this blank line *) 
                   WITH 
                     WTempMark 
-                    = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                    = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                   DO Assert 
                        ( RbmTempMarkElemNo < RbmTempMarkElemCt 
                          AND WTempMark . TokMark . Kind 
@@ -2943,7 +2943,7 @@ MODULE TempMark
                    ) 
               ; Assert 
                     ( ModCmnt 
-                      = ParseInfo . PiOrigTempMarkListRef ^ 
+                      = ParseInfo . PiFinalTempMarkListRef ^ 
                         [ RbmTempMarkElemNo ] 
                         . EstRef  
                     , AFT . A_RbmTeTfsLeadingModsNoDel_MarkedModMismatch 
@@ -3465,7 +3465,7 @@ MODULE TempMark
               OF RbmStateDescend 
               => WITH 
                    WTempMark 
-                   = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                   = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                  DO (* The next temp mark should denote this InsTok. *) 
 (* CHECK: Sheesh.  Is all this really necessary? *) 
                     CASE WTempMark . TokMark . Kind <* NOWARN *> 
@@ -3487,6 +3487,11 @@ MODULE TempMark
                     => Assert 
                         ( RbmTeEstTravInfo . EtiParentRef = WTempMark . EstRef 
                         , AFT . A_RbmTeTfsInsTok_InsTokWOTempMark 
+                        ) 
+                    | MarkKindTyp . Plain 
+                    => Assert 
+                        ( RbmTeEstTravInfo . EtiParentRef = WTempMark . EstRef 
+                        , AFT . A_RbmTeTfsInsTok_DeletedInsTokWOTempMark 
                         ) 
                     END (* CASE *) 
                  END (* WITH WTempMark *) 
@@ -3520,7 +3525,7 @@ MODULE TempMark
                 THEN 
                   WITH 
                     WTempMark 
-                    = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+                    = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
                   DO (* If next temp mark applies to this InsTok, do the 
                         building of all marks within. *) 
                      CASE WTempMark . TokMark . Kind 
@@ -3879,7 +3884,7 @@ MODULE TempMark
 (* CHECK^ On this. *) 
                         , RbmTeEstTravInfo 
                         , StartMark 
-                            := ParseInfo . PiOrigTempMarkListRef ^ 
+                            := ParseInfo . PiFinalTempMarkListRef ^ 
                                  [ RbmTempMarkElemNo ]  
                                . TokMark 
                         , StartMarkIsKnownNl := FALSE 
@@ -3987,7 +3992,7 @@ MODULE TempMark
 
         = BEGIN   
             WITH WTempMark 
-                 = ParseInfo . PiOrigTempMarkListRef <* NOWARN *> 
+                 = ParseInfo . PiFinalTempMarkListRef <* NOWARN *> 
                    ^ [ RbmTempMarkElemNo ] 
             DO 
               IF RbmTeEstTravInfo . EtiChildNo 
@@ -4255,18 +4260,25 @@ MODULE TempMark
             RbmTeDoneWEst := FALSE 
           ; WITH 
               WTempMark 
-              = ParseInfo . PiOrigTempMarkListRef ^ [ RbmTempMarkElemNo ] 
+              = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
             DO 
               IF RbmTeEstTravInfo . EtiNodeRef = WTempMark . EstRef 
               THEN (* The next temp mark denotes the Est parent node. *) 
                 CASE WTempMark . TokMark . Kind 
                 OF MarkKindTyp . Plain 
                 , MarkKindTyp . BlankLine 
-                => Assert 
-                     ( RbmTeEstTravInfo . EtiParentRef = NIL 
-                     , AFT . A_RbmTeComputeEstAndFmtNoForDescend_NotLeaf
-                     ) 
-                ; RbmTeFmtNo := EstHs . FmtNoNull (* Defensive. *) 
+                => IF RbmTeEstTravInfo . EtiParentRef # NIL
+                      AND RbmTeEstTravInfo . EtiParentRef . EstNodeKind
+                          = EstHs . EstNodeKindTyp . EstNodeKindModTok
+                   THEN
+                     RbmTeFmtNo := EstHs . FmtNoModTok (* Probably dead. *) 
+                   ELSE
+                     Assert 
+                       ( RbmTeEstTravInfo . EtiParentRef = NIL 
+                       , AFT . A_RbmTeComputeEstAndFmtNoForDescend_NotLeaf
+                       ) 
+                   ; RbmTeFmtNo := EstHs . FmtNoNull (* Defensive. *)
+                   END (* IF *) 
 
                 | MarkKindTyp . RightSibFmtNo 
                 => (* This can happen if we went back to RbmStateDescend,
@@ -4276,7 +4288,7 @@ MODULE TempMark
 
                 | MarkKindTyp . ChildFmtNo 
                 => Assert 
-                    ( RbmTeEstTravInfo . EtiChildCt = 0 
+                    ( RbmTeEstTravInfo . EtiChildCt > 0 
                     , AFT . A_RbmTeComputeEstAndFmtNoForDescend_ChildFmtNo_with_children 
                     ) 
                 ; RbmTeFmtNo := WTempMark . TokMark . FmtNo 
@@ -4297,12 +4309,12 @@ MODULE TempMark
                      >= RbmTeEstTravInfo . EtiChildCt
                      AND WTempMark . EstRef = RbmTeRMChildRef 
                    ) 
-                THEN (* We off the right end, but there is a TempMark pointing 
-                        to the rightmost child.  It must be RightSib. 
+                THEN (* We are off the right end, but there is a TempMark
+                        pointing to the rightmost child.  It must be RightSib. 
                         If we are ascending, it may already be unmarked. *)
                   Assert 
                     ( WTempMark . TokMark . Kind = MarkKindTyp . RightSibFmtNo
-                    , AFT . A_RbmTeComputeEstAndFmtNoForDescend_Youngest_not_RioghtSib 
+                    , AFT . A_RbmTeComputeEstAndFmtNoForDescend_Youngest_not_RightSib 
                     ) 
                 ; RbmTeFmtNo := WTempMark . TokMark . FmtNo 
                 ELSIF 
@@ -4312,8 +4324,8 @@ FALSE AND             WTempMark . EstRef
                         It must be LeftSib and can only happen when truly
                         descending. *)   
                   Assert 
-                    ( WTempMark . TokMark . Kind = MarkKindTyp . RightSibFmtNo
-                    , AFT . A_RbmTeComputeEstAndFmtNoForDescend_Elder_not_RightSib
+                    ( WTempMark . TokMark . Kind = MarkKindTyp . LeftSibFmtNo
+                    , AFT . A_RbmTeComputeEstAndFmtNoForDescend_Elder_not_LeftSib
                     ) 
                 ; RbmTeFmtNo := WTempMark . TokMark . FmtNo 
                 ELSE 
@@ -4537,7 +4549,7 @@ FALSE AND             WTempMark . EstRef
         IF NewEstRef # NIL 
         THEN 
           RbmImagePers := ImageRef . ItPers 
-        ; RbmTempMarkElemCt := NUMBER ( ParseInfo . PiOrigTempMarkListRef ^ ) 
+        ; RbmTempMarkElemCt := NUMBER ( ParseInfo . PiFinalTempMarkListRef ^ ) 
         ; Assert 
             ( RbmTempMarkElemCt > 0 
             , AFT . A_RebuildMarkList_EmptyTempMarkList 

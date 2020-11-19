@@ -84,7 +84,6 @@ INTERFACE ParseHs
       ; TiFullTempMarkRange : TempMarkRangeTyp := TempMarkRangeNull 
         (* TiFullTempMarkRange is the range of temp mark subscripts of
            all temp marks in this token, including its attached mods. 
-           When empty, it will = TempMarkRangeNull. 
         *) 
       ; TiPatchTempMarkRange : TempMarkRangeTyp := TempMarkRangeNull 
         (* TiPatchTempMarkRange gives a range of TempMarks that denote 
@@ -93,7 +92,7 @@ INTERFACE ParseHs
            to point to a newly constructed Est node when the token is 
            reduced in a building reduction.  ParseTrv also uses it to
            temporarily keep TempMark ranges that it later patches, before
-           returning a token. Same convention for an empty range. 
+           returning a token. 
         *) 
       ; TiTok : LbeStd . TokTyp := LbeStd . Tok__Null 
       ; TiSyntTokCt : LbeStd . LimitedTokCtTyp := 0 
@@ -387,6 +386,8 @@ INTERFACE ParseHs
             including suggested repairs, and these are always descended-to,
             never advanced-over, even when Parser requested an advance.
         *) 
+      ; PiFinalTempMarkListRef : TempMarkArrayRefTyp
+        (* ^After a parse. *)
       ; PiString : Strings . StringTyp 
       ; PiAttemptedRepairCt : CARDINAL := 0 
       ; PiAttemptedRepairActionCt : CARDINAL := 0 
