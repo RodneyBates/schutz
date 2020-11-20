@@ -1,0 +1,18 @@
+File_Open_Text "testacc_134a.m3"
+CursorDown
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CursorRight
+CharType_Char ';'
+STOP
+SemParse
+File_Export_Text "testacc_134a.export.m3"
+STOP
+File_CloseImage_Text "testacc_134a.m3"
+STOP
+File_Quit
+
+
