@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+> Schutz, a programming-language-aware editor. </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="NEXT"
+TITLE=" Design goals"
+HREF="x15.html"></HEAD
+><BODY
+CLASS="article"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="ARTICLE"
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="title"
+><A
+NAME="AEN2"
+>Schutz, a programming-language-aware editor.</A
+></H1
+><H3
+CLASS="author"
+><A
+NAME="AEN4"
+>Rodney Bates</A
+></H3
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>1. <A
+HREF="index.html#intro"
+>Introduction</A
+></DT
+><DT
+>2. <A
+HREF="x15.html"
+>Design goals</A
+></DT
+><DD
+><DL
+><DT
+>2.1. <A
+HREF="x15.html#AstRep"
+>Internal AST Representation</A
+></DT
+><DT
+>2.2. <A
+HREF="x15.html#SyntLayout"
+>Automatic Layout of Syntactic Mterial</A
+></DT
+><DT
+>2.3. <A
+HREF="x15.html#NonsyntLayout"
+>User-specified Nonsyntactic Layout</A
+></DT
+><DT
+>2.4. <A
+HREF="x15.html#PartAnal"
+>Partial Analysis</A
+></DT
+><DT
+>2.5. <A
+HREF="x15.html#LangIndep"
+>Language Independence</A
+></DT
+><DT
+>2.6. <A
+HREF="x15.html#Ldl1"
+>Language Definition Language</A
+></DT
+><DT
+>2.7. <A
+HREF="x15.html#IncrAnal"
+>Incremental Anaysis</A
+></DT
+><DT
+>2.8. <A
+HREF="x15.html#CompactRep"
+>Compact Internal Representation</A
+></DT
+><DT
+>2.9. <A
+HREF="x15.html#NoUnasked"
+>Nothing Unasked-for</A
+></DT
+><DT
+>2.10. <A
+HREF="x15.html#FunctionalRep"
+>Functional Representation</A
+></DT
+><DT
+>2.11. <A
+HREF="x15.html#SyntRepair"
+>Syntax repair</A
+></DT
+><DT
+>2.12. <A
+HREF="x15.html#Recovery"
+>Crash Recovery</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="intro"
+>1. Introduction</A
+></H1
+><P
+>&#13;      In the 1980s, there was a lot of research done on editors
+      for programming languages.  I was very interested in these, in part because
+      I was tired of constantly reworking code layout when reworking code
+      content.  Also, I wanted help with many of what have come to be called
+      refactorings, that are time-consuming and error-prone to carry out.
+    </P
+><P
+>&#13;      I was particularly interested in the method of static semantic
+      analysis used the the PSG system.  This does incremental
+      analysis on incomplete programs, including type inference in the
+      absence of declarations.  Most of the tools I have encountered
+      that provide the user with interactive information work mainly
+      only on complete and syntactically correct code.  They start to
+      rapidly lose capability the minute any edit changes are made.
+    </P
+><P
+>&#13;      Unfortunately, interest in these died down, primarily, I
+      believe, because they generally used "syntax directed editing",
+      where the user constructs code something like building or
+      altering an abstract syntax tree, while the code is displayed
+      textually.  This turns out to be, in many cases, far more
+      difficult to use than just typing text.  Interestingly, a
+      variation of this idea has recently resurfaced in tools that
+      call for graphiically abutting puzzle-piece-like blocks of
+      various shapes, each representing a syntactic construct.  But
+      apparently it has not been embraced by programmers with even
+      moderate experience.
+    </P
+><P
+>&#13;      I did not give up on the idea of a programming-language-aware editor.
+      Instead, I embarked on an attempt to allow user editing in the usual
+      textual way, while internally  maintaining a syntactially analyzed
+      form of code, upon which layout, refactoring, semantically-aware
+      browsing, etc. could be performed by the editor.  Schutz is the
+      result of a decades long project to that aim.  So far, about all it
+      does is support text editing while maintaing an internal representation
+      akin to an abstract syntax tree (AST), plus automated layout of
+      the syntactic portions of code.  But it is on the brink of readiness
+      to support more sophisticated functions.
+    </P
+><P
+>&#13;      This has turned out to be insanely complicated, but I think the behaviors
+      it shows mostly necessitate the complication.  Here is a list of design
+      goals, many of them more or less achieved. 
+    </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x15.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Design goals</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>
