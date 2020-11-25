@@ -3556,6 +3556,12 @@ MODULE TempMark
                           RbmTeBuildSomeMarksForTok 
                             ( RbmTeEstTravInfo . EtiParentRef ) 
                         END (* IF *) 
+                     | MarkKindTyp . Plain  
+                     => IF RbmTeEstTravInfo . EtiParentRef = WTempMark . EstRef 
+                        THEN 
+                          RbmTeBuildSomeMarksForTok 
+                            ( RbmTeEstTravInfo . EtiParentRef ) 
+                        END (* IF *) 
                      ELSE 
                      END (* CASE *) 
                   END (* WITH WTempMark *) 
