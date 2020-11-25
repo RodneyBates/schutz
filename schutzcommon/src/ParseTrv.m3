@@ -1452,14 +1452,14 @@ END
         END (* IF *) 
       END NpsPassNewLine 
 
-  ; PROCEDURE NpsAccumLexErrChars ( ) 
+  ; PROCEDURE NpsAccumRescannedLexErrChars ( ) 
     RAISES { AssertionFailure } 
 
     = VAR LString : SharedStrings . T 
     ; VAR LChildKindSet : EstHs . EstChildKindSetTyp 
     ; VAR LDeferredInfo : ParseHs . DeferredInfoRefTyp 
 
-    ; BEGIN (* NpsAccumLexErrChars *) 
+    ; BEGIN (* NpsAccumRescannedLexErrChars *) 
         LString  
           := SharedStrings . FromString 
                ( ParseInfo . PiScanIf . SifAccumString 
@@ -1486,7 +1486,6 @@ END
         | DeliverStateTyp . DsTokFound 
         => (* Save LexErrChars for the next token. *) 
           LDeferredInfo := NpsGetDeferredInfoRef ( ) 
-        ; LDeferredInfo . Tok := SharedStrings . Tok ( LString ) 
         ; LDeferredInfo . Tok := LbeStd . Tok__LexErrChars  
         ; LDeferredInfo . SyntTokCt := 0 
         ; LDeferredInfo . ObjRef := LString   
@@ -1498,7 +1497,7 @@ END
         ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* ^Dead. *)
         ; NpsDeliverState := DeliverStateTyp . DsDeliver 
         END (* CASE *) 
-      END NpsAccumLexErrChars  
+      END NpsAccumRescannedLexErrChars  
 
   ; PROCEDURE NpsAccumScannedBlankLine ( ) 
     RAISES { AssertionFailure } 
@@ -1743,7 +1742,8 @@ END
     ; VAR LDeferredInfo : ParseHs . DeferredInfoRefTyp 
 
     ; BEGIN (* NpsDeliverRescannedTok *) 
-        NpsBiasTempMarks ( NpsResultStateRef . PtsScanInfo . SiTokBegPos ) 
+        NpsBiasTempMarks ( NpsResultStateRef . PtsScanInfo . SiTokBegPos )
+        (* ^Any leftovers. *) 
       ; WITH WSif = ParseInfo . PiScanIf 
         DO IF LangUtil . TokClass ( ParseInfo . PiLang , WSif . SifTok ) 
               = LbeStd . TokClassTyp . TokClassConstTerm
@@ -2190,7 +2190,7 @@ END ;
                 NpsAccumRescannedCmnt ( StartPosRelTo ) 
               ELSIF ParseInfo . PiScanIf . SifTok = LbeStd . Tok__LexErrChars 
               THEN 
-                NpsAccumLexErrChars ( ) 
+                NpsAccumRescannedLexErrChars ( ) 
               ELSE (* Delivered tok is a valid syntactic token *) 
                 NpsDeliverRescannedTok ( ) 
               END (* IF comment *) 

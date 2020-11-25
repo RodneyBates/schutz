@@ -23,10 +23,10 @@ INTERFACE Marks
  
    During reparsing, each LineMark is converted to token-relative form. 
    This leads to a token (anything which has text associated with 
-   it) and gives a character postion relative to that.  The character 
+   it) and gives a character position relative to that.  The character 
    position could lie outside the actual token, if it is off the 
    left or right end of the nonblank text on a line.  One of these 
-   is called a TokenMark. 
+   is called a TempMark. 
  
 *) 
 
@@ -46,7 +46,7 @@ INTERFACE Marks
            the Fs child it refers to.  This representation copes with 
            the case where the Fs child becomes a child of an Est node 
            with a different token after reparsing.  In consequence, it 
-           requires that parse traverse deliver a range of Mark 
+           requires that parse traverser deliver a range of Mark 
            subscripts belonging to the syntactic token.  The parser 
            must then use this to reconstruct the Mark record when it 
            reduces to an Est node. *) 
@@ -54,9 +54,9 @@ INTERFACE Marks
       , RightSibFmtNo 
         (* These kinds are used to indicate 
            a point in an InsTok that belongs to the format syntax tree 
-           for a list node.  The EstNodeNo leads to the child Est node 
-           of which the Fs child is a left/right sibling. This allows 
-           whole slices which contain Marks within to be sliced and 
+           for a list node.  The EstNodeNo or EstRef leads to the child
+           Est node of which the Fs child is a left/right sibling. This
+           allows whole slices which contain Marks within to be sliced and 
            respliced more easily.  This depends on the fact that the slice 
            always is denoted to the parser by a sublist nonterminal 
            uniquely associated with the full list nonterminal, and 
@@ -119,8 +119,8 @@ INTERFACE Marks
         (* For ChildFmtNo, the token in node number EstNodeNo.
            For LeftSibFmtNo and RightSibFmtNo, the token in the
            parent of node number EstNodeNo, i.e., the list node. 
-           For BlankLine, the RM token on the nonblank line before the
-           blank lines.  
+           For BlankLine, the rightmost token on the nonblank line
+           before the blank lines.  
            For Plain, I also put Tok__ModText , Tok__Cmnt, and 
            Tok__CmntAtEndOfLine in here, as appropriate, just for consistency, 
            but as of this writing, these are not used. *) 
