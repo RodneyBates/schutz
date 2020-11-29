@@ -745,7 +745,7 @@ MODULE Parser
       IntSets . ForAllDo ( TempMarkSet , PtmVisit )
     END PatchTempMarkSetKindsAndEstRefs 
 
-; PROCEDURE TempMarksForTok 
+; PROCEDURE TempMarksForInsTok 
     ( VAR ParseInfo : ParseHs . ParseInfoTyp 
     ; MergeInfo : MergeInfoTyp (* Fields can change. *)  
     ; READONLY TokInfo : ParseHs . TokInfoTyp 
@@ -753,6 +753,8 @@ MODULE Parser
     ; VAR (* IN OUT *) TempMarksExist : BOOLEAN 
     )
   (* PRE: CopyFullTempMarks has been done. *)
+  (* Patch and/or defer any temp marks in this insertion token. *) 
+  (* Harmless if not an insertion tok. *) 
 
   = BEGIN
       IF LangUtil . TokClass ( ParseInfo . PiLang , TokInfo . TiTok )
@@ -760,7 +762,7 @@ MODULE Parser
       THEN (* Not an insertion token. *) 
         Assert
           ( ParseHs . RangeIsEmpty ( TokInfo . TiPatchTempMarkRange ) 
-          , AFT . A_TempMarksForTok_Patch_marks_on_noninsertion_tok
+          , AFT . A_TempMarksForInsTok_Patch_marks_on_noninsertion_tok
           ) 
       ELSIF TempMarksExist
       THEN 
@@ -790,37 +792,43 @@ MODULE Parser
         END (* IF *)
       ; TempMarksExist := FALSE 
       END (* IF *)
-    END TempMarksForTok  
+    END TempMarksForInsTok  
 
-; PROCEDURE NoteChildExists
+; PROCEDURE EstChildNowArriving
     ( VAR ParseInfo : ParseHs . ParseInfoTyp 
     ; MergeInfo : MergeInfoTyp (* Fields can change. *)
     ; ChildRef : LbeStd . EstRootTyp
     )
+  (* Call this *after* merging an explicit EST child.  *) 
   = BEGIN
-(* FIXME: Add containstempmark bit to ChildRef, and, maybe, its parent. *)
       IF MergeInfo . MiRMChildRef = NIL 
       THEN (* First, thus RM, child to be noted. *)
         IF LangUtil . TokClass ( ParseInfo . PiLang , MergeInfo . MsEstTok )
            IN LbeStd . TokClassSetAsList
-        THEN (* This is the RM child of a list.  Patch any RightSib tempmarks. *)
+        THEN
+          (* This is the RM child of a list.  Patch any deferred RightSib tempmarks.
+             These can only be trailing mods attached to this explicit child. *)
           Assert
             ( ChildRef # NIL
-            , AFT . A_NoteChildExists_temp_mark_on_nil_child_of_list
+            , AFT . A_EstChildNowArriving_temp_mark_on_nil_child_of_list
             )
-        ; PatchTempMarkSetKindsAndEstRefs
-            ( MergeInfo . MiTempMarkListRef 
-            , MergeInfo . MiDeferredTempMarkSet 
-            , MarkKindTyp . RightSibFmtNo
-            , ChildRef
-            ) 
-        ; EstBuild . InclNextRightmostChildKindSet 
-            ( MergeInfo , EstHs . EstChildKindSetContainsTempMark ) 
-        END (* IF *) 
+        ; IF NOT IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet )
+          THEN 
+            PatchTempMarkSetKindsAndEstRefs
+              ( MergeInfo . MiTempMarkListRef 
+              , MergeInfo . MiDeferredTempMarkSet 
+              , MarkKindTyp . RightSibFmtNo
+              , ChildRef
+              ) 
+          ; EstBuild . InclNextRightmostChildKindSet
+              ( MergeInfo , EstHs . EstChildKindSetContainsTempMark) 
 (* CHECK: ^That this will be copied up to the root of the Est. *)
+          ; MergeInfo . MiDeferredTempMarkSet := IntSets . Empty ( ) 
+          END (* IF *) 
+        END (* IF *) 
       ; MergeInfo . MiRMChildRef := ChildRef 
       END (* IF *) 
-    END NoteChildExists 
+    END EstChildNowArriving 
 
 ; PROCEDURE InitMergeInfo 
     ( READONLY TrialState : TrialStateTyp 
@@ -909,14 +917,14 @@ MODULE Parser
                     , (* VAR *) ResultLeafElem := LFromLeafElem 
                     )
                 ; IF ISTYPE 
-                       ( LFromLeafElem . LeChildRef
-                       , ModHs . ModCmntTrailingTyp 
-                       ) 
+                       ( LFromLeafElem . LeChildRef , ModHs . ModCmntTrailingTyp ) 
                   THEN
                   
                   (* All of this slice and slices to its right are trailing mods.
                      It's too soon/rightward for TokInfo or TempMarks. *)
-                    EstBuild . MergeSlice 
+                    EstChildNowArriving
+                      ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
+                  ; EstBuild . MergeSlice 
                       ( MergeInfo 
                       , WParentEstRef 
                       , LSliceListElemRef ^ . SleFrom 
@@ -930,16 +938,11 @@ MODULE Parser
                                     := MergeInfo . MiLMNewChildRef 
                       , (* VAR *) LeftmostNewKindSet := LLMKindSet (* Dead. *) 
                       ) 
-                  ; NoteChildExists
-                      ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
                   ELSE
                   
-                  (* Slice begins with a leading mod.  The syntactic token is
-                     an insertion token, thus not an explicit child. *) 
+                  (* Slice begins with a leading mod. *) 
                     IF ISTYPE 
-                         ( LThruLeafElem . LeChildRef 
-                         , ModHs . ModCmntTrailingTyp 
-                         ) 
+                         ( LThruLeafElem . LeChildRef , ModHs . ModCmntTrailingTyp ) 
                     THEN (* Begins with leading item and ends with trailing. *)
                     (* We have to split the slice, merge the trailing items,
                        take care of TempMarks (to get the mark bit in the 
@@ -964,6 +967,8 @@ MODULE Parser
                         , AFT . A_MergeSliceList_MissingTrailingMod 
                         ) 
                       (* Merge the trailing mods. *) 
+                    ; EstChildNowArriving
+                        ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
                     ; EstBuild . MergeSlice 
                         ( MergeInfo 
                         , WParentEstRef  
@@ -976,9 +981,7 @@ MODULE Parser
                                       := MergeInfo . MiLMNewChildRef 
                         , (* VAR *) LeftmostNewKindSet := LLMKindSet (* Dead. *)
                         )
-                    ; NoteChildExists
-                        ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
-                    ; TempMarksForTok
+                    ; TempMarksForInsTok
                         ( ParseInfo
                         , MergeInfo
                         , TokInfo
@@ -1007,7 +1010,7 @@ MODULE Parser
                         , (* VAR *) LeftmostNewKindSet := LLMKindSet (* Dead. *)
                         ) 
                     ELSE (* Begins and ends with leading items. *) 
-                      TempMarksForTok
+                      TempMarksForInsTok
                         ( ParseInfo
                         , MergeInfo
                         , TokInfo
@@ -1020,6 +1023,8 @@ MODULE Parser
                           ( MergeInfo , TokInfo . TiTok ) 
                       ; LTokInfoIsUncounted := FALSE 
                       END (* IF *) 
+                    ; EstChildNowArriving
+                        ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
                     ; EstBuild . MergeSlice 
                         ( MergeInfo 
                         , WParentEstRef 
@@ -1034,12 +1039,12 @@ MODULE Parser
                             := MergeInfo . MiLMNewChildRef 
                         , (* VAR *) LeftmostNewKindSet := LLMKindSet (* Dead. *)
                         )
-                    ; NoteChildExists
-                        ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
                     END (* IF *) 
                   END (* IF *) 
                 ELSE (* Neither TokInfo nor TempMarks to deal with. *) 
-                  EstBuild . MergeSlice 
+                  EstChildNowArriving
+                    ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
+                ; EstBuild . MergeSlice 
                     ( MergeInfo 
                     , WParentEstRef 
                     , LSliceListElemRef ^ . SleFrom 
@@ -1061,8 +1066,6 @@ MODULE Parser
                         := MergeInfo . MiLMNewChildRef 
                     , (* VAR *) LeftmostNewKindSet := LLMKindSet (* Dead. *)
                     ) 
-                ; NoteChildExists
-                    ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
                 END (* IF *) 
               END (* WITH WParentEstRef *) 
             END (* IF Slice is nonempty *) 
@@ -1071,8 +1074,8 @@ MODULE Parser
                      ( LSliceListElemRef ^ . SleNodeRef 
                      , ModHs . ModCmntTrailingTyp 
                      ) 
-            THEN 
-              TempMarksForTok
+            THEN (* Either a leading mod or an AST child. *) 
+              TempMarksForInsTok
                 ( ParseInfo
                 , MergeInfo
                 , TokInfo
@@ -1097,6 +1100,8 @@ MODULE Parser
                  We must turn it off.
               *) 
             END (* IF *) 
+          ; EstChildNowArriving
+              ( ParseInfo , MergeInfo , LSliceListElemRef ^ . SleNodeRef )
           ; EstBuild . MergeChild 
               ( MergeInfo 
               , LSliceListElemRef ^ . SleNodeRef 
@@ -1105,12 +1110,10 @@ MODULE Parser
               , GroupFmtNo := FmtNo 
               ) 
           ; MergeInfo . MiLMNewChildRef := LSliceListElemRef ^ . SleNodeRef
-          ; NoteChildExists
-              ( ParseInfo , MergeInfo , LSliceListElemRef ^ . SleNodeRef )
           END (* IF SleIsSlice *) 
         ; LSliceListElemRef := LSliceListElemRef ^ . SlePredLink 
         END (* WHILE over elements of slice list. *) 
-      ; TempMarksForTok
+      ; TempMarksForInsTok
           ( ParseInfo
           , MergeInfo
           , TokInfo
@@ -1134,22 +1137,17 @@ MODULE Parser
 
   = BEGIN 
       IF NOT IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet ) 
-      THEN
-        IF NOT LangUtil . TokClass ( ParseInfo . PiLang , MergeInfo . MsEstTok )
-               IN LbeStd . TokClassSetAsList
-           AND NOT IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet ) 
-        THEN (* Finished building a fixed Est node.  Patch deferred temp marks
-                as ChildFmtNo marks pointing to it. *) 
-          PatchTempMarkSetKindsAndEstRefs 
-            ( MergeInfo . MiTempMarkListRef 
-            , TempMarkSet := MergeInfo . MiDeferredTempMarkSet
-            , MarkKind := MarkKindTyp . ChildFmtNo  
-            , EstRef := EstRef 
-            ) 
-        ; EstRef . EstChildKindSet
-            := EstRef . EstChildKindSet + EstHs . EstChildKindSetContainsTempMark
-        END (* IF *) 
-      END (* IF *)
+      THEN (* Patch deferred temp marks as ChildFmtNo marks pointing to the finished
+              node.  It could be a fixed node or a list node with no Est children. *) 
+        PatchTempMarkSetKindsAndEstRefs 
+          ( MergeInfo . MiTempMarkListRef 
+          , TempMarkSet := MergeInfo . MiDeferredTempMarkSet
+          , MarkKind := MarkKindTyp . ChildFmtNo  
+          , EstRef := EstRef 
+          ) 
+      ; EstRef . EstChildKindSet
+          := EstRef . EstChildKindSet + EstHs . EstChildKindSetContainsTempMark
+      END (* IF *) 
     END FinishMergeInfo 
 
 ; PROCEDURE FindEstChildInSliceList 
@@ -1516,7 +1514,8 @@ MODULE Parser
       Get this working. Maybe just close DelMods lazily? 
 *) 
             THEN (* Close the ModDel and merge it. *) 
-              EstBuild . MergeChild 
+              EstChildNowArriving ( ParseInfo , RedMergeInfo , RedModDelRef )
+            ; EstBuild . MergeChild 
                 ( RedMergeInfo 
                 , RedModDelRef 
                 , EstHs . EstChildKindSetInsertionRepairModDel 
@@ -1524,7 +1523,6 @@ MODULE Parser
                 , GroupFmtNo := FmtNo 
                 ) 
             ; RedMergeInfo . MiLMNewChildRef := RedModDelRef  
-            ; NoteChildExists ( ParseInfo , RedMergeInfo , RedModDelRef )
             ; RedModDelRef := NIL 
             ; RedInsertionRepairIsWithin := TRUE 
             END (* IF *) 
@@ -1712,13 +1710,16 @@ MODULE Parser
           Assert 
             ( NOT FsNodeRef . FsIsInsideList 
             , AFT . A_RedAstStringOrEstChild_Child_of_list_is_absent 
-            ) 
+            )
+(* FIXME: This doesn't make sense.  Only when we *are* in a list should be
+          need to insert a dummy or NIL. *)
         ; IF NOT IntSets . IsEmpty ( RedMergeInfo . MiDeferredTempMarkSet ) 
           THEN (* Merge an EstDummyTempMarkTyp node. *)   
             LChild := NEW ( ModHs . EstDummyTempMarkTyp ) 
           ; Assertions . MessageText 
               ( "Parser inserted DummyTempMark, for RightSibFmtNo TempMark." )
           (* Dummy will have no temp marks. *) 
+          ; EstChildNowArriving ( ParseInfo , RedMergeInfo , LChild )
           ; EstBuild . MergeChild 
               ( RedMergeInfo 
               , EstRef := LChild 
@@ -1727,11 +1728,11 @@ MODULE Parser
               , GroupFmtNo := FsNodeRef . FsFmtNo 
               ) 
           ; RedMergeInfo . MiLMNewChildRef := LChild 
-          ; NoteChildExists ( ParseInfo , RedMergeInfo , LChild )
           ELSIF ParseInfo . PiInsertNilFixedChildren 
           THEN (* Merge a NIL for the absent child. *) 
           (* NIL will have no temp marks. *) 
-            EstBuild . MergeChild 
+            EstChildNowArriving ( ParseInfo , RedMergeInfo , ChildRef := NIL )
+          ; EstBuild . MergeChild 
               ( RedMergeInfo 
               , EstRef := NIL  
               , KindSet := EstHs . EstChildKindSetEstChild 
@@ -1739,7 +1740,6 @@ MODULE Parser
               , GroupFmtNo := FsNodeRef . FsFmtNo 
               ) 
           ; RedMergeInfo . MiLMNewChildRef := NIL
-          ; NoteChildExists ( ParseInfo , RedMergeInfo , ChildRef := NIL )
           END (* IF *) 
         END (* IF Child is present. *) 
       END RedAstStringOrEstChild 
