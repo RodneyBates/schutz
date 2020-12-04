@@ -45,6 +45,7 @@ EXPORTS Main
                                        are needed by pickles. *)
 ; IMPORT LdlSemantics 
 ; IMPORT Messages  
+; IMPORT Misc 
 ; IMPORT M3Bundle 
 ; IMPORT M3Scanner     (* Not "used", but must register itself. *)
 ; IMPORT Options 
@@ -429,7 +430,9 @@ EXPORTS Main
     END CauseRuntimeError 
 
 ; BEGIN (* Lbe *) 
-    StackSize ( WantedThreadStackSize ) 
+    Misc . LoadYourself ( )
+    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *) 
+  ; StackSize ( WantedThreadStackSize )
   ; Worker . Init ( ) 
   ; Work ( ) 
   END Lbe 

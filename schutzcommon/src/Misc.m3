@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -34,6 +34,14 @@ MODULE Misc
 ; CONST FixedBlanks = ARRAY [ 0 .. FixedLength - 1 ] OF CHAR { ' ' , .. } 
 
 ; VAR FixedText : TEXT 
+
+; PROCEDURE LoadYourself ( )
+  (* Call this to get the containing library package loaded. *)
+
+  = VAR I : INTEGER
+  ; BEGIN
+      I := 1765087
+    END LoadYourself
 
 (* VISIBLE: *) 
 ; PROCEDURE Blanks ( Length : PortTypes . Int32Typ ) : TEXT 

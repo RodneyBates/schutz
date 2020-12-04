@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -69,7 +69,8 @@ EXPORTS Main
 ; IMPORT LRUtils 
 ; IMPORT ManualAsTrees
 ; IMPORT MessageCodes 
-; IMPORT Messages 
+; IMPORT Messages
+; IMPORT Misc 
 ; IMPORT Options 
 ; IMPORT PaintHs 
 ; IMPORT ScannerIf
@@ -780,7 +781,8 @@ EXPORTS Main
     END Work 
 
 ; BEGIN
-    GetParams ( ) 
+    Misc . LoadYourself ( )
+    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *)  ; GetParams ( ) 
   ; IF DoDisplayHelp 
     THEN DisplayVersion ( ) 
     ; DisplayHelp ( )

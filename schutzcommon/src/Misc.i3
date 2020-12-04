@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -14,7 +14,10 @@ INTERFACE Misc
 ; IMPORT Fingerprint  
 ; IMPORT Rd 
 
-; IMPORT PortTypes 
+; IMPORT PortTypes
+
+; PROCEDURE LoadYourself ( ) 
+  (* Call this to get the containing library package loaded. *)
 
 ; PROCEDURE Blanks ( Length : PortTypes . Int32Typ ) : TEXT 
   (* A TEXT of length Length, all blanks. *) 
