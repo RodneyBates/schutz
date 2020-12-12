@@ -3270,7 +3270,7 @@ MODULE EstBuild
             , InsertionKindSet := LResultInfo . RiSeamInsertionKindSet2 
             ) 
         ; MergeState . MsWaitingRightmostKindSet 
-            := EstHs . EstChildKindSetEmpty 
+            := EstHs . EstChildKindSetEmpty
         END (* IF *) 
       (* Save things for next time. *) 
       ; MergeState . MsLastEstRef := EstRef

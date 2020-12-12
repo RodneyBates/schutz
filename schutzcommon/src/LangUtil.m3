@@ -1306,9 +1306,9 @@ MODULE LangUtil
       WITH WLangInfo = LangMap . LangInfo ( Lang ) ^
       DO
         IF WLangInfo . StringToks <= Tok AND Tok < WLangInfo . VarTermToks
-        THEN
+        THEN (* It's an AST string.  Bias it to its ModTok counterpart. *)
           RETURN Tok - WLangInfo . StringToks + WLangInfo . VarTermToks
-        ELSE
+        ELSE (* Identity. *) 
           RETURN Tok
         END (* IF *)
       END (* WITH *)

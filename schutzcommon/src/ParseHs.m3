@@ -12,13 +12,93 @@ MODULE ParseHs
 
 ; IMPORT EstHs
 ; IMPORT EstUtil
+; IMPORT Fmt 
 ; IMPORT LangUtil 
 ; IMPORT LbeStd
-; IMPORT SharedStrings 
+; IMPORT Marks
+; IMPORT Misc 
+; FROM Misc IMPORT RefanyPad 
+; IMPORT SharedStrings
+; IMPORT Text 
+; IMPORT TextWr
+; IMPORT Wr 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
+; PROCEDURE TempMarkImage ( READONLY TempMark : TempMarkTyp ) : TEXT
+  = VAR LResult : TEXT 
+  ; VAR LWrT : TextWr . T 
+
+  ; BEGIN
+      LWrT := TextWr . New ( ) 
+    ; Wr . PutText ( LWrT , "TokMark={" )
+    ; Wr . PutText ( LWrT , Marks . MarkImage ( TempMark . TokMark ) )
+    ; Wr . PutText ( LWrT , "},EstRef=" )
+    ; Wr . PutText
+        ( LWrT , Fmt . Pad ( Misc . RefanyImage ( TempMark . EstRef ) , RefanyPad ) )
+    ; Wr . PutText ( LWrT , ",LineNo=" )
+    ; Wr . PutText ( LWrT , LbeStd . LineNoImage ( TempMark . LineNo ) ) 
+    ; Wr . PutText ( LWrT , ",CharPos=" )
+    ; Wr . PutText ( LWrT , LbeStd . CharNoImage ( TempMark . CharPos ) ) 
+    ; LResult := TextWr . ToText ( LWrT )
+    ; RETURN LResult 
+    END TempMarkImage 
+
+(* EXPORTED: *) 
+; PROCEDURE TempMarkListImage ( List : TempMarkArrayRefTyp ; Msg : TEXT := NIL )
+  : TEXT 
+
+  = VAR LPrefix : TEXT
+  ; VAR LNumber : INTEGER 
+  ; VAR LSs : INTEGER
+  ; VAR LResult : TEXT 
+  ; VAR LWrT : TextWr . T 
+
+  ; BEGIN
+      IF Msg = NIL THEN Msg := "" END (* IF *)
+    ; LWrT := TextWr . New ( ) 
+    ; Wr . PutText ( LWrT , Msg ) 
+    ; IF List = NIL THEN Wr . PutText ( LWrT , "NIL" ) 
+      ELSE
+        LNumber := NUMBER ( List ^ )
+      ; IF LNumber = 0
+        THEN
+          Wr . PutText ( LWrT , "{ }" )
+        ELSE
+          Wr . PutText ( LWrT , "{ " )
+        ; LPrefix := Misc . Blanks ( Text . Length ( Msg ) ) 
+        ; Wr . PutText ( LWrT , TempMarkImage ( List ^ [ 0 ] ) ) 
+        ; LSs := 1
+        ; LOOP
+            IF LSs >= LNumber
+            THEN EXIT
+            ELSE
+              Wr . PutText ( LWrT , Wr . EOL ) 
+            ; Wr . PutText ( LWrT , LPrefix ) 
+            ; Wr . PutText ( LWrT , ", " )
+            ; Wr . PutText ( LWrT , TempMarkImage ( List ^ [ LSs ] ) ) 
+            ; INC ( LSs ) 
+            END (* IF *)
+          END (* LOOP *)
+        ; IF LNumber > 1
+          THEN
+            Wr . PutText ( LWrT , Wr . EOL ) 
+          ; Wr . PutText ( LWrT , LPrefix )
+          END (* IF *) 
+        ; Wr . PutText ( LWrT , "}" )
+        ; Wr . PutText ( LWrT , " SeqNo = " )
+        ; Wr . PutText ( LWrT , Fmt . Int ( List ^ [ 0 ] . SeqNo ) )
+        ; Wr . PutText ( LWrT , " list addr = " )
+        ; Wr . PutText
+            ( LWrT , Fmt . Pad ( Misc . RefanyImage ( List ) , RefanyPad ) ) 
+        END (* IF *)
+      END (* IF *)
+    ; LResult := TextWr . ToText ( LWrT )
+    ; RETURN LResult 
+    END TempMarkListImage 
+
+(* EXPORTED: *) 
 ; PROCEDURE CopyOfTempMarkList 
-    ( OldTempMarkList : TempMarkArrayRefTyp 
+    ( OldTempMarkListRef : TempMarkArrayRefTyp 
     ; CopyNumber : LbeStd . MarkNoTyp := LbeStd . MarkNoMax 
       (* In the copy, marks beyond CopyNumber will be null. *) 
     ) 
@@ -28,14 +108,17 @@ MODULE ParseHs
   ; VAR LNumber , LCopyNumber: INTEGER 
 
   ; BEGIN 
-      IF OldTempMarkList = NIL 
+      IF OldTempMarkListRef = NIL 
       THEN RETURN NIL 
       ELSE
-        LNumber := NUMBER ( OldTempMarkList ^ )
+        LNumber := NUMBER ( OldTempMarkListRef ^ )
       ; LNewTempMarkListRef := NEW ( TempMarkArrayRefTyp , LNumber )
+      ; LNewTempMarkListRef ^ [ 0 ] . SeqNo
+          := OldTempMarkListRef ^ [ 0 ] . SeqNo + 1 
       ; LCopyNumber := MIN ( CopyNumber , LNumber ) 
       ; SUBARRAY ( LNewTempMarkListRef ^ , 0 , LCopyNumber ) 
-	  := SUBARRAY ( OldTempMarkList ^ , 0 , LCopyNumber ) 
+	  := SUBARRAY ( OldTempMarkListRef ^ , 0 , LCopyNumber ) 
+      ; INC ( LNewTempMarkListRef ^ [ 0 ] . SeqNo ) 
       ; RETURN LNewTempMarkListRef 
       END (* IF *) 
     END CopyOfTempMarkList 
@@ -52,7 +135,7 @@ MODULE ParseHs
       END (* IF *) 
     END RangeIsEmpty 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE TempMarkRangeImage ( Range : TempMarkRangeTyp ) : TEXT 
 
   = BEGIN 
@@ -64,7 +147,7 @@ MODULE ParseHs
         & ")"
     END TempMarkRangeImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE TokInfoSharedString
     ( READONLY TokInfo : TokInfoTyp ; Lang : LbeStd . LangTyp )
   : SharedStrings . T
@@ -123,7 +206,7 @@ MODULE ParseHs
     ; RETURN NIL 
     END TokInfoSharedString
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE TokInfoImage
     ( READONLY TokInfo : TokInfoTyp ; Lang : LbeStd . LangTyp )
   : TEXT
@@ -138,7 +221,7 @@ MODULE ParseHs
       END (* END *) 
     END TokInfoImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ParseTravStateKindImage ( Kind : ParseTravStateKindTyp ) : TEXT 
 
   = TYPE T = ParseTravStateKindTyp 

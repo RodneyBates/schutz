@@ -2234,13 +2234,15 @@ MODULE LdlSemantics
           ; IF IncludeDefaultValuedFields 
                OR FsNodeRef . FsFmtNo # GDefaultValueFsNode . FsFmtNo 
             THEN 
-              WF ( "FsFmtNo" , EstHs . FmtNoImage ( FsNodeRef . FsFmtNo ) ) 
+              WF ( "FsFmtNo"
+                 , EstHs . FmtNoImage ( FsNodeRef . FsFmtNo , Pad := 0 )
+                 ) 
             END (* IF *) 
           ; IF IncludeDefaultValuedFields 
                OR FsNodeRef . FsLeftFmtNo # GDefaultValueFsNode . FsLeftFmtNo 
             THEN 
               WF ( "FsLeftFmtNo" 
-                 , EstHs . FmtNoImage ( FsNodeRef . FsLeftFmtNo ) 
+                 , EstHs . FmtNoImage ( FsNodeRef . FsLeftFmtNo , Pad := 0 ) 
                  ) 
             END (* IF *) 
           ; IF IncludeDefaultValuedFields 
@@ -2248,7 +2250,7 @@ MODULE LdlSemantics
                   # GDefaultValueFsNode . FsRightFmtNo 
             THEN 
               WF ( "FsRightFmtNo" 
-                 , EstHs . FmtNoImage ( FsNodeRef . FsRightFmtNo ) 
+                 , EstHs . FmtNoImage ( FsNodeRef . FsRightFmtNo , Pad := 0 ) 
                  ) 
             END (* IF *) 
           ; IF IncludeDefaultValuedFields 
@@ -2310,7 +2312,8 @@ MODULE LdlSemantics
                   # GDefaultValueFsNode . FsListSliceThruFmtNo 
             THEN 
               WF ( "FsListSliceThruFmtNo" 
-                 , EstHs . FmtNoImage ( FsNodeRef . FsListSliceThruFmtNo ) 
+                 , EstHs . FmtNoImage
+                     ( FsNodeRef . FsListSliceThruFmtNo , Pad := 0 ) 
                  ) 
             END (* IF *) 
           ; IF IncludeDefaultValuedFields 
@@ -2450,7 +2453,7 @@ MODULE LdlSemantics
             THEN 
               WF ( "FsSameLineEstChildFmtNo" 
                  , EstHs . FmtNoImage 
-                    ( FsNodeRef . FsSameLineEstChildFmtNo ) 
+                    ( FsNodeRef . FsSameLineEstChildFmtNo , Pad := 0 ) 
                  ) 
             END (* IF *) 
           ; IF IncludeDefaultValuedFields 
@@ -2492,7 +2495,7 @@ MODULE LdlSemantics
             THEN 
               WF ( "FsLineBreakToReachFmtNo" 
                  , EstHs . FmtNoImage 
-                     ( FsNodeRef . FsLineBreakToReachFmtNo ) 
+                     ( FsNodeRef . FsLineBreakToReachFmtNo , Pad := 0 ) 
                  ) 
             END (* IF *) 
           ; IF IncludeDefaultValuedFields 

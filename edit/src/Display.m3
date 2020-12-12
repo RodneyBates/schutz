@@ -3800,8 +3800,7 @@ MODULE Display
           ( ImageRef , (* VAR *) LSavedMarkListRef )   
       ; TRY 
           LParseInfo . PiLang := LImagePers . IpLang 
-        ; LScannerIf 
-            := LangUtil . ScannerIfForLang ( LImagePers . IpLang ) 
+        ; LScannerIf := LangUtil . ScannerIfForLang ( LImagePers . IpLang ) 
      (* ; ImageRef . ItScannerIf := LScannerIf These things choke pickles. *) 
         ; LParseInfo . PiScanIf := LScannerIf 
         ; LParseInfo . PiGram := LangUtil . Gram ( LImagePers . IpLang ) 

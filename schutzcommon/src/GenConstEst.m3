@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -179,7 +179,7 @@ MODULE GenConstEst
 
     = BEGIN 
         W ( "NEW ModHs.ModDelTyp ( ModDelThruFmtNo := "
-            & EstHs . FmtNoImage ( M . ModDelThruFmtNo ) 
+            & EstHs . FmtNoImage ( M . ModDelThruFmtNo , Pad := 0 ) 
             & " , ModDelIsRepair := " & Fmt . Bool ( M . ModDelIsRepair ) 
             & " )" 
           )   
@@ -369,9 +369,8 @@ MODULE GenConstEst
               & EstHs . EstChildKindSetImage
                   ( LEstTravInfo . EtiChildLeafElem . LeKindSet 
                     - EstHs . EstChildKindSetFirstOfGroup 
-                  , Indent := Indent + 12 
-                  , Mnemonic := TRUE 
-                  , Qualified := TRUE 
+                  , Indent := Indent + 12
+                  , ImageKind := EstHs . ImageKindTyp . Qualified 
                   ) 
             )   
         ; W ( B ( Indent + 8 ) & ", IsFirstOfGroup := " 
@@ -382,7 +381,7 @@ MODULE GenConstEst
             )   
         ; W ( B ( Indent + 8 ) & ", GroupFmtNo := " 
               & EstHs . FmtNoImage 
-                  ( LEstTravInfo . EtiChildLeafElem . LeFmtNo ) 
+                  ( LEstTravInfo . EtiChildLeafElem . LeFmtNo , Pad := 0 ) 
             )   
         ; W ( B ( Indent + 8 ) & ") " )   
         ; TravUtil . DecEstChild ( LEstTravInfo ) 

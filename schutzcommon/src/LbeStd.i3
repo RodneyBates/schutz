@@ -246,12 +246,6 @@ INTERFACE LbeStd
 ; TYPE TokTyp = PortTypes . Card16Typ 
 (* ; TYPE TokPackedTyp = BITS 16 FOR TokTyp *)
 
-; CONST NumTokImage = PortTypes . Int16Image 
-        (* Purely numeric. *) 
-
-; PROCEDURE NumIdTokImage ( Tok : TokTyp ) : TEXT 
-  (* An identifier with numeric value inside. *) 
-
 (* Tokens which are likely to be format tokens in various languages 
    are defined here. 
    Tokens which are likely to be present but with different rules 
@@ -326,13 +320,22 @@ INTERFACE LbeStd
 
 ; TYPE StdTokTyp = [ Tok__Null .. Tok__LastStd ] 
 
+; CONST NumTokImage = PortTypes . Int16Image 
+        (* Purely digits. *) 
+
+; PROCEDURE NumIdTokImage ( Tok : TokTyp ) : TEXT 
+  (* An identifier with numeric value inside.  A valid Modula-3 identifier, but
+     not a valid Ldl identifier. *)
+
 ; PROCEDURE StdTokImage ( Tok : StdTokTyp ) : TEXT 
-  (* Image of a standard tok.  It is a valid Modula-3 identifier, but
+  (* Image of a standard tok.  A valid Modula-3 identifier, but
      not a valid Ldl identifier.
   *) 
 
 ; PROCEDURE StdTokPlaceholderImage ( Tok : StdTokTyp ) : TEXT 
   (* ^Has nonterminal delimiter characters. *) 
+
+(* See also: LangUtil.TokImage and ParseHs . TokInfoImage. *)
 
 ; TYPE StdTokSetTyp = SET OF StdTokTyp 
 

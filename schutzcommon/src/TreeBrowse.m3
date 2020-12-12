@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -133,53 +133,65 @@ MODULE TreeBrowse
   ; VAR LChildLeafElem : EstHs . LeafElemTyp 
   ; VAR LText : TEXT 
 
-  ; BEGIN (* Display *) 
-      IF Session . CurrentRef . NodeNo = 0 
-      THEN 
-        LChildLeafElem := EstHs . LeafElemNull 
-      ELSE 
-        EstUtil . GetIthChild 
-          ( Session . ParentRef . NodeRef  
-          , Session . ParentRef . ChildNo   
-          , (* VAR *) ResultChildRelNodeNo := LEstRelNodeNo (* Dead. *) 
-          , (* VAR *) ResultLeafElem := LChildLeafElem 
-          ) 
-(* TODO^ Maybe someday.  This is unnecessarily inefficient.  We could cache this
-         info for the current node in the session, when other stuff that is
-         already there is cached. *) 
-      END (* IF *) 
-    ; LText 
-        := "NodeNo " 
-           & LbeStd . EstNodeNoImage ( Session . CurrentRef . NodeNo ) 
-           & " Addr " 
-           & Misc . RefanyImage ( Session . CurrentRef . NodeRef ) 
-           & " ChildNo = " 
-           & LbeStd . EstChildNoImage ( Session . ParentRef . ChildNo ) 
-           & " FmtNo = " & EstHs . FmtNoImage ( LChildLeafElem . LeFmtNo ) 
-           & " KindSet = " 
-    ; Wr . PutText 
-        ( Session . WrT 
-        , LText 
-          & EstHs . EstChildKindSetImage 
-              ( LChildLeafElem . LeKindSet 
-              , Text . Length ( LText ) 
-              , Mnemonic := FALSE 
-              , RightMargin := 110 
-              )  
-          & Wr . EOL 
-        ) 
-    ; Wr . PutText 
-        ( Session . WrT 
-        , EstUtil . EstNodeImage 
-            ( Session . CurrentRef . NodeRef 
-            , Indent := 0 
-            , NodeNo := Session . CurrentRef . NodeNo 
-            , ChildNo := 0 
-            , Lang := Session . Lang 
-            , Mnemonic := TRUE 
+  ; BEGIN (* Display *)
+      TRY 
+        IF Session . CurrentRef . NodeNo = 0 
+        THEN 
+          LChildLeafElem := EstHs . LeafElemNull 
+        ELSE 
+          EstUtil . GetIthChild 
+            ( Session . ParentRef . NodeRef  
+            , Session . ParentRef . ChildNo   
+            , (* VAR *) ResultChildRelNodeNo := LEstRelNodeNo (* Dead. *) 
+            , (* VAR *) ResultLeafElem := LChildLeafElem 
             ) 
-          & Wr . EOL 
-        ) 
+(* TODO^ Maybe someday.  This is unnecessarily inefficient.  We could cache this
+           info for the current node in the session, when other stuff that is
+           already there is cached. *) 
+        END (* IF *) 
+      ; LText 
+          := "NodeNo " 
+             & LbeStd . EstNodeNoImage ( Session . CurrentRef . NodeNo ) 
+             & " Addr " 
+             & Misc . RefanyImage ( Session . CurrentRef . NodeRef ) 
+             & " ChildNo " 
+             & LbeStd . EstChildNoImage ( Session . ParentRef . ChildNo ) 
+             & " FmtNo "
+             & EstHs . FmtNoImage ( LChildLeafElem . LeFmtNo )
+             & " KindSet " 
+      ; Wr . PutText  ( Session . WrT , LText ) 
+      ; Wr . PutText 
+          ( Session . WrT 
+          , EstHs . EstChildKindSetImage
+              ( LChildLeafElem . LeKindSet , EstHs . ImageKindTyp . Decimal ) 
+          ) 
+      ; Wr . PutText ( Session . WrT , Wr . EOL ) 
+      ; Wr . PutText 
+          ( Session . WrT 
+          , EstUtil . EstNodeImageBrief 
+              ( Session . CurrentRef . NodeRef 
+              , Indent := 0 
+              , NodeNo := Session . CurrentRef . NodeNo 
+              , Lang := Session . Lang 
+              ) 
+          )
+      ; Wr . PutText ( Session . WrT , Wr . EOL ) 
+      ; Wr . PutText ( Session . WrT , "  " ) 
+      ; Wr . PutText 
+          ( Session . WrT 
+          , EstUtil . EstLeavesImage
+              ( Session . CurrentRef . NodeRef 
+              , NodeNo := Session . CurrentRef . NodeNo + 1 
+              , Indent := 2 
+              , Lang := Session . Lang 
+              ) 
+          ) 
+      ; Wr . PutText ( Session . WrT , Wr . EOL ) 
+
+      EXCEPT
+      | Wr . Failure , Thread . Alerted => 
+      (* Silently ignore it, so as not to crash everything. *) 
+      END (* EXCEPT *) 
     END Display 
 
 ; PROCEDURE GetInt ( String : TEXT ) : PortTypes . Int32Typ 
@@ -461,7 +473,7 @@ MODULE TreeBrowse
   = BEGIN (* InitStdSession *) 
       Session . WrT := Stdio . stdout 
     ; Session . RdT := Stdio . stdin 
-    ; Session . Prompt := ">" 
+    ; Session . Prompt := "Schutz browse>" 
     ; Session . RootRef . NodeRef := RootEstRef 
     ; Session . RootRef . NodeNo := 0 
     ; Session . RootRef . ChildNo := 0 

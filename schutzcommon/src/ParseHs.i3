@@ -23,7 +23,9 @@ INTERFACE ParseHs
 ; IMPORT LRTable 
 ; IMPORT ScannerIf 
 
-(* Temporary marks: *) 
+(* Temporary marks: *)
+
+; TYPE TmSeqNoTyp = PortTypes . Card16Typ
 
 ; TYPE TempMarkTyp 
     = RECORD 
@@ -34,11 +36,22 @@ INTERFACE ParseHs
            Zero-valued otherwise. 
         *)  
       ; CharPos : LbeStd . LimitedCharNoSignedTyp 
-          := LbeStd . LimitedCharNoUnknown  
+          := LbeStd . LimitedCharNoUnknown
+      ; SeqNo : TmSeqNoTyp
+        (* ^ For debugging/tracing.  This is intended to identify a 
+             TempMarkArrayRef (whose address could be changed by GC),
+             so only the 0-th element of its array will have it maintained.
+             This is Mickey Mouse data structure design, but cleaner
+             alternatives would be distressingly memory-hogging. *)
       END (* RECORD  TempMarkTyp *) 
 
 ; TYPE TempMarkArrayTyp = ARRAY OF TempMarkTyp 
 ; TYPE TempMarkArrayRefTyp = REF TempMarkArrayTyp 
+
+; PROCEDURE TempMarkImage ( READONLY TempMark : TempMarkTyp ) : TEXT
+
+; PROCEDURE TempMarkListImage ( List : TempMarkArrayRefTyp ; Msg : TEXT := NIL )
+  : TEXT 
 
 ; PROCEDURE CopyOfTempMarkList 
     ( OldTempMarkList : TempMarkArrayRefTyp 
@@ -96,8 +109,9 @@ INTERFACE ParseHs
         *) 
       ; TiTok : LbeStd . TokTyp := LbeStd . Tok__Null 
       ; TiSyntTokCt : LbeStd . LimitedTokCtTyp := 0 
-      ; TiIsInterior : BITS 1 FOR BOOLEAN := FALSE 
-      ; TiIsInsertionRepair : BITS 1 FOR BOOLEAN := FALSE 
+      ; TiIsInterior : BOOLEAN := FALSE 
+      ; TiIsInsertionRepair : BOOLEAN := FALSE 
+      ; TiIsDeletionRepair : BOOLEAN := FALSE 
       END (* RECORD TokInfoTyp *)
 
 ; PROCEDURE TokInfoSharedString
@@ -108,6 +122,8 @@ INTERFACE ParseHs
 ; PROCEDURE TokInfoImage
     ( READONLY TokInfo : TokInfoTyp ; Lang : LbeStd . LangTyp )
   : TEXT
+
+(* See also: LbeStd . *Tok*Image* and LangUtil.TokImage. *)
 
 (* Info needed for both Est traversal and file/keyboard scanning *) 
 (* Everything in ScanInfoTyp is relative to NEW TOKENS. *) 
@@ -291,10 +307,9 @@ INTERFACE ParseHs
     = RECORD 
         SlePredLink : SliceListElemRefTyp 
       ; SleNodeRef : LbeStd . EstRootTyp 
-      ; SleKindSet 
-        : EstHs . EstChildKindSetTyp (* Meaningful IFF NOT SleIsSlice *) 
       ; SleFrom : LbeStd . EstChildNoTyp (* Meaningful IFF SleIsSlice *) 
       ; SleTo : LbeStd . EstChildNoTyp (* Meaningful IFF SleIsSlice *) 
+      ; SleKindSet : EstHs . EstChildKindSetTyp (* Meaningful IFF NOT SleIsSlice *) 
       ; SleIsSlice : BOOLEAN (* otherwise, single element *) 
       END (* RECORD  SliceListElemTyp *) 
 

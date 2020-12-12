@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -200,7 +200,7 @@ MODULE SharedStrings
 
 (* VISIBLE: *) 
 ; PROCEDURE ToText ( String : T ) : TEXT 
-  (* Will not return NIL *) 
+  (* Will not return NIL. (Not the same thing as "NIL".)*) 
 
   = BEGIN (* ToText *) 
       IF String = NIL 
@@ -213,16 +213,15 @@ MODULE SharedStrings
 
 (* VISIBLE: *) 
 ; PROCEDURE Image ( String : T ; Indent := LbeStd . StdIndent ) : TEXT 
-  (* Will not return NIL *) 
+  (* Will not return NIL. (Not the same thing as "NIL".) *) 
 
   = BEGIN (* Image *) 
       IF String = NIL 
       THEN 
-        RETURN Misc . Blanks ( Indent ) & "NIL" 
+        RETURN "NIL" 
       ELSE 
         RETURN 
-          Misc . Blanks ( Indent ) 
-          & "SharedString.T{" 
+          "SharedString.T{" 
           & LbeStd . NumIdTokImage ( String . Tok ) 
           & "," 
           & StringNoImage ( String . StringNo ) 

@@ -25,8 +25,8 @@ INTERFACE EstHs
 
 ; CONST FmtNoNull = VAL ( LAST ( FmtNoTyp ) , FmtNoTyp ) 
 ; CONST FmtNoUnknown = FmtNoNull - 1 
-; CONST FmtNoMax = FmtNoUnknown - 1 
-; CONST FmtNoImage = PortTypes . Int32Image (* A PROCEDURE *) 
+; CONST FmtNoMax = FmtNoUnknown - 1
+; CONST FmtNoPad = 3 
 
 ; CONST FmtNoEstTop = 0 
   (* Used to get parse traverse started:  The top Est has this format number 
@@ -47,18 +47,18 @@ INTERFACE EstHs
   (* Augment Est nodes have one Est child, and this is its FmtNo. *) 
 ; CONST FmtNoEOIChildOfAugment = 2 
 
-; CONST FmtNoInitial = 0 
+; CONST FmtNoInitial = 0
+
+; PROCEDURE FmtNoImage ( FmtNo : FmtNoTyp ; Pad := FmtNoPad ) : TEXT
 
 (* Note on FmtNo values: 
    The Est child of a list always has FmtNoListEstChild, which 
    is less than all other real FmtNos.  FmtNos of frontier leaves of 
    an Fs tree increase left to right, but need not be compact. 
-   Exception:  For an Est list Fs node containing an Fs CondFmt (which 
-   can only occur above the single Est child Fs node of the list), 
-   FmtNos start with the Est child, increase thru the right CondFmt items, 
-   then the direct children of the Fs root, then the left children of the 
-   CondFmt.  This is the order in which they must be inserted when 
-   splicing lists.  The order of FmtNos only matters for Delete mods, 
+   Exception:  For an Est list Fs node, FmtNos start with the Est child,
+   increase rightward thru the Fs leaves to the right, then wrap to the
+   leftmost leaf and increase rightward thru the leaves to the left of
+   the Est Child lists.  The order of FmtNos only matters for Delete mods, 
    which can cover a range of FmtNos.  This range will never cover 
    an Est child of a list. *) 
 
@@ -82,14 +82,15 @@ INTERFACE EstHs
      In this case, if it were to be formatted starting at an absolute 
      position <= WiNlTrigger, then WiWidth is the absolute to-position of 
      the subtree's text.  For larger starting positions, at least one implied 
-     new line will be inserted, thus it will have multiple lines and infinite 
-     width.
+     new line will be inserted in its proper interior, thus it will have
+     multiple lines and infinite width.
    - However, WiWholeLineModsOnly means the entire subtree consists only of one
-     or more blank lines, whole-line comments, and whole-line text mods.
-     If such a group appears only at the left and right ends of the subtree,
-     it does not contribute to the width.  The interior part will be formatted
-     as if these groups were absent. 
-     Concatenation of WidthInfo values is associative, I confidently believe.
+     or more blank lines, whole-line comments, and/or whole-line text mods.
+     If such a group appears only at the left or right end of a containing
+     subtree, it is as if it were a single new line, i.e., it does not
+     contribute to the containing subtree's width.  Its interior part will
+     be formatted as if these groups were absent.  Concatenation of WidthInfo
+     values is associative, I confidently believe.
 *)  
 
 ; TYPE WidthInfoTyp 
@@ -141,7 +142,7 @@ INTERFACE EstHs
 ; PROCEDURE WidthInfoIsNull ( WidthInfo : WidthInfoTyp ) : BOOLEAN 
   RAISES { Assertions . AssertionFailure } 
 
-(* Use the procedure below to assign to WidthInfoInfinity, because 
+(* Use MakeWidthInfoInfinity to assign WidthInfoInfinity, because 
    Pm3-1.1.15, LINUXLIBC6, generates bad code for := WidthInfoNull, 
    and I suspect if of being capable of the same for WidthInfoInfinity. *) 
 ; CONST WidthInfoInfinity 
@@ -232,7 +233,20 @@ INTERFACE EstHs
 
 ; CONST ImageRightMargin = 78 
 
-; PROCEDURE EstChildKindImage ( Value : EstChildKindTyp ) : TEXT 
+; TYPE ImageKindTyp
+    = { Decimal    (* Need I elaborate? *)
+      , Hex        (* Hexadecimal *) 
+      , Short      (* E.g. FirstOfGroup *) 
+      , Ident      (* E.g. EstChildKindFirstOfGroup *)
+      , Qualified  (* E.g. EstHs.EstChildKindFirstOfGroup *)
+      } 
+
+; PROCEDURE EstChildKindImage
+    ( Value : EstChildKindTyp ; ImageKind : ImageKindTyp ) : TEXT 
+  
+; PROCEDURE EstChildKindSetFixedImage  ( Value : EstChildKindSetTyp ) : TEXT 
+  (* Fixed size image, by leaving blank spaces for absent kinds and
+     denoting each present kind by its hexadecimal value. *) 
 
 ; TYPE EstChildKindSetTyp = SET OF EstChildKindTyp 
 ; TYPE EstChildKindSetPackedTyp 
@@ -242,10 +256,8 @@ INTERFACE EstHs
 
 ; PROCEDURE EstChildKindSetImage 
     ( Value : EstChildKindSetTyp 
-    ; Indent := LbeStd . StdIndent 
-    ; Mnemonic : BOOLEAN := TRUE 
-    ; Qualified : BOOLEAN := FALSE 
-      (* ^Fully qualified names of mnemonic set members. *)  
+    ; ImageKind := ImageKindTyp . Ident (* Of the set members. *)  
+    ; Indent := LbeStd . StdIndent
     ; RightMargin : CARDINAL := ImageRightMargin 
     ) 
     : TEXT 
@@ -422,7 +434,15 @@ INTERFACE EstHs
         , EstChildKindNonNIL 
         , EstChildKindFirstOfGroup 
           (* Members of EstChildKindSetCopyUp come from the child. *) 
-        } 
+        }
+
+; PROCEDURE IsFirstOfGroup 
+    ( LeftFmtNo : FmtNoTyp 
+    ; LeftEdgeKind : EdgeKindTyp 
+    ; RightFmtNo : FmtNoTyp 
+    ; RightEdgeKind : EdgeKindTyp 
+    ) 
+  : BOOLEAN 
 
 (* K-trees *) 
 
@@ -502,18 +522,6 @@ INTERFACE EstHs
        (* ^Can't assume 100% self-adapting. *) 
 
 ; CONST KTreeHeightImage = PortTypes . Int32Image 
-
-(* There is a Cartesian product of node formats: 
-   { Est , KTree } X { Leaf , Nonleaf }. 
-   Est is topmost in a K-tree and KTree is non-topmost. 
-   Leaf is bottommost and Nonleaf is non-bottommost. 
- 
-   KTreeRefTyp is the topmost object type and EstRefTyp is a subtype 
-   of KTreeRefTyp, which takes care of the first distinction. The 
-   second is handled by subtypes KTreeLeafRefTyp, KTreeNonleafRefTyp, 
-   EstLeafRefTyp, and EstNonleafRefTyp.  Access to fields common to 
-   both leaf types or to both nonleaf types is by method of KTreeRefTyp. 
-*) 
 
 (* Leaf Elements and Arrays thereof *) 
 
@@ -628,7 +636,7 @@ INTERFACE EstHs
 (* Edge Info.  This is information collected from 
    the leftmost (First) and rightmost (Last) descendent 
    leaf element.  Only a nonleaf node has this stored. 
-   It is computed, for leaf nodes. 
+   For leaf nodes, it is computed when needed. 
 *) 
 
 ; TYPE EdgeKindTyp 
@@ -643,14 +651,6 @@ INTERFACE EstHs
               which can have a ModDel, or an EstChild, which can have 
               an EstChild. 
            2) We can distinguish a TrailingMod by looking at the Tok. *) 
-
-; PROCEDURE IsFirstOfGroup 
-    ( LeftFmtNo : FmtNoTyp 
-    ; LeftEdgeKind : EdgeKindTyp 
-    ; RightFmtNo : FmtNoTyp 
-    ; RightEdgeKind : EdgeKindTyp 
-    ) 
-  : BOOLEAN 
 
 ; PROCEDURE EdgeKindImage ( READONLY Value : EdgeKindTyp ) : TEXT 
 
@@ -744,6 +744,18 @@ INTERFACE EstHs
       ; EmiWidthInfo : WidthInfoTyp 
       END (* RECORD EstMiscInfoTyp *) 
 
+(* There is a Cartesian product of node formats: 
+   { Est , KTree } X { Leaf , Nonleaf }. 
+   Est is topmost in a K-tree and KTree is non-topmost. 
+   Leaf is bottommost and Nonleaf is non-bottommost. 
+ 
+   KTreeRefTyp is the topmost object type and EstRefTyp is a subtype 
+   of KTreeRefTyp, which takes care of the first distinction. The 
+   second is handled by subtypes KTreeLeafRefTyp, KTreeNonleafRefTyp, 
+   EstLeafRefTyp, and EstNonleafRefTyp.  Access to fields common to 
+   both leaf types or to both nonleaf types is by method of KTreeRefTyp. 
+*) 
+
 (* K-tree nodes. These are fields common to leaf/nonleaf, 
    root/nonroot nodes. *) 
 
@@ -825,6 +837,13 @@ INTERFACE EstHs
         OVERRIDES 
           Image := EstRefImage 
         END (* OBJECT EstRefTyp *) 
+
+; PROCEDURE EstRefImageBrief 
+    ( Self : EstRefTyp 
+    ; Indent := LbeStd . StdIndent 
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
+    ) 
+    : TEXT 
 
 ; PROCEDURE EstRefImage 
     ( Self : EstRefTyp 

@@ -19,6 +19,10 @@ INTERFACE Misc
 ; PROCEDURE LoadYourself ( ) 
   (* Call this to get the containing library package loaded. *)
 
+; PROCEDURE CeilLog10 ( Val : INTEGER ) : INTEGER
+(* Number of characters required to represent Val in decimal. *) 
+(* Currently works only up to 2**31-1, regardless of INTEGER size. *)
+
 ; PROCEDURE Blanks ( Length : PortTypes . Int32Typ ) : TEXT 
   (* A TEXT of length Length, all blanks. *) 
 
@@ -30,6 +34,8 @@ INTERFACE Misc
 ; PROCEDURE DateImage ( READONLY Value : Date . T ) : TEXT 
 
 ; PROCEDURE FingerprintImage ( READONLY Value : Fingerprint . T ) : TEXT 
+
+; CONST RefanyPad = 4 + 2 * BYTESIZE ( REFANY ) 
 
 ; PROCEDURE RefanyImage ( Ref : REFANY ) : TEXT 
 

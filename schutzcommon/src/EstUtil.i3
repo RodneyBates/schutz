@@ -109,6 +109,16 @@ INTERFACE EstUtil
   (* Token, StringNo, and the string, with escapes. 
      "", if NodRef is not a non-NIL SharedString.T. *)
 
+; PROCEDURE EstNodeImageBrief 
+    ( NodeRef : LbeStd . EstRootTyp 
+    ; Indent := LbeStd . StdIndent 
+    ; NodeNo : LbeStd . EstNodeNoTyp 
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
+    ) 
+  : TEXT 
+  RAISES { AssertionFailure } 
+  (* ^Also works on NIL, giving "NIL" *) 
+
 ; PROCEDURE EstNodeImage 
     ( NodeRef : LbeStd . EstRootTyp 
     ; Indent := LbeStd . StdIndent 
@@ -120,6 +130,17 @@ INTERFACE EstUtil
   : TEXT 
   RAISES { AssertionFailure } 
   (* ^Also works on NIL, giving "NIL" *) 
+
+; PROCEDURE EstLeavesImage
+    ( TreeRef : LbeStd . EstRootTyp 
+    ; NodeNo : LbeStd . EstNodeNoTyp
+    ; Indent := LbeStd . StdIndent 
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
+    ) 
+  : TEXT
+  (* If TreeRef is an Est interior node, Flatten all its leaf elements and display
+     then in a compact, usually one-line form, prefixed
+     by node and child numbers.  Otherwise "" *) 
 
 (* Display widths.  These are the number of chars it takes to 
    display the entire subtree of an Est node, except that if 

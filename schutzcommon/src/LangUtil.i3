@@ -938,6 +938,8 @@ INTERFACE LangUtil
       parentheses. 
    *) 
 
+(* See also: LbeStd . *Tok*Image* and ParseHs . TokInfoImage. *)
+
 ; PROCEDURE TextForTok 
     ( Lang : LbeStd . LangTyp ; Tok : LbeStd . TokTyp )
   : TEXT 

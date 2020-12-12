@@ -8,7 +8,12 @@
 
 MODULE EstUtil 
 
-(* Many collected lowish-level utilities for manipulating Est nodes. *) 
+(* Many collected medium-level utilities for manipulating Est nodes. *) 
+
+; IMPORT Fmt 
+; IMPORT TextWr 
+; IMPORT Thread
+; IMPORT Wr 
 
 ; IMPORT Assertions 
 ; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
@@ -24,7 +29,7 @@ MODULE EstUtil
 
 ; TYPE AFT = MessageCodes . T 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE HasSyntErrors ( NodeRef : LbeStd . EstRootTyp ) : BOOLEAN 
 
   = BEGIN 
@@ -42,7 +47,7 @@ MODULE EstUtil
     END HasSyntErrors 
 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EstTok ( NodeRef : LbeStd . EstRootTyp ) 
   : LbeStd . TokTyp 
   RAISES { AssertionFailure } 
@@ -92,7 +97,7 @@ MODULE EstUtil
       END (* TYPECASE *) 
     END EstTok 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE FsRuleForEstNode 
     ( Lang : LbeStd . LangTyp ; NodeRef : LbeStd . EstRootTyp ) 
   : LangUtil . FsNodeRefTyp 
@@ -128,7 +133,7 @@ MODULE EstUtil
     ; RETURN LangUtil . FsRuleForTok ( Lang , LTok , LIsPlaceholder ) 
     END FsRuleForEstNode 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EstChildKindSet ( NodeRef : LbeStd . EstRootTyp ) 
   : EstHs . EstChildKindSetTyp 
   RAISES { AssertionFailure } 
@@ -198,7 +203,7 @@ MODULE EstUtil
       END (* TYPECASE  CASE *) 
     END EstChildKindSet 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EstIsPlaceholder 
     ( Lang : LbeStd . LangTyp ; NodeRef : LbeStd . EstRootTyp ) 
   : BOOLEAN 
@@ -249,7 +254,7 @@ MODULE EstUtil
       END (* TYPECASE  CASE *) 
     END EstIsPlaceholder 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EstNodeCt 
     ( NodeRef : LbeStd . EstRootTyp ) : LbeStd . EstNodeNoTyp 
 
@@ -267,7 +272,7 @@ MODULE EstUtil
       END (* TYPECASE *) 
     END EstNodeCt 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EstChildCt 
     ( NodeRef : LbeStd . EstRootTyp ) : LbeStd . EstChildNoTyp 
 
@@ -284,7 +289,7 @@ MODULE EstUtil
       END (* TYPECASE *) 
     END EstChildCt 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE IsModTok ( NodeRef : LbeStd . EstRootTyp ) : BOOLEAN 
 
   = BEGIN 
@@ -298,7 +303,7 @@ MODULE EstUtil
       END 
     END IsModTok 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE VarTermImage
     ( NodeRef : LbeStd . EstRootTyp
     ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
@@ -325,7 +330,61 @@ MODULE EstUtil
       END (* TYPECASE *) 
     END VarTermImage 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
+; PROCEDURE EstNodeImageBrief 
+    ( NodeRef : LbeStd . EstRootTyp 
+    ; Indent := LbeStd . StdIndent 
+    ; NodeNo : LbeStd . EstNodeNoTyp 
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
+    ) 
+  : TEXT 
+  RAISES { AssertionFailure } 
+  (* ^Also works on NIL, giving "NIL" *) 
+
+  = VAR LNodeImage , LChildrenImage , LResult : TEXT
+
+  ; BEGIN (* EstNodeImageBrief *) 
+      TYPECASE NodeRef 
+      OF NULL 
+      => RETURN "NIL" 
+
+      | SharedStrings . T ( TSharedString ) 
+      => (* Lex error characters are a special case of this, identified
+            by Tok__LexErrChars. *)
+        RETURN SharedStrings . Image ( TSharedString , Indent (* , Lang *) ) 
+
+      | ModHs . EstDummyTyp ( TDummyRef )  
+      => RETURN ModHs . EstDummyImage ( TDummyRef ) 
+
+      | EstHs . EstRefTyp ( TEstRef ) 
+      => LResult := EstHs . EstRefImageBrief ( TEstRef , Indent , Lang )
+      ; RETURN LResult 
+
+      | ModHs . ModCmntTyp ( TModCmnt ) 
+      => RETURN ModHs . ModCmntImage ( TModCmnt , Indent ) 
+
+      | ModHs . ModTextTyp ( TModText ) 
+      => RETURN ModHs . ModTextImage ( TModText , Indent ) 
+
+      | ModHs . ModBlankLineTyp ( TModBlankLine ) 
+      => RETURN ModHs . ModBlankLineImage ( TModBlankLine , Indent ) 
+
+      | ModHs . ModLexErrTyp ( TModLexErr ) 
+      => RETURN ModHs . ModLexErrImage ( TModLexErr , Indent ) 
+
+      | ModHs . ModSyntErrTyp ( TModSyntErr ) 
+      => RETURN ModHs . ModSyntErrImage ( TModSyntErr , Indent ) 
+
+      | ModHs . ModDelTyp ( TModDel ) 
+      => RETURN ModHs . ModDelImage ( TModDel , Indent ) 
+
+      ELSE 
+        CantHappen ( AFT . A_EstUtilDotEstNodeImageBadObjType ) 
+      ; RETURN "" 
+      END (* TYPECASE  CASE *) 
+    END EstNodeImageBrief 
+
+(* EXPORTED *) 
 ; PROCEDURE EstNodeImage 
     ( NodeRef : LbeStd . EstRootTyp 
     ; Indent := LbeStd . StdIndent 
@@ -344,7 +403,9 @@ MODULE EstUtil
       => RETURN "NIL" 
 
       | SharedStrings . T ( TSharedString ) 
-      => RETURN SharedStrings . Image ( TSharedString , Indent (* , Lang *) ) 
+      => (* Lex error characters are a special case of this, identified
+            by Tok__LexErrChars. *)
+        RETURN SharedStrings . Image ( TSharedString , Indent (* , Lang *) ) 
 
       | ModHs . EstDummyTyp ( TDummyRef )  
       => RETURN ModHs . EstDummyImage ( TDummyRef ) 
@@ -376,7 +437,193 @@ MODULE EstUtil
       END (* TYPECASE  CASE *) 
     END EstNodeImage 
 
-(* VISIBLE: *) 
+(* EXPORTED *)
+; PROCEDURE EstLeavesImage
+    ( TreeRef : LbeStd . EstRootTyp
+    ; NodeNo : LbeStd . EstNodeNoTyp
+    ; Indent := LbeStd . StdIndent 
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
+    ) 
+  : TEXT
+  (* If TreeRef is an Est interior node, Flatten all its leaf elements and display
+     then in a compact, usually one-line form, prefixed
+     by node and child numbers.  Otherwise "" *) 
+
+  = CONST NodePrefix = "    " 
+  ; CONST NodeIndent = 4 (* = Text . Length ( NodePrefix ) *)
+
+  ; VAR EliEstRef : EstHs . EstRefTyp 
+  ; VAR EliNodeNoPad := 7
+  ; VAR EliChildNoPad := 4
+  ; VAR EliNodeCt : INTEGER 
+  ; VAR EliChildCt , EliChildNo : INTEGER
+  ; VAR EliResult : TEXT
+  ; VAR EliWrT : Wr . T
+  ; VAR EliIndentBlanks := ""
+  
+  ; PROCEDURE EliNonleafArray
+      ( ArrayRef : EstHs . NonleafArrayRefTyp 
+      ; NodeNo : LbeStd . EstNodeNoTyp 
+      ; ChildNo : LbeStd . EstChildNoTyp 
+      )
+
+    = VAR LNumber : INTEGER
+    ; VAR LSs : INTEGER 
+    ; VAR LNodeCt , LNodeNo : INTEGER 
+    ; VAR LChildCt , LChildNo : INTEGER 
+
+    ; BEGIN
+        IF ArrayRef = NIL THEN RETURN END (* IF *)
+      ; LNumber := NUMBER ( ArrayRef ^ )
+      ; IF LNumber <= 0 THEN RETURN END (* IF *)
+      ; LSs := LAST ( ArrayRef ^ )
+      ; WITH WLMElem = ArrayRef ^ [ LSs ]
+        DO
+          LNodeCt := WLMElem . NleCumNodeCt 
+        ; LChildCt := WLMElem . NleCumChildCt
+        END (* WITH *) 
+      ; WHILE LNumber > 0 
+        DO WITH WElem = ArrayRef ^ [ LSs ]
+          DO
+            LNodeNo := NodeNo + LNodeCt - WElem . NleCumNodeCt  
+          ; LChildNo := ChildNo + LChildCt - WElem . NleCumChildCt  
+          ; TYPECASE WElem . NleChildRef  
+            OF NULL =>
+
+            | EstHs . EstLeafRefTyp ( TLeafRef )
+            => EliLeafArray 
+                 ( TLeafRef . EstLeafArrayRef , LNodeNo , LChildNo )
+
+            | EstHs . EstNonleafRefTyp ( TNonleafRef )
+            => EliNonleafArray
+                 ( TNonleafRef . EstNonleafArrayRef , LNodeNo , LChildNo )
+
+            | EstHs . KTreeLeafRefTyp ( TLeafRef )
+            => EliLeafArray 
+                 ( TLeafRef . KTreeLeafArrayRef , LNodeNo , LChildNo )
+
+            | EstHs . KTreeNonleafRefTyp ( TNonleafRef )
+            => EliNonleafArray
+                 ( TNonleafRef . KTreeNonleafArrayRef , LNodeNo , LChildNo )
+
+            ELSE
+            END (* TYPECASE *)
+          END (* WITH *) 
+        ; DEC ( LSs ) 
+        ; DEC ( LNumber ) 
+        END (* WHILE *) 
+      END EliNonleafArray
+
+  ; PROCEDURE EliLeafArray
+      ( ArrayRef : EstHs . LeafArrayRefTyp 
+      ; NodeNo : LbeStd . EstNodeNoTyp 
+      ; ChildNo : LbeStd . EstChildNoTyp 
+      ) 
+
+    = VAR LNumber : INTEGER
+    ; VAR LSs : INTEGER
+    ; VAR LNodeCt , LNodeNo : INTEGER
+    ; VAR LChildCt , LChildNo : INTEGER
+
+    ; BEGIN
+        IF ArrayRef = NIL THEN RETURN END (* IF *)
+      ; LNumber := NUMBER ( ArrayRef ^ )
+      ; IF LNumber <= 0 THEN RETURN END (* IF *)
+      ; LSs := LAST ( ArrayRef ^ )
+      ; LNodeCt := ArrayRef ^ [ LSs ] . LeCumNodeCt 
+      ; LChildCt := LNumber
+      ; LOOP 
+          WITH WElem = ArrayRef ^ [ LSs ]
+          DO
+            LNodeNo := NodeNo + LNodeCt - WElem . LeCumNodeCt  
+          ; LChildNo := ChildNo + LChildCt - LNumber
+          ; Wr . PutText ( EliWrT , "NodeNo " )
+          ; Wr . PutText
+              ( EliWrT
+              , Fmt . Pad ( LbeStd . EstNodeNoImage ( LNodeNo ) , EliNodeNoPad )
+              )
+          ; Wr . PutText ( EliWrT , " ChildNo " )
+          ; Wr . PutText
+              ( EliWrT
+              , Fmt . Pad ( LbeStd . EstNodeNoImage ( LChildNo ) , EliChildNoPad )
+              )
+          ; Wr . PutChar ( EliWrT , ' ' )
+          ; Wr . PutText ( EliWrT , Misc . RefanyImage ( WElem . LeChildRef ) )
+          ; Wr . PutText ( EliWrT , " FmtNo " )
+          ; Wr . PutText ( EliWrT , EstHs . FmtNoImage ( WElem . LeFmtNo ) ) 
+          ; Wr . PutText ( EliWrT , " KindSet " )
+          ; Wr . PutText
+              ( EliWrT
+              , EstHs . EstChildKindSetImage
+                  ( WElem . LeKindSet
+                  , ImageKind := EstHs . ImageKindTyp . Decimal 
+                  , RightMargin := 10000 (* Prevent wrap. *)
+                  )
+              )
+          ; Wr . PutText ( EliWrT , Wr . EOL )
+          ; Wr . PutText ( EliWrT , EliIndentBlanks )
+          ; Wr . PutText ( EliWrT , NodePrefix  )
+          ; Wr . PutText
+              ( EliWrT
+              , EstNodeImageBrief
+                  ( WElem . LeChildRef , Indent + NodeIndent , LNodeNo , Lang )
+              )
+          END (* WITH *)
+        ; INC ( EliChildNo )
+        ; IF EliChildNo < EliChildCt
+          THEN
+            Wr . PutText ( EliWrT , Wr . EOL )
+          ; Wr . PutText ( EliWrT , EliIndentBlanks )
+          ; Wr . PutText ( EliWrT , ", " )
+          END (* IF *)
+        ; DEC ( LNumber )
+        ; IF LNumber <= 0
+          THEN EXIT
+          ELSE DEC ( LSs ) 
+          END (* IF *) 
+        END (* LOOP *)
+      END EliLeafArray 
+
+  ; BEGIN (* EstLeavesImage *)
+      TYPECASE TreeRef OF
+      | NULL => RETURN ""
+      | EstHs . EstRefTyp ( TEstRef )
+      => EliEstRef := TEstRef 
+      ELSE RETURN ""
+      END (* TYPECASE *) 
+    ; EliChildCt := EstChildCt ( EliEstRef ) 
+    ; IF EliChildCt <= 0
+      THEN RETURN "{ }"
+      ELSE
+        EliNodeCt := EstNodeCt ( EliEstRef )
+      ; EliNodeNoPad := Misc . CeilLog10 ( EliNodeCt ) 
+      ; EliChildNoPad := Misc . CeilLog10 ( EliChildCt )
+      ; EliChildNo := 0 
+      ; EliWrT := TextWr . New ( ) 
+      ; IF EliChildCt > 1
+        THEN EliIndentBlanks := Misc . Blanks ( Indent )
+        END (* IF *)
+
+      ; Wr . PutText ( EliWrT , "{ " )
+      ; TYPECASE EliEstRef 
+        OF NULL => 
+        | EstHs . EstLeafRefTyp ( TEstLeaf ) 
+        => EliLeafArray ( TEstLeaf . EstLeafArrayRef , NodeNo , 0 )
+        | EstHs . EstNonleafRefTyp ( TEstNonleaf ) 
+        => EliNonleafArray ( TEstNonleaf . EstNonleafArrayRef , NodeNo , 0 )
+        ELSE
+        END (* TYPECASE *)
+      ; IF EliChildCt > 1
+        THEN
+          Wr . PutText ( EliWrT , Wr . EOL )
+        ; Wr . PutText ( EliWrT , EliIndentBlanks )
+        END (* IF *)
+      ; Wr . PutChar ( EliWrT , '}' )
+      ; EliResult := TextWr . ToText ( EliWrT )
+      ; RETURN EliResult
+      END (* IF *)
+    END EstLeavesImage 
+
 ; PROCEDURE WidthValue 
     ( Arg : PortTypes . Int32Typ ) : LbeStd . LimitedCharNoTyp 
 
@@ -392,7 +639,7 @@ MODULE EstUtil
       END (* IF *) 
     END WidthValue 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE WidthSum 
     ( Left , Right : LbeStd . LimitedCharNoSignedTyp ) 
   : LbeStd . LimitedCharNoTyp 
@@ -414,7 +661,7 @@ MODULE EstUtil
       END (* IF *) 
     END WidthSum 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE WidthSumSigned 
     ( Left , Right : LbeStd . LimitedCharNoSignedTyp ) 
   : LbeStd . LimitedCharNoSignedTyp 
@@ -438,7 +685,7 @@ MODULE EstUtil
       END (* IF *) 
     END WidthSumSigned 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE WidthSum3 
     ( W , X , Y : LbeStd . LimitedCharNoSignedTyp ) 
   : LbeStd . LimitedCharNoTyp 
@@ -461,7 +708,7 @@ MODULE EstUtil
       END (* IF *) 
     END WidthSum3 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE WidthSumSigned3 
     ( W , X , Y : LbeStd . LimitedCharNoSignedTyp ) 
   : LbeStd . LimitedCharNoSignedTyp 
@@ -492,7 +739,7 @@ MODULE EstUtil
       END (* IF *) 
     END WidthSumSigned3 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE CharPosPlusWidthInfo 
     ( Left : LbeStd . LimitedCharNoSignedTyp 
     ; READONLY Right : EstHs . WidthInfoTyp 
@@ -514,7 +761,7 @@ MODULE EstUtil
       END (* IF *) 
     END CharPosPlusWidthInfo 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE WidthInfoCat 
     ( Left : EstHs . WidthInfoTyp 
     ; NeedsSep : BOOLEAN 
@@ -704,7 +951,7 @@ MODULE EstUtil
     ; RETURN LLoElemNo 
     END SearchNonleafArrayForNodeNo 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE GetEstChildContainingRelNodeNo 
     ( NodeRef : EstHs . KTreeRefTyp 
     ; RelNodeNo : LbeStd . EstNodeNoTyp 
@@ -782,7 +1029,7 @@ MODULE EstUtil
       END (* IF *) 
     END GetEstChildContainingRelNodeNo 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SearchNonleafArrayForChild 
     ( READONLY NonleafArray : EstHs . NonleafArrayTyp 
     ; ChildCt : LbeStd . EstChildNoTyp 
@@ -919,7 +1166,7 @@ MODULE EstUtil
   = BEGIN (* VisitNoop *) 
     END VisitNoop 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE IthChildRef 
     ( EstRef : EstHs . EstRefTyp ; I : LbeStd . EstChildNoTyp ) 
   : LbeStd . EstRootTyp  
@@ -943,7 +1190,7 @@ MODULE EstUtil
       END (* IF *) 
     END IthChildRef 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE GetIthChild 
     ( EstRef : EstHs . EstRefTyp 
     ; I : LbeStd . EstChildNoTyp 
@@ -979,7 +1226,7 @@ MODULE EstUtil
       END (* IF *) 
     END GetIthChild 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE GetParent 
     ( RootRef : EstHs . EstRefTyp 
     ; NodeNo : LbeStd . EstNodeNoTyp 
@@ -1032,7 +1279,7 @@ MODULE EstUtil
       END (* IF *) 
     END GetParent 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE GetLeafElem 
     ( RootRef : EstHs . EstRefTyp 
     ; NodeNo : LbeStd . EstNodeNoTyp 
@@ -1078,7 +1325,7 @@ MODULE EstUtil
       END (* IF *) 
     END GetLeafElem 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SetChildKindBitTRUE 
     ( EstRef : EstHs . EstRefTyp 
     ; ChildNo : LbeStd . EstChildNoTyp 
@@ -1119,7 +1366,7 @@ MODULE EstUtil
       END (* WITH WLeafElem *) 
     END SetChildKindBitTRUE 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SetDescendentKindBitTRUE 
     ( EstRef : EstHs . EstRefTyp 
     ; NodeNo : LbeStd . EstNodeNoTyp 
@@ -1203,7 +1450,7 @@ MODULE EstUtil
       END (* LOOP *) 
     END SetDescendentKindBitTRUE 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SetChildRef 
     ( EstRef : EstHs . EstRefTyp 
     ; ChildNo : LbeStd . EstChildNoTyp 
@@ -1231,7 +1478,7 @@ MODULE EstUtil
 
 ; EXCEPTION SfBailout 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SetChildKindBitFALSE 
     ( EstRef : EstHs . EstRefTyp 
     ; ChildNo : LbeStd . EstChildNoTyp 
@@ -1629,7 +1876,7 @@ MODULE EstUtil
       END (* Block  SearchForKindSet block *) 
     END SearchForKindSet 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE NextInKindSet 
     ( EstRef : EstHs . EstRefTyp 
     ; StartChildNo : LbeStd . EstChildNoTyp 
@@ -1659,7 +1906,7 @@ MODULE EstUtil
         ) 
     END NextInKindSet 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PrevInKindSet 
     ( EstRef : EstHs . EstRefTyp 
     ; StartChildNo : LbeStd . EstChildNoTyp 
@@ -1683,7 +1930,7 @@ MODULE EstUtil
         ) 
     END PrevInKindSet 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ApproxChildCt ( Root : LbeStd . EstRootTyp ) 
   : ModHs . EstApproxChildCtTyp 
   RAISES { AssertionFailure } 
@@ -1728,7 +1975,7 @@ MODULE EstUtil
       END (* TYPECASE *) 
     END ApproxChildCt 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EvalPredicate 
     ( Lang : LbeStd . LangTyp 
     ; FsNodeRef : LangUtil . FsNodeRefTyp
@@ -1871,7 +2118,7 @@ MODULE EstUtil
       END (* CASE *) 
     END EvalPredicate
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE IsZeroWidthModText ( ItemRef : LbeStd . EstRootTyp ) : BOOLEAN
 
   = VAR LHasNlBefore , LHasNlAfter : BOOLEAN
@@ -1886,11 +2133,12 @@ MODULE EstUtil
         THEN (* It's a whole-line ModText.  It gets zero width. *)
           RETURN TRUE 
         ELSE RETURN FALSE 
-        END (* IF *) 
+        END (* IF *)
+      ELSE RETURN FALSE 
       END (* TYPECASE *)
     END IsZeroWidthModText 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EstMiscInfo 
     ( <* UNUSED *> Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : EstHs . EstMiscInfoTyp 
@@ -2043,7 +2291,7 @@ MODULE EstUtil
     ; RETURN LResult 
     END EstMiscInfo 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EstEdgeKind  
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : EstHs . EdgeKindTyp 
@@ -2056,7 +2304,7 @@ MODULE EstUtil
     ; RETURN LEstMiscInfo . EmiEdgeKind 
     END EstEdgeKind  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EstIthChildEdgeKind  
     ( Lang : LbeStd . LangTyp 
     ; EstRef : EstHs . EstRefTyp 
@@ -2074,7 +2322,7 @@ MODULE EstUtil
     ; RETURN LEstMiscInfo . EmiEdgeKind 
     END EstIthChildEdgeKind  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE LeftTokForEst 
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : LbeStd . TokTyp 
@@ -2092,7 +2340,7 @@ MODULE EstUtil
       END (* IF *) 
     END LeftTokForEst 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE RightTokForEst 
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : LbeStd . TokTyp 
@@ -2209,7 +2457,7 @@ MODULE EstUtil
       END (* IF *) 
     END ComputeWholeLeafSliceEdgeInfoPair 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE GetKTreeSliceEdgeInfoPair 
     ( Lang : LbeStd . LangTyp 
     ; KTreeRef : EstHs . KTreeRefTyp 
@@ -2231,7 +2479,7 @@ MODULE EstUtil
       END (* TYPECASE *) 
     END GetKTreeSliceEdgeInfoPair 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE UnmarkContainsTempMark ( EstRef : LbeStd . EstRootTyp ) 
 
   = PROCEDURE UmChildren 
@@ -2295,7 +2543,7 @@ MODULE EstUtil
       END (* TYPECASE *) 
     END  UnmarkContainsTempMark 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE Statistics 
     ( Parent : EstHs . KTreeRefTyp ; VAR Result : StatisticsTyp ) 
   RAISES { AssertionFailure } 

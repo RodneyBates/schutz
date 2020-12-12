@@ -35,6 +35,7 @@ MODULE Misc
 
 ; VAR FixedText : TEXT 
 
+(* EXPORTED: *) 
 ; PROCEDURE LoadYourself ( )
   (* Call this to get the containing library package loaded. *)
 
@@ -43,7 +44,74 @@ MODULE Misc
       I := 1765087
     END LoadYourself
 
-(* VISIBLE: *) 
+; CONST DecVals
+    = ARRAY OF INTEGER
+        { 0
+        , 9                      (* 1 *)
+        , 99                     (* 2 *)
+        , 999                    (* 3 *)
+        , 9999                   (* 4 *)
+        , 99999                  (* 5 *)
+        , 999999                 (* 6 *)
+        , 9999999                (* 7 *)
+        , 99999999               (* 8 *)
+        , 999999999              (* 9 *)
+        , 2147483647             (* 10 *) (* = 16_7FFFFFFF *)
+(* Use these for the 64-bit case:  
+        , 9999999999             (* 10 *)
+        , 99999999999            (* 11 *)
+        , 999999999999           (* 12 *)
+        , 9999999999999          (* 13 *)
+        , 99999999999999         (* 14 *)
+        , 999999999999999        (* 15 *)
+        , 9999999999999999       (* 16 *)
+        , 99999999999999999      (* 17 *)
+        , 999999999999999999     (* 18 *)
+        , 9223372036854775807    (* 19 *) (* = 16_7FFFFFFFFFFFFFFF *)
+*)
+        } 
+
+(* EXPORTED: *)
+; PROCEDURE CeilLog10 ( Val : INTEGER ) : INTEGER
+(* Number of characters required to represent Val in decimal. *)
+(* Currently works only up to 2**31-1, regardless of INTEGER size. *)
+
+  = CONST ForFIRST = 11 (* For 64-bit case, 20 *)
+  ; VAR Abs : INTEGER
+  ; VAR LLo , LHi , LProbe , LResult : INTEGER
+  ; VAR LIsNeg : BOOLEAN := FALSE  
+
+  ; BEGIN
+      IF Val = FIRST ( INTEGER )
+      THEN RETURN ForFIRST
+      END (* IF *) 
+    ; IF Val < 0
+      THEN
+        Abs := - Val
+      ; LIsNeg := TRUE
+      ELSE Abs := Val 
+      END
+    (* INVARIANT : DecVals [ LLo ] < Abs <= DecVals [ LHi] *) 
+    ; LLo := 0
+    ; LHi := LAST ( DecVals ) 
+    ; LOOP
+        IF LLo + 1 >= LHi
+        THEN
+          LResult := LHi
+        ; EXIT 
+        ELSE 
+          LProbe := ( LLo + LHi ) DIV 2
+        ; IF DecVals [ LProbe ] < Abs
+          THEN LLo := LProbe 
+          ELSE LHi := LProbe 
+          END (*( IF *) 
+        END (* IF *) 
+      END (* LOOP *)
+    ; INC ( LResult , ORD ( LIsNeg ) ) 
+    ; RETURN LResult 
+    END CeilLog10
+    
+(* EXPORTED: *) 
 ; PROCEDURE Blanks ( Length : PortTypes . Int32Typ ) : TEXT 
   (* A TEXT of length Length, all blanks. *) 
 
@@ -71,14 +139,14 @@ MODULE Misc
       END (* IF *) 
     END Blanks 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IntegerImage ( Value : INTEGER ) : TEXT 
 
   = BEGIN 
       RETURN Fmt . Int ( Value ) 
     END IntegerImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE BooleanImageShort ( Value : BOOLEAN ) : TEXT 
   (* "F" or "T" *) 
 
@@ -86,7 +154,7 @@ MODULE Misc
       IF Value THEN RETURN "T" ELSE RETURN "F" END (* IF *) 
     END BooleanImageShort 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DateImage ( READONLY Value : Date . T ) : TEXT 
 
   = BEGIN 
@@ -100,7 +168,7 @@ MODULE Misc
         & " " & Value . zone
     END DateImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FingerprintImage ( READONLY Value : Fingerprint . T ) : TEXT 
 
   = BEGIN 
@@ -120,7 +188,7 @@ MODULE Misc
 
 ; CONST AddressImageLen = BYTESIZE ( ADDRESS ) * 2 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE RefanyImage ( Ref : REFANY ) : TEXT 
 
   = BEGIN
@@ -133,7 +201,7 @@ MODULE Misc
             ) 
     END RefanyImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EscapeText ( String : TEXT ) : TEXT 
 (* Add Modula-3 TEXT literal escapes. Do not add enclosing double quotes. *) 
 
@@ -187,7 +255,7 @@ MODULE Misc
     ; RETURN TextWr . ToText ( WrT ) 
     END EscapeText 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE QuoteText ( String : TEXT ) : TEXT 
   (* Add escape sequences and string quotes. *) 
 
@@ -195,7 +263,7 @@ MODULE Misc
       RETURN "\"" & EscapeText ( String ) & "\""  
     END QuoteText 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE QuoteChar ( Ch : CHAR ) : TEXT 
   (* Add escape sequences and character quotes. *) 
 
@@ -203,7 +271,7 @@ MODULE Misc
       RETURN "'" & EscapeText ( Text . FromChar ( Ch ) ) & "'"  
     END QuoteChar  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReadAndUnquoteText ( RdT : Rd . T ) : TEXT 
   (* Read a Modula-3 string from RdT.  Remove leading and trailing blanks 
      and bounding string quotes.  Also convert escape sequences inside to 
@@ -298,7 +366,7 @@ MODULE Misc
     ; RETURN TextWr . ToText ( WrT ) 
     END ReadAndUnquoteText  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE UnescapeText ( String : TEXT ) : TEXT 
   (* Remove Modula-3 TEXT literal escapes. *)  
 
@@ -360,7 +428,7 @@ MODULE Misc
     ; RETURN TextWr . ToText ( WrT ) 
     END UnescapeText 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE UnquoteText ( String : TEXT ) : TEXT 
   (* Remove any leading and trailing blanks and bounding string quotes.
      If there are bounding quotes at each end, convert escape sequences 
@@ -472,7 +540,7 @@ MODULE Misc
       END (* IF *) 
     END UnquoteChar  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE CharIsEqual 
     ( Ch1 , Ch2 : CHAR ; CaseSensitive : BOOLEAN := TRUE ) 
   : BOOLEAN 
@@ -490,7 +558,7 @@ MODULE Misc
     ; RETURN Ch1 = Ch2 
     END CharIsEqual 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE CharCompare  
     ( Ch1 , Ch2 : CHAR ; CaseSensitive : BOOLEAN := TRUE ) 
   : [ - 1 .. 1 ] 
@@ -528,7 +596,7 @@ MODULE Misc
         := Text . Sub ( LSub1 , 0 , Text . Length ( LSub1 ) - 1 ) 
     END InitGFilePathSeparator  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FilePathSeparator ( ) : TEXT 
   (* OS-independent. *) 
 
@@ -538,7 +606,7 @@ MODULE Misc
 
 ; CONST Digits = SET OF CHAR { '0' .. '9' } 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE WoVersionSuffix ( Name : TEXT ) : TEXT 
   (* Remove any suffix that is either dot tilde digit* tilde, or just tilde. *)
 
@@ -587,7 +655,7 @@ MODULE Misc
     END (* IF *) 
   END WoVersionSuffix 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE AbsFileName ( Name : TEXT ) : TEXT 
   (* Name need not exist. OS-independent. *) 
 
@@ -606,7 +674,7 @@ MODULE Misc
       END (* IF *) 
     END AbsFileName 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE RelFileName 
     ( Name : TEXT  
     ; RelativeTo : TEXT := NIL 
@@ -667,7 +735,7 @@ MODULE Misc
       END (* IF *) 
     END RelFileName 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE JoinPath ( Path : TEXT ; File : TEXT ) : TEXT 
   (* OS-independent. *) 
 
@@ -675,7 +743,7 @@ MODULE Misc
       RETURN Pathname . Join ( Path , File , ext := NIL )  
     END JoinPath
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE PickleName ( Name : TEXT ) : TEXT 
   (* Convert text file suffix or checkpoint suffix to pickle suffix. 
      First remove version suffix. 
@@ -707,7 +775,7 @@ MODULE Misc
       END (* IF *) 
     END PickleName 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE CheckpointName ( Name : TEXT ) : TEXT 
   (* Convert text file suffix or pickle to checkpoint suffix. 
      First remove version suffix. 
@@ -739,7 +807,7 @@ MODULE Misc
       END (* IF *) 
     END CheckpointName 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE TextName ( Name : TEXT ) : TEXT 
   (* Convert a pickle suffix or checkpoint suffix to a text file suffix. 
      First remove version suffix. 
@@ -771,7 +839,7 @@ MODULE Misc
       END (* IF *) 
     END TextName 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IsPickleName ( Name : TEXT ) : BOOLEAN 
   (* Ignores a version suffix.  Works on anything from a full path name 
      down to just a suffix without even a dot. 
@@ -795,7 +863,7 @@ MODULE Misc
       END (* IF *) 
     END IsPickleName 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IsPickleOrCheckpointName ( Name : TEXT ) : BOOLEAN 
   (* Ignores a version suffix.  Works on anything from a full path name 
      down to just a suffix without even a dot. 

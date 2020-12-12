@@ -139,7 +139,9 @@ INTERFACE Marks
            ModCmntSameLineFixedTyp, to which the mark leads. *) 
       END (* RECORD  TokMarkTyp *) 
 
-; PROCEDURE MarkImage ( Mark : TokMarkTyp ) : TEXT 
+; PROCEDURE MarkImage
+    ( Mark : TokMarkTyp ; Lang : LbeStd . LangTyp := LbeStd . LangNull )
+  : TEXT 
 
 ; PROCEDURE Equal ( Left , Right : TokMarkTyp ) : BOOLEAN 
   (* Returns FALSE if unordered. *) 

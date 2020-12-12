@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -13,15 +13,17 @@ MODULE EstHs
    mutator procedures in here.  
 *) 
 
-; IMPORT Wr 
+; IMPORT Fmt 
 (* Except for swapping the strings "Pickle" and "Pickle2 AS Pickle", make no
    changes to the following line, as it is recognized/edited by scripts.
    (see scripts/topickle.sh and scripts/topickle2.sh)
 *) 
 ; IMPORT Pickle2 AS Pickle (* The Pickle2 mess. *)
 ; IMPORT Rd 
-; IMPORT Text 
-; IMPORT Thread 
+; IMPORT Text
+; IMPORT TextWr 
+; IMPORT Thread
+; IMPORT Wr 
 
 ; FROM Assertions IMPORT Assert , AssertionFailure  
 ; IMPORT LbeStd 
@@ -30,13 +32,32 @@ MODULE EstHs
 ; IMPORT Misc 
 ; IMPORT LangUtil 
 
-; TYPE AFT = MessageCodes . T 
+; TYPE AFT = MessageCodes . T
+
+(* EXPORTED: *) 
+; PROCEDURE FmtNoImage ( FmtNo : FmtNoTyp ; Pad := FmtNoPad ) : TEXT
+
+  = VAR LShort , LResult : TEXT
+
+  ; BEGIN
+      IF FmtNo = FmtNoNull
+      THEN LShort := "Nul" 
+      ELSIF FmtNo = FmtNoUnknown
+      THEN LShort := "Unk"
+      ELSE LShort := Fmt . Int ( FmtNo ) 
+      END (* IF *)
+    ; IF Pad > 0 
+      THEN LResult := Fmt . Pad ( LShort , Pad )
+      ELSE LResult := LShort
+      END (* IF *)
+    ; RETURN LResult 
+    END FmtNoImage 
 
 (* Use the procedure below to assign to WidthInfoNull, because 
    PM3-1.1.15, LINUXLIBC6, generates bad code for := WidthInfoNull 
    Later: This is probably the integrated back end byte assignment 
    bug. *) 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE MakeWidthInfoNull ( VAR WidthInfo : WidthInfoTyp ) 
 
   = BEGIN (* MakeWidthInfoNull *) 
@@ -53,7 +74,7 @@ MODULE EstHs
 (* Use the procedure below to assign to WidthInfoInfinity, because 
    Pm3-1.1.15, LINUXLIBC6, generates bad code for := WidthInfoNull, 
    and I suspect if of being capable of the same for WidthInfoInfinity. *) 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE MakeWidthInfoInfinity ( VAR WidthInfo : WidthInfoTyp ) 
 
   = BEGIN (* MakeWidthInfoInfinity *) 
@@ -67,7 +88,7 @@ MODULE EstHs
     ; WidthInfo . WiWholeLineModsOnly := FALSE 
     END MakeWidthInfoInfinity 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE RefToNewLeafArray 
     ( Length : ElemNoTyp ; READONLY FullLeafArray : FullLeafArrayTyp ) 
     : LeafArrayRefTyp 
@@ -83,7 +104,7 @@ MODULE EstHs
       END (* WITH *) 
     END RefToNewLeafArray 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE RefToNewNonleafArray 
     ( Length : ElemNoTyp ; READONLY FullNonleafArray : FullNonleafArrayTyp ) 
     : NonleafArrayRefTyp 
@@ -99,7 +120,7 @@ MODULE EstHs
       END (* WITH *) 
     END RefToNewNonleafArray 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE KTreeLeafChildCt 
     ( Self : KTreeLeafRefTyp ) : LbeStd . EstChildNoTyp 
 
@@ -114,7 +135,7 @@ MODULE EstHs
       END (* WITH *) 
     END KTreeLeafChildCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE KTreeLeafNodeCt 
     ( Self : KTreeLeafRefTyp ) : LbeStd . EstNodeNoTyp 
 
@@ -129,14 +150,14 @@ MODULE EstHs
       END (* WITH *) 
     END KTreeLeafNodeCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE KTreeLeafArrayRef ( Self : KTreeLeafRefTyp ) : LeafArrayRefTyp 
 
   = BEGIN (* KTreeLeafArrayRef *) 
       RETURN Self . KTreeLeafArrayRef 
     END KTreeLeafArrayRef 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FetchKTreeLeafArray 
     ( Self : KTreeLeafRefTyp ; VAR ResultLeafArray : FullLeafArrayTyp ) 
 
@@ -159,7 +180,7 @@ MODULE EstHs
       END (* WITH *) 
     END FetchKTreeLeafArray 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE KTreeNonleafChildCt 
     ( Self : KTreeNonleafRefTyp ) : LbeStd . EstChildNoTyp 
 
@@ -171,7 +192,7 @@ MODULE EstHs
       END (* WITH *) 
     END KTreeNonleafChildCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE KTreeNonleafNodeCt 
     ( Self : KTreeNonleafRefTyp ) : LbeStd . EstNodeNoTyp 
 
@@ -183,7 +204,7 @@ MODULE EstHs
       END (* WITH *) 
     END KTreeNonleafNodeCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE KTreeNonleafArrayRef 
     ( Self : KTreeNonleafRefTyp ) : NonleafArrayRefTyp 
 
@@ -191,7 +212,7 @@ MODULE EstHs
       RETURN Self . KTreeNonleafArrayRef 
     END KTreeNonleafArrayRef 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FetchKTreeNonleafArray 
     ( Self : KTreeNonleafRefTyp 
     ; VAR ResultNonleafArray : FullNonleafArrayTyp 
@@ -209,7 +230,7 @@ MODULE EstHs
       END (* WITH *) 
     END FetchKTreeNonleafArray 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EstLeafChildCt ( Self : EstLeafRefTyp ) : LbeStd . EstChildNoTyp 
 
   = BEGIN (* EstLeafChildCt *) 
@@ -223,7 +244,7 @@ MODULE EstHs
       END (* WITH *) 
     END EstLeafChildCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EstLeafNodeCt ( Self : EstLeafRefTyp ) : LbeStd . EstNodeNoTyp 
 
   = BEGIN (* EstLeafNodeCt *) 
@@ -239,14 +260,14 @@ MODULE EstHs
       END (* WITH *) 
     END EstLeafNodeCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EstLeafArrayRef ( Self : EstLeafRefTyp ) : LeafArrayRefTyp 
 
   = BEGIN (* EstLeafArrayRef *) 
       RETURN Self . EstLeafArrayRef 
     END EstLeafArrayRef 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FetchEstLeafArray 
     ( Self : EstLeafRefTyp ; VAR ResultLeafArray : FullLeafArrayTyp ) 
 
@@ -269,7 +290,7 @@ MODULE EstHs
       END (* WITH *) 
     END FetchEstLeafArray 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EstNonleafChildCt 
     ( Self : EstNonleafRefTyp ) : LbeStd . EstChildNoTyp 
 
@@ -281,7 +302,7 @@ MODULE EstHs
       END (* WITH *) 
     END EstNonleafChildCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EstNonleafNodeCt 
     ( Self : EstNonleafRefTyp ) : LbeStd . EstNodeNoTyp 
 
@@ -293,7 +314,7 @@ MODULE EstHs
       END (* WITH *) 
     END EstNonleafNodeCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EstNonleafArrayRef 
     ( Self : EstNonleafRefTyp ) : NonleafArrayRefTyp 
 
@@ -301,7 +322,7 @@ MODULE EstHs
       RETURN Self . EstNonleafArrayRef 
     END EstNonleafArrayRef 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FetchEstNonleafArray 
     ( Self : EstNonleafRefTyp 
     ; VAR ResultNonleafArray : FullNonleafArrayTyp 
@@ -319,8 +340,9 @@ MODULE EstHs
       END (* WITH *) 
     END FetchEstNonleafArray 
 
-(* VISIBLE: *) 
-; PROCEDURE EstNodeKindImage ( Value : EstNodeKindTyp ) : TEXT 
+(* EXPORTED: *) 
+; PROCEDURE EstNodeKindImage ( Value : EstNodeKindTyp ) : TEXT
+(* TODO: Give this an ImageKind parameter. *) 
 
   = BEGIN (* EstNodeKindImage *) 
       CASE Value 
@@ -333,7 +355,7 @@ MODULE EstHs
       END (* CASE *) 
     END EstNodeKindImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE WidthInfoImage ( READONLY Value : WidthInfoTyp ) : TEXT 
 
   = BEGIN (* WidthInfoImage *) 
@@ -357,7 +379,7 @@ MODULE EstHs
         & "}" 
     END WidthInfoImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE WidthInfoIsNull ( WidthInfo : WidthInfoTyp ) : BOOLEAN 
   RAISES { AssertionFailure } 
 
@@ -376,98 +398,136 @@ MODULE EstHs
     ; RETURN LResult 
     END WidthInfoIsNull
 
-(* VISIBLE: *) 
-; PROCEDURE EstChildKindImage ( Value : EstChildKindTyp ) : TEXT 
+(* EXPORTED: *) 
+; PROCEDURE EstChildKindImage
+    ( Value : EstChildKindTyp ; ImageKind : ImageKindTyp ) : TEXT 
 
-  = BEGIN (* EstChildKindImage *) 
-      CASE Value 
-      OF EstChildKindEstChild 
-      => RETURN "EstChildKindEstChild" 
-      | EstChildKindFirstOfGroup
-      => RETURN "EstChildKindFirstOfGroup" 
-      | EstChildKindContainsSyntMod 
-      => RETURN "EstChildKindContainsSyntMod" 
-      | EstChildKindContainsInsertionRepair 
-      => RETURN "EstChildKindContainsInsertionRepair" 
-      | EstChildKindContainsDeletionRepair 
-      => RETURN "EstChildKindContainsDeletionRepair" 
-      | EstChildKindDisplayComputable 
-      => RETURN "EstChildKindDisplayComputable" 
-      | EstChildKindNonNIL 
-      => RETURN "EstChildKindNonNIL" 
-      | EstChildKindContainsErr 
-      => RETURN "EstChildKindContainsErr" 
-      | EstChildKindContainsNoKnownNl 
-      => RETURN "EstChildKindContainsNoKnownNl" 
-      | EstChildKindContainsTempMark 
-      => RETURN "EstChildKindContainsTempMark" 
-      | EstChildKindTrailingMod 
-      => RETURN "EstChildKindTrailingMod" 
-      | EstChildKindOptSingletonList 
-      => RETURN "EstChildKindOptSingletonList"
-      | EstChildKindTrailingSep 
-      => RETURN "EstChildKindTrailingSep"
+  = BEGIN (* EstChildKindImage *)
+      CASE ImageKind OF
+      | ImageKindTyp . Decimal
+        => RETURN Fmt . Int ( Value )  
+      | ImageKindTyp . Hex 
+        => RETURN Fmt . Int ( Value , 16 )
+      | ImageKindTyp . Short 
+        => RETURN EstChildKindImageShort ( Value ) 
+      | ImageKindTyp . Ident 
+        => RETURN "EstChildKind" & EstChildKindImageShort ( Value ) 
+      | ImageKindTyp . Qualified 
+        => RETURN "EstHs.EstChildKind" & EstChildKindImageShort ( Value ) 
       END (* CASE *) 
     END EstChildKindImage 
 
-(* VISIBLE: *) 
+; PROCEDURE EstChildKindImageShort ( Value : EstChildKindTyp ) : TEXT
+  (* Only the distinct part, e.g. "FirstOfGroup" *)
+
+  = BEGIN (* EstChildKindShortImage *) 
+      CASE Value 
+      OF EstChildKindEstChild 
+      => RETURN "EstChild" 
+      | EstChildKindFirstOfGroup
+      => RETURN "FirstOfGroup" 
+      | EstChildKindContainsSyntMod 
+      => RETURN "ContainsSyntMod" 
+      | EstChildKindContainsInsertionRepair 
+      => RETURN "ContainsInsertionRepair" 
+      | EstChildKindContainsDeletionRepair 
+      => RETURN "ContainsDeletionRepair" 
+      | EstChildKindDisplayComputable 
+      => RETURN "DisplayComputable" 
+      | EstChildKindNonNIL 
+      => RETURN "NonNIL" 
+      | EstChildKindContainsErr 
+      => RETURN "ContainsErr" 
+      | EstChildKindContainsNoKnownNl 
+      => RETURN "ContainsNoKnownNl" 
+      | EstChildKindContainsTempMark 
+      => RETURN "ContainsTempMark" 
+      | EstChildKindTrailingMod 
+      => RETURN "TrailingMod" 
+      | EstChildKindOptSingletonList 
+      => RETURN "OptSingletonList"
+      | EstChildKindTrailingSep 
+      => RETURN "TrailingSep"
+      END (* CASE *) 
+    END EstChildKindImageShort
+
+(* EXPORTED: *) 
 ; PROCEDURE EstChildKindSetImage 
     ( Value : EstChildKindSetTyp 
-    ; Indent := LbeStd . StdIndent 
-    ; Mnemonic : BOOLEAN := TRUE
-    ; Qualified : BOOLEAN := FALSE 
-      (* ^Fully qualified names of mnemonic set members. *)  
+    ; ImageKind := ImageKindTyp . Ident (* Of the set members. *)  
+    ; Indent := LbeStd . StdIndent
     ; RightMargin : CARDINAL := ImageRightMargin 
     ) 
     : TEXT 
 
   = VAR LID := Misc . Blanks ( Indent ) 
   ; VAR LResult : TEXT 
-  ; VAR LPos : PortTypes . Int32Typ 
+  ; VAR LPos : INTEGER 
   ; VAR LElementImage : TEXT 
-  ; VAR LElementLength : PortTypes . Int32Typ 
+  ; VAR LElementLength : INTEGER 
   ; VAR LElementCt := 0 
   ; VAR LLineCt := 1 
+  ; VAR LWrT : Wr . T
 
   ; BEGIN (* EstChildKindSetImage *) 
-      LResult := "{ " 
-    ; LPos := Indent + 2 
+      LWrT := TextWr . New ( ) 
+    ; Wr . PutChar ( LWrT , '{' )  
+    ; LPos := Indent + 1 
     ; FOR I := EstChildKindMin TO EstChildKindMax 
       DO IF I IN Value 
-         THEN 
-           IF Mnemonic 
-           THEN 
-             IF Qualified
-             THEN
-               LElementImage := "EstHs . " & EstChildKindImage ( I ) 
-             ELSE
-               LElementImage := EstChildKindImage ( I ) 
-             END (* IF *) 
-           ELSE 
-             LElementImage := PortTypes . Int32Image ( I ) 
-           END (* IF *) 
+         THEN
+           LElementImage := EstChildKindImage ( I , ImageKind ) 
+         ; LElementLength := Text . Length ( LElementImage ) 
          ; IF LElementCt > 0 
            THEN 
-             LElementImage := ", " & LElementImage 
+             IF LPos + LElementLength > RightMargin 
+             THEN
+               Wr . PutText ( LWrT , Wr . EOL ) 
+             ; Wr . PutText ( LWrT , LID ) 
+             ; LPos := Indent
+             ; INC ( LLineCt ) 
+             END (* IF *) 
+           ; Wr . PutChar ( LWrT , ',' )
+           ; INC ( LPos )
            END (* IF *) 
-         ; LElementLength := Text . Length ( LElementImage ) 
-         ; IF LPos + LElementLength > RightMargin 
-           THEN 
-             LResult := LResult & Wr . EOL & LID 
-           ; LPos := Indent 
-           ; INC ( LLineCt ) 
-           END (* IF *) 
-         ; LResult := LResult & LElementImage & " " 
-         ; INC ( LPos , LElementLength + 1 ) 
+         ; Wr . PutText ( LWrT , LElementImage ) 
+         ; INC ( LPos , LElementLength ) 
          ; INC ( LElementCt ) 
          END (* IF *) 
       END (* FOR *) 
-    ; IF LLineCt > 1 THEN LResult := LResult & Wr . EOL & LID END (* IF *) 
-    ; LResult := LResult & "} " 
+    ; IF LLineCt > 1
+      THEN
+        Wr . PutText ( LWrT , Wr . EOL ) 
+      ; Wr . PutText ( LWrT , LID ) 
+      END (* IF *) 
+    ; Wr . PutChar ( LWrT , '}' )  
+    ; LResult := TextWr . ToText ( LWrT )
     ; RETURN LResult 
     END EstChildKindSetImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
+; PROCEDURE EstChildKindSetFixedImage  ( Value : EstChildKindSetTyp ) : TEXT 
+  (* Fixed size image, by leaving blank spaces for absent kinds and
+     denoting each present kind by its hexadecimal value. *) 
+
+  = VAR LResult : TEXT 
+  ; VAR LWrT : Wr . T
+
+  ; BEGIN (* EstChildKindSetFixedImage *) 
+      LWrT := TextWr . New ( ) 
+    ; Wr . PutChar ( LWrT , '{' ) 
+    ; FOR I := EstChildKindMin TO EstChildKindMax 
+      DO IF I IN Value 
+        THEN Wr . PutText ( LWrT , Fmt . Int ( I , base := 16 ) ) 
+        ELSE Wr . PutChar ( LWrT , ' ' ) 
+        END (* IF *)
+      END (* FOR *) 
+    ; Wr . PutChar ( LWrT , '}' )  
+    ; LResult := TextWr . ToText ( LWrT )
+    ; RETURN LResult 
+    END EstChildKindSetFixedImage 
+
+(* EXPORTED: *) 
 ; PROCEDURE IsFirstOfGroup 
     ( LeftFmtNo : FmtNoTyp 
     ; LeftEdgeKind : EdgeKindTyp 
@@ -489,7 +549,7 @@ MODULE EstHs
       END 
     END IsFirstOfGroup 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EdgeKindImage ( READONLY Value : EdgeKindTyp ) : TEXT 
 
   = BEGIN (* EdgeKindImage *) 
@@ -505,7 +565,7 @@ MODULE EstHs
       END (* CASE *) 
     END EdgeKindImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EdgeInfoImage ( READONLY Value : EdgeInfoTyp ) : TEXT 
 
   = BEGIN (* EdgeInfoImage *) 
@@ -519,7 +579,7 @@ MODULE EstHs
         & "}" 
     END EdgeInfoImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SliceEdgeInfoPairImage 
     ( READONLY Value : SliceEdgeInfoPairTyp ; Indent := LbeStd . StdIndent ) 
     : TEXT 
@@ -537,7 +597,7 @@ MODULE EstHs
         & "}" 
     END SliceEdgeInfoPairImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE LeafElemImage 
     ( READONLY LeafArray : LeafArrayTyp 
     ; Indent := LbeStd . StdIndent 
@@ -583,10 +643,9 @@ MODULE EstHs
              & ", LeKindSet=" 
              & EstChildKindSetImage 
                  ( WElem . LeKindSet 
-                 , Indent := Indent + 12 
-                 , Qualified := FALSE 
-                 , Mnemonic := FALSE   
-(* TODO: Pass Mnemonic all the way down through EstUtil . EstNodeImage, 
+                 , Indent := Indent + 12
+                 , ImageKind := ImageKindTyp . Decimal  
+(* TODO: Pass ImageKind all the way down through EstUtil . EstNodeImage, 
          the 6 method overrides of EstHs . KTreeRefTyp . Image, LeafArrayImage,
          whatever, to LeafElemImage.
 *) 
@@ -598,7 +657,7 @@ MODULE EstHs
       END (* WITH *) 
     END LeafElemImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE LeafArrayImage 
     ( READONLY Value : LeafArrayRefTyp 
     ; Indent := LbeStd . StdIndent 
@@ -649,7 +708,7 @@ MODULE EstHs
       END (* IF *) 
     END LeafArrayImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE NonleafElemImage 
     ( READONLY NonleafArray : NonleafArrayTyp 
     ; Indent := LbeStd . StdIndent 
@@ -691,13 +750,14 @@ MODULE EstHs
              & Wr . EOL 
              & LID 
              & " , NleChildKindSet=" 
-             & EstChildKindSetImage ( WElem . NleKindSet ) 
+             & EstChildKindSetImage
+                 ( WElem . NleKindSet , ImageKindTyp . Decimal ) 
              & "}" 
          END (* WITH *) 
       END (* WITH *) 
     END NonleafElemImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE NonleafArrayImage 
     ( READONLY Value : NonleafArrayRefTyp 
     ; Indent := LbeStd . StdIndent 
@@ -746,9 +806,9 @@ MODULE EstHs
         ; RETURN LResult 
         END (* IF *) 
       END (* IF *) 
-    END NonleafArrayImage 
+    END NonleafArrayImage
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE KTreeRefImage 
     ( Self : KTreeRefTyp 
     ; Indent := LbeStd . StdIndent 
@@ -775,7 +835,44 @@ MODULE EstHs
         & ElemNoImage ( Self . KTreeElemCt ) 
     END KTreeRefImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
+; PROCEDURE EstRefImageBrief 
+    ( Self : EstRefTyp 
+    ; <* UNUSED *> Indent := LbeStd . StdIndent 
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
+    ) 
+    : TEXT 
+
+  = BEGIN (* EstRefImageBrief *) 
+      RETURN 
+        "Tokens={" 
+        & LangUtil . TokImage ( Self . EstLeftTok , Lang )
+      (*
+        & "(" 
+        & LbeStd . NumIdTokImage ( Self . EstLeftTok ) 
+        & ")"
+      *)
+        & "," 
+        & LangUtil . TokImage ( Self . EstTok , Lang ) 
+      (*
+        & "(" 
+        & LbeStd . NumIdTokImage ( Self . EstTok ) 
+        & ")" 
+      *)
+        & "," 
+        & LangUtil . TokImage ( Self . EstRightTok , Lang ) 
+      (*
+        & "(" 
+        & LbeStd . NumIdTokImage ( Self . EstRightTok ) 
+        & ")" 
+      *)
+        & "} " 
+        & EstNodeKindImage ( Self . EstNodeKind ) 
+        & " EstHeight=" 
+        & KTreeHeightImage ( Self . EstHeight ) 
+    END EstRefImageBrief
+
+(* EXPORTED: *) 
 ; PROCEDURE EstRefImage 
     ( Self : EstRefTyp 
     ; Indent := LbeStd . StdIndent 
@@ -785,36 +882,17 @@ MODULE EstHs
     ) 
     : TEXT 
 
-  = VAR LID := Misc . Blanks ( Indent ) 
+  = VAR LPrefix , LRest , LResult : TEXT
+  ; VAR LID := Misc . Blanks ( Indent ) 
 
-  ; BEGIN (* EstRefImage *) 
-      RETURN 
-        LID 
-        & "Tokens={Left=" 
-        & LangUtil . TokImage ( Self . EstLeftTok , Lang ) 
-        & "(" 
-        & LbeStd . NumIdTokImage ( Self . EstLeftTok ) 
-        & "), Node=" 
-        & LangUtil . TokImage ( Self . EstTok , Lang ) 
-        & "(" 
-        & LbeStd . NumIdTokImage ( Self . EstTok ) 
-        & "), Right=" 
-        & LangUtil . TokImage ( Self . EstRightTok , Lang ) 
-        & "(" 
-        & LbeStd . NumIdTokImage ( Self . EstRightTok ) 
-        & ")}" 
-        & Wr . EOL 
-        & LID 
-        & "EstNodeKind=" 
-        & EstNodeKindImage ( Self . EstNodeKind ) 
-        & ", EstHeight=" 
-        & KTreeHeightImage ( Self . EstHeight ) 
-        & Wr . EOL 
-        & LID 
-        & KTreeRefTyp . Image ( Self , Indent , NodeNo , ChildNo , Lang ) 
+  ; BEGIN (* EstRefImage *)
+      LPrefix := EstRefImageBrief ( Self , Indent , Lang )
+    ; LRest := KTreeRefTyp . Image ( Self , Indent , NodeNo , ChildNo , Lang )
+    ; LResult := LPrefix & LID & LRest
+    ; RETURN LResult 
     END EstRefImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE KTreeLeafRefImage 
     ( Self : KTreeLeafRefTyp 
     ; Indent := LbeStd . StdIndent 
@@ -845,7 +923,7 @@ MODULE EstHs
     ; RETURN LResult 
     END KTreeLeafRefImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE KTreeNonleafRefImage 
     ( Self : KTreeNonleafRefTyp 
     ; Indent := LbeStd . StdIndent 
@@ -885,7 +963,7 @@ MODULE EstHs
     ; RETURN LResult 
     END KTreeNonleafRefImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EstLeafRefImage 
     ( Self : EstLeafRefTyp 
     ; Indent := LbeStd . StdIndent 
@@ -907,7 +985,7 @@ MODULE EstHs
             ( Self . EstLeafArrayRef , Indent + 11 , NodeNo , ChildNo ) 
     END EstLeafRefImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE EstNonleafRefImage 
     ( Self : EstNonleafRefTyp 
     ; Indent := LbeStd . StdIndent 

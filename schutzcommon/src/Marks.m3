@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -13,11 +13,12 @@ MODULE Marks
 ; IMPORT Integer 
 ; IMPORT Boolean  
 
-; IMPORT EstHs 
+; IMPORT EstHs
+; IMPORT LangUtil 
 ; IMPORT LbeStd 
-; IMPORT Misc 
+; IMPORT Misc
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE MarkKindImage ( Value : MarkKindTyp ) : TEXT 
 
   = BEGIN 
@@ -32,7 +33,7 @@ MODULE Marks
       END (* CASE *) 
     END MarkKindImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE MarkKindImageShort ( Value : MarkKindTyp ) : TEXT 
 
   = BEGIN 
@@ -47,22 +48,36 @@ MODULE Marks
       END (* CASE *) 
     END MarkKindImageShort 
 
-(* VISIBLE: *) 
-; PROCEDURE MarkImage ( Mark : TokMarkTyp ) : TEXT 
+(* EXPORTED: *) 
+; PROCEDURE MarkImage
+    ( Mark : TokMarkTyp ; Lang : LbeStd . LangTyp := LbeStd . LangNull )
+  : TEXT 
 
-  = BEGIN 
-      RETURN
+  = VAR LBlCharPosImage : TEXT 
+  ; VAR LTokImage : TEXT
+  
+  ; BEGIN
+      IF Lang = LbeStd . LangNull
+      THEN LTokImage := LbeStd . NumIdTokImage ( Mark . Tok ) 
+      ELSE LTokImage := LangUtil . TokImage ( Mark . Tok , Lang ) 
+      END (* IF *) 
+    ; IF Mark . Kind = MarkKindTyp . BlankLine
+      THEN
+        LBlCharPosImage := "BlCharPos=" & LbeStd . CharNoImage ( Mark . BlCharPos )
+      ELSE LBlCharPosImage := ""
+      END (* IF*)
+    ; RETURN
         LbeStd . EstNodeNoImage ( Mark . EstNodeNo ) 
         & "(" & LbeStd . EstNodeNoImage ( Mark . EstNodeCt ) & ")" 
         & MarkKindImageShort ( Mark . Kind ) 
         & EstHs . FmtNoImage ( Mark . FmtNo ) 
         & Misc . BooleanImageShort ( Mark . StartAtEnd ) 
         & Misc . BooleanImageShort ( Mark . IsImpliedNewLine )
-        & "(" & LbeStd . NumIdTokImage ( Mark . Tok ) & ")"  
-        & LbeStd . CharNoImage ( Mark . BlCharPos ) 
+        & ",Tok={" & LTokImage & "}"
+        & LBlCharPosImage 
     END MarkImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE Equal ( Left , Right : TokMarkTyp ) : BOOLEAN 
   (* Returns FALSE if unordered. *) 
 
@@ -94,7 +109,7 @@ MODULE Marks
       END (* IF *) 
     END Equal 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE Compare ( Left , Right : TokMarkTyp ) : [ - 1 .. 1 ] 
   RAISES { Unordered } 
 
@@ -246,7 +261,7 @@ MODULE Marks
       END (* CASE *) 
     END Compare 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IsNull ( Mark : TokMarkTyp ) : BOOLEAN 
 
   = BEGIN (* IsNull *) 
