@@ -37,6 +37,7 @@ EXPORTS ParseTrv , ScannerIf
 ; IMPORT Marks 
 ; FROM Marks IMPORT MarkKindTyp 
 ; IMPORT Misc 
+; FROM Misc IMPORT RefanyPad 
 ; IMPORT MessageCodes 
 ; IMPORT ModHs 
 ; IMPORT Options
@@ -48,7 +49,9 @@ EXPORTS ParseTrv , ScannerIf
 ; IMPORT SharedStrings 
 ; IMPORT Strings 
 ; IMPORT TravUtil
-; IMPORT VersionedFiles 
+; IMPORT VersionedFiles
+
+; IMPORT TreeBrowse 
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -442,7 +445,6 @@ EXPORTS ParseTrv , ScannerIf
     ; RETURN LSuccess 
     END CheckStacks 
 
-; CONST RefanyPad = 4 + 2 * BYTESIZE ( REFANY ) 
 ; CONST TokPad = 5
 ; CONST DepthPad = 3
 ; CONST PostPad = 5
@@ -463,26 +465,29 @@ EXPORTS ParseTrv , ScannerIf
            ; StateRef : ParseHs . ParseTravStateRefTyp
            ; Depth : INTEGER 
            )
-
+         RAISES { AssertionFailure }
+         
 ; PROCEDURE TraverseStates
     ( READONLY ParseInfo : ParseHs . ParseInfoTyp ; Visitor : StateVisitorTyp ) 
+  RAISES { AssertionFailure } 
 
   = PROCEDURE TsRecurse
       ( FromStateRef , ToStateRef : ParseHs . ParseTravStateEstRefTyp
       ; Depth : INTEGER
       )
+    RAISES { AssertionFailure } 
   
     = VAR LStateRef , LAdvanceStateRef : ParseHs . ParseTravStateEstRefTyp 
     ; BEGIN
-        LStateRef := FromStateRef 
+        LStateRef := FromStateRef
+      ; IF LStateRef = NIL THEN RETURN END (* IF *) 
       ; LOOP (* Thru' advances at this level. *) 
           LAdvanceStateRef := LStateRef . PtsAdvanceStateRef
-        ; Assert
-            ( LAdvanceStateRef # NIL
-            , AFT . A_TsRecurse_NIL_advance_state
-            )
         ; Visitor ( ParseInfo , LStateRef , Depth ) 
-        ; IF LAdvanceStateRef = ToStateRef
+        ; IF LAdvanceStateRef = NIL 
+          THEN (* This is all we can do. *)
+            EXIT  
+          ELSIF LAdvanceStateRef = ToStateRef
           THEN (* This is all we were asked to do. *)
             Assert
               ( Depth > 0
@@ -562,6 +567,7 @@ EXPORTS ParseTrv , ScannerIf
 (* This is here for debugging. *) 
 ; <* UNUSED *> PROCEDURE DumpStateGraph
     ( FileName : TEXT ; READONLY ParseInfo : ParseHs . ParseInfoTyp )
+  RAISES { AssertionFailure } 
 
   = VAR DsgWrT : Wr . T
   ; VAR DsgLayoutWrT : Layout . T
@@ -571,6 +577,8 @@ EXPORTS ParseTrv , ScannerIf
       ; StateRef : ParseHs . ParseTravStateRefTyp
       ; Depth : INTEGER 
       )
+    RAISES { AssertionFailure }
+    
     = CONST IndentAmt = 2
     ; CONST DepthPad = 2
     
@@ -1092,8 +1100,7 @@ END
                = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
           DO 
             NpsNextTempMarkIsRelevant
-              := WTempMark . TokMark . Kind 
-                 IN Marks . MarkKindSetEstLeaf 
+              := WTempMark . TokMark . Kind IN Marks . MarkKindSetEstLeaf 
                  AND LeafRef = WTempMark . EstRef 
           END (* WITH *) 
         END (* IF *)  
@@ -1918,9 +1925,6 @@ END
       = VAR LAbsCharPos : LbeStd . LimitedCharNoTyp  
 
       ; BEGIN
-IF ToPos = 9
-THEN LAbsCharPos := 17
-END ;
           LOOP 
             IF NOT NpsNextTempMarkIsRelevant 
             THEN 
@@ -1930,10 +1934,24 @@ END ;
                 WTempMark 
                 = ParseInfo . PiTravTempMarkListRef ^ [ NpsNextTempMarkSs ] 
               DO
+(* TODO: The following 3 assertions are probably overly pedantic. *)
                 Assert
-                  ( WTempMark
+                  ( WTempMark . TokMark . FmtNo 
                     = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
-                  , AFT . A_NpsDssIncludeTempMarks_not_original 
+                      . TokMark . FmtNo
+                  , AFT . A_NpsDssIncludeTempMarks_fmtno_not_original 
+                  ) 
+              ; Assert
+                  ( WTempMark . TokMark . Kind 
+                    = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
+                      . TokMark . Kind 
+                  , AFT . A_NpsDssIncludeTempMarks_kind_not_original 
+                  ) 
+              ; Assert
+                  ( WTempMark . EstRef 
+                    = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
+                      . EstRef
+                  , AFT . A_NpsDssIncludeTempMarks_estref_not_original 
                   ) 
               ; LAbsCharPos 
                   := EstUtil . WidthSum 
@@ -4097,7 +4115,7 @@ END ;
        (Possibly a list slice). This can happen when the Est/slice has no 
        syntactic mods and an advance is done after the whole 
        Est/slice is delivered, and, at a different time, a descend 
-       is done from the same state (and a sequence of advances 
+       was done from the same state (and a sequence of advances 
        and descends thereafter finally leads back to end of Est/slice). 
        If either happens, SeEstAdvanceState will be set to the 
        state after, and when the other happens, this pointer 
@@ -4105,20 +4123,30 @@ END ;
        NpsDeliverState := DeliverStateTyp . DsDeliver. 
        If we are rescanning at this point, none of this can happen. *) 
 
-    = BEGIN (* NpsCheckEstSuccessor *) 
+    =
+VAR LI : INTEGER := 9
+    ; BEGIN (* NpsCheckEstSuccessor *) 
         IF NpsResultStateRef . PtsScanInfo . SiScanState = LbeStd . SsIdle 
         THEN 
           IF NpsSeEstRef . SeEstAdvanceState # NIL 
           THEN (* Abandon the object we allocated. *) 
             Assert 
-              ( NpsSeEstRef . SeEstAdvanceState . PtsTokInfo 
+              (
+TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo 
                 . TiFullTempMarkRange . From 
                 = NpsResultStateEstRef . PtsTokInfo . TiFullTempMarkRange 
                   . From 
               , AFT . A_NpsCheckEstSuccessor_Mismatched_temp_mark_range
               ) 
+; IF NpsSeEstRef . SeEstAdvanceState . PtseTokTempMarkSs 
+    # NpsResultStateEstRef . PtseTokTempMarkSs
+ THEN
+   LI := 17 
+ END 
           ; NpsResultStateRef := NpsSeEstRef . SeEstAdvanceState 
-          ; NpsResultStateEstRef := NpsSeEstRef . SeEstAdvanceState 
+          ; NpsResultStateEstRef := NpsSeEstRef . SeEstAdvanceState
+          ; NpsNextTempMarkSs := NpsResultStateEstRef . PtseTokTempMarkSs
+            (* Update cached value in NpsNextTempMarkSs. *) 
            (* ^Defensive *) 
           ; NpsDeliverState := DeliverStateTyp . DsDeliver 
           END (* IF *) 
@@ -5546,8 +5574,7 @@ END ;
                 CantHappen 
                   ( AFT . A_NpsParseFromEst_DescendBadEstChild ) 
               ; IF EstHs . EstChildKindFirstOfGroup 
-                   IN NpsSeEstRef . SeEstTravInfo . EtiChildLeafElem 
-                      . LeKindSet 
+                   IN NpsSeEstRef . SeEstTravInfo . EtiChildLeafElem . LeKindSet 
                 THEN
                   NpsFlushSlice ( ) 
                 END (* IF *) 
@@ -5573,7 +5600,7 @@ END ;
                 ( TRUE OR LSliceListElemRef . SlePredLink = NIL 
                 , AFT . A_NpsParseFromEst_DescendEstLeftovers  
                 )  
-(* FIXME: This can happen.  A blank line is a mod on a deleted InsTok.
+(* FIXME: This can happen.  A blank line is a mod on a deleted InsTok. E.g.,
           MergeTxt will do this if delete "THEN", when it is on a line alone.
           Then the slice list will have the blank line and a proper Est subtree.
           In the case where it came up, the parser wanted to descend into the
@@ -5872,7 +5899,10 @@ END ;
   ; VAR LStackElemEstNodeRef : ParseHs . StackElemEstTyp 
 
   ; BEGIN (* InitParseEst *) 
-      Assert ( EstRef # NIL , AFT . A_InitParseEstReparseNILEst ) 
+      Assert ( EstRef # NIL , AFT . A_InitParseEstReparseNILEst )
+
+; TreeBrowse.Browse (EstRef,ParseInfo.PiLang,"In InitParseEst" )
+
     ; ParseInfo . PiParseKind := LbeStd . ParseKindTyp . ParseKindTrav
     ; ParseInfo . PiTravTempMarkListRef
         := ParseHs . CopyOfTempMarkList ( ParseInfo . PiOrigTempMarkListRef )

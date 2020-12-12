@@ -23,14 +23,15 @@ MODULE Parser
 ; IMPORT EstHs 
 ; IMPORT EstUtil
 ; IMPORT IntSets 
-; FROM LangUtil IMPORT ChildOptTyp , FsKindTyp , PredicateKindTyp 
 ; IMPORT LangMap 
 ; IMPORT LangUtil 
-; IMPORT LbeStd 
+; FROM LangUtil IMPORT ChildOptTyp , FsKindTyp , PredicateKindTyp 
+; IMPORT LbeStd
 ; IMPORT LRTable 
 ; IMPORT Marks 
 ; IMPORT MessageCodes 
 ; IMPORT Misc 
+; FROM Misc IMPORT RefanyPad 
 ; IMPORT ModHs 
 ; IMPORT Options 
 ; IMPORT ParseHs 
@@ -57,7 +58,7 @@ MODULE Parser
       ; TsParseTravStateRef : ParseHs . ParseTravStateRefTyp := NIL 
       ; TsTempMarkListRef : ParseHs . TempMarkArrayRefTyp := NIL  
       ; TsJustShifted : BOOLEAN := FALSE 
-        (* TsJustShifted is true if the last parsing operation 
+        (* TsJustShifted is TRUE iff the last parsing operation 
            leading to this state was a shift *) 
       END (* RECORD  TrialStateTyp *) 
 
@@ -66,7 +67,6 @@ MODULE Parser
 
 ; CONST StateListStaticMax = 4 
 ; VAR StateListMax : PortTypes . Int32Typ := 1 (* StateListStaticMax *)  
-(* ^Someday, make this runtime variable. *) 
 ; TYPE StateListElemNoTyp = [ 0 .. StateListStaticMax - 1 ] 
 ; TYPE StateListTyp 
     = RECORD 
@@ -144,7 +144,7 @@ MODULE Parser
 (* TODO: Fill this in. *) 
       IF Options . TraceWrT # NIL AND NOT Wr . Closed ( Options . TraceWrT ) 
       THEN 
-(*      ; Wr . PutText ( Options . TraceWrT , ) 
+(*      Wr . PutText ( Options . TraceWrT , ) 
       ; Wr . PutText ( Options . TraceWrT , ) 
       ; Wr . PutText ( Options . TraceWrT , ) 
       ; Wr . PutText ( Options . TraceWrT , ) 
@@ -201,8 +201,7 @@ MODULE Parser
   ; <* FATAL Wr . Failure *> 
     BEGIN 
       LResult 
-        := ParseTrv . NextParseTravState 
-             ( ParseInfo , FromStateRef , SuccKind ) 
+        := ParseTrv . NextParseTravState ( ParseInfo , FromStateRef , SuccKind ) 
     ; IF Options . ParseTracing 
          AND Options . TraceWrT # NIL 
          AND NOT Wr . Closed ( Options . TraceWrT ) 
@@ -279,7 +278,6 @@ MODULE Parser
       END (* IF *) 
     END WriteTraceParseEnd 
 
-  ; CONST RefanyPad = 4 + 2 * BYTESIZE ( REFANY ) 
   ; CONST TokPad = 25
 
   ; PROCEDURE DumpParseTrvState 
@@ -402,16 +400,18 @@ MODULE Parser
                       , TokPad  
                       )  
                   )
-              ; Wr . PutText ( LWrT , " " )
+              ; Wr . PutText ( LWrT , " Interior=" )
               ; Wr . PutText 
                   ( LWrT 
                   , Misc . BooleanImageShort 
                       ( LBse ^ . BseTokInfo . TiIsInterior)  
                   )
+              ; Wr . PutText ( LWrT , ", Inserted=" )
               ; Wr . PutText 
                   ( LWrT 
                   , Misc . BooleanImageShort ( LBse ^ . BseWasInsertedByParser )
                   )
+              ; Wr . PutText ( LWrT , ", Deleted=" )
               ; Wr . PutText 
                   ( LWrT 
                   , Misc . BooleanImageShort 
@@ -504,10 +504,7 @@ MODULE Parser
         THEN 
           IF Repairing 
           THEN 
-            Wr . PutText 
-              ( Options . TraceWrT 
-              , "(Repair) " 
-              )
+            Wr . PutText ( Options . TraceWrT , "(Repair) " )
           ELSE
             Wr . PutText
               ( Options . TraceWrT
@@ -599,7 +596,22 @@ MODULE Parser
       ; MiTempMarkListRef : ParseHs . TempMarkArrayRefTyp
         (* ^Just a convenient copy of TsTempMarkListRef, during merge. *) 
       ; MiTempMarkRangeTo : LbeStd . MarkNoTyp 
-      END (* MergeInfoTyp *) 
+      END (* MergeInfoTyp *)
+
+; PROCEDURE TraceTempMarkList ( ListRef : ParseHs . TempMarkArrayRefTyp ; Msg : TEXT )
+  = BEGIN 
+      IF Options . ParseTracing 
+         AND Options . TraceWrT # NIL 
+         AND NOT Wr . Closed ( Options . TraceWrT ) 
+      THEN 
+        Wr . PutText
+          ( Options . TraceWrT
+          , ParseHs . TempMarkListImage ( ListRef , Msg )
+          ) 
+      ; Wr . PutText ( Options . TraceWrT , Wr . EOL ) 
+      ; Wr . Flush ( Options . TraceWrT ) 
+      END (* IF *)
+     END TraceTempMarkList 
 
 (* We have to patch the FmtNo of temp marks while visiting the
    Fs node for an insertion token, when we know what the FmtNo is.
@@ -608,10 +620,6 @@ MODULE Parser
    which kind, nor do we have the EstRef.  So there are two patch
    procedures, one to patch FmtNos and the other to patch Kind and
    EstRef.
-
-   PatchTempMarksFmtNos is called only from within MergeSliceList, 
-   so could be nested inside it, but putting both here makes the
-   similarities easier to see, at the cost of passing more parameters. 
 
    For LeftSibFmtNo marks, we know the kind and all the fields at
    the time of visiting the Fs node, but calling both procedures 
@@ -648,15 +656,23 @@ MODULE Parser
   RAISES { AssertionFailure }
   (* ParseTrv will be making changes to its temp mark list, as it traverses
      the tree.  By the time of a reduce, when this is called, (but hot much
-     before, ParseTrv will have finished with all temp marks that are in the
+     before), ParseTrv will have finished with all temp marks that are in the
      reduced-from tokens and subtrees.  Here, we copy any such changes to
      the evolving trial state's list. 
   *)  
 
-  = BEGIN
-      IF ParseHs . RangeIsEmpty ( TokInfo . TiFullTempMarkRange )
+  = VAR LSeqNo : ParseHs . TmSeqNoTyp 
+
+  ; BEGIN
+      IF MergeInfo . MiTempMarkListRef = NIL THEN RETURN END (* IF *) 
+    ; WriteParseTraceText
+        ( "CopyFullTempMarks, range "
+          & ParseHs . TempMarkRangeImage ( TokInfo . TiFullTempMarkRange )
+        ) 
+    ; IF ParseHs . RangeIsEmpty ( TokInfo . TiFullTempMarkRange )
       THEN
-        Assert
+        TraceTempMarkList ( MergeInfo . MiTempMarkListRef , "     List:   " )
+      ; Assert
           ( ParseHs . RangeIsEmpty ( TokInfo . TiPatchTempMarkRange )
           , AFT . A_CopyFullTempMarks_patch_range_wo_full_range
           )
@@ -664,18 +680,26 @@ MODULE Parser
         IF LangUtil . TokClass ( ParseInfo . PiLang , TokInfo . TiTok )
            IN LbeStd . TokClassSetTerm
         THEN
-          FOR RTempMarkSs := TokInfo . TiFullTempMarkRange . From 
+          LSeqNo := MergeInfo . MiTempMarkListRef ^ [ 0 ] . SeqNo 
+        ; TraceTempMarkList ( MergeInfo . MiTempMarkListRef , "     Before: " ) 
+        ; FOR RTempMarkSs := TokInfo . TiFullTempMarkRange . From 
               TO TokInfo . TiFullTempMarkRange . To - 1
           DO
             MergeInfo . MiTempMarkListRef ^ [ RTempMarkSs ]
               := ParseInfo . PiTravTempMarkListRef ^ [ RTempMarkSs ]
-          END (* FOR *) 
+          END (* FOR *)
+        ; MergeInfo . MiTempMarkListRef ^ [ 0 ] . SeqNo := LSeqNo
+        ; TraceTempMarkList ( MergeInfo . MiTempMarkListRef , "     After:  " )
         ELSE (* ParseTrv should neither have made nor requested (of this
-                Parser), changes to marks in more comples subtrees. *) 
+                Parser), changes to marks in more complex subtrees. *) 
           Assert
             ( ParseHs . RangeIsEmpty ( TokInfo . TiPatchTempMarkRange )
             , AFT . A_CopyFullTempMarks_patch_range_wo_full_range
             )
+        ; LSeqNo := MergeInfo . MiTempMarkListRef ^ [ 0 ] . SeqNo
+        ; MergeInfo . MiTempMarkListRef ^ [ 0 ] . SeqNo
+            := ParseInfo . PiTravTempMarkListRef ^ [ 0 ] . SeqNo
+          (* M-i-c--k-e-y--m-o-u-s-e. *)
         ; FOR RTempMarkSs := TokInfo . TiFullTempMarkRange . From 
               TO TokInfo . TiFullTempMarkRange . To - 1
           DO
@@ -685,6 +709,7 @@ MODULE Parser
               , AFT . A_CopyFullTempMarks_changed_temp_mark_inside_Est 
               ) 
           END (* FOR *) 
+        ; MergeInfo . MiTempMarkListRef ^ [ 0 ] . SeqNo := LSeqNo
         END (* IF *) 
       END (* IF *) 
     END CopyFullTempMarks 
@@ -697,11 +722,20 @@ MODULE Parser
   (* Patch FmtNo fields of TempMarks in TempMarkRange.  *) 
   (* PRE: CopyFullTempMarks has been done. *)
 
-  = BEGIN 
-      FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
-      DO
-        TempMarkListRef ^ [ RTempMarkSs ] . TokMark . FmtNo := FmtNo
-      END (* FOR *) 
+  = BEGIN
+      IF NOT ParseHs . RangeIsEmpty ( TempMarkRange )
+      THEN 
+        WriteParseTraceText
+          ( "PatchTempMark FmtNos, range "
+            & ParseHs . TempMarkRangeImage ( TempMarkRange )
+          ) 
+      ; TraceTempMarkList ( TempMarkListRef , "    Before : " ) 
+      ; FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
+        DO
+          TempMarkListRef ^ [ RTempMarkSs ] . TokMark . FmtNo := FmtNo
+        END (* FOR *) 
+      ; TraceTempMarkList ( TempMarkListRef , "     After:  " )
+      END (* IF *) 
     END PatchTempMarkRangeFmtNos
 
 ; PROCEDURE PatchTempMarkRangeKindsAndEstRefs
@@ -714,14 +748,28 @@ MODULE Parser
   (* PRE: CopyFullTempMarks has been done. *)
 
   = BEGIN 
-      FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
-      DO WITH WTempMarkRec = TempMarkListRef ^ [ RTempMarkSs ] 
-         DO
-           WTempMarkRec . TokMark . Kind := MarkKind    
-         ; WTempMarkRec . EstRef := EstRef
-         END (* WITH *) 
-      END (* FOR *)
+      IF NOT ParseHs . RangeIsEmpty ( TempMarkRange )
+      THEN 
+        WriteParseTraceText
+          ( "PatchTempMarkRange, range "
+            & ParseHs . TempMarkRangeImage ( TempMarkRange )
+          ) 
+      ; TraceTempMarkList ( TempMarkListRef , "     Before: " ) 
+      ; FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
+        DO WITH WTempMarkRec = TempMarkListRef ^ [ RTempMarkSs ] 
+           DO
+             WTempMarkRec . TokMark . Kind := MarkKind    
+           ; WTempMarkRec . EstRef := EstRef
+           END (* WITH *) 
+        END (* FOR *)
+      ; TraceTempMarkList ( TempMarkListRef , "     After:  " )   
+      END (* IF *) 
     END PatchTempMarkRangeKindsAndEstRefs
+
+; PROCEDURE IntImage ( Value : IntSets . ValidElemT ) : TEXT 
+  = BEGIN
+      RETURN PortTypes . IntImage ( Value ) 
+    END IntImage 
 
 ; PROCEDURE PatchTempMarkSetKindsAndEstRefs
     ( TempMarkListRef : ParseHs . TempMarkArrayRefTyp  
@@ -742,8 +790,17 @@ MODULE Parser
       END PtmVisit 
 
   ; BEGIN (* PatchTempMarkSetKindsAndEstRefs *) 
-      IntSets . ForAllDo ( TempMarkSet , PtmVisit )
-    END PatchTempMarkSetKindsAndEstRefs 
+      IF NOT IntSets . IsEmpty ( TempMarkSet )
+      THEN 
+        WriteParseTraceText
+          ( "PatchTempMark set "
+            & IntSets . Image ( TempMarkSet , IntImage ) 
+          ) 
+      ; TraceTempMarkList ( TempMarkListRef , "     Before: " ) 
+      ; IntSets . ForAllDo ( TempMarkSet , PtmVisit )
+      ; TraceTempMarkList ( TempMarkListRef , "     After:  " ) 
+      END (* IF *) 
+    END PatchTempMarkSetKindsAndEstRefs
 
 ; PROCEDURE TempMarksForInsTok 
     ( VAR ParseInfo : ParseHs . ParseInfoTyp 
@@ -759,7 +816,9 @@ MODULE Parser
   = BEGIN
       IF LangUtil . TokClass ( ParseInfo . PiLang , TokInfo . TiTok )
          # LbeStd . TokClassTyp . TokClassConstTerm
-      THEN (* Not an insertion token. *) 
+         (* Not an insertion token. *)
+         OR TokInfo . TiIsDeletionRepair 
+      THEN 
         Assert
           ( ParseHs . RangeIsEmpty ( TokInfo . TiPatchTempMarkRange ) 
           , AFT . A_TempMarksForInsTok_Patch_marks_on_noninsertion_tok
@@ -773,12 +832,12 @@ MODULE Parser
           ) 
       ; IF NOT LangUtil . TokClass ( ParseInfo . PiLang , MergeInfo . MsEstTok )
                IN LbeStd . TokClassSetAsList
-               (* ^ Merging an Est fixed node.  Will later patch as ChildFmtNo. *)
+               (* ^ Merging into an Est fixed node.  Will later patch as
+                    ChildFmtNo. *)
            OR MergeInfo . MiRMChildRef = NIL 
               (* ^ No child yet.  Will later patch as RightSibFmtNo. *)
         THEN 
-          DeferTempMarkRange
-            ( MergeInfo , TokInfo . TiPatchTempMarkRange )
+          DeferTempMarkRange ( MergeInfo , TokInfo . TiPatchTempMarkRange )
         ELSE (* Patch as LeftSib.  We have enough info to do so right now. *)
           PatchTempMarkRangeKindsAndEstRefs 
             ( MergeInfo . MiTempMarkListRef 
@@ -794,23 +853,24 @@ MODULE Parser
       END (* IF *)
     END TempMarksForInsTok  
 
-; PROCEDURE EstChildNowArriving
+; PROCEDURE NoteEstChildImminent
     ( VAR ParseInfo : ParseHs . ParseInfoTyp 
     ; MergeInfo : MergeInfoTyp (* Fields can change. *)
     ; ChildRef : LbeStd . EstRootTyp
     )
-  (* Call this *after* merging an explicit EST child.  *) 
+  (* Call this *before* merging an explicit EST child.  *) 
   = BEGIN
       IF MergeInfo . MiRMChildRef = NIL 
-      THEN (* First, thus RM, child to be noted. *)
+      THEN (* ChildRef will be the irst, thus RM, child to be noted. *)
         IF LangUtil . TokClass ( ParseInfo . PiLang , MergeInfo . MsEstTok )
            IN LbeStd . TokClassSetAsList
         THEN
-          (* This is the RM child of a list.  Patch any deferred RightSib tempmarks.
-             These can only be trailing mods attached to this explicit child. *)
+          (* ChildRef will be the RM child of a list.  Patch any deferred
+             RightSib tempmarks.  These can only be trailing mods attached
+             to this explicit child. *)
           Assert
             ( ChildRef # NIL
-            , AFT . A_EstChildNowArriving_temp_mark_on_nil_child_of_list
+            , AFT . A_NoteEstChildImminent_temp_mark_on_nil_child_of_list
             )
         ; IF NOT IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet )
           THEN 
@@ -821,14 +881,13 @@ MODULE Parser
               , ChildRef
               ) 
           ; EstBuild . InclNextRightmostChildKindSet
-              ( MergeInfo , EstHs . EstChildKindSetContainsTempMark) 
-(* CHECK: ^That this will be copied up to the root of the Est. *)
+              ( MergeInfo , EstHs . EstChildKindSetContainsTempMark ) 
           ; MergeInfo . MiDeferredTempMarkSet := IntSets . Empty ( ) 
           END (* IF *) 
         END (* IF *) 
       ; MergeInfo . MiRMChildRef := ChildRef 
       END (* IF *) 
-    END EstChildNowArriving 
+    END NoteEstChildImminent 
 
 ; PROCEDURE InitMergeInfo 
     ( READONLY TrialState : TrialStateTyp 
@@ -916,13 +975,12 @@ MODULE Parser
                     , (* VAR *) ResultChildRelNodeNo := LFromNodeNo (* Dead. *)
                     , (* VAR *) ResultLeafElem := LFromLeafElem 
                     )
-                ; IF ISTYPE 
-                       ( LFromLeafElem . LeChildRef , ModHs . ModCmntTrailingTyp ) 
+                ; IF ISTYPE ( LFromLeafElem . LeChildRef , ModHs . ModCmntTrailingTyp ) 
                   THEN
                   
                   (* All of this slice and slices to its right are trailing mods.
                      It's too soon/rightward for TokInfo or TempMarks. *)
-                    EstChildNowArriving
+                    NoteEstChildImminent
                       ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
                   ; EstBuild . MergeSlice 
                       ( MergeInfo 
@@ -940,9 +998,8 @@ MODULE Parser
                       ) 
                   ELSE
                   
-                  (* Slice begins with a leading mod. *) 
-                    IF ISTYPE 
-                         ( LThruLeafElem . LeChildRef , ModHs . ModCmntTrailingTyp ) 
+                  (* Slice begins with a leading mod or AST child. *) 
+                    IF ISTYPE ( LThruLeafElem . LeChildRef , ModHs . ModCmntTrailingTyp ) 
                     THEN (* Begins with leading item and ends with trailing. *)
                     (* We have to split the slice, merge the trailing items,
                        take care of TempMarks (to get the mark bit in the 
@@ -967,7 +1024,7 @@ MODULE Parser
                         , AFT . A_MergeSliceList_MissingTrailingMod 
                         ) 
                       (* Merge the trailing mods. *) 
-                    ; EstChildNowArriving
+                    ; NoteEstChildImminent
                         ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
                     ; EstBuild . MergeSlice 
                         ( MergeInfo 
@@ -1023,7 +1080,7 @@ MODULE Parser
                           ( MergeInfo , TokInfo . TiTok ) 
                       ; LTokInfoIsUncounted := FALSE 
                       END (* IF *) 
-                    ; EstChildNowArriving
+                    ; NoteEstChildImminent
                         ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
                     ; EstBuild . MergeSlice 
                         ( MergeInfo 
@@ -1042,7 +1099,7 @@ MODULE Parser
                     END (* IF *) 
                   END (* IF *) 
                 ELSE (* Neither TokInfo nor TempMarks to deal with. *) 
-                  EstChildNowArriving
+                  NoteEstChildImminent
                     ( ParseInfo , MergeInfo , LThruLeafElem . LeChildRef )
                 ; EstBuild . MergeSlice 
                     ( MergeInfo 
@@ -1100,7 +1157,7 @@ MODULE Parser
                  We must turn it off.
               *) 
             END (* IF *) 
-          ; EstChildNowArriving
+          ; NoteEstChildImminent
               ( ParseInfo , MergeInfo , LSliceListElemRef ^ . SleNodeRef )
           ; EstBuild . MergeChild 
               ( MergeInfo 
@@ -1108,7 +1165,7 @@ MODULE Parser
               , LChildKindSet 
               , LIsFirstOfGroup 
               , GroupFmtNo := FmtNo 
-              ) 
+              )
           ; MergeInfo . MiLMNewChildRef := LSliceListElemRef ^ . SleNodeRef
           END (* IF SleIsSlice *) 
         ; LSliceListElemRef := LSliceListElemRef ^ . SlePredLink 
@@ -1345,8 +1402,11 @@ MODULE Parser
            OR RedOldBuildStackElemRef . BseWasInsertedByParser 
         THEN RETURN FALSE 
         ELSE 
-          LSliceListElemRef := RedOldBuildStackElemRef . BseTokInfo . TiInfo 
-          (* ^Implied NARROW, always OK. *)  
+          LSliceListElemRef
+            := NARROW
+                 ( RedOldBuildStackElemRef . BseTokInfo . TiInfo
+                 , ParseHs . SliceListElemRefTyp
+                 ) 
         ; IF LSliceListElemRef = NIL 
           THEN (* No subtree at all. *)  
             RETURN FALSE 
@@ -1514,7 +1574,7 @@ MODULE Parser
       Get this working. Maybe just close DelMods lazily? 
 *) 
             THEN (* Close the ModDel and merge it. *) 
-              EstChildNowArriving ( ParseInfo , RedMergeInfo , RedModDelRef )
+              NoteEstChildImminent ( ParseInfo , RedMergeInfo , RedModDelRef )
             ; EstBuild . MergeChild 
                 ( RedMergeInfo 
                 , RedModDelRef 
@@ -1719,7 +1779,7 @@ MODULE Parser
           ; Assertions . MessageText 
               ( "Parser inserted DummyTempMark, for RightSibFmtNo TempMark." )
           (* Dummy will have no temp marks. *) 
-          ; EstChildNowArriving ( ParseInfo , RedMergeInfo , LChild )
+          ; NoteEstChildImminent ( ParseInfo , RedMergeInfo , LChild )
           ; EstBuild . MergeChild 
               ( RedMergeInfo 
               , EstRef := LChild 
@@ -1731,7 +1791,7 @@ MODULE Parser
           ELSIF ParseInfo . PiInsertNilFixedChildren 
           THEN (* Merge a NIL for the absent child. *) 
           (* NIL will have no temp marks. *) 
-            EstChildNowArriving ( ParseInfo , RedMergeInfo , ChildRef := NIL )
+            NoteEstChildImminent ( ParseInfo , RedMergeInfo , ChildRef := NIL )
           ; EstBuild . MergeChild 
               ( RedMergeInfo 
               , EstRef := NIL  
@@ -2149,11 +2209,7 @@ TRUE OR
            AND NOT Wr . Closed ( Options . TraceWrT ) 
         THEN 
           IF Repairing 
-          THEN 
-            Wr . PutText 
-              ( Options . TraceWrT 
-              , "(Repair) " 
-              )           
+          THEN Wr . PutText ( Options . TraceWrT , "(Repair) " )           
           END (* IF *) 
         ; Wr . PutText 
             ( Options . TraceWrT 
@@ -2168,8 +2224,7 @@ TRUE OR
             Wr . PutText 
               ( Options . TraceWrT 
               , " BUILD " 
-                & LangUtil . TokImage 
-                    ( ReduceInfo . BuildTok , ParseInfo . PiLang ) 
+                & LangUtil . TokImage ( ReduceInfo . BuildTok , ParseInfo . PiLang ) 
               ) 
            END (* IF *) 
         ; Wr . PutText 
@@ -2181,8 +2236,7 @@ TRUE OR
               & Wr . EOL 
             ) 
 
-        ; Wr . PutText 
-            ( Options . TraceWrT , "  ParseStack:" & Wr . EOL ) 
+        ; Wr . PutText ( Options . TraceWrT , "  ParseStack:" & Wr . EOL ) 
         ; LP := TrialState . TsParseStackTopRef 
         ; WHILE LP # NIL AND LP # RedDeepestParseStackElemRef 
           DO
@@ -2208,8 +2262,7 @@ TRUE OR
           ; Wr . PutText ( Options . TraceWrT , Wr . EOL ) 
           END (* IF *) 
 
-        ; Wr . PutText 
-            ( Options . TraceWrT , "  BuildStack:" & Wr . EOL ) 
+        ; Wr . PutText ( Options . TraceWrT , "  BuildStack:" & Wr . EOL ) 
         ; LB := TrialState . TsBuildStackTopRef 
         ; WHILE LB # NIL AND LB # RedDeepestBuildStackElemRef 
           DO
@@ -2259,8 +2312,7 @@ TRUE OR
             Wr . PutText ( Options . TraceWrT , "Parse top" )
           ; Wr . PutText 
               ( Options . TraceWrT 
-              , Fmt . Pad 
-                  ( Misc . RefanyImage ( ParseStackTopRef ) , RefanyPad ) 
+              , Fmt . Pad ( Misc . RefanyImage ( ParseStackTopRef ) , RefanyPad ) 
               ) 
           ; Wr . PutText ( Options . TraceWrT , ", Tok " )
           ; Wr . PutText 
@@ -2270,9 +2322,7 @@ TRUE OR
               )  
           ; Wr . PutText ( Options . TraceWrT , ", LRState " ) 
           ; Wr . PutText 
-              ( Options . TraceWrT 
-              , Fmt . Int ( ParseStackTopRef . PseLRState ) 
-              )  
+              ( Options . TraceWrT , Fmt . Int ( ParseStackTopRef . PseLRState ) )  
           ; Wr . PutText ( Options . TraceWrT , ", InputTok " )
           ; Wr . PutText 
               ( Options . TraceWrT 
@@ -2293,8 +2343,7 @@ TRUE OR
             Wr . PutText ( Options . TraceWrT , "  Build top" )
           ; Wr . PutText 
               ( Options . TraceWrT 
-              , Fmt . Pad 
-                  ( Misc . RefanyImage ( BuildStackTopRef ) , RefanyPad ) 
+              , Fmt . Pad ( Misc . RefanyImage ( BuildStackTopRef ) , RefanyPad ) 
               ) 
           ; Wr . PutText ( Options . TraceWrT , ", Tok " )
           ; Wr . PutText 
@@ -2337,14 +2386,30 @@ TRUE OR
             StateList . SlOldest 
               := ( StateList . SlOldest + 1 ) MOD StateListMax 
           END (* IF *)
-        ; WITH WOldTrialState = StateList . SlStates [ LOldLatest ] 
-               , WNewTrialState = StateList . SlStates [ StateList . SlLatest ]
-          DO WNewTrialState := WOldTrialState
-          ; WNewTrialState . TsTempMarkListRef
-              := ParseHs . CopyOfTempMarkList
-                   ( WOldTrialState . TsTempMarkListRef )
-          ; WNewTrialState . TsJustShifted := FALSE 
-          END (* WITH *)
+        ; IF StateList . SlLatest = LOldLatest
+          THEN (* No need to copy state or its temp mark list, which will never
+                  be backtracked-to. *)
+            WriteParseTraceText
+              ( "Reuse temp mark list" 
+                & ParseHs . TempMarkListImage
+                    ( StateList . SlStates [ LOldLatest ] . TsTempMarkListRef ) 
+              ) 
+          ELSE 
+            WITH WOldTrialState = StateList . SlStates [ LOldLatest ] 
+                 , WNewTrialState = StateList . SlStates [ StateList . SlLatest ]
+            DO WNewTrialState := WOldTrialState
+            ; WNewTrialState . TsTempMarkListRef
+                := ParseHs . CopyOfTempMarkList ( WOldTrialState . TsTempMarkListRef )
+
+            (* Trace the copy. *)
+            ; TraceTempMarkList
+                ( WOldTrialState . TsTempMarkListRef , "Copy temp mark list from:" )
+            ; TraceTempMarkList
+                ( WNewTrialState . TsTempMarkListRef , "Copy temp mark list to:  " )
+
+            ; WNewTrialState . TsJustShifted := FALSE 
+            END (* WITH *)
+          END (* IF *) 
         END (* IF *) 
 
       (* Now do the real reduce. *) 
@@ -2604,6 +2669,7 @@ TRUE OR
               ; WTokInfo . TiPatchTempMarkRange := ParseHs . TempMarkRangeNull 
               END (* IF *)
             ; WTokInfo . TiIsInsertionRepair := FALSE 
+            ; WTokInfo . TiIsDeletionRepair := FALSE 
             END (* WITH WTokInfo *) 
           ; LNewBuildStackElemRef . BseWasInsertedByParser := FALSE 
           ; LNewBuildStackElemRef . BseWasDeletedByParser := FALSE 
@@ -2879,22 +2945,20 @@ TRUE OR
     END LRMachine 
 
 ; PROCEDURE RepairCostSum 
-    ( Left , Right : LbeStd . RepairCostTyp ) : LbeStd . RepairCostTyp 
+    ( Left , Right : LbeStd . RepairCostTyp ) : LbeStd . RepairCostTyp
+  (* Saturates at LbeStd . RepairCostInfinity. *) 
 
-  = VAR LSum : PortTypes . Card32Typ 
+  = VAR LSum : INTEGER 
 
   ; BEGIN (* RepairCostSum *) 
       IF Left = LbeStd . RepairCostInfinity 
          OR Right = LbeStd . RepairCostInfinity 
-      THEN 
-        RETURN LbeStd . RepairCostInfinity 
+      THEN RETURN LbeStd . RepairCostInfinity 
       ELSE 
         LSum := Left + Right 
       ; IF LSum >= LbeStd . RepairCostInfinity 
-        THEN 
-          RETURN LbeStd . RepairCostInfinity 
-        ELSE 
-          RETURN LSum 
+        THEN RETURN LbeStd . RepairCostInfinity 
+        ELSE RETURN LSum 
         END (* IF *) 
       END (* IF *) 
     END RepairCostSum 
@@ -2941,6 +3005,7 @@ TRUE OR
         END (* IF *) 
       ; TokInfo . TiTok := Tok 
       ; TokInfo . TiIsInterior := FALSE 
+      ; TokInfo . TiIsDeletionRepair := FALSE 
       ; TokInfo . TiIsInsertionRepair := TRUE  
       ; TokInfo . TiSyntTokCt := 1 
       ; TokInfo . TiFullTempMarkRange := ParseHs . TempMarkRangeEmpty 
@@ -3090,26 +3155,29 @@ TRUE OR
       ; VAR (* IN OUT *) TrialState : TrialStateTyp 
       ) 
     RAISES { AssertionFailure } 
-    (* Construct antideletion insertion mod *) 
+    (* Construct a ModTok to reverse a parser deletion of TokInfo, and
+       put it into the TokIinfo's slice list, as a leading mod. *) 
 
     = VAR LMergeInfo : MergeInfoTyp 
     ; VAR LNewEstRef : EstHs . EstRefTyp 
     ; VAR LSliceListElemRef : ParseHs . SliceListElemRefTyp 
     ; VAR LNewBuildStackElemRef : ParseHs . BuildStackElemRefTyp
     ; VAR LTempMarkRange : ParseHs . TempMarkRangeTyp 
-    ; VAR LDoRepatch : BOOLEAN 
+    ; VAR LDoPatch : BOOLEAN 
 
     ; BEGIN (* RepConstructAntideletion *) 
         IF TokInfo . TiIsInsertionRepair  
-           (* Go ahead and delete without creating a ModTok (i.e. a proposed 
-              deletion), a repair that was inserted in a previous parse. 
+           (* This token was inserted by a previous parse, as a repair.
               NOTE: At the time of coding, ParseTrv doesn't give these to
                     Parser anyway, but this is defensive. 
               NOTE: If this could happen, we would have to do something
                     about temp marks in the deleted token. 
            *) 
-        THEN 
-        ELSE 
+        THEN (* Go ahead and delete without creating a ModTok (i.e. a suggested 
+                deletion), a repair that was inserted in a previous parse. *) 
+        ELSE
+        
+        (* Build a ModTok. *)
           LMergeInfo := NEW ( MergeInfoTyp ) 
         ; InitMergeInfo ( TrialState , (* VAR *) LMergeInfo ) 
         ; EVAL EstBuild . InitMergeState 
@@ -3121,15 +3189,17 @@ TRUE OR
                  ) 
         
         (* It would be cleaner to add EstChildKindContainsDeletionRepair to
-           the Est child of the ModTok node (this could only be a string),
-           but it could involve taking apart a slice and differentiating
+           the Est child of the ModTok node (this could only be an Ast string),
+           but that could involve taking apart a slice and differentiating
            some K-tree nodes.  Instead, we make traversers propagate the 
            property down from the ModTok node. 
         *)
-        ; LDoRepatch
+        ; LDoPatch
             := NOT ParseHs . RangeIsEmpty ( TokInfo . TiPatchTempMarkRange )
-        ; IF LDoRepatch
-          THEN 
+        ; IF LDoPatch
+          THEN (* This token has temp marks, which implies it is an insertion
+                  token.  The temp marks will need to be repatched to be
+                  ChildFmtNo marks of the new ModTok. *)
             Assert
               ( LangUtil . TokClass ( ParseInfo . PiLang , TokInfo . TiTok )
                 = LbeStd . TokClassTyp . TokClassConstTerm 
@@ -3152,13 +3222,13 @@ TRUE OR
             , (* VAR *) ResultTreeRef := LNewEstRef 
             )
 
-        ; IF LDoRepatch 
+        ; IF LDoPatch 
           THEN
             Assert
               ( IntSets . IsEmpty ( LMergeInfo . MiDeferredTempMarkSet )
               , AFT . A_RepConstructAntideletion_deferred_temp_marks
               ) 
-            (* Change FmtNo marks to Plain, denoting the explicit ModTok. *)
+          (* Change FmtNo marks to ChildFmtNo, denoting the insertion tok. *)
           ; PatchTempMarkRangeFmtNos
               ( TrialState . TsTempMarkListRef
               , LTempMarkRange 
@@ -3167,16 +3237,17 @@ TRUE OR
           ; PatchTempMarkRangeKindsAndEstRefs
               ( TrialState . TsTempMarkListRef
               , LTempMarkRange 
-              , MarkKindTyp . Plain
+              , MarkKindTyp . ChildFmtNo 
               , LNewEstRef
               ) 
-        ; LNewEstRef . EstChildKindSet
-            := LNewEstRef . EstChildKindSet
-               + EstHs . EstChildKindSetContainsTempMark
+          ; LNewEstRef . EstChildKindSet
+              := LNewEstRef . EstChildKindSet
+                 + EstHs . EstChildKindSetContainsTempMark
+          ; TokInfo . TiPatchTempMarkRange := LTempMarkRange 
+            (* ^Put it back, in case there is a different parse path later. *)
           END (* IF *) 
 
-        ; FinishMergeInfo 
-            ( (* READONLY *) ParseInfo , LMergeInfo , LNewEstRef )  
+        ; FinishMergeInfo ( (* READONLY *) ParseInfo , LMergeInfo , LNewEstRef ) 
         ; LSliceListElemRef := NEW ( ParseHs . SliceListElemRefTyp ) 
         ; LSliceListElemRef ^ . SleNodeRef := LNewEstRef 
         ; LSliceListElemRef ^ . SlePredLink := NIL 
@@ -3185,15 +3256,18 @@ TRUE OR
             := ( LNewEstRef . EstChildKindSet * EstHs . EstChildKindSetCopyUp )
                + EstHs . EstChildKindSetModTok 
         ; LNewBuildStackElemRef := NEW ( ParseHs . BuildStackElemRefTyp ) 
-        ; LNewBuildStackElemRef . BseLink 
-            := TrialState . TsWaitingBuildStackElemRef 
         ; LNewBuildStackElemRef . BseTokInfo := TokInfo 
         ; LNewBuildStackElemRef . BseTokInfo . TiInfo := LSliceListElemRef 
-        ; LNewBuildStackElemRef . BseTokInfo . TiSliceListRMRoot 
+        ; LNewBuildStackElemRef . BseTokInfo . TiSliceListRMRoot
             := LSliceListElemRef 
-          (* ^Just to simplify debugging. *) 
+          (* ^Just to simplify debugging. *)
+        ; LNewBuildStackElemRef . BseTokInfo . TiPatchTempMarkRange
+            := ParseHs . TempMarkRangeEmpty (* We already patched 'em. *)
+        ; LNewBuildStackElemRef . BseTokInfo . TiIsDeletionRepair := TRUE 
         ; LNewBuildStackElemRef . BseWasDeletedByParser := TRUE 
         ; LNewBuildStackElemRef . BseWasInsertedByParser := FALSE 
+        ; LNewBuildStackElemRef . BseLink 
+            := TrialState . TsWaitingBuildStackElemRef 
         ; TrialState . TsWaitingBuildStackElemRef 
             := LNewBuildStackElemRef 
         END (* IF TiIsInsertionRepair ELSE *) 
@@ -3663,6 +3737,7 @@ TRUE OR
         DO WTokInfo . TiTok := LbeStd . Tok__Null 
         ; WTokInfo . TiPatchTempMarkRange := ParseHs . TempMarkRangeNull 
         ; WTokInfo . TiIsInsertionRepair := FALSE 
+        ; WTokInfo . TiIsDeletionRepair := FALSE 
         ; WTokInfo . TiInfo := LNewSliceListElemRef 
         ; WTokInfo . TiSliceListRMRoot := LNewSliceListElemRef 
           (* ^Just to simplify debugging. *) 
@@ -3757,7 +3832,7 @@ TRUE OR
   ; VAR LAccepted : BOOLEAN 
 
   ; BEGIN (* Parse *) 
-      WriteTraceParseBegin ( ) 
+      WriteTraceParseBegin ( )
     ; GSingletonListCt := 0 
     ; GSingletonListOptCt := 0 
     ; ParseInfo . PiAttemptedRepairActionCt := 0 

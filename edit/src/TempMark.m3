@@ -1,4 +1,3 @@
-
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
 (* Copyright 1988..2020, Rodney M. Bates.                                    *)
@@ -1829,6 +1828,9 @@ MODULE TempMark
           THEN 
             ParseInfo . PiOrigTempMarkListRef 
               := NEW ( ParseHs . TempMarkArrayRefTyp , BtmTempMarkCt ) 
+          ; IF BtmTempMarkCt > 0
+            THEN ParseInfo . PiOrigTempMarkListRef ^ [ 0 ] . SeqNo := 0
+            END (* IF *)
           ; FOR RI := 0 TO NUMBER ( ParseInfo . PiOrigTempMarkListRef ^ ) - 1 
             DO 
               WITH WTempMark = ParseInfo . PiOrigTempMarkListRef ^ [ RI ] 
@@ -1839,8 +1841,8 @@ MODULE TempMark
             END 
           ; BtmTempMarkNextElemNo := 0 
           ; BtmLineMarkMeat := ImageRef . ItPers . IpMarkHeader . LmRightLink  
-          ; LOOP (* One iteration of this loop handles a group of marks 
-                    that are based on the same line mark.  Sometimes, it
+          ; LOOP (* One iteration of this loop fills in a group of marks 
+                    that are built from the same line mark.  Sometimes, it
                     traverses into the next line too, if marks based on
                     the line mark have to be turned into TempMarks on things
                     in the succeeding line. *) 
@@ -1900,6 +1902,8 @@ MODULE TempMark
 ; TYPE ProcTyp = PROCEDURE ( ) RAISES { AssertionFailure }  
 
 ; PROCEDURE ProcNoop ( ) = BEGIN (* ProcNoop *) END ProcNoop
+
+; VAR GDoUnmark : BOOLEAN := TRUE 
 
 (* VISIBLE *) 
 ; PROCEDURE RebuildMarkList 
@@ -1973,7 +1977,7 @@ MODULE TempMark
   ; VAR RbmMaxLineBreakCt : CARDINAL (* Just for statistics. *) 
   ; VAR RbmCurrentLineTokMark : Marks . TokMarkTyp 
   ; VAR RbmEstRefForTrailingMarks : LbeStd . EstRootTyp 
-    (* Non-NIL means a trailing mark was found.  *) 
+        (* Non-NIL means a trailing mark was found.  *) 
   ; VAR RbmLineMarkMeat : PaintHs . LineMarkMeatTyp 
   ; VAR RbmLastFmtNoOnLine : EstHs . FmtNoTyp 
   ; VAR RbmEstListChildrenToPass : LbeStd . EstChildNoTyp 
@@ -2013,9 +2017,7 @@ MODULE TempMark
         THEN 
           Assert 
             ( ISTYPE 
-                ( RbmLineMarkMeat . LmRightLink 
-                , PaintHs . LineMarkHeaderTyp 
-                ) 
+                ( RbmLineMarkMeat . LmRightLink , PaintHs . LineMarkHeaderTyp ) 
             , AFT . A_RbmIncTempMark_ExtraMarks 
             ) 
         ; RETURN TRUE 
@@ -2026,25 +2028,28 @@ MODULE TempMark
             = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
           , WOldTempMark 
             = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo - 1 ] 
-          DO RETURN 
-               WNewTempMark . TokMark . Kind 
-                  # WOldTempMark . TokMark . Kind 
-               OR WNewTempMark . TokMark . FmtNo 
-                  # WOldTempMark . TokMark . FmtNo 
-               OR WNewTempMark . EstRef # CurrentMarkEstRef 
-               (* Since subtrees and strings can be shared, it is possible 
-                  that the same node appears in two places in a tree,
-                  getting us to here with them incorrectly looking the saame.
-                  The EstNodeNo fields are in the tree before parsing, and
-                  are not adjusted for the changes due to reparsing, but 
-                  they will still be equal iff the two nodes are at the same
-                  place in the reparsed tree. 
-               *) 
-               OR WNewTempMark . TokMark . EstNodeNo 
-                  # WOldTempMark . TokMark . EstNodeNo  
+          DO IF WNewTempMark . TokMark . Kind # WOldTempMark . TokMark . Kind
+            THEN RETURN TRUE 
+            ELSIF WNewTempMark . TokMark . FmtNo # WOldTempMark . TokMark . FmtNo 
+            THEN RETURN TRUE 
+            ELSIF WNewTempMark . EstRef # CurrentMarkEstRef 
 (* CHECK: Is there any remaining reason to use CurrentMarkEstRef, or can we
           just compare to WOldTempMark.EstRef? 
 *) 
+            THEN RETURN TRUE 
+            ELSIF WNewTempMark . TokMark . EstNodeNo
+                  # WOldTempMark . TokMark . EstNodeNo  
+                  (* ^Since subtrees and strings can be shared, it is possible 
+                     that the same node appears in two places in a tree,
+                     getting us to here with them incorrectly looking the same.
+                     The EstNodeNo fields are in the tree before parsing, and
+                     are not adjusted for the changes due to reparsing, but 
+                     they will still be equal iff the two nodes are at the same
+                     place in the reparsed tree. 
+                  *)
+            THEN RETURN TRUE 
+            ELSE RETURN FALSE
+            END (* IF *) 
           END (* WITH *) 
         END (* IF *) 
       END RbmIncTempMark 
@@ -2198,7 +2203,7 @@ MODULE TempMark
           THEN 
             RbmTeCurrentChildNoToPatch := RbmTeEstTravInfo . EtiChildNo 
           END (* IF *) 
-        END RbmTeDecEstChild 
+        END RbmTeDecEstChild
 
     ; PROCEDURE RbmTeUnmarkCurrentChild ( ) 
 
@@ -2942,12 +2947,12 @@ MODULE TempMark
                    , AFT . A_RbmTeTfsLeadingModsNoDel_NoMarkOnMod 
                    ) 
               ; Assert 
-                    ( ModCmnt 
-                      = ParseInfo . PiFinalTempMarkListRef ^ 
-                        [ RbmTempMarkElemNo ] 
-                        . EstRef  
-                    , AFT . A_RbmTeTfsLeadingModsNoDel_MarkedModMismatch 
-                    ) 
+                  ( ModCmnt 
+                    = ParseInfo . PiFinalTempMarkListRef ^ 
+                      [ RbmTempMarkElemNo ] 
+                      . EstRef  
+                  , AFT . A_RbmTeTfsLeadingModsNoDel_MarkedModMismatch 
+                  ) 
               ; RbmTeTfsBolCmntIntoFwdNl ( ModCmnt ) 
 
               | RbmStateBwdNl 
@@ -4260,8 +4265,7 @@ MODULE TempMark
       = BEGIN (* RbmTeComputeEstAndFmtNoForDescend *) 
           RbmTeFmtNo := EstHs . FmtNoNull (* Dead. *) 
         ; IF RbmTempMarkElemNo >= RbmTempMarkElemCt 
-          THEN 
-            RbmTeDoneWEst := TRUE 
+          THEN RbmTeDoneWEst := TRUE 
           ELSE 
             RbmTeDoneWEst := FALSE 
           ; WITH 
@@ -4277,6 +4281,8 @@ MODULE TempMark
                       AND RbmTeEstTravInfo . EtiParentRef . EstNodeKind
                           = EstHs . EstNodeKindTyp . EstNodeKindModTok
                    THEN
+                     (* This should no longer happen.  This case should be
+                        marked as ChildFmtNo. *) 
                      RbmTeFmtNo := EstHs . FmtNoModTok (* Probably dead. *) 
                    ELSE
                      Assert 
@@ -4293,18 +4299,13 @@ MODULE TempMark
                   RbmTeDoneWEst := TRUE 
 
                 | MarkKindTyp . ChildFmtNo 
-                => Assert 
-                    ( RbmTeEstTravInfo . EtiChildCt > 0 
-                    , AFT . A_RbmTeComputeEstAndFmtNoForDescend_ChildFmtNo_with_children 
-                    ) 
-                ; RbmTeFmtNo := WTempMark . TokMark . FmtNo 
-                  (* ^Arrange to visit the insertion token. *) 
+                => RbmTeFmtNo := WTempMark . TokMark . FmtNo 
+                   (* ^Arrange to visit the insertion token.  Could be a ModTok. *) 
                 ELSE 
                   CantHappen 
                     ( AFT . A_RbmTeComputeEstAndFmtNoForDescend_BadMarkKind 
                     ) 
-                  (* ^For a LeftSib or RightSib mark, we will not descend into
-                     its tree. 
+                  (* ^For a LeftSib mark, we will not descend into its tree. 
                   *) 
                 END (* CASE *) 
               ELSIF RbmTeEstTravInfo . EtiChildCt <= 0 
@@ -4745,8 +4746,8 @@ FALSE AND             WTempMark . EstRef
 
   ; BEGIN 
       LElemCt := ImageTrans . ItPers . IpMarkCt 
-    ; SavedMarkListRef 
-        := NEW ( ParseHs . TempMarkArrayRefTyp, LElemCt ) 
+    ; SavedMarkListRef := NEW ( ParseHs . TempMarkArrayRefTyp, LElemCt )
+    ; IF LElemCt > 0 THEN SavedMarkListRef ^ [ 0 ] . SeqNo := 0 END (* IF *)
     ; LElemNo := 0  
     ; LLineMarkMeat := ImageTrans . ItPers . IpMarkHeader . LmRightLink 
     ; LOOP 
@@ -4760,8 +4761,7 @@ FALSE AND             WTempMark . EstRef
         ; IF LElemNo >= LElemCt 
           THEN 
             Assert 
-              ( LLineMarkMeat . LmRightLink 
-                = ImageTrans . ItPers . IpMarkHeader
+              ( LLineMarkMeat . LmRightLink = ImageTrans . ItPers . IpMarkHeader
               , AFT . A_SavePermanentMarks_Low_IpMarkCt 
               ) 
           ; EXIT (* The normal exit. *) 
