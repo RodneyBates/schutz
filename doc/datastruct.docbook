@@ -29,6 +29,18 @@
     </para>
 
     <para>
+      For each language, there is a single flat space of token
+      codes, of several kinds.  The lowest numbered are common
+      to all languages and have special porposes.  These are
+      declared in LbdStd.i3.  For each langauge, there are
+      several categories of codes.
+      <em>constant terminals</em>.
+    </para>
+
+    <para>
+    </para>
+
+    <para>
       In a usual ast, a leaf node corresponds to a lexical token that,
       for parsing purposes, is a terminal in the grammar of the language,
       but has additional information attached, for uses beyond parsing.   
@@ -172,12 +184,6 @@
       be inserted.  It can also apply to a line break.  Unlike any other
       kind of modifier, it also gives an ending fmtno, so one modifier can
       delete multiple fsnos.  
-    </para>
-
-    <para>
-    </para>
-
-    <para>
     </para>
 
     <para>
@@ -443,11 +449,12 @@
 
     <para>
       For a fill line break, some traversal is unavoidable, but although
-      it is algorithmically rich, it need not traverse very far, so it
-      is not computationally demanding.  
+      it is a bit complex algorithmically, it need not traverse very far, so it
+      is not too computationally demanding.  
     </para>
 
     <para>
+      
     </para>
 
     <para>
