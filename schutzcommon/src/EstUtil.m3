@@ -104,15 +104,22 @@ MODULE EstUtil
   RAISES { AssertionFailure } 
   (* The FsNodeRef of the root of the format tree for an Est node,
      or an FsNode of FsKindAstString, for an AstString. 
-  *) 
+  *)
+
+(* TODO: Do we really need all this back-and-forth between LangUtil
+         (FrRuleForEstChild, FsRuleForTok) and here? *) 
 
   = VAR LTok : LbeStd . TokTyp
   ; VAR LIsPlaceholder : BOOLEAN := FALSE  
 
   ; BEGIN 
       TYPECASE NodeRef 
-      OF ModHs . ModRefTyp (* Including NIL *)  
-      => RETURN NIL 
+      OF NULL => LTok := LbeStd . Tok__Null 
+
+(* Why? 
+      | ModHs . ModRefTyp 
+      => RETURN NIL
+*)
 
       | SharedStrings . T ( TSharedString ) 
       => LTok := SharedStrings . Tok ( TSharedString ) 
@@ -125,7 +132,7 @@ MODULE EstUtil
       => LTok := TEstRef . EstTok 
 
       | ModHs . EstDummyTyp 
-      => RETURN NIL 
+      => LTok := LbeStd . Tok__Empty 
 
       ELSE 
         CantHappen ( AFT . A_EstUtilDotEstTokBadObjType ) 
@@ -334,14 +341,14 @@ MODULE EstUtil
 ; PROCEDURE EstNodeImageBrief 
     ( NodeRef : LbeStd . EstRootTyp 
     ; Indent := LbeStd . StdIndent 
-    ; NodeNo : LbeStd . EstNodeNoTyp 
+    ; <* UNUSED *> NodeNo : LbeStd . EstNodeNoTyp 
     ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
     ) 
   : TEXT 
   RAISES { AssertionFailure } 
   (* ^Also works on NIL, giving "NIL" *) 
 
-  = VAR LNodeImage , LChildrenImage , LResult : TEXT
+  = VAR LResult : TEXT
 
   ; BEGIN (* EstNodeImageBrief *) 
       TYPECASE NodeRef 
@@ -745,7 +752,6 @@ MODULE EstUtil
     ; READONLY Right : EstHs . WidthInfoTyp 
     ) 
   : LbeStd . LimitedCharNoTyp 
-  RAISES { AssertionFailure } 
   (* Prepend a left starting CharPos to a right WidthInfo, giving an ending
      CharPos. 
      Return infinity if won't fit on a full-length line. 

@@ -1629,9 +1629,24 @@ MODULE LangUtil
       RETURN GTopFsNodeRef
     END TopFsNodeRef
 
+; PROCEDURE StdStuffForEmpty ( Tok : LbeStd . TokTyp )
+
+  = <* FATAL AssertionFailure *> 
+    BEGIN (* StdStuffForEmpty *)
+      StdTokFsTreeMap [ Tok ]
+        := NEW
+             ( FsNodeRefTyp
+             , FsIndentCode := IndentCodeInitial
+             , FsTok := Tok
+             , FsKind := FsKindTyp . FsKindNull
+             , FsFormatsEmpty := UbTrue  
+             , FsLdlNodeNo := LbeStd . EstNodeNoNull 
+             )
+    ; StdTokStringMap [ Tok ] := SharedStrings . FromText ( "" ) 
+    END StdStuffForEmpty 
+
 ; PROCEDURE StdStuffForVarTerminal
-    ( Tok : LbeStd . TokTyp ; PlaceholderText : TEXT
-    )
+    ( Tok : LbeStd . TokTyp ; PlaceholderText : TEXT )
 
   = <* FATAL AssertionFailure *> 
     BEGIN (* StdStuffForVarTerminal *)
@@ -1767,7 +1782,9 @@ MODULE LangUtil
 ; PROCEDURE StdStuffForOther ( )
 
   = BEGIN
-      StdStuffForLexErrModTok ( ) 
+      StdStuffForEmpty ( LbeStd . Tok__Null ) 
+    ; StdStuffForEmpty ( LbeStd . Tok__Empty ) 
+    ; StdStuffForLexErrModTok ( ) 
     ; StdStuffForAugment ( ) 
     END StdStuffForOther 
 

@@ -4419,7 +4419,7 @@ FALSE AND             WTempMark . EstRef
           ; RbmTeRMChildKindSet := EstHs . EstChildKindSetEmpty 
           ; RbmTeFmtNo := 0 
           ; RbmTeDoneWEst := FALSE 
-          ; IF RootFsNodeRef . FsChildren = NIL 
+          ; IF RootFsNodeRef = NIL OR RootFsNodeRef . FsChildren = NIL 
             THEN LFsChildCt := 0 
             ELSE LFsChildCt := NUMBER ( RootFsNodeRef . FsChildren ^ ) 
             END (* IF *) 

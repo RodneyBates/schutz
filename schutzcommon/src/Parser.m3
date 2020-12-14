@@ -2445,7 +2445,8 @@ TRUE OR
             LReduceToPartial := FALSE 
           END (* IF *) 
 
-        ; IF LFsNodeRef = NIL 
+        ; IF LFsNodeRef = NIL
+             OR LFsNodeRef . FsKind = FsKindTyp . FsKindNull 
           THEN (* Nothing to build.  Fiddle with parse stack only. *) 
             IF WReduceInfo . RhsLen = 0 
             THEN (* Reduce empty to some nonterminal. *) 

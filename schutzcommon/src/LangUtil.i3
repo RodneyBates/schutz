@@ -244,6 +244,8 @@ INTERFACE LangUtil
 ; CONST FsKindSetEmpty = FsKindSetTyp { } 
     (* ^Not used 10-97 *) 
 
+; CONST FsKindSetNull = FsKindSetTyp { FsKindTyp . FsKindNull } 
+
 ; CONST FsKindSetLineBreak 
     = FsKindSetTyp 
         { FsKindTyp . FsKindLineBreakOpt
@@ -308,7 +310,7 @@ INTERFACE LangUtil
 
 ; CONST FsKindSetFsRoot 
     = FsKindSetEstFixed + FsKindSetEstList + FsKindSetAstString 
-      + FsKindSetInsTok 
+      + FsKindSetInsTok + FsKindSetNull  
 
 ; CONST FsKindSetFormattingFixed 
     = FsKindSetTyp 

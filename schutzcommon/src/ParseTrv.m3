@@ -5901,7 +5901,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
   ; BEGIN (* InitParseEst *) 
       Assert ( EstRef # NIL , AFT . A_InitParseEstReparseNILEst )
 
-; TreeBrowse.Browse (EstRef,ParseInfo.PiLang,"In InitParseEst" )
+(* ; TreeBrowse.Browse (EstRef,ParseInfo.PiLang,"In InitParseEst" ) *)
 
     ; ParseInfo . PiParseKind := LbeStd . ParseKindTyp . ParseKindTrav
     ; ParseInfo . PiTravTempMarkListRef
