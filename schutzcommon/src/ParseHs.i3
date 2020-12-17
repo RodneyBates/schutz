@@ -372,6 +372,9 @@ INTERFACE ParseHs
     = RECORD 
         ObjRef : LbeStd . EstRootTyp := NIL 
       ; KindSet : EstHs . EstChildKindSetTyp := EstHs . EstChildKindSetEmpty  
+      ; WaitingTempMarkRange : TempMarkRangeTyp := TempMarkRangeNull
+        (* ^Holds NpsTempMarkRange, which is almost always empty,
+            but not quite. *)
       ; FullTempMarkRange : TempMarkRangeTyp := TempMarkRangeNull
         (* ^Only temp marks within the deferred item.  Plain and BlankLine
             patching will have already been done on them. *)

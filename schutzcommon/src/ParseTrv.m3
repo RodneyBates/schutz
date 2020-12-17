@@ -260,6 +260,7 @@ EXPORTS ParseTrv , ScannerIf
     ; Ref . SyntTokCt := 0  
     ; Ref . IsInsertionRepair := FALSE 
     ; Ref . IsInterior := FALSE 
+    ; Ref . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
     ; Ref . FullTempMarkRange := ParseHs . TempMarkRangeEmpty 
     ; Ref . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty 
     ; Ref . ObjRef := NIL 
@@ -947,9 +948,9 @@ EXPORTS ParseTrv , ScannerIf
         old state have their SeEstAdvanceState pointers patched to point
         to the new state. *) 
   ; VAR NpsNextTempMarkSs : LbeStd . MarkNoTyp 
-  ; VAR NpsTempMarkRange : ParseHs . TempMarkRangeTyp 
+  ; VAR NpsWaitingTempMarkRange : ParseHs . TempMarkRangeTyp 
         := ParseHs . TempMarkRangeEmpty
-        (* NpsTempMarkRange holds the subscripts of temp marks that belong to
+        (* NpsWaitingTempMarkRange holds the subscripts of temp marks that belong to
            the current item, until it is clear that the current item will be
            part of the delivered token.  At that time, they will be appended
            to TiFullTempMarkRange and maybe to TiPatchTempMarkRange. *)
@@ -1121,7 +1122,7 @@ END
           WITH 
             WTempMark 
             = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ] 
-            , WTravInfo = NpsSeEstRef . SeEstTravInfo  
+          , WTravInfo = NpsSeEstRef . SeEstTravInfo  
           DO IF WTempMark . TokMark . FmtNo = FmtNo 
             THEN
               CASE WTempMark . TokMark . Kind 
@@ -1172,24 +1173,24 @@ END
       END NpsCheckNextTempMarkForInsTok 
 
   ; PROCEDURE NpsIncludeTempMark ( ) RAISES { AssertionFailure } 
-    (* Include the next temp mark into NpsTempMarkRange and advance to the
+    (* Include the next temp mark into NpsWaitingTempMarkRange and advance to the
        next temp mark. *)  
 
     = BEGIN (* NpsIncludeTempMark *) 
-        IF ParseHs . RangeIsEmpty ( NpsTempMarkRange )
+        IF ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange )
         THEN 
-          NpsTempMarkRange . From := NpsNextTempMarkSs
+          NpsWaitingTempMarkRange . From := NpsNextTempMarkSs
         ELSE Assert
-               ( NpsTempMarkRange . To = NpsNextTempMarkSs
+               ( NpsWaitingTempMarkRange . To = NpsNextTempMarkSs
                , AFT . A_NpsIncludeTempMark_Discontiguous 
                )
-        END (* IF *) 
+        END (* IF *)
       ; INC ( NpsNextTempMarkSs ) 
-      ; NpsTempMarkRange . To := NpsNextTempMarkSs 
+      ; NpsWaitingTempMarkRange . To := NpsNextTempMarkSs 
       END NpsIncludeTempMark
 
   ; PROCEDURE NpsBiasTempMarks ( TokBegPos : LbeStd . CharNoTyp ) 
-    (* Convert CharPos of marks in NpsTempMarkRange from line-relative 
+    (* Convert CharPos of marks in NpsWaitingTempMarkRange from line-relative 
        to tok-relative. 
     *)
 
@@ -1198,10 +1199,10 @@ END
         THEN RETURN
         END (* IF *)
       ; IF TokBegPos = 0 THEN RETURN END (* IF *) 
-      ; IF ParseHs . RangeIsEmpty ( NpsTempMarkRange ) THEN RETURN END (* IF *)
+      ; IF ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) THEN RETURN END (* IF *)
       
-      ; FOR RTempMarkSs := NpsTempMarkRange . From 
-            TO NpsTempMarkRange . To - 1  
+      ; FOR RTempMarkSs := NpsWaitingTempMarkRange . From 
+            TO NpsWaitingTempMarkRange . To - 1  
         DO WITH 
              WCharPos  
              = ParseInfo . PiTravTempMarkListRef ^ [ RTempMarkSs ] . CharPos 
@@ -1213,19 +1214,18 @@ END
 
   ; PROCEDURE NpsPatchTmEstRefs 
       ( NodeRef : LbeStd . EstRootTyp ; Kind : MarkKindTyp ) 
-    (* For TempMarks in NpsTempMarkRange, Patch the EstRef field to
+    (* For TempMarks in NpsWaitingTempMarkRange, Patch the EstRef field to
        NodeRef and the kind to Kind.  Only used for kinds for which 
        FmtNo is irrelevant, so leave it alone.  
     *)
 
     = BEGIN (* NpsPatchTmEstRefs *) 
-        IF ParseInfo . PiParseKind 
-           = LbeStd . ParseKindTyp . ParseKindTrav 
-           AND NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+        IF ParseInfo . PiParseKind = LbeStd . ParseKindTyp . ParseKindTrav 
+           AND NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
         THEN
 (* TODO: Assert we are not in descend-only-by-parser-request sequence. (How?) *)
-          FOR RTempMarkSs := NpsTempMarkRange . From 
-              TO NpsTempMarkRange . To - 1 
+          FOR RTempMarkSs := NpsWaitingTempMarkRange . From 
+              TO NpsWaitingTempMarkRange . To - 1 
           DO WITH 
                WTempMark 
                = ParseInfo . PiTravTempMarkListRef ^ [ RTempMarkSs ] 
@@ -1239,19 +1239,19 @@ END
   ; PROCEDURE NpsAppendTempMarkRange 
       ( VAR ToRange : ParseHs . TempMarkRangeTyp ) 
     RAISES { AssertionFailure } 
-    (* Append NpsTempMarkRange to ToRange. *) 
+    (* Append NpsWaitingTempMarkRange to ToRange. *) 
 
     = BEGIN 
-        IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange )
+        IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange )
         THEN
           IF ParseHs . RangeIsEmpty ( ToRange )
-          THEN ToRange := NpsTempMarkRange
+          THEN ToRange := NpsWaitingTempMarkRange
           ELSE
             Assert
-              ( ToRange . To = NpsTempMarkRange . From 
+              ( ToRange . To = NpsWaitingTempMarkRange . From 
               , AFT . A_NpsAppendTempMarkRange_Discontiguous 
               ) 
-          ; ToRange . To := NpsTempMarkRange . To 
+          ; ToRange . To := NpsWaitingTempMarkRange . To 
           END (* IF *) 
         END (* IF *) 
       END NpsAppendTempMarkRange 
@@ -1473,7 +1473,7 @@ END
                , LbeStd . Tok__LexErrChars  
                )
       ; LChildKindSet := EstHs . EstChildKindSetLexErrChars 
-      ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange )  
+      ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange )  
         THEN 
           NpsPatchTmEstRefs ( LString , MarkKindTyp . Plain ) 
         ; LChildKindSet 
@@ -1488,7 +1488,7 @@ END
             ( (* VAR *) ToRange 
               := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
             ) 
-        ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+        ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
 
         | DeliverStateTyp . DsTokFound 
         => (* Save LexErrChars for the next token. *) 
@@ -1499,9 +1499,10 @@ END
         ; LDeferredInfo . IsInsertionRepair := FALSE 
         ; LDeferredInfo . IsInterior := FALSE  
         ; LDeferredInfo . KindSet := LChildKindSet
-        ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
+        ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
         ; LDeferredInfo . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty 
-        ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* ^Dead. *)
+        ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
+        ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* ^Dead. *)
         ; NpsDeliverState := DeliverStateTyp . DsDeliver 
         END (* CASE *) 
       END NpsAccumRescannedLexErrChars  
@@ -1543,7 +1544,7 @@ END
               LNewModRef 
                 := NEW ( ModHs . ModBlankLineTyp , ModBlankLineCt := 1 ) 
             ; LChildKindSet := EstHs . EstChildKindSetModBlankLine 
-            ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+            ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
               THEN 
                 NpsPatchTmEstRefs ( LNewModRef , MarkKindTyp . BlankLine ) 
               ; LChildKindSet 
@@ -1552,13 +1553,13 @@ END
                   ( (* VAR *) ToRange 
                     := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
                   ) 
-              ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+              ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
               END (* IF *) 
             ; NpsAccumNode ( LNewModRef , LChildKindSet , SyntTokCt := 0 ) 
             ELSE (* Reuse the already-created ModBlankLine *)  
               INC ( LExistingModRef . ModBlankLineCt ) 
 (* TODO: ^Protect this against overflows. *) 
-            ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+            ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
               THEN 
                 NpsPatchTmEstRefs ( LExistingModRef , MarkKindTyp . BlankLine )
               ; WSliceListElemRef ^ . SleKindSet 
@@ -1568,7 +1569,7 @@ END
                   ( (* VAR *) ToRange 
                     := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
                   ) 
-              ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+              ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
               END (* IF *) 
             END (* IF *) 
           END (* WITH *) 
@@ -1583,7 +1584,7 @@ END
         ; LDeferredInfo . IsInsertionRepair := FALSE 
         ; LDeferredInfo . IsInterior := FALSE 
         ; LDeferredInfo . KindSet := EstHs . EstChildKindSetModBlankLine  
-        ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+        ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
           THEN 
             NpsPatchTmEstRefs 
               ( LDeferredInfo . ObjRef , MarkKindTyp . BlankLine ) 
@@ -1591,9 +1592,10 @@ END
               := LDeferredInfo . KindSet 
                  + EstHs . EstChildKindSetContainsTempMark 
           END (* IF *) 
-        ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
+        ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
         ; LDeferredInfo . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty 
-        ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
+        ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
+        ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
         ; NpsDeliverState := DeliverStateTyp . DsDeliver 
         END (* CASE *) 
       END NpsAccumScannedBlankLine 
@@ -1700,7 +1702,7 @@ END
           := NpsResultStateRef . PtsScanInfo . SiScanState 
 
       (* Handle any TempMarks in the new comment. *) 
-      ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+      ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
         THEN 
           NpsBiasTempMarks ( NpsResultStateRef . PtsScanInfo . SiTokBegPos ) 
         ; NpsPatchTmEstRefs ( LModCmntRef , MarkKindTyp . Plain ) 
@@ -1716,7 +1718,7 @@ END
             ( (* VAR *) ToRange 
               := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
             ) 
-        ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+        ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
         ; NpsResultStateRef . PtsPrevTokAfter := ParseInfo . PiScanIf . SifTok
         
         ELSE (* Save this leading comment for the next token. *) 
@@ -1727,7 +1729,7 @@ END
         ; LDeferredInfo . KindSet := LChildKindSet 
         ; LDeferredInfo . IsInsertionRepair := FALSE 
         ; LDeferredInfo . IsInterior := FALSE 
-        ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+        ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
           THEN 
             NpsPatchTmEstRefs 
               ( LDeferredInfo . ObjRef , MarkKindTyp . Plain ) 
@@ -1735,9 +1737,10 @@ END
               := LDeferredInfo . KindSet 
                  + EstHs . EstChildKindSetContainsTempMark 
           END (* IF *) 
-        ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
+        ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
         ; LDeferredInfo . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty 
-        ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
+        ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
+        ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
         ; NpsDeliverState := DeliverStateTyp . DsDeliver 
         END (* IF *) 
       END NpsAccumRescannedCmnt 
@@ -1770,7 +1773,7 @@ END
                  )
                (* ^Arrange for the Parser to patch leftovers as FmtNo
                    tempmarks. *)
-             ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+             ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
              ; NpsResultStateRef . PtsTokInfo . TiTok := WSif . SifTok 
              ; NpsResultStateRef . PtsPrevTokAfter := WSif . SifTok  
              ; NpsAccumNode ( LStringRef , LChildKindSet , SyntTokCt := 1 ) 
@@ -1782,9 +1785,10 @@ END
                LDeferredInfo := NpsGetDeferredInfoRef ( ) 
              ; LDeferredInfo . Tok := WSif . SifTok 
              ; LDeferredInfo . SyntTokCt := 1 
-             ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
-             ; LDeferredInfo . PatchTempMarkRange := NpsTempMarkRange 
-             ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
+             ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
+             ; LDeferredInfo . PatchTempMarkRange := NpsWaitingTempMarkRange 
+             ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
+             ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
              ; LDeferredInfo . ObjRef := LStringRef  
              ; LDeferredInfo . KindSet := LChildKindSet 
              ; NpsDeliverState := DeliverStateTyp . DsDeliver 
@@ -1802,7 +1806,7 @@ END
                , AFT . A_NpsDeliverRescannedTokNILAstString 
                ) 
            ; LChildKindSet := EstHs . EstChildKindSetEstChildNonNIL
-           ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+           ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
              THEN 
                NpsPatchTmEstRefs ( LStringRef , MarkKindTyp . Plain ) 
                (* ^Patch any leftover TempMarks in the new Ast String token. *) 
@@ -1816,7 +1820,7 @@ END
                  ( (* VAR *) ToRange 
                    := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
                  ) 
-             ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+             ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
              ; NpsResultStateRef . PtsTokInfo . TiTok := WSif . SifTok 
              ; NpsResultStateRef . PtsPrevTokAfter := WSif . SifTok  
              ; NpsAccumNode ( LStringRef , LChildKindSet , SyntTokCt := 1 ) 
@@ -1829,9 +1833,10 @@ END
                LDeferredInfo := NpsGetDeferredInfoRef ( ) 
              ; LDeferredInfo . Tok := WSif . SifTok 
              ; LDeferredInfo . SyntTokCt := 1 
-             ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
+             ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
              ; LDeferredInfo . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty 
-             ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
+             ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
+             ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
              ; LDeferredInfo . ObjRef := LStringRef 
              ; LDeferredInfo . KindSet := LChildKindSet
              ; NpsDeliverState := DeliverStateTyp . DsDeliver 
@@ -1845,7 +1850,7 @@ END
                := LangUtil . DisplayStringForTok 
                     ( ParseInfo . PiLang , WSif . SifTok ) 
            ; LChildKindSet := EstHs . EstChildKindSetEstChildNonNIL 
-           ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+           ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
              THEN 
                NpsPatchTmEstRefs ( LStringRef , MarkKindTyp . Plain ) 
                (* ^Patch leftover TempMarks into the new NT placeholder. *)
@@ -1859,7 +1864,7 @@ END
                  ( (* VAR *) ToRange 
                    := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
                  ) 
-             ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+             ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
              ; NpsResultStateRef . PtsTokInfo . TiTok := WSif . SifTok 
              ; NpsResultStateRef . PtsPrevTokAfter := WSif . SifTok  
              ; NpsAccumNode ( LStringRef , LChildKindSet , SyntTokCt := 1 ) 
@@ -1871,10 +1876,11 @@ END
                LDeferredInfo := NpsGetDeferredInfoRef ( ) 
              ; LDeferredInfo . Tok := WSif . SifTok 
              ; LDeferredInfo . SyntTokCt := 1 
-             ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
+             ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
              ; LDeferredInfo . PatchTempMarkRange
                  := ParseHs . TempMarkRangeEmpty 
-             ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
+             ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
+             ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
              ; LDeferredInfo . ObjRef := LStringRef  
              ; LDeferredInfo . KindSet := LChildKindSet 
              ; NpsDeliverState := DeliverStateTyp . DsDeliver 
@@ -2003,8 +2009,8 @@ END
           TRY 
             NpsResultStateRef . PtsScanInfo . SiScanState 
               := ParseInfo . PiScanIf . SifScanState 
-  (* TODO: Somehow protect this code from the scanner's changing 
-           ParseInfo . PiScanIf . SifDeliverString. *) 
+(* TODO: Somehow protect this code from the scanner's changing 
+         ParseInfo . PiScanIf . SifDeliverString. *) 
           ; IF Strings . Length ( ParseInfo . PiScanIf . SifDeliverString ) 
                > 0 
             THEN 
@@ -2170,8 +2176,10 @@ END
           ; LDeferredInfo . ObjRef := LModLexErrRef     
           ; LDeferredInfo . IsInsertionRepair := FALSE (* Dead. *) 
           ; LDeferredInfo . IsInterior := FALSE (* Dead. *)  
-          ; LDeferredInfo . KindSet := EstHs . EstChildKindSetModLexErr  
-          ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
+          ; LDeferredInfo . KindSet := EstHs . EstChildKindSetModLexErr
+          ; LDeferredInfo . WaitingTempMarkRange := NpsWaitingTempMarkRange 
+          ; LDeferredInfo . FullTempMarkRange
+              := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
           ; LDeferredInfo . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty
           ; NpsDeliverState := DeliverStateTyp . DsDeliver 
           END (* CASE *) 
@@ -2753,7 +2761,7 @@ END
     = VAR LDeferredInfo : ParseHs . DeferredInfoRefTyp
     
     ; BEGIN (* NpsInsTok *) 
-        (* NpsTempMarkRange may contain leftover TempMarks from proposed
+        (* NpsWaitingTempMarkRange may contain leftover TempMarks from proposed
            insertion repairs alone on a line. *) 
         IF NpsResultStateRef . PtsScanInfo . SiScanState = LbeStd . SsIdle 
         THEN (* Need not scan, deliver the token *) 
@@ -2790,7 +2798,7 @@ END
               ( (* VAR *) ToRange 
                 := NpsResultStateRef . PtsTokInfo . TiPatchTempMarkRange 
               ) 
-          ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+          ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
           ; NpsDeliverState := DeliverStateTyp . DsTokFound
           
           | DeliverStateTyp . DsTokFound 
@@ -2801,9 +2809,10 @@ END
           ; LDeferredInfo . SyntTokCt := 1 
           ; LDeferredInfo . IsInsertionRepair := FALSE 
           ; LDeferredInfo . IsInterior := FALSE 
-          ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
-          ; LDeferredInfo . PatchTempMarkRange := NpsTempMarkRange 
-          ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
+          ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
+          ; LDeferredInfo . PatchTempMarkRange := NpsWaitingTempMarkRange 
+          ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
+          ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
           ; LDeferredInfo . ObjRef := NIL 
           ; LDeferredInfo . KindSet := EstHs . EstChildKindSetEmpty 
           ; NpsDeliverState := DeliverStateTyp . DsDeliver 
@@ -3265,7 +3274,7 @@ END
         (* ^RightSib TempMarks pointing to RM child belong to a following 
             InsTok. *) 
 (* Unnecessary? ; NpsResultStateEstRef . PtseTokTempMarkSs := NpsNextTempMarkSs *)
-      ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+      ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
       ; NpsResultStateEstRef . PtseLastFmtNoOnLine := EstHs . FmtNoUnknown 
       ; NpsResultStateEstRef . PtseEstListChildrenToPass := 0 (* Dead. *) 
 (* REVIEW: EstChildKindContainsNoKnownNl and EstChildKindContainsNoKnownNl
@@ -3481,7 +3490,7 @@ END
                (* Will revisit it here, in different state. *) 
              ELSE 
              (* Fix any leftover temp marks from an omitted repair item. *)  
-               IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+               IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
                THEN 
                  NpsPatchTmEstRefs ( LChildRef , MarkKindTyp . BlankLine ) 
                ; LMustIncludeContainsTempMark := TRUE 
@@ -3489,7 +3498,7 @@ END
                    ( (* VAR *) ToRange 
                      := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
                    ) 
-               ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+               ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
                ELSE 
                  LMustIncludeContainsTempMark := FALSE  
                END (* IF *) 
@@ -3530,7 +3539,7 @@ END
              (* Will revisit it here, in different state. *) 
              ELSE (* Still wait and see what's on the next line. *)  
              (* Fix any leftover temp marks from an omitted repair item. *)  
-               IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+               IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
                THEN 
                  NpsPatchTmEstRefs ( LChildRef , MarkKindTyp . Plain ) 
                ; LMustIncludeContainsTempMark := TRUE 
@@ -3538,7 +3547,7 @@ END
                    ( (* VAR *) ToRange 
                      := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
                    ) 
-               ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+               ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
                ELSE 
                  LMustIncludeContainsTempMark := FALSE  
                END (* IF *) 
@@ -3574,7 +3583,7 @@ END
              ; NpsRescanModCmntLeaders ( TModCmntTrailingRef ) 
              ELSE
                Assert
-                 ( ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+                 ( ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
                  , AFT . A_NpsAttachedMods_LeftoverTempMarksForTrailingCmnt 
                  ) 
              ; NpsResultStateRef . PtsScanInfo . SiScanState 
@@ -3647,7 +3656,7 @@ END
           current scan state are unequal. *)
                THEN (* Keep it among the leading mods of the to-be-found token. *)
                  Assert
-                   ( NpsTempMarkRange = ParseHs . TempMarkRangeEmpty
+                   ( NpsWaitingTempMarkRange = ParseHs . TempMarkRangeEmpty
                    , AFT . A_NpsAttachedMods_TempMarksOnModLexError 
                    )
                ; LKindSet 
@@ -3737,7 +3746,7 @@ END
                    this to happen only if the line has nothing but repairs
                    and this is the last one.  Make the temp marks absolute at
                    the beginning of the (next) line and include them in 
-                   NpsTempMarkRange.  They will be applied to the next item. 
+                   NpsWaitingTempMarkRange.  They will be applied to the next item. 
                 *)
                   LOOP 
                     NpsCheckNextTempMarkForInsTok 
@@ -3888,7 +3897,7 @@ END
                 last time, they will be the same this time.  Accumulate
                 them, unchanged. *)
           LKindSet := NpsSeEstRef . SeEstTravInfo . EtiChildLeafElem . LeKindSet 
-        ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+        ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
           THEN (* Patch leftover temp marks. *)  
   (* TODO: It would be nice to bias them relative to this LexErrChars String,
        but we are not keeping CharPos, and this is a very rare case. 
@@ -3914,7 +3923,7 @@ END
               ( (* VAR *) ToRange 
                 := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
               ) 
-          ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty
+          ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty
 
             (* Include the lex error string in the result. *)
             ; IF NpsSeEstRef . SeEstTravInfo . EtiChildLeafElem . LeKindSet
@@ -3943,9 +3952,10 @@ END
           ; LDeferredInfo . IsInsertionRepair := FALSE 
           ; LDeferredInfo . IsInterior := FALSE  
           ; LDeferredInfo . KindSet := LKindSet
-          ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
+          ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
           ; LDeferredInfo . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty 
-          ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *)
+          ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
+          ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *)
           ; NpsDeliverState := DeliverStateTyp . DsDeliver 
           ; TravUtil . IncEstChild ( NpsSeEstRef . SeEstTravInfo )  
           END (* CASE *)
@@ -3981,7 +3991,7 @@ END
            this to happen only if the line has nothing but repairs
            and this is the last one.  Make the temp marks absolute at
            the beginning of the (next) line and include them in 
-           NpsTempMarkRange.  They will be applied to the next item. 
+           NpsWaitingTempMarkRange.  They will be applied to the next item. 
         *)
           LOOP 
             NpsCheckNextTempMarkForEstLeaf 
@@ -3995,7 +4005,7 @@ END
             ; NpsIncludeTempMark ( ) 
             END (* IF *) 
           (* These temp marks will be held as additional leftovers in
-             NpsTempMarkRange, and will be later attached to the next item. 
+             NpsWaitingTempMarkRange, and will be later attached to the next item. 
           *) 
           END (* LOOP *) 
         ; NpsResultStateEstRef . PtseStateKind 
@@ -4011,7 +4021,7 @@ END
 (* TODO: It would be nice to bias them relative to this AstString, but
          we are not keeping CharPos, and this is a very rare case. 
 *)  
-          ; IF NOT ParseHs . RangeIsEmpty ( NpsTempMarkRange ) 
+          ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
             THEN
               NpsPatchTmEstRefs 
                 ( LStringRef 
@@ -4041,7 +4051,7 @@ END
                   := NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange 
                 )
                 
-            ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+            ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
             ; NpsResultStateRef . PtsTokInfo . TiTok 
                 := SharedStrings . Tok ( LStringRef )
             ; LbeStd . IncLimitedTokCt
@@ -4083,11 +4093,11 @@ END
             ; LDeferredInfo . SyntTokCt := 1 
             ; LDeferredInfo . IsInsertionRepair := FALSE 
             ; LDeferredInfo . IsInterior := FALSE
-            ; LDeferredInfo . FullTempMarkRange := NpsTempMarkRange 
+            ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
             ; LDeferredInfo . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty 
-            ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
-            ; LDeferredInfo . ObjRef
-                := LStringRef 
+            ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
+            ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
+            ; LDeferredInfo . ObjRef := LStringRef 
             ; LDeferredInfo . KindSet := LKindSet  
             ; TravUtil . IncEstChild ( NpsSeEstRef . SeEstTravInfo )  
             ; NpsResultStateEstRef . PtseStateKind 
@@ -4405,7 +4415,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
                     , NpsSeEstRef . SeEstTravInfo . EtiChildNo 
                     , NpsSeEstRef . SeEstWholeSliceToChildNo 
                     ) 
-                ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+                ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
                 ; NpsResultStateEstRef . PtseStateKind 
                     := ParseHs . ParseTravStateKindTyp 
                        . PtsKindDoneWithListSliceUntraversed 
@@ -5083,9 +5093,9 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
           (* ^Any RightSib TempMarks pointing to the ModTok belong to a 
               following InsTok. *)
           ; NpsRangeTempMarksForModTok
-              ( LModTok , LTok , RangeToSearch := NpsTempMarkRange )
+              ( LModTok , LTok , RangeToSearch := NpsWaitingTempMarkRange )
             (* ^May put some into TiPatchTempMarkRange. *)
-          ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+          ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
           ; NpsPushEstPlain 
               ( IsModTok := TRUE , (* VAR *) FsNodeRef := LFsNodeRef ) 
           ; NpsResultStateEstRef . PtseStateKind 
@@ -5135,7 +5145,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
               (* ^RightSib TempMarks pointing to RM child belong to a following 
                  InsTok. *)
             END (* IF *) 
-          ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+          ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
           ; NpsResultStateRef . PtsTokInfo . TiIsInterior := TRUE 
           ; NpsPushEstPlain 
               ( IsModTok := FALSE , (* VAR *) FsNodeRef := LFsNodeRef ) 
@@ -5302,7 +5312,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
           ( (* VAR *) ToRange 
             := NpsResultStateRef . PtsTokInfo . TiPatchTempMarkRange 
           ) 
-      ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+      ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
       (* Rest of deliver fields are irrelevant for LbeStd . Tok__EndOfImage *) 
       ; NpsResultStateEstRef . PtseDescendStateRef 
           := NpsResultStateEstRef (* Circular *) 
@@ -5468,10 +5478,11 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
               := DeferredInfo . IsInterior
           END (* IF *)
 
+        ; NpsWaitingTempMarkRange := DeferredInfo . WaitingTempMarkRange
         ; NpsResultStateRef . PtsTokInfo . TiFullTempMarkRange
             := DeferredInfo . FullTempMarkRange 
         ; NpsResultStateRef . PtsTokInfo . TiPatchTempMarkRange 
-            := DeferredInfo . PatchTempMarkRange 
+            := DeferredInfo . PatchTempMarkRange
 
         ; IF DeferredInfo . ObjRef # NIL 
           THEN 
@@ -5490,7 +5501,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
     = BEGIN (* NpsInitNps *) 
         NpsDeliverState := DeliverStateTyp . DsStarting 
       ; NpsSliceParentRef := NIL 
-      ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+      ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
       ; NpsNextTempMarkIsRelevant := FALSE 
       END NpsInitNps 
 
@@ -5542,7 +5553,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
               := ParseHs . TempMarkRangeEmpty 
           ; NpsResultStateEstRef . PtsTokInfo . TiPatchTempMarkRange
               := ParseHs . TempMarkRangeEmpty 
-          ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+          ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
           ; NpsNextTempMarkSs := NpsResultStateEstRef . PtseTokTempMarkSs 
 
           ; LSliceListElemRef := LFromStateEstRef . PtsTokInfo . TiInfo  
@@ -5658,7 +5669,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
               := ParseHs . TempMarkRangeEmpty 
           ; NpsResultStateEstRef . PtsTokInfo . TiPatchTempMarkRange
               := ParseHs . TempMarkRangeEmpty 
-          ; NpsTempMarkRange := ParseHs . TempMarkRangeEmpty 
+          ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
           ; NpsNextTempMarkSs := NpsResultStateEstRef . PtseTokTempMarkSs 
           ; NpsAccumPreviouslyDeferredItem 
               ( LFromStateEstRef . PtseDeferredInfoRef )
