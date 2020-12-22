@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -89,7 +89,7 @@ MODULE LineMarks
         } 
     (* In GnlStateStartAtBeg and GnlStateStartAtEnd, TraverseEst and 
        TraverseFs jump into the middle of their respective trees, 
-       using the start of line mark to decide where.  Once the starting 
+       using StartMark to decide where.  Once the starting 
        point is reached, must go in to another state to traverse left- 
        to-right. *) 
   ; TYPE GnlStateSetTyp = SET OF GnlStateTyp 
@@ -541,7 +541,8 @@ MODULE LineMarks
         ( FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FsFmtKind : LangUtil . FmtKindTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { AssertionFailure , Thread . Alerted }
+      (* Does not handle Fs tree root nodes. *) 
 
       = PROCEDURE GnlTeTfsEstSubtree ( IsModTok : BOOLEAN ) 
         RAISES { AssertionFailure , Thread . Alerted } 
@@ -1685,7 +1686,7 @@ MODULE LineMarks
 
             OF GnlStateTyp . GnlStateStartAtBeg 
             , GnlStateTyp . GnlStateStartAtEnd 
-            => (* Choose the correct Est child. *) 
+            => (* Choose the Est child to descend to. *) 
                IF RootAbsNodeNo = StartMark . EstNodeNo 
                THEN (* Mark denotes the Est root. *)  
                  TravUtil . InitEstTravInfoFwd 
@@ -1693,22 +1694,14 @@ MODULE LineMarks
                ; CASE StartMark . Kind <* NOWARN *> 
                  OF MarkKindTyp . Plain 
                  , MarkKindTyp . BlankLine 
-                 => (* The mark denotes the Est root, which is a leaf. 
+                 => (* The mark denotes the Est root, which is either a leaf
+                       or a ModTok For an insertion token. 
                        No need to set to a child. *) 
-                    Assert 
-                      ( GnlTeEstTravInfo . EtiParentRef = NIL 
-                      , AFT . A_LineMarks_GnlTraverseEst_Not_leaf 
-                      ) 
-
-                 | MarkKindTyp . ChildFmtNo 
-                 => Assert 
-                      ( GnlTeEstTravInfo . EtiChildCt = 0 
-                      , AFT . A_GnlTraverseEst_ChildFmtNo_has_children 
-                      ) 
 
                  | MarkKindTyp . LeftSibFmtNo 
                  , MarkKindTyp . RightSibFmtNo 
-                 => CantHappen ( AFT . A_GnlTraverseEst_SibFmtNo_on_parent ) 
+                 => (* NodeRef for these is handled when it is LeChildRef. *)
+                   CantHappen ( AFT . A_GnlTraverseEst_SibFmtNo_on_parent ) 
                  END (* CASE  *) 
                ELSE (* Mark does not lead to this (parent) EstNode. *) 
                  TravUtil . InitToChildContainingNodeNo 
@@ -1727,23 +1720,24 @@ MODULE LineMarks
                        = GnlTeEstTravInfo . EtiChildCt 
                      , AFT . A_GnlTraverseEst_RightSib_not_rightmost
                      ) 
-                 ; GnlTeIncEstChild ( ) 
+                 ; GnlTeIncEstChild ( )
+                   (* Go off right end.  This will set GnlTeRMChildRelNodeNo
+                      to the RM child. *)
                  END (* IF *) 
                END (* IF *) 
 
-            (* Choose the correct FmtNo. *) 
-            ; GnlTeStartFmtNo := GnlTeEstTravInfo . EtiChildFmtNo (* Default. *)
+            (* Choose the FmtNo to descend to. *) 
+            ; GnlTeStartFmtNo := GnlTeEstTravInfo . EtiChildFmtNo (* default *)
             ; CASE StartMark . Kind 
               OF MarkKindTyp . ChildFmtNo 
               => IF RootAbsNodeNo = StartMark . EstNodeNo 
-                 THEN 
-                   GnlTeStartFmtNo := StartMark . FmtNo 
-                 END (* IF *) 
+                 THEN GnlTeStartFmtNo := StartMark . FmtNo 
+                 END (* IF *)
+                 
               | MarkKindTyp . LeftSibFmtNo 
               => IF RootAbsNodeNo + GnlTeEstTravInfo . EtiChildRelNodeNo 
                     = StartMark . EstNodeNo 
-                 THEN 
-                   GnlTeStartFmtNo := StartMark . FmtNo 
+                 THEN GnlTeStartFmtNo := StartMark . FmtNo 
                  END (* IF *) 
 
               | MarkKindTyp . RightSibFmtNo 
@@ -1751,12 +1745,11 @@ MODULE LineMarks
                     >= GnlTeEstTravInfo . EtiChildCt 
                     AND RootAbsNodeNo + GnlTeRMChildRelNodeNo 
                         = StartMark . EstNodeNo 
-                 THEN 
-                   GnlTeStartFmtNo := StartMark . FmtNo 
+                 THEN GnlTeStartFmtNo := StartMark . FmtNo 
                  END (* IF *) 
 
               ELSE 
-              END (* CASE *) 
+              END (* CASE StartMark . Kind. *) 
             ; LInitialFsChildNo 
                 := LangUtil . FsChildNoOfFmtNo 
                      ( FsRuleNodeRef , GnlTeStartFmtNo ) 
@@ -1771,15 +1764,18 @@ MODULE LineMarks
             , GnlStateTyp . GnlStateRightNlFound 
             => TravUtil . InitEstTravInfoFwd 
                  ( GnlTeEstTravInfo , EstRef , KindSet , RootAbsNodeNo ) 
-            ; GnlTeStartFmtNo := EstHs . FmtNoNull   
+            ; GnlTeStartFmtNo := FsRuleNodeRef . FsLeftFmtNo 
             ; LInitialFsChildNo := 0 
+            ; GnlTeInitialFsLeafRef
+                := LangUtil . FsLeafRefOfFmtNo 
+                     ( FsRuleNodeRef, GnlTeStartFmtNo ) 
             ; GnlTeIsFirstLine := TRUE 
             ; GnlTeIndentPos := EstIndentPos1
             ; GnlTeDescendedInto := FALSE  
 
             ELSE 
               CantHappen ( AFT . A_GnlTraverseEst_Bad_state ) 
-            END (* CASE *) 
+            END (* CASE FsRuleNodeRef . FsKind. *) 
 (* CHECK: No other traverser has this assertion.  Do we really need it? *) 
           ; Assert 
               ( FsRuleNodeRef . FsChildren = NIL 
@@ -1791,6 +1787,7 @@ MODULE LineMarks
               , AFT . A_GnlTraverseEst_Bad_FsChildNo 
               ) 
 
+          (* Now traverse the Fs tree. *) 
           ; CASE FsRuleNodeRef . FsKind <* NOWARN *> 
 
             (* Est fixed nodes. *) 
@@ -1815,7 +1812,7 @@ MODULE LineMarks
             => GnlTeAstString ( FsRuleNodeRef , EstFmtKind ) 
 
          (* ELSE Cant happen. *) 
-            END (* CASE *) 
+            END (* CASE FsRuleNodeRef . FsKind. *) 
           ; IF Thread . TestAlert ( ) THEN RAISE Thread . Alerted END 
           END (* IF *) 
         END (* Block *) 
@@ -1896,8 +1893,8 @@ MODULE LineMarks
           (* ^Start a line at the first new line of the token. *) 
         , GplStateStartAtEnd 
           (* ^Start a line at the last new line of a token 
-             which has a possible new line at the end. 
-             (comment or text insertion mod) *) 
+             that has a possible new line at the end. 
+             (comment, text mod, implied Nl) *) 
         , GplStatePassingNl 
           (* Passing a group of Nl's at the right end of the line. *) 
         , GplStateInLine 
@@ -1976,7 +1973,8 @@ MODULE LineMarks
         ( FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FsApproxFmtKind : LangUtil . FmtKindTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { AssertionFailure , Thread . Alerted }
+      (* DOES handle Fs root nodes. *)
 
       = PROCEDURE GplTeTfsEstSubtree ( ) 
         RAISES { AssertionFailure , Thread . Alerted } 
@@ -2625,7 +2623,7 @@ MODULE LineMarks
 
         = VAR LFsChildNo : LangUtil . FsChildNoSignedTyp 
 
-        ; BEGIN (* GplTeTfsTraverseFsFixedChildren *) 
+        ; BEGIN (* GplTeTfsTraverseFsFixedChildren *)
             CASE GplState <* NOWARN *> 
             OF GplStateTyp . GplStateStartAtBeg 
             , GplStateTyp . GplStateStartAtEnd 
@@ -2857,67 +2855,74 @@ MODULE LineMarks
         IF Thread . TestAlert ( ) THEN RAISE Thread . Alerted END 
       ; IF EstRef # NIL 
         THEN 
-        (* Choose the correct Est child. *) 
-          TravUtil . InitEstTravInfo ( GplTeEstTravInfo , EstRef ) 
-        ; GplTeRightwardChildRelNodeNo := LbeStd . EstNodeNoNull 
+          GplTeRightwardChildRelNodeNo := LbeStd . EstNodeNoNull 
         ; GplTeRightwardChildRef := NIL 
-        ; GplTeRightwardChildKindSet := EstHs . EstChildKindSetEmpty  
+        ; GplTeRightwardChildKindSet := EstHs . EstChildKindSetEmpty
+
+; IF RootAbsNodeNo = 1
+     AND StartMark . EstNodeNo = 27
+  THEN RootAbsNodeNo := 1 
+  END
+
         ; CASE GplState 
           OF GplStateTyp . GplStateStartAtBeg 
           , GplStateTyp . GplStateStartAtEnd 
-          => IF RootAbsNodeNo = StartMark . EstNodeNo 
-                AND StartMark . Kind = MarkKindTyp . ChildFmtNo 
-             THEN (* The mark denotes the Est root and an fs child thereof. 
-                     This can only be a line break, and those don't have 
-                     trailing mods.  Also, there are no Est children. *) 
-               TravUtil . InitEstTravInfoBwd 
-                 ( GplTeEstTravInfo , EstRef , KindSet , RootAbsNodeNo )
-             ; Assert 
-                 ( GplTeEstTravInfo . EtiChildCt = 0 
-                 , AFT . A_GplTraverseEst_ChildFmtNo_mark_on_nonempty_node 
-                 )  
-             ELSE 
-               TravUtil . InitToChildContainingNodeNo 
-                 ( GplTeEstTravInfo 
-                 , EstRef 
-                 , StartMark . EstNodeNo - RootAbsNodeNo 
-                 , KindSet 
-                 , RootAbsNodeNo 
-                 )
-             ; IF RootAbsNodeNo + GplTeEstTravInfo . EtiChildRelNodeNo 
-                  = StartMark . EstNodeNo 
-               THEN 
-                 CASE StartMark . Kind 
-                 OF MarkKindTyp . LeftSibFmtNo
-                 => GplTeDecEstChild ( ) 
-                 | MarkKindTyp . RightSibFmtNo
-                 => Assert 
-                      ( GplTeEstTravInfo . EtiChildNo + 1 
-                        = GplTeEstTravInfo . EtiChildCt  
-                      , AFT . A_GplTraverseEst_RightSibFmtNo_mark_on_nonrightmost_child
-                      ) 
-                 ELSE 
-                 END (* CASE *) 
-               END (* IF *) 
-             END (* IF *) 
-          | GplStateTyp . GplStateInLine 
-          , GplStateTyp . GplStatePassingNl 
-          => TravUtil . InitEstTravInfoBwd 
-               ( GplTeEstTravInfo , EstRef , KindSet , RootAbsNodeNo ) 
-          ELSE 
-            CantHappen ( AFT . A_GplTraverseEst_BadState ) 
-          END (* CASE *) 
-        ; CASE GplState <* NOWARN *> 
+          => (* Choose the Est child to descend to. *) 
+            IF RootAbsNodeNo = StartMark . EstNodeNo 
+            THEN (* The mark denotes the root of this Est and an fs child
+                    thereof.  This can only be a line break, and those don't
+                    have trailing mods.  Also, there are no Est children. *) 
+              TravUtil . InitEstTravInfoBwd 
+                ( GplTeEstTravInfo , EstRef , KindSet , RootAbsNodeNo )
+; IF GplTeEstTravInfo.EtiChildNo < 0
+ THEN EstIndentPosN := EstIndentPosN
+ END
+            ; CASE StartMark . Kind <* NOWARN *> 
+              OF MarkKindTyp . Plain 
+              , MarkKindTyp . BlankLine 
+              => (* The mark denotes the Est root, which is either a leaf
+                    or a ModTok For an insertion token. 
+                    No need to set to a child. *) 
 
-          OF GplStateTyp . GplStateStartAtBeg 
-          , GplStateTyp . GplStateStartAtEnd 
-          => (* Choose the right FmtNo. *) 
-            GplTeStartFmtNo := GplTeEstTravInfo . EtiChildFmtNo 
+              | MarkKindTyp . LeftSibFmtNo 
+              , MarkKindTyp . RightSibFmtNo 
+              => (* NodeRef for these is handled when it is LeChildRef. *)
+                CantHappen ( AFT . A_GplTraverseEst_SibFmtNo_on_parent ) 
+              END (* CASE StartMark . Kind. *) 
+            ELSE (* Mark does not lead to this (parent) EstNode. *) 
+              TravUtil . InitToChildContainingNodeNo 
+                ( GplTeEstTravInfo 
+                , EstRef 
+                , StartMark . EstNodeNo - RootAbsNodeNo 
+                , KindSet 
+                , RootAbsNodeNo 
+                )
+; IF GplTeEstTravInfo.EtiChildNo < 0
+ THEN EstIndentPosN := EstIndentPosN
+ END
+            ; IF RootAbsNodeNo + GplTeEstTravInfo . EtiChildRelNodeNo 
+                 = StartMark . EstNodeNo 
+              THEN 
+                CASE StartMark . Kind 
+                OF MarkKindTyp . LeftSibFmtNo
+                => GplTeDecEstChild ( ) 
+                | MarkKindTyp . RightSibFmtNo
+                => Assert 
+                     ( GplTeEstTravInfo . EtiChildNo + 1 
+                       = GplTeEstTravInfo . EtiChildCt  
+                     , AFT . A_GplTraverseEst_RightSibFmtNo_mark_on_nonrightmost_child
+                     ) 
+                ELSE 
+                END (* CASE StartMark . Kind. *) 
+              END (* IF *) 
+            END (* IF *)
+             
+          (* Choose the FmtNo to descend to. *) 
+          ; GplTeStartFmtNo := GplTeEstTravInfo . EtiChildFmtNo (* default *)
           ; CASE StartMark . Kind 
             OF MarkKindTyp . ChildFmtNo 
             => IF RootAbsNodeNo = StartMark . EstNodeNo 
-               THEN 
-                 GplTeStartFmtNo := StartMark . FmtNo 
+               THEN GplTeStartFmtNo := StartMark . FmtNo 
                END (* IF *) 
 
             | MarkKindTyp . LeftSibFmtNo 
@@ -2937,13 +2942,17 @@ MODULE LineMarks
                END (* IF *) 
 
             ELSE 
-            END (* CASE *) 
+            END (* CASE StartMark . Kind. *) 
 
           | GplStateTyp . GplStateInLine 
           , GplStateTyp . GplStatePassingNl 
-          => GplTeStartFmtNo := EstHs . FmtNoNull   
-
-          END (* CASE *) 
+          => TravUtil . InitEstTravInfoBwd 
+               ( GplTeEstTravInfo , EstRef , KindSet , RootAbsNodeNo )
+          ; GplTeStartFmtNo := FsRuleNodeRef . FsRightFmtNo 
+; IF GplTeEstTravInfo.EtiChildNo < 0
+  THEN EstIndentPosN := EstIndentPosN
+  END
+          END (* CASE GplState *) 
         ; GplTeTraverseFs ( FsRuleNodeRef , EstApproxFmtKind ) 
         ; IF Thread . TestAlert ( ) THEN RAISE Thread . Alerted END 
         END (* IF *) 

@@ -25,7 +25,7 @@ MODULE TravUtil
 
 ; TYPE AFT = MessageCodes . T 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IndentPos 
     ( Lang : LbeStd . LangTyp 
     ; EstIndentPos : LbeStd . LimitedCharNoTyp 
@@ -45,7 +45,7 @@ MODULE TravUtil
       END (* IF *) 
     END IndentPos 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE PosForTok 
     ( Lang : LbeStd . LangTyp 
     ; FmtKind : LangUtil . FmtKindTyp 
@@ -96,8 +96,8 @@ MODULE TravUtil
     ) 
   RAISES { AssertionFailure } 
   (* EstChildRef is the single list child of an Est list node omitted by the
-     singleton-list optimization.  Construct EstTravInfo for this list, setting
-     it to the only element.  
+     singleton-list optimization.  Construct a fake EstTravInfo for this list,
+     setting EstChildRef as its only element.  
   *) 
 
   = BEGIN (* BuildEstTravInfoForSingletonList *) 
@@ -184,7 +184,7 @@ MODULE TravUtil
       END (* IF *) 
     END SetEstChildFmtNo 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InitEstTravInfo 
     ( VAR EstTravInfo : EstTravInfoTyp 
     ; EstNodeRef : LbeStd . EstRootTyp 
@@ -198,28 +198,25 @@ MODULE TravUtil
   = BEGIN (* InitEstTravInfo *) 
       EstTravInfo . EtiIsOptSingletonList := IsOptSingletonList  
     ; EstTravInfo . EtiNodeRef := EstNodeRef 
+    ; EstTravInfo . EtiAbsNodeNo := ParentAbsNodeNo 
     ; TYPECASE EstNodeRef 
       OF NULL 
       => EstTravInfo . EtiParentRef := NIL 
       ; EstTravInfo . EtiChildCt := 0 
       ; EstTravInfo . EtiStringRef := NIL 
-      ; EstTravInfo . EtiAbsNodeNo := ParentAbsNodeNo 
       | ModHs . EstDummyTyp (* Can this happen? *) 
       => EstTravInfo . EtiParentRef := NIL  
       ; EstTravInfo . EtiChildCt := 0 
       ; EstTravInfo . EtiStringRef := NIL 
-      ; EstTravInfo . EtiAbsNodeNo := ParentAbsNodeNo 
       | EstHs . EstRefTyp ( TEstRef ) 
       => EstTravInfo . EtiParentRef := TEstRef 
       ; EstTravInfo . EtiChildCt := TEstRef . KTreeChildCt ( ) 
       ; EstTravInfo . EtiStringRef := NIL 
-      ; EstTravInfo . EtiAbsNodeNo := ParentAbsNodeNo 
       | SharedStrings . T ( TStringRef ) 
       => EstTravInfo . EtiParentRef := NIL 
       ; EstTravInfo . EtiChildCt := 0 
       ; EstTravInfo . EtiStringRef := TStringRef 
-      ; EstTravInfo . EtiAbsNodeNo := ParentAbsNodeNo 
-      | ModHs . ModRefTyp 
+      | ModHs . ModRefTyp (* But not a ModTok, caught by EstRefTyp, above. *) 
       => CantHappen ( AFT . A_InitEstTravInfoMod ) 
          (* We never descend to a mod, but always process it from above. *) 
       ELSE 
@@ -227,7 +224,7 @@ MODULE TravUtil
       END (* TYPECASE *) 
     END InitEstTravInfo 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InitEstTravInfoFwd 
     ( VAR EstTravInfo : EstTravInfoTyp 
     ; EstNodeRef : LbeStd . EstRootTyp 
@@ -252,7 +249,7 @@ MODULE TravUtil
       END (* IF *) 
     END InitEstTravInfoFwd  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InitEstTravInfoBwd 
     ( VAR EstTravInfo : EstTravInfoTyp 
     ; EstNodeRef : LbeStd . EstRootTyp 
@@ -277,11 +274,11 @@ MODULE TravUtil
       END (* IF *) 
     END InitEstTravInfoBwd  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InitToChildContainingNodeNo 
     ( VAR EstTravInfo : EstTravInfoTyp 
     ; EstNodeRef : LbeStd . EstRootTyp 
-    ; EstNodeNo : LbeStd . EstNodeNoTyp 
+    ; EstRelNodeNo : LbeStd . EstNodeNoTyp 
       (* ^Node number relative to EstNodeRef. *) 
     ; KindSet : EstHs . EstChildKindSetTyp := EstHs . EstChildKindSetEmpty  
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
@@ -292,16 +289,19 @@ MODULE TravUtil
       IF EstHs . EstChildKindOptSingletonList IN KindSet 
       THEN 
         BuildEstTravInfoForSingletonList 
-          ( (* VAR *) EstTravInfo , EstNodeRef , ParentAbsNodeNo ) 
-      ; SetToChildContainingNodeNo ( (* IN OUT *) EstTravInfo , EstNodeNo ) 
+          ( (* VAR *) EstTravInfo , EstNodeRef , ParentAbsNodeNo )
+      ; Assert
+          ( EstRelNodeNo = 1 (* In the fictitious unoptimized list. *) 
+          , AFT . A_InitToChildContainingNodeNo_nonzero_node_no
+          )
       ELSE 
         InitEstTravInfo 
           ( (* VAR *) EstTravInfo , EstNodeRef , ParentAbsNodeNo ) 
-      ; SetToChildContainingNodeNo ( (* IN OUT *) EstTravInfo , EstNodeNo ) 
+      ; SetToChildContainingNodeNo ( (* IN OUT *) EstTravInfo , EstRelNodeNo ) 
       END (* IF *) 
     END InitToChildContainingNodeNo 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE GetLMEstChild ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp )
   RAISES { AssertionFailure }  
   (* PRE: EstTravInfo is initialized. *) 
@@ -322,7 +322,7 @@ MODULE TravUtil
       (* Remaining fields will have been set initially and unmolested since. *) 
       ELSE (* Not singleton-optimized list. *)  
         TYPECASE EstTravInfo . EtiParentRef 
-        OF NULL 
+        OF NULL   
         => (* Treat as off the right end: Defensive: *) 
           EstTravInfo . EtiChildNo := 0
         ; EstTravInfo . EtiChildRelNodeNo := 0
@@ -361,7 +361,7 @@ MODULE TravUtil
       END (* IF *) 
     END GetLMEstChild 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE GetRMEstChild ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp )
   RAISES { AssertionFailure }  
   (* PRE: EstTravInfo is initialized. *) 
@@ -386,7 +386,7 @@ MODULE TravUtil
       (* Remaining fields will have been set initially and unmolested since. *) 
       ELSE 
         TYPECASE EstTravInfo . EtiParentRef 
-        OF NULL 
+        OF NULL  
         => (* Treat as off the left end: Defensive: *) 
           EstTravInfo . EtiChildNo := - 1 
         ; EstTravInfo . EtiChildRelNodeNo := 0 
@@ -431,7 +431,7 @@ MODULE TravUtil
       END (* IF *) 
     END GetRMEstChild 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SetToIthChild 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
     ; I : LbeStd . EstChildNoTyp 
@@ -472,7 +472,7 @@ MODULE TravUtil
                        ) 
           (* Leave other fields alone in case it is later reset to child 0. *) 
           END (* IF *) 
-        ELSE (* Not an optimized-wasy singleton list. *) 
+        ELSE (* Not an optimized-away singleton list. *) 
           IF I >= EstTravInfo . EtiChildCt   
           THEN (* Treat as off the right end: Defensive: *) 
             EstTravInfo . EtiChildNo := EstTravInfo . EtiChildCt 
@@ -492,10 +492,10 @@ MODULE TravUtil
       END (* IF *) 
     END SetToIthChild 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SetToChildContainingNodeNo 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
-    ; EstNodeNo : LbeStd . EstNodeNoTyp 
+    ; EstRelNodeNo : LbeStd . EstNodeNoTyp 
       (* ^Node number relative to the parent of EstTravInfo. *) 
     )
   RAISES { AssertionFailure }  
@@ -508,12 +508,12 @@ MODULE TravUtil
           ( EstTravInfo . EtiChildCt = 1 
           , AFT . A_TravUtil_SetToChildContainingNodeNo_BadSingletonList 
           ) 
-      ; IF EstNodeNo < 0 
+      ; IF EstRelNodeNo < 0 
         THEN (* Treat as off the left end: Defensive: *) 
           EstTravInfo . EtiChildNo := - 1  
         ; EstTravInfo . EtiChildRelNodeNo := 0 
         (* Leave other fields alone in case it is later reset to child 0. *) 
-      ; ELSIF EstNodeNo 
+      ; ELSIF EstRelNodeNo 
               - 1 (* Discount the optimized-away list node. *) 
               < EstUtil . EstNodeCt 
                   ( EstTravInfo . EtiChildLeafElem . LeChildRef )  
@@ -535,7 +535,7 @@ MODULE TravUtil
       ELSE 
         EstUtil . GetEstChildContainingRelNodeNo 
           ( EstTravInfo . EtiParentRef 
-          , EstNodeNo 
+          , EstRelNodeNo 
           , (* VAR *) EstTravInfo . EtiChildNo 
           , (* VAR *) EstTravInfo . EtiChildRelNodeNo 
           , (* VAR *) EstTravInfo . EtiChildLeafElem 
@@ -544,7 +544,7 @@ MODULE TravUtil
       END (* IF *) 
     END SetToChildContainingNodeNo 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IncEstChild ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp ) 
   RAISES { AssertionFailure } 
   (* PRE: EstTravInfo is initialized. *) 
@@ -612,7 +612,7 @@ MODULE TravUtil
       END (* IF *) 
     END IncEstChild 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DecEstChild ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp ) 
   RAISES { AssertionFailure } 
   (* PRE: EstTravInfo is initialized. *) 
@@ -678,7 +678,7 @@ MODULE TravUtil
       END (* IF *) 
     END DecEstChild 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SetToNextInKindSet 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
     ; StartChildNo : LbeStd . EstChildNoTyp 
@@ -725,7 +725,7 @@ MODULE TravUtil
       END (* IF *) 
     END SetToNextInKindSet 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SetToPrevInKindSet 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
     ; StartChildNo : LbeStd . EstChildNoTyp 
@@ -766,7 +766,7 @@ MODULE TravUtil
 
 (* Utility: *) 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ChildIndentPositions 
     ( Lang : LbeStd . LangTyp  
     ; FsEstChildNodeRef : LangUtil . FsNodeRefTyp 
@@ -854,7 +854,7 @@ MODULE TravUtil
       END (* IF *) 
     END ChildIndentPositions 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IsInFirstLine  
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
@@ -973,7 +973,7 @@ MODULE TravUtil
     ; RETURN LIsInFirstLine 
     END IsInFirstLine 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE CheckModFwd 
     ( READONLY EstTravInfo : EstTravInfoTyp 
     ; FsNodeRef : LangUtil . FsNodeRefTyp 
@@ -1042,7 +1042,7 @@ MODULE TravUtil
       END (* IF *) 
     END CheckModFwd 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DoCondFmtFwd 
     ( Lang : LbeStd . LangTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
@@ -1153,7 +1153,7 @@ MODULE TravUtil
       END 
     END DoCondFmtFwd 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DoCondFmtBwd 
     ( Lang : LbeStd . LangTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
@@ -1246,7 +1246,7 @@ MODULE TravUtil
       END (* IF *)  
     END DoCondFmtBwd 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE GetDescendantWithNodeNo 
     ( Root : LbeStd . EstRootTyp 
     ; EstNodeNo : LbeStd . EstNodeNoTyp 
@@ -1326,7 +1326,7 @@ MODULE TravUtil
       END (* IF *) 
     END GetDescendantWithNodeNo 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE NodeCtOfDescendantWithNodeNo 
     ( Root : LbeStd . EstRootTyp 
     ; EstNodeNo : LbeStd . EstNodeNoTyp 
@@ -1353,7 +1353,7 @@ MODULE TravUtil
     ; RETURN LResult 
     END NodeCtOfDescendantWithNodeNo 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DescendCondFmt 
     ( Lang : LbeStd . LangTyp 
     ; FsNodeRef : LangUtil . FsNodeRefTyp 
@@ -1413,7 +1413,7 @@ MODULE TravUtil
       END (* LOOP *) 
     END DescendCondFmt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FsLeafRefOfFmtNo 
     ( Lang : LbeStd . LangTyp 
     ; FsNodeRef : LangUtil . FsNodeRefTyp 
@@ -1614,7 +1614,7 @@ MODULE TravUtil
       (* m3gdb fails to print ParentFsNodeRef, hence the local. *)  
     END GetNodeInfo 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IndentPosOfBolTokMark 
     ( Lang : LbeStd . LangTyp 
     ; EstRoot : LbeStd . EstRootTyp 
@@ -1758,7 +1758,7 @@ MODULE TravUtil
       END (* CASE *) 
     END IndentPosOfBolTokMark 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE GetFsEstDescendant 
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
     ; VAR ParentRef : LangUtil . FsNodeRefTyp 
@@ -3261,7 +3261,7 @@ MODULE TravUtil
       END (* IF *) 
     END PreTraversedFsSubtreeFits 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FmtKindForEstDescending 
     ( FsKind : FsKindTyp 
       (* ^Must be in LangUtil . FsKindSetFsRoot *) 
@@ -3376,7 +3376,7 @@ TRUE OR
       END (*( IF *) 
     END FmtKindForEstDescending 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FmtKindForEstTraversing 
     ( Lang : LbeStd . LangTyp 
     ; CharPos : LbeStd . LimitedCharNoSignedTyp 
@@ -3513,7 +3513,7 @@ TRUE OR
       END (* IF *) 
     END FmtKindForEstTraversing 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FmtKindForFsSubtreeDescending   
     ( Lang : LbeStd . LangTyp 
     ; RootFsNodeRef : LangUtil . FsNodeRefTyp
@@ -3729,7 +3729,7 @@ TRUE OR
       END (* IF *) 
     END FmtKindForFsSubtreeDescending
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE FmtKindForFsSubtreeTraversing  
     ( Lang : LbeStd . LangTyp 
     ; CharPos : LbeStd . LimitedCharNoSignedTyp 
@@ -3799,7 +3799,7 @@ TRUE OR
       END (* if *) 
     END FmtKindForFsSubtreeTraversing
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE PassEstListChild 
     ( VAR (* IN OUT *) EstListChildrenToPass : LbeStd . EstChildNoTyp ) 
   (* Call this when passing an EstListChild *) 
@@ -3810,7 +3810,7 @@ TRUE OR
       END (* IF *) 
     END PassEstListChild
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DoTakeLineBreak 
     ( Lang : LbeStd . LangTyp 
     ; CharPos : LbeStd . LimitedCharNoSignedTyp 
@@ -3896,7 +3896,7 @@ TRUE OR
       END (* IF*) 
     END DoTakeLineBreak 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE AssertFwdNoLostFixedChild 
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
@@ -3924,7 +3924,7 @@ TRUE OR
       END (* IF *) 
     END AssertFwdNoLostFixedChild 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE AssertBwdNoLostFixedChild 
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 

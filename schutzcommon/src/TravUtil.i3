@@ -103,7 +103,7 @@ INTERFACE TravUtil
 ; PROCEDURE InitToChildContainingNodeNo 
     ( VAR EstTravInfo : EstTravInfoTyp 
     ; EstNodeRef : LbeStd . EstRootTyp 
-    ; EstNodeNo : LbeStd . EstNodeNoTyp 
+    ; EstRelNodeNo : LbeStd . EstNodeNoTyp 
       (* ^Node number relative to EstNodeRef. *) 
     ; KindSet : EstHs . EstChildKindSetTyp := EstHs . EstChildKindSetEmpty  
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
@@ -138,7 +138,7 @@ INTERFACE TravUtil
 
 ; PROCEDURE SetToChildContainingNodeNo 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
-    ; EstNodeNo : LbeStd . EstNodeNoTyp 
+    ; EstRelNodeNo : LbeStd . EstNodeNoTyp 
       (* ^Node number relative to the parent of EstTravInfo. *) 
     ) 
   RAISES { AssertionFailure } 

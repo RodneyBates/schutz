@@ -3030,47 +3030,8 @@ MODULE TempMark
                 := EstUtil . FsRuleForEstNode 
                      ( ParseInfo . PiLang 
                      , RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
-                     ) 
-            ; CASE RbmState 
-              OF RbmStateDescend   
-              => RbmTeTfsSetIndentInfo ( Bwd := FALSE )  
-
-              | RbmStateBwdNl  
-              => RbmTeTfsSetIndentInfo ( Bwd := TRUE )  
-
-              | RbmStateFwdNl  
-              => RbmTeTfsSetIndentInfo ( Bwd := FALSE )  
-              ; IF EstUtil . CharPosPlusWidthInfo 
-                     ( RbmCharPos , EstRef . KTreeWidthInfo ) 
-                    > Options . RightMargin 
-                THEN (* Implied Nl before the ModTok, which ends line. *)
-                  IF RbmPrevTok # LbeStd . Tok__BegOfLine 
-                  THEN 
-                    RbmTeSqueezeTrailingTempMarks 
-                      ( RbmTokBegPos , LbeStd . LimitedCharNoInfinity ) 
-                  END (* IF *) 
-                ; RbmCharPos := 0 
-                ; RbmPrevTok := LbeStd . Tok__BegOfLine 
-                ; RbmPrevTokToPos := 0 
-                ; RbmTokBegPos := 0 
-                ; RbmLastFmtNoOnLine := EstHs . FmtNoUnknown  
-                ; RbmEstListChildrenToPass := 0 (* Dead *) 
-                ; RbmCurrentLineTokMark 
-                    := Marks . TokMarkTyp 
-                         { EstNodeNo 
-                             := RootAbsNodeNo 
-                                + RbmTeEstTravInfo . EtiChildRelNodeNo 
-                         , EstNodeCt := EstUtil . EstNodeCt ( EstRef ) 
-                         , Kind := MarkKindTyp . Plain 
-                         , FmtNo := FsNodeRef . FsFmtNo 
-                         , StartAtEnd := TRUE 
-                         , IsImpliedNewLine := TRUE
-                         , Tok := EstRef . EstTok 
-                         } 
-                 (* But keep traversing LToR, because the backwards phase
-                    would have traversed RToL right through this point. *) 
-                 END (* IF *) 
-              END (* CASE *) 
+                     )
+            ; RbmTeTfsSetIndentInfo ( Bwd := RbmState = RbmStateBwdNl ) 
             ; LChildFmtKind := FmtKindHoriz 
             ; RbmTraverseEst 
                 ( EstRef 

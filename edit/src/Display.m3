@@ -3812,7 +3812,7 @@ MODULE Display
           THEN
             TreeBrowse . Browse 
               ( LOldEstRef , LImagePers . IpLang 
-              , "Before BuildMarkList" 
+              , "Before BuildTempMarkList" 
               ) 
           END (* IF *) 
         ; TempMark . BuildTempMarkList ( ImageRef , LParseInfo )
@@ -3821,7 +3821,7 @@ MODULE Display
           THEN
             TreeBrowse . Browse 
               ( LOldEstRef , LImagePers . IpLang 
-              , "After BuildMarkList, before parse" 
+              , "After BuildTempMarkList, before parse" 
               ) 
           END (* IF *) 
         ; LInitialParseTravStateRef
