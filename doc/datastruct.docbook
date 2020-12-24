@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Docbook introduction to Schutz.--> 
+<!-- Schutz data structures. --> 
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
                   "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
   [ <!ENTITY schutz "Schutz">
@@ -7,6 +7,7 @@
     <!ENTITY ldl1 "Ldl1">
     <!ENTITY ast "AST">
     <!ENTITY est "EST">
+    <!ENTITY varterm "VarTerm">
   ]
 >
 
@@ -14,7 +15,7 @@
   <articleinfo>
   <title> The &schutz; Data Structure   </title> 
     <author> <firstname>Rodney</firstname> <surname>Bates</surname> </author>
-    <date> 2020-11-24 </date>  
+    <date> 2020-11-25 </date>  
   </articleinfo>
 
   <sect1 id="intro">
@@ -22,9 +23,9 @@
 
     <para>
       The primary data structure in &schutz;, which represents code
-      being edited, is called an &est;, for <em>Extended Syntax Tree</em>.
+      being edited, is called an &est;, for <emphasis>Extended Syntax Tree</emphasis>.
       Imbedded within an &est; is an &ast;, abstractly viewable as a standard
-      <em>abstract syntax tree</em>, with some significant representational
+      <emphasis>abstract syntax tree</emphasis>, with some significant representational
       differences.
     </para>
 
@@ -34,7 +35,7 @@
       to all languages and have special porposes.  These are
       declared in LbdStd.i3.  For each langauge, there are
       several categories of codes.
-      <em>constant terminals</em>.
+      <emphasis>constant terminals</emphasis>.
     </para>
 
     <para>
@@ -45,7 +46,7 @@
       for parsing purposes, is a terminal in the grammar of the language,
       but has additional information attached, for uses beyond parsing.   
       Identifiera and string literals are typical examples.  In schutz,
-      these are called &varterm_l;s, for <em> variable terminal </em>.
+      these are called &varterm;s, for <emphasis> variable terminal </emphasis>.
       These are represented by a node containing the token code and a
       pointer to atom of the character string.
     </para>
@@ -65,23 +66,23 @@
 
     <para>
       A schutz est is similar.  Each interior est node has an ast token,
-      and some of its leaf nodes are varterms.  But there are possibly other
-      children, besides ests and varterms.  These are called mods.
-      for <em>modifier</em>.  They represent nonsyntactic content such
+      and some of its leaf nodes are &varterm;s.  But there are possibly other
+      children, besides ests and &varterm;s.  These are called mods.
+      for <emphasis>modifier</emphasis>.  They represent nonsyntactic content such
       as comments, error messages, etc.  Moreover, the children are stored
       in a runtime variable list. 
     </para>
 
     <para>
       Displaying content texually entails a variation
-      on <em>paramodulation</em>.  There is a language-dependent set
+      on <emphasis>paramodulation</emphasis>.  There is a language-dependent set
       of rewrite rules, one for each ast token.  Each rule gives a
       list of what, in a paramodulation system, are
-      called <em>variables</em> that match the ast children of the
+      called <emphasis>variables</emphasis> that match the ast children of the
       ast node.  Interspersed among these are other items that are
       to be inserted into the textual equivant of the est node.
       Most commonly, ond of these is a terminal symbol of fixed spelling,
-      called a constterm, for <em>constant terminal</em>.  A constterm
+      called a constterm, for <emphasis>constant terminal</emphasis>.  A constterm
       correspond to a delimiter token, such as "IF", or ";", that
       brackets and separates the textual representations of the subtrees.
     </para>
@@ -98,20 +99,20 @@
     <para>
       In schutz, the rewrite rules of a language are orginally
       specified textually, in ldl1, by the language definer.  The
-      rules are called fsrules, for <em>format syntax</em> rules.  Ldl
+      rules are called fsrules, for <emphasis>format syntax</emphasis> rules.  Ldl
       processing of these converts each to a linked tree data
       structure, which is loaded into RAM as part of the supporting
-      data for a language.  This is called an fstree, <em>format
-       syntax</em> tree.  The fstree for an ast node is located
+      data for a language.  This is called an fstree, <emphasis>format
+       syntax</emphasis> tree.  The fstree for an ast node is located
       directly by the node's token code.  Nodes of an fstree that
-      call for inserting a constterm are called <em>insertion tokens</em>
+      call for inserting a constterm are called <emphasis>insertion tokens</emphasis>
       and are leaf nodes.  
     </para>
 
     <para>
       There are several additional complications possible in a format
       syntax rule/tree.  First, along the leaf nodes, there may also be
-      <em>line breaks</em>.  These specify that a new line is to be
+      <emphasis>line breaks</emphasis>.  These specify that a new line is to be
       begun where the line break occurs.  The inserted new line is
       indented by a dynamically computed amount inherited from above,
       plus a static amount attached to the line break.
@@ -120,11 +121,11 @@
     <para>
       There are three conditions controlling whether a line break is
       actually taken.  All line breaks in a range of textual material
-      have the same condition.  A group of <em>vertical</em> line
-      breaks are always inserted.  A group of <em>horizontal</em> line
+      have the same condition.  A group of <emphasis>vertical</emphasis> line
+      breaks are always inserted.  A group of <emphasis>horizontal</emphasis> line
       break is inserted only if the entire range of textual material
       they belong to fits on the current line.  Otherwise, none of
-      them is taken.  a <em>fill</em> line break, independently of the
+      them is taken.  a <emphasis>fill</emphasis> line break, independently of the
       others in its range, is taken if the material from it to the
       following (fill) line break or the end of the range fits on the
       line.  Thus sections of material delimited by fill line breaks
@@ -148,8 +149,8 @@
 
     <para>
       The leaf nodes of an fsrule are numbered sequentially,
-      left-to-right.  These are called fsnos, for <em>format syntax
-      numbers</em>.  They are used to match fstree leaf nodes to est
+      left-to-right.  These are called fsnos, for <emphasis>format syntax
+      numbers</emphasis>.  They are used to match fstree leaf nodes to est
       leaf nodes.  Each est leaf also has a fsno stored it it.  This
       will be equal to the fsno of the fsrule leaf that corresponds to
       it.
@@ -159,7 +160,7 @@
       In addition to ast children, all of
       the modifier children of the est, have a fsno too.  This attaches the
       modifier to an ast child.  Each kind of modifier is statically either
-      <em>leading</em> or <em>trailing</em>, the former being more
+      <emphasis>leading</emphasis> or <emphasis>trailing</emphasis>, the former being more
       common.  Every leaf of an fstree matches a range, possibly
       empty, of est children all with the same fsno as the fstree
       leaf.  This will include zero or more leading modifiers, an
@@ -167,7 +168,7 @@
     </para>
 
     <para>
-      The est child can occur only for a varterm, but even then is
+      The est child can occur only for a &varterm;, but even then is
       optional.  It could be optional in the abstract grammer of the
       language, e.g. an initial value expression of a variable declaration.
       It can also be removed in various cases involving textual editing,
@@ -179,7 +180,7 @@
       est, but implicitly part of its textual material.  This saves a lot
       of memory, perticularly since many of them will be a single character.
       So when one needs to be removed, it is done, perversely, by inserting
-      a <em>delete modifier</em>  This is a leading modifier containing the
+      a <emphasis>delete modifier</emphasis>  This is a leading modifier containing the
       fsno of the insertion token.  It specifies that the token is not to
       be inserted.  It can also apply to a line break.  Unlike any other
       kind of modifier, it also gives an ending fmtno, so one modifier can
@@ -187,7 +188,7 @@
     </para>
 
     <para>
-      In schutz terminlogy, a <em>newline</em> causes
+      In schutz terminlogy, a <emphasis>newline</emphasis> causes
       textual display to start on the next line.  But unlike a carriage return,
       multiple newlines, concatentated with nothing visible in between, only
       cause moving to the next line once.  One might say concatenation of
@@ -196,7 +197,7 @@
     </para>
 
     <para>
-      A <em>blank line mod</em> is a leading modifier that specifies
+      A <emphasis>blank line mod</emphasis> is a leading modifier that specifies
       insertion of two or more new lines, but there is implicitly one
       or more lines of white but nonempty space between then, so they
       are not concatenated in the way described above.  It is the only
@@ -217,7 +218,7 @@
 
     <para>
       When the user types new or altered text, which has yet to be reparsed,
-      I <em>text modifier</em> gets inserted.  All text altered or touched by
+      I <emphasis>text modifier</emphasis> gets inserted.  All text altered or touched by
       a contiguous group of edits is removed from the est in the ways described
       above.  Then any alterted text is inserted as a text modifier.  It
       resembles a comment modifier, but will be rescanned and reparsed
@@ -226,10 +227,10 @@
     </para>
 
     <para>
-      A <em>token modifier</em> is used so as not to lose user-typed
+      A <emphasis>token modifier</emphasis> is used so as not to lose user-typed
       text that the parser suggests deleting, as part of its syntax
       repair.  The token can have a large complement of leading and trailing modifiers
-      as well as its own text, if a varterm.
+      as well as its own text, if a &varterm;.
       A token modifier is actually a mini-est with one root and children like a
       single fsno would have. 
     </para>
@@ -240,8 +241,8 @@
     </para>
 
     <para>
-      The children of an est node are kept in an array of <em>leaf
-      elements</em>, which have additional fields beside the obvious
+      The children of an est node are kept in an array of <emphasis>leaf
+      elements</emphasis>, which have additional fields beside the obvious
       pointer to the child node.  One is the fsno of the child.  This
       is a property that is meaningful only in the context of the
       parent node, so belongs here.  Another is a cumulative count of
@@ -259,10 +260,10 @@
       variable number of children.  However, there are many places
       this would require linear-time search through the children, which in
       some cases, will be longish.  Instead, at a lower level, a single
-      est node and its children are actually represented by a <em>K tree</em>.
+      est node and its children are actually represented by a <emphasis>K tree</emphasis>.
       After the initial development of the K tree data structure, it
       was pointed out that the term K tree was in use with another meaning,
-      so they were renamed <em>Sequence trees</em> in later literature.
+      so they were renamed <emphasis>Sequence trees</emphasis> in later literature.
       But "KTree" was already in extensive use in the the code of schutz,
       so has been retained there.
     </para>
@@ -307,7 +308,7 @@
       Aside from systematic traversal of an entire est, there are two
       methods of locating a desired node in an est.  One is for
       locating a node with some interesting property.  Each est node a
-      set of <em>kind bits</em>.  This is a fixed set of bits, each
+      set of <emphasis>kind bits</emphasis>.  This is a fixed set of bits, each
       denoting an interesting node property.
       Each est node holds bits
       for all properties found anywhere in its subtree.  Thus finding
@@ -360,7 +361,7 @@
       meaningful.  Prior to reparsing, a mark on an est leaf node is
       converted to a pointer directly to the node, node kind bits are
       inserted into the est that lead to each such pointed-to leaf node.
-      These are called tempmarks, for <em>temporary marks</em>.
+      These are called tempmarks, for <emphasis>temporary marks</emphasis>.
     </para>
 
     <para>
@@ -426,7 +427,7 @@
 
     <para>
       Decisions about whether to take a horizontal line break are made
-      without traversing, with the aid of <em>width info</em>, a
+      without traversing, with the aid of <emphasis>width info</emphasis>, a
       collection of information about the space occupied by the text
       of an est node.  This is complicated by the fact that, in
       addition to a simple character count, it can involve new lines
@@ -453,17 +454,5 @@
       is not too computationally demanding.  
     </para>
 
-    <para>
-      
-    </para>
-
-    <para>
-    </para>
-
-    <para>
-    </para>
-
-    <para>
-    </para>
-
-</article>
+  </sect1>
+</article><!-- Schutz data structures. --> 

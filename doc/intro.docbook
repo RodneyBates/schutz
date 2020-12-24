@@ -11,9 +11,9 @@
 
 <article id="schutz-intro" lang="en">
   <articleinfo>
-  <title> &schutz;, a programming-language-aware editor. </title> 
+  <title> An introductions to the &schutz;, programming-language-aware editor. </title> 
     <author> <firstname>Rodney</firstname> <surname>Bates</surname> </author>
-    <date> 2008-10-31 </date>  
+    <date> 2020-11-24 </date>  
   </articleinfo>
 
   <sect1 id="intro">
@@ -89,7 +89,7 @@
     </sect2>      
 
     <sect2 id= "SyntLayout">
-      <title> Automatic Layout of Syntactic Mterial</title>
+      <title> Automatic Layout of Syntactic Material</title>
 
       <para>
         The layout of syntactic content of the code being edited
@@ -303,4 +303,4 @@
     </sect2>      
   </sect1>
 
-</article><!--schutz-intro-->
+</article> <!-- Docbook introduction to Schutz.--> 
