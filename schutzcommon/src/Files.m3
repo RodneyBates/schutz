@@ -550,7 +550,7 @@ MODULE Files
         | Thread . Alerted => RAISE Thread . Alerted 
 
         ELSE
-          LMsg := "Can't parse input text file " & FileName 
+          LMsg := "Can't open input text file " & FileName 
         ; RAISE Error ( LMsg ) 
         END (* EXCEPT *) 
 (* 
