@@ -3985,7 +3985,10 @@ MODULE TempMark
               ELSE 
                 TYPECASE <* NOWARN *> 
                   RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
-                OF NULL 
+                OF ModHs . EstDummyTyp (* Including NIL. *)
+(* CHECK ^Is this right?  Once we got here with the est child zero pointing
+          to a dummy, with child kind contains temp mark, but no temp mark
+          pointing there.  What does this mean? *)
                 => RETURN WhatNextTyp . FsItem 
                 | SharedStrings . T ( TString ) 
                   => IF SharedStrings . Tok ( TString ) 
