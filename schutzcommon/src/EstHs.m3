@@ -250,8 +250,9 @@ MODULE EstHs
   = BEGIN (* EstLeafNodeCt *) 
       WITH WArrayRef = EstLeafArrayRef ( Self ) 
       DO IF WArrayRef = NIL 
-         THEN 
-           RETURN 0 
+         THEN RETURN 0
+         ELSIF NUMBER ( WArrayRef ^ ) <= 0 
+         THEN RETURN 0
          ELSE 
            WITH WElem = WArrayRef [ NUMBER ( WArrayRef ^ ) - 1 ] 
            DO RETURN WElem . LeCumNodeCt 
