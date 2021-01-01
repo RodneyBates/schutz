@@ -3629,8 +3629,9 @@ MODULE TempMark
             THEN LTok := LbeStd . Tok__OptSingletonList 
             ELSE LTok := EstUtil . EstTok ( RbmTeEstTravInfo . EtiNodeRef ) 
             END (* IF *) 
-          ; IF RbmTeEstTravInfo . EtiChildCt = 0 
-            THEN (* No Est children. *) 
+          ; IF RbmTeEstTravInfo . EtiChildCt = 0 (* No Est children. *)
+               OR RootFsNodeRef . FsKind IN LangUtil . FsKindSetEstFixed
+            THEN 
               RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
                      { EstNodeNo := RootAbsNodeNo 
@@ -4137,10 +4138,6 @@ MODULE TempMark
                        RbmEstRefForTrailingMarks := RbmTeRMChildRef 
                      ; RbmTeSqueezeTrailingTempMarks  
                          ( 0 , LbeStd . LimitedCharNoInfinity ) 
-                     ; Assert 
-                         ( RbmTempMarkElemNo >= RbmTempMarkElemCt 
-                         , AFT . A_RbmTeTraverseFs_Unrebuilt_marks_at_EOI
-                         ) 
                      END (* IF *) 
                    ; RbmTokBegPos := 0 (* Dead? *)  
                    ; RbmCharPos := 0 (* Dead? *)  
