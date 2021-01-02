@@ -17,7 +17,7 @@ INTERFACE Misc
 ; IMPORT PortTypes
 
 ; PROCEDURE LoadYourself ( ) 
-  (* Call this to get the containing library package loaded. *)
+  (* Call this early, to get the containing dynamic library package loaded. *)
 
 ; PROCEDURE CeilLog10 ( Val : INTEGER ) : INTEGER
 (* Number of characters required to represent Val in decimal. *) 
@@ -128,7 +128,7 @@ INTERFACE Misc
 ; PROCEDURE IsPickleOrCheckpointName ( Name : TEXT ) : BOOLEAN 
   (* Ignores a version suffix.  Works on anything from a full path name 
      down to just a suffix without even a dot. 
-  *) 
+  *)
 
 ; END Misc 
 . 

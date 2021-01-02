@@ -23,6 +23,10 @@ INTERFACE UnsafeUtils
 
 ; PROCEDURE AdrToRT0_ActivationPtr ( Address : ADDRESS ) : RT0 . ActivationPtr 
 
+; PROCEDURE DisplayException ( Tag : TEXT ; Addr : ADDRESS )
+  (* Display, on command line, an interpretation of a value gotten from
+     Compiler.ThisException. *)
+
 ; TYPE TypeCodeTyp = CARDINAL 
 
 ; PROCEDURE ObjectSize ( TC : TypeCodeTyp ) : INTEGER 

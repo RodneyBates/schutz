@@ -10,10 +10,11 @@ MODULE Files
 
 (* Routines for accessing Schutz-specific files. *) 
 
-; IMPORT Atom 
+; IMPORT Atom
+; IMPORT Compiler 
 ; IMPORT FileRd 
 ; IMPORT FileWr 
-; IMPORT Fmt 
+; IMPORT Fmt
 ; IMPORT FS 
 ; IMPORT OSError 
 (* Except for swapping the strings "Pickle" and "Pickle2 AS Pickle", make no
@@ -26,7 +27,8 @@ MODULE Files
 ; IMPORT Rsrc 
 ; IMPORT TextRd 
 ; IMPORT TextWr 
-; IMPORT Thread 
+; IMPORT Thread
+; IMPORT UnsafeUtils 
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
@@ -518,7 +520,8 @@ MODULE Files
   ; VAR LRdT : Rd . T 
   ; VAR LSuffixInfo : SuffixInfo . T 
   ; VAR LSuffix : TEXT 
-  ; VAR LMsg : TEXT 
+  ; VAR LMsg : TEXT
+  ; VAR LException : ADDRESS 
 
   ; BEGIN (* OpenNamedTextFile *) 
       LSuffix := LangUtil . LangSuffixOfFileName ( FileName )  
@@ -539,7 +542,8 @@ MODULE Files
           LRdT := FileRd . Open ( FileName ) 
         EXCEPT Thread . Alerted => RAISE Thread . Alerted 
         ELSE 
-          LMsg := "Can't open input text file " & FileName 
+          LMsg := "Can't open input file " & FileName 
+        ; LException := Compiler . ThisException ( ) 
         ; RAISE Error ( LMsg ) 
         END (* EXCEPT *) 
       ; TRY 
@@ -550,7 +554,9 @@ MODULE Files
         | Thread . Alerted => RAISE Thread . Alerted 
 
         ELSE
-          LMsg := "Can't open input text file " & FileName 
+          LMsg := "Can't parse input text file " & FileName
+        ; LException := Compiler . ThisException ( )
+        ; UnsafeUtils . DisplayException ( "OpenNamedTextFile" , LException ) 
         ; RAISE Error ( LMsg ) 
         END (* EXCEPT *) 
 (* 

@@ -18,12 +18,12 @@ MODULE Misc
 ; IMPORT OSError 
 ; IMPORT Pathname 
 ; IMPORT Process 
-; IMPORT Rd 
+; IMPORT Rd
 ; IMPORT TextRd 
 ; IMPORT TextSeq 
 ; IMPORT TextWr 
 ; IMPORT Text 
-; IMPORT Thread 
+; IMPORT Thread
 ; IMPORT Wr 
 
 ; IMPORT LbeStd 
@@ -37,7 +37,7 @@ MODULE Misc
 
 (* EXPORTED: *) 
 ; PROCEDURE LoadYourself ( )
-  (* Call this to get the containing library package loaded. *)
+  (* Call this early, to get the containing dynamic library package loaded. *)
 
   = VAR I : INTEGER
   ; BEGIN
