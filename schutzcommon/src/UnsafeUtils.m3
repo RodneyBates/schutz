@@ -57,6 +57,7 @@ UNSAFE MODULE UnsafeUtils
    do this properly.  That is a runtime system change, not to be undertaken
    lightly.  This is a temporary expedient to keep moving forward on
    schutz. *)
+(* Later note: The version in RTExStack looks to be identical. *)
 
 (* OR, maybe keep here and write to a TEXT or Wr.T, for more flexibility? *)
 
@@ -82,6 +83,7 @@ UNSAFE MODULE UnsafeUtils
       RTIO.PutText ("  arg=");        RTIO.PutAddr (a.un_arg);
     END;
     RTIO.PutText ("\n");
+    RTIO.Flush ();
   END PutExcept
 
 

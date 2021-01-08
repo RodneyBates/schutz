@@ -830,12 +830,10 @@ MODULE Parser
           , TokInfo . TiPatchTempMarkRange
           , FmtNo
           ) 
-      ; IF NOT LangUtil . TokClass ( ParseInfo . PiLang , MergeInfo . MsEstTok )
-               IN LbeStd . TokClassSetAsList
-               (* ^ Merging into an Est fixed node.  Will later patch as
-                    ChildFmtNo. *)
-           OR MergeInfo . MiRMChildRef = NIL 
-              (* ^ No child yet.  Will later patch as RightSibFmtNo. *)
+      ; IF MergeInfo . MiRMChildRef = NIL 
+           (* ^ No child yet.  Will later patch as RightSibFmtNo, if/when
+              a child appears, or ChildFmtNo if the merge finishes
+              childless. *)
         THEN 
           DeferTempMarkRange ( MergeInfo , TokInfo . TiPatchTempMarkRange )
         ELSE (* Patch as LeftSib.  We have enough info to do so right now. *)
@@ -858,33 +856,29 @@ MODULE Parser
     ; MergeInfo : MergeInfoTyp (* Fields can change. *)
     ; ChildRef : LbeStd . EstRootTyp
     )
-  (* Call this *before* merging an explicit EST child.  *) 
+  (* Call this *before* merging ChildRef as an explicit EST child.  *) 
   = BEGIN
       IF MergeInfo . MiRMChildRef = NIL 
-      THEN (* ChildRef will be the irst, thus RM, child to be noted. *)
-        IF LangUtil . TokClass ( ParseInfo . PiLang , MergeInfo . MsEstTok )
-           IN LbeStd . TokClassSetAsList
-        THEN
-          (* ChildRef will be the RM child of a list.  Patch any deferred
-             RightSib tempmarks.  These can only be trailing mods attached
-             to this explicit child. *)
-          Assert
-            ( ChildRef # NIL
-            , AFT . A_NoteEstChildImminent_temp_mark_on_nil_child_of_list
-            )
-        ; IF NOT IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet )
-          THEN 
-            PatchTempMarkSetKindsAndEstRefs
-              ( MergeInfo . MiTempMarkListRef 
-              , MergeInfo . MiDeferredTempMarkSet 
-              , MarkKindTyp . RightSibFmtNo
-              , ChildRef
-              ) 
-          ; EstBuild . InclNextRightmostChildKindSet
-              ( MergeInfo , EstHs . EstChildKindSetContainsTempMark ) 
-          ; MergeInfo . MiDeferredTempMarkSet := IntSets . Empty ( ) 
-          END (* IF *) 
+      THEN (* ChildRef will be the first, thus RM, child to be noted. 
+              Patch any deferred tempmarks as RightSib tempmarks.  These
+              can only be trailing mods attached to this explicit child. *)
+        Assert
+          ( ChildRef # NIL
+          , AFT . A_NoteEstChildImminent_temp_mark_on_nil_child
+          )
+      ; IF NOT IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet )
+        THEN 
+          PatchTempMarkSetKindsAndEstRefs
+            ( MergeInfo . MiTempMarkListRef 
+            , MergeInfo . MiDeferredTempMarkSet 
+            , MarkKindTyp . RightSibFmtNo
+            , ChildRef
+            ) 
+        ; EstBuild . InclNextRightmostChildKindSet
+            ( MergeInfo , EstHs . EstChildKindSetContainsTempMark ) 
+        ; MergeInfo . MiDeferredTempMarkSet := IntSets . Empty ( ) 
         END (* IF *) 
+
       ; MergeInfo . MiRMChildRef := ChildRef 
       END (* IF *) 
     END NoteEstChildImminent 
@@ -1194,8 +1188,8 @@ MODULE Parser
 
   = BEGIN 
       IF NOT IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet ) 
-      THEN (* Patch deferred temp marks as ChildFmtNo marks pointing to the finished
-              node.  It could be a fixed node or a list node with no Est children. *) 
+      THEN (* Patch deferred temp marks as ChildFmtNo marks pointing to the
+              finished node.  It will have no Est children. *) 
         PatchTempMarkSetKindsAndEstRefs 
           ( MergeInfo . MiTempMarkListRef 
           , TempMarkSet := MergeInfo . MiDeferredTempMarkSet
@@ -1715,9 +1709,7 @@ MODULE Parser
       END RedInsTok 
 
   ; PROCEDURE RedAstStringOrEstChild 
-      ( FsNodeRef : LangUtil . FsNodeRefTyp 
-      ; ChildIsPresent : BOOLEAN 
-      ) 
+      ( FsNodeRef : LangUtil . FsNodeRefTyp ; ChildIsPresent : BOOLEAN ) 
     RAISES { AssertionFailure } 
     (* The Fs node is a string or Est child. *) 
 
@@ -1737,7 +1729,6 @@ MODULE Parser
   ; RedDumpStacks ( DumpAll := TRUE ) 
   END 
 ; 
-
           Assert 
             ( RedNextBseMatches ( FsNodeRef ) 
             , AFT . A_RedAstStringOrEstChild_Mismatched_est_child 
@@ -2416,7 +2407,11 @@ TRUE OR
       ; WITH 
           WTrialState = StateList . SlStates [ StateList . SlLatest ] 
         , WReduceInfo = ParseInfo . PiGram . ReduceInfoRef ^ [ ProdNo ] 
-        DO 
+        DO
+IF WReduceInfo.BuildTok=225
+THEN
+  LNewParseStackElemRef := NIL 
+END ;
           LNewParseStackElemRef := NEW ( ParseHs . ParseStackElemRefTyp ) 
         ; LFsNodeRef 
             := LangUtil . FsRuleForTok 
@@ -3184,7 +3179,7 @@ TRUE OR
         ; EVAL EstBuild . InitMergeState 
                  ( LMergeInfo  
                  , ParseInfo . PiLang 
-                 , LangUtil . VarTermModTok 
+                 , LangUtil . VarTermModTok
                      ( ParseInfo . PiLang , TokInfo . TiTok ) 
                  , EstRefToInheritFrom := NIL 
                  ) 
@@ -3198,17 +3193,18 @@ TRUE OR
         ; LDoPatch
             := NOT ParseHs . RangeIsEmpty ( TokInfo . TiPatchTempMarkRange )
         ; IF LDoPatch
-          THEN (* This token has temp marks, which implies it is an insertion
-                  token.  The temp marks will need to be repatched to be
-                  ChildFmtNo marks of the new ModTok. *)
+          THEN (* This token has temp marks to be patched, which implies it is
+                  an insertion token.  *)
             Assert
               ( LangUtil . TokClass ( ParseInfo . PiLang , TokInfo . TiTok )
                 = LbeStd . TokClassTyp . TokClassConstTerm 
               , AFT . A_RepConstructAntideletion_patch_not_ins_tok 
               )
-          ; LTempMarkRange := TokInfo . TiPatchTempMarkRange
+       
+       (* ; LTempMarkRange := TokInfo . TiPatchTempMarkRange
           ; TokInfo . TiPatchTempMarkRange := ParseHs . TempMarkRangeEmpty
             (* ^Don't let MergeSliceList do its usual FmtNo patching. *)
+       *)
           END (* IF *) 
         ; MergeSliceList 
             ( ParseInfo 
@@ -3223,7 +3219,7 @@ TRUE OR
             , (* VAR *) ResultTreeRef := LNewEstRef 
             )
 
-        ; IF LDoPatch 
+        ; IF FALSE AND LDoPatch 
           THEN
             Assert
               ( IntSets . IsEmpty ( LMergeInfo . MiDeferredTempMarkSet )

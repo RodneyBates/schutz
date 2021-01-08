@@ -55,7 +55,7 @@ MODULE TempMark
      for either left or right sib insertion tokens? 
 *) 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE BuildTempMarkList 
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; VAR ParseInfo : ParseHs . ParseInfoTyp 
@@ -187,7 +187,7 @@ MODULE TempMark
       ; EstChildNo : LbeStd . EstChildNoTyp 
         (* ^EstRef has this KindSet and ChildNo in GrandparentRef. *) 
       ; GrandparentEstRef : EstHs . EstRefTyp 
-      ; RootAbsNodeNo : LbeStd . EstNodeNoTyp 
+      ; EstAbsNodeNo : LbeStd . EstNodeNoTyp 
       ; RootFsNodeRef : LangUtil . FsNodeRefTyp 
       ; EstFmtKind : FmtKindTyp 
       ; EstIndentPos1 : LbeStd . LimitedCharNoTyp 
@@ -332,7 +332,7 @@ MODULE TempMark
           THEN 
             IF BtmTeEstTravInfo . EtiChildNo < BtmTeEstTravInfo . EtiChildCt 
                AND BtmTmEstNodeNo 
-                   = RootAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo  
+                   = EstAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo  
             THEN (* Got lucky.  It's current child. *) 
               EstUtil . SetChildKindBitTRUE 
                 ( BtmTeEstRefToPatch  
@@ -341,7 +341,7 @@ MODULE TempMark
                 , LWasAlreadyMarked (* Dead. *) 
                 ) 
             ELSIF BtmTeRMChildRelNodeNo # LbeStd . EstNodeNoNull  
-                  AND BtmTmEstNodeNo = RootAbsNodeNo + BtmTeRMChildRelNodeNo 
+                  AND BtmTmEstNodeNo = EstAbsNodeNo + BtmTeRMChildRelNodeNo 
             THEN (* Another lucky case: the rightmost child. *) 
               EstUtil . SetChildKindBitTRUE 
                 ( BtmTeEstRefToPatch  
@@ -349,7 +349,7 @@ MODULE TempMark
                 , EstHs . EstChildKindContainsTempMark 
                 , LWasAlreadyMarked (* Dead. *)
                 )
-            ELSIF RootAbsNodeNo < BtmTmEstNodeNo 
+            ELSIF EstAbsNodeNo < BtmTmEstNodeNo 
                   AND BtmTmEstNodeNo < EstUtil . EstNodeCt ( EstRef ) 
             THEN (* Desired node is inside current subtree. *)
               Assert 
@@ -358,7 +358,7 @@ MODULE TempMark
                 ) 
             ; EstUtil . SetDescendentKindBitTRUE 
                 ( BtmTeEstTravInfo . EtiParentRef 
-                , BtmTmEstNodeNo - RootAbsNodeNo 
+                , BtmTmEstNodeNo - EstAbsNodeNo 
                 , EstHs . EstChildKindContainsTempMark 
                 ) 
             ELSE (* Worst case: it's outside our subtree.  Must start at top. *)
@@ -502,7 +502,7 @@ MODULE TempMark
               ) 
           ; BtmTmEstRef := BtmTeEstTravInfo . EtiStringRef 
           ; BtmTmEstRefIsMarked := FALSE 
-          ; BtmTmEstNodeNo := RootAbsNodeNo 
+          ; BtmTmEstNodeNo := EstAbsNodeNo 
           ; BtmTmKind := MarkKindTyp . Plain 
           ; BtmTmFmtNo := FsNodeRef . FsFmtNo 
             (* ^Dead, but maybe useful in debugging. *) 
@@ -650,7 +650,7 @@ MODULE TempMark
               := BtmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
           ; BtmTmEstRefIsMarked := FALSE 
           ; BtmTmEstNodeNo 
-              := RootAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
+              := EstAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
           ; BtmTmKind := TmKind  
           ; BtmTmFmtNo := BtmTeEstTravInfo . EtiChildFmtNo 
             (* ^Dead, but maybe useful in debugging. *) 
@@ -666,9 +666,9 @@ MODULE TempMark
 
         = BEGIN 
             IF BtmTeEstTravInfo . EtiChildCt = 0 
-            THEN (* Child mark. *) 
+            THEN (* ChildFmtNo mark. *) 
               BtmTmEstRef := BtmTeEstTravInfo . EtiParentRef 
-            ; BtmTmEstNodeNo := RootAbsNodeNo 
+            ; BtmTmEstNodeNo := EstAbsNodeNo 
             ; BtmTmKind := MarkKindTyp . ChildFmtNo 
             ELSIF BtmTeEstTravInfo . EtiChildNo 
                     < BtmTeEstTravInfo . EtiChildCt 
@@ -688,7 +688,7 @@ MODULE TempMark
             ; BtmTmEstRef 
                 := BtmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
             ; BtmTmEstNodeNo 
-                := RootAbsNodeNo 
+                := EstAbsNodeNo 
                    + BtmTeEstTravInfo . EtiChildRelNodeNo 
             ; BtmTmKind := MarkKindTyp . LeftSibFmtNo 
             ELSE (* Right sib mark. *) 
@@ -699,7 +699,7 @@ MODULE TempMark
                 , BtmTmEstNodeNo 
                 ) 
             ; BtmTmEstRef := BtmTeRMChildRef 
-            ; BtmTmEstNodeNo := RootAbsNodeNo + BtmTeRMChildRelNodeNo 
+            ; BtmTmEstNodeNo := EstAbsNodeNo + BtmTeRMChildRelNodeNo 
             ; BtmTmKind := MarkKindTyp . RightSibFmtNo 
             END (* IF *) 
           ; BtmTmFmtNo := FsNodeRef . FsFmtNo 
@@ -776,7 +776,7 @@ MODULE TempMark
               , BtmTeEstTravInfo . EtiChildLeafElem . LeKindSet  
               , BtmTeEstTravInfo . EtiChildNo 
               , BtmTeEstTravInfo . EtiParentRef   
-              , RootAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
+              , EstAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
               , LFsNodeRef 
               , LChildFmtKind 
               , LChildIndentPos1 
@@ -1113,7 +1113,7 @@ MODULE TempMark
             , BtmStateTyp . BtmStateStartAtEnd 
             => BtmTeTfsSetIndentInfo ( )
             ; IF BtmLineMarkMeat . LmTokMark . EstNodeNo 
-                  = RootAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
+                  = EstAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
                   AND BtmLineMarkMeat . LmTokMark . Kind = MarkKindTyp . Plain 
               THEN (* Starting mark denotes this ModTok.  This means we are
                       starting at an implied Nl for the ModTok. *)  
@@ -1157,7 +1157,7 @@ MODULE TempMark
               , BtmTeEstTravInfo . EtiChildLeafElem . LeKindSet  
               , BtmTeEstTravInfo . EtiChildNo 
               , BtmTeEstTravInfo . EtiParentRef   
-              , RootAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
+              , EstAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
               , LChildFsNodeRef 
               , FmtKindHoriz  
               , BtmTeIndentPos 
@@ -1242,7 +1242,7 @@ MODULE TempMark
               ; BtmTmEstRef := TString 
               ; BtmTmEstRefIsMarked := FALSE 
               ; BtmTmEstNodeNo 
-                  := RootAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
+                  := EstAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
               ; BtmTmKind := MarkKindTyp . Plain 
               ; BtmTmFmtNo := FsNodeRef . FsFmtNo 
                 (* ^Dead, but maybe useful in debugging. *) 
@@ -1450,7 +1450,7 @@ MODULE TempMark
 
             OF BtmStateTyp . BtmStateStartAtBeg 
             , BtmStateTyp . BtmStateStartAtEnd 
-            => IF RootAbsNodeNo 
+            => IF EstAbsNodeNo 
                   + EstUtil . EstNodeCt ( BtmTeEstTravInfo . EtiNodeRef ) 
                   + ORD ( BtmTeEstTravInfo . EtiIsOptSingletonList )  
                   <= BtmLinesRef . LrBolTokMark . EstNodeNo 
@@ -1690,9 +1690,9 @@ MODULE TempMark
           ; CASE BtmState 
             OF BtmStateTyp . BtmStateStartAtBeg 
             , BtmStateTyp . BtmStateStartAtEnd 
-            => IF RootAbsNodeNo = BtmLineMarkMeat . LmTokMark . EstNodeNo 
+            => IF EstAbsNodeNo = BtmLineMarkMeat . LmTokMark . EstNodeNo 
                THEN (* The mark denotes the Est root. *) 
-                 BtmTeInitEstTravInfoFwd ( EstRef , KindSet , RootAbsNodeNo )
+                 BtmTeInitEstTravInfoFwd ( EstRef , KindSet , EstAbsNodeNo )
                ; CASE BtmLineMarkMeat . LmTokMark . Kind <* NOWARN *> 
                  OF MarkKindTyp . Plain 
                  , MarkKindTyp . BlankLine
@@ -1718,13 +1718,17 @@ MODULE TempMark
                ELSE 
                  BtmTeInitToChildContainingNodeNo 
                    ( EstRef 
-                   , BtmLineMarkMeat . LmTokMark . EstNodeNo - RootAbsNodeNo 
+                   , BtmLineMarkMeat . LmTokMark . EstNodeNo - EstAbsNodeNo 
                    , KindSet 
-                   , RootAbsNodeNo  
+                   , EstAbsNodeNo  
+                   ) 
+               ; Assert
+                   ( BtmTeEstTravInfo . EtiChildCt > 0
+                   , AFT . AF_BtmTraverseEst_descend_thru_empty_node 
                    ) 
                ; IF BtmLineMarkMeat . LmTokMark . Kind 
                     = MarkKindTyp . RightSibFmtNo 
-                    AND RootAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
+                    AND EstAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
                         = BtmLineMarkMeat . LmTokMark . EstNodeNo 
                  THEN 
                    Assert
@@ -1741,13 +1745,13 @@ MODULE TempMark
             ; BtmTeStartFmtNo := BtmTeEstTravInfo . EtiChildFmtNo (* Default. *)
             ; CASE BtmLineMarkMeat . LmTokMark . Kind 
               OF MarkKindTyp . ChildFmtNo 
-              => IF RootAbsNodeNo = BtmLineMarkMeat . LmTokMark . EstNodeNo 
+              => IF EstAbsNodeNo = BtmLineMarkMeat . LmTokMark . EstNodeNo 
                  THEN 
                    BtmTeStartFmtNo := BtmLineMarkMeat . LmTokMark . FmtNo 
                  END (* IF *) 
 
               | MarkKindTyp . LeftSibFmtNo 
-              => IF RootAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
+              => IF EstAbsNodeNo + BtmTeEstTravInfo . EtiChildRelNodeNo 
                     = BtmLineMarkMeat . LmTokMark . EstNodeNo 
                  THEN 
                    BtmTeStartFmtNo := BtmLineMarkMeat . LmTokMark . FmtNo 
@@ -1756,7 +1760,7 @@ MODULE TempMark
               | MarkKindTyp . RightSibFmtNo 
               => IF BtmTeEstTravInfo . EtiChildNo 
                     >= BtmTeEstTravInfo . EtiChildCt 
-                    AND RootAbsNodeNo + BtmTeRMChildRelNodeNo 
+                    AND EstAbsNodeNo + BtmTeRMChildRelNodeNo 
                         = BtmLineMarkMeat . LmTokMark . EstNodeNo 
                  THEN 
                    BtmTeStartFmtNo := BtmLineMarkMeat . LmTokMark . FmtNo 
@@ -1769,7 +1773,7 @@ MODULE TempMark
 
             | BtmStateTyp . BtmStatePassingNl 
             , BtmStateTyp . BtmStateInLine 
-            => BtmTeInitEstTravInfoFwd ( EstRef , KindSet , RootAbsNodeNo )
+            => BtmTeInitEstTravInfoFwd ( EstRef , KindSet , EstAbsNodeNo )
             ; BtmTeStartFmtNo := 0  
             ; LInitialFsChildNo := 0 
             ; BtmTeIsFirstLine := TRUE 
@@ -1867,7 +1871,7 @@ MODULE TempMark
                 , KindSet := EstHs . EstChildKindSetEmpty  
                 , EstChildNo := 0 
                 , GrandparentEstRef := NIL 
-                , RootAbsNodeNo := 0 
+                , EstAbsNodeNo := 0 
                 , RootFsNodeRef 
                     := EstUtil . FsRuleForEstNode  
                          ( ParseInfo . PiLang 
@@ -2062,7 +2066,7 @@ MODULE TempMark
       ; EstChildNo : LbeStd . EstChildNoTyp 
         (* ^EstRef has this KindSet and ChildNo in GrandparentRef. *) 
       ; GrandparentEstRef : EstHs . EstRefTyp 
-      ; RootAbsNodeNo : LbeStd . EstNodeNoTyp 
+      ; EstAbsNodeNo : LbeStd . EstNodeNoTyp 
       ; RootFsNodeRef : LangUtil . FsNodeRefTyp 
       ; VAR (* IN OUT *)  EstApproxFmtKind : FmtKindTyp 
         (* ^EstApproxFmtKind could be FmtKindUnknown if the subtree has finite 
@@ -2708,7 +2712,7 @@ MODULE TempMark
                   , RbmTeEstTravInfo . EtiChildLeafElem . LeKindSet  
                   , RbmTeEstTravInfo . EtiChildNo 
                   , RbmTeEstTravInfo . EtiParentRef   
-                  , RootAbsNodeNo + RbmTeEstTravInfo . EtiChildRelNodeNo 
+                  , EstAbsNodeNo + RbmTeEstTravInfo . EtiChildRelNodeNo 
                   , EssChildFsNodeRef 
                   , (* IN OUT *) EssChildFmtKind  
                   , EstRecomputeFmtKindProc := RbmTeTfsEssRecomputeFmtKind
@@ -2766,7 +2770,7 @@ MODULE TempMark
               ; RbmCurrentLineTokMark 
                   := Marks . TokMarkTyp 
                        { EstNodeNo 
-                           := RootAbsNodeNo 
+                           := EstAbsNodeNo 
                               + RbmTeEstTravInfo . EtiChildRelNodeNo 
                        , EstNodeCt := 1 
                        , Kind := MarkKindTyp . BlankLine 
@@ -2807,7 +2811,7 @@ MODULE TempMark
               ; RbmCurrentLineTokMark 
                   := Marks . TokMarkTyp 
                        { EstNodeNo 
-                           := RootAbsNodeNo 
+                           := EstAbsNodeNo 
                               + RbmTeEstTravInfo . EtiChildRelNodeNo 
                        , EstNodeCt := 1 
                        , Kind := MarkKindTyp . BlankLine 
@@ -2860,7 +2864,7 @@ MODULE TempMark
             ; RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
                      { EstNodeNo 
-                         := RootAbsNodeNo 
+                         := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt := 1 
                      , Kind := MarkKindTyp . Plain 
@@ -2896,7 +2900,7 @@ MODULE TempMark
           ; RbmCurrentLineTokMark 
               := Marks . TokMarkTyp 
                    { EstNodeNo 
-                       := RootAbsNodeNo 
+                       := EstAbsNodeNo 
                           + RbmTeEstTravInfo . EtiChildRelNodeNo 
                    , EstNodeCt := 1 
                    , Kind := MarkKindTyp . Plain 
@@ -3038,7 +3042,7 @@ MODULE TempMark
                 , RbmTeEstTravInfo . EtiChildLeafElem . LeKindSet  
                 , RbmTeEstTravInfo . EtiChildNo 
                 , RbmTeEstTravInfo . EtiParentRef   
-                , RootAbsNodeNo + RbmTeEstTravInfo . EtiChildRelNodeNo 
+                , EstAbsNodeNo + RbmTeEstTravInfo . EtiChildRelNodeNo 
                 , LFsNodeRef 
                 , (* IN OUT *) LChildFmtKind 
                 , EstRecomputeFmtKindProc := FsRecomputeFmtKindProc  
@@ -3197,7 +3201,7 @@ MODULE TempMark
             ; RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
                      { EstNodeNo 
-                         := RootAbsNodeNo 
+                         := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt := 1 
                      , Kind := MarkKindTyp . Plain 
@@ -3248,7 +3252,7 @@ MODULE TempMark
             ; RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
                      { EstNodeNo 
-                         := RootAbsNodeNo 
+                         := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt := 1 
                      , Kind := MarkKindTyp . Plain 
@@ -3593,7 +3597,7 @@ MODULE TempMark
                       ) 
                   ; Assertions . MessageText 
                       ( "NILed out internal DummyTempMark, in RebuildMarksList, Root node no "
-                        & LbeStd . EstNodeNoImage ( RootAbsNodeNo ) 
+                        & LbeStd . EstNodeNoImage ( EstAbsNodeNo ) 
                         & ", child no "
                         & LbeStd . EstChildNoImage 
                             ( RbmTeEstTravInfo . EtiChildCt - 1 ) 
@@ -3630,12 +3634,13 @@ MODULE TempMark
             ELSE LTok := EstUtil . EstTok ( RbmTeEstTravInfo . EtiNodeRef ) 
             END (* IF *) 
           ; IF RbmTeEstTravInfo . EtiChildCt = 0 (* No Est children. *)
-               OR RootFsNodeRef . FsKind IN LangUtil . FsKindSetEstFixed
             THEN 
               RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo := RootAbsNodeNo 
-                     , EstNodeCt := 1 
+                     { EstNodeNo := EstAbsNodeNo 
+                     , EstNodeCt
+                         := EstUtil . EstNodeCt
+                              ( RbmTeEstTravInfo . EtiNodeRef ) 
                      , Kind := MarkKindTyp . ChildFmtNo 
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
@@ -3650,7 +3655,7 @@ MODULE TempMark
               RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
                      { EstNodeNo 
-                         := RootAbsNodeNo 
+                         := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt 
                          := EstUtil . EstNodeCt 
@@ -3670,7 +3675,7 @@ MODULE TempMark
             ELSE (* There is an Est child to the left but not to the right. *)
               RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo := RootAbsNodeNo + RbmTeRMChildRelNodeNo 
+                     { EstNodeNo := EstAbsNodeNo + RbmTeRMChildRelNodeNo 
                      , EstNodeCt 
                          := EstUtil . EstNodeCt ( RbmTeRMChildRef )
                             + ORD ( EstHs . EstChildKindOptSingletonList 
@@ -4243,8 +4248,10 @@ MODULE TempMark
                           = EstHs . EstNodeKindTyp . EstNodeKindModTok
                    THEN
                      (* This should no longer happen.  This case should be
-                        marked as ChildFmtNo. *) 
-                     RbmTeFmtNo := EstHs . FmtNoModTok (* Probably dead. *) 
+                        marked as *FmtNo. *)
+                     CantHappen
+                       ( AFT . AF_RbmTeComputeEstAndFmtNoForDescend_temp_makr_on_mod_tok ) 
+                   ; RbmTeFmtNo := EstHs . FmtNoModTok (* Probably dead. *) 
                    ELSE
                      Assert 
                        ( RbmTeEstTravInfo . EtiParentRef = NIL 
@@ -4346,7 +4353,7 @@ FALSE AND             WTempMark . EstRef
                 ) 
             ; Assertions . MessageText 
                 ( "NILed out rightmost DummyTempMark, in RebuildMarksList, Root node no "
-                  & LbeStd . EstNodeNoImage ( RootAbsNodeNo ) 
+                  & LbeStd . EstNodeNoImage ( EstAbsNodeNo ) 
                   & ", child no "
                   & LbeStd . EstChildNoImage 
                       ( RbmTeEstTravInfo . EtiChildCt - 1 ) 
@@ -4386,7 +4393,7 @@ FALSE AND             WTempMark . EstRef
             END (* IF *) 
           ; CASE RbmState 
             OF RbmStateDescend 
-            => RbmTeInitEstTravInfoFwd ( EstRef , KindSet , RootAbsNodeNo )
+            => RbmTeInitEstTravInfoFwd ( EstRef , KindSet , EstAbsNodeNo )
             ; RbmTeInitRMFsChildNo ( LFsChildCt ) 
             ; RbmTeComputeEstAndFmtNoForDescend ( ) 
             ; IF RbmTeDoneWEst 
@@ -4397,7 +4404,7 @@ FALSE AND             WTempMark . EstRef
               END (* IF *) 
 
             | RbmStateBwdNl 
-            => RbmTeInitEstTravInfoBwd ( EstRef , KindSet , RootAbsNodeNo ) 
+            => RbmTeInitEstTravInfoBwd ( EstRef , KindSet , EstAbsNodeNo ) 
             ; RbmTeInitRMFsChildNo ( LFsChildCt ) 
             ; CASE RootFsNodeRef . FsKind <* NOWARN *> 
 
@@ -4431,7 +4438,7 @@ FALSE AND             WTempMark . EstRef
               END (* CASE *) 
 
             | RbmStateFwdNl 
-            => RbmTeInitEstTravInfoFwd ( EstRef , KindSet , RootAbsNodeNo )
+            => RbmTeInitEstTravInfoFwd ( EstRef , KindSet , EstAbsNodeNo )
             ; RbmTeInitRMFsChildNo ( LFsChildCt ) 
             ; RbmTeInitNodeToPatch ( ) 
             ; LInitialFsChildNo := 0 
@@ -4549,7 +4556,7 @@ FALSE AND             WTempMark . EstRef
             , EstHs . EstChildKindSetEmpty  
             , EstChildNo := 0 
             , GrandparentEstRef := NIL 
-            , RootAbsNodeNo := 0           
+            , EstAbsNodeNo := 0           
             , RootFsNodeRef 
                 := EstUtil . FsRuleForEstNode ( ParseInfo . PiLang , NewEstRef )
             , (* IN OUT *) EstApproxFmtKind := LChildFmtKind 
@@ -4587,7 +4594,7 @@ FALSE AND             WTempMark . EstRef
 (* VISIBLE *) 
 ; PROCEDURE UnmarkEst 
     ( EstRef : LbeStd . EstRootTyp 
-    ; RootAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
+    ; EstAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
   RAISES { AssertionFailure , Thread . Alerted } 
 
@@ -4636,7 +4643,7 @@ FALSE AND             WTempMark . EstRef
           ; Assertions . MessageText 
               ( "Removed DummyTempMark, in UnmarkEst, ode no "
                 & LbeStd . EstNodeNoImage 
-                    ( RootAbsNodeNo + LEstTravInfo . EtiChildRelNodeNo ) 
+                    ( EstAbsNodeNo + LEstTravInfo . EtiChildRelNodeNo ) 
               ) 
 
           ELSE 
@@ -4646,7 +4653,7 @@ FALSE AND             WTempMark . EstRef
           THEN 
             UnmarkEst 
               ( LEstTravInfo . EtiChildLeafElem . LeChildRef 
-              , RootAbsNodeNo + LEstTravInfo . EtiChildRelNodeNo 
+              , EstAbsNodeNo + LEstTravInfo . EtiChildRelNodeNo 
               ) 
           ; EstUtil . SetChildKindBitFALSE 
               ( TEstTreeRef 
@@ -4669,7 +4676,7 @@ FALSE AND             WTempMark . EstRef
       END (* TYPECASE *) 
     END UnmarkEst 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DisconnectMarksFromLinesRefs 
     ( ImageTrans : PaintHs . ImageTransientTyp ) 
   (* For every mark, remove its reference to a LinesRef. *) 
@@ -4694,7 +4701,7 @@ FALSE AND             WTempMark . EstRef
       END (* LOOP *) 
     END DisconnectMarksFromLinesRefs 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SavePermanentMarks 
     ( ImageTrans : PaintHs . ImageTransientTyp 
     ; VAR SavedMarkListRef : ParseHs . TempMarkArrayRefTyp 
@@ -4744,7 +4751,7 @@ FALSE AND             WTempMark . EstRef
       END (* LOOP *) 
     END SavePermanentMarks 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE RestorePermanentMarks 
     ( ImageTrans : PaintHs . ImageTransientTyp 
     ; SavedMarkListRef : ParseHs . TempMarkArrayRefTyp 

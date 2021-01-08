@@ -522,8 +522,7 @@ MODULE TextEdit
                   , StartBolTokMark := LBegOfImageMark 
                   , ExpectedLineCt := TFirstLinesRef . LrLineCt 
                   , ExpectedAtEndOfImage 
-                      := TFirstLinesRef . LrRightLink 
-                         = LHeader 
+                      := TFirstLinesRef . LrRightLink = LHeader 
                   , ExpectedString := LineString ( TFirstLinesRef ) 
                   , (* VAR *) RegeneratedString := LRegeneratedString 
                   , (* VAR *) RegeneratedTextAttrArrayRef 

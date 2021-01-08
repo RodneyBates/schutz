@@ -410,7 +410,13 @@ INTERFACE TravUtil
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { AssertionFailure }
 
+; PROCEDURE NodeNoOfNodeRef 
+    ( RootNodeRef , SoughtNodeRef : LbeStd . EstRootTyp ) 
+  : LbeStd . EstNodeNoTyp
+  (* LbeStd.EstNodNoNull, if not found. *) 
+  RAISES { AssertionFailure } 
+  
 ; END TravUtil 
 . 

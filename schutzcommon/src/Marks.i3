@@ -41,29 +41,24 @@ INTERFACE Marks
            BlankLineNo and BlCharPos fields. *) 
       , ChildFmtNo 
         (* A ChildFmtNo mark is used to indicate a point in an InsTok 
-           that belongs to the format syntax tree for a fixed node.  It 
-           leads to the parent Est node and gives the format number of 
-           the Fs child it refers to.  This representation copes with 
-           the case where the Fs child becomes a child of an Est node 
-           with a different token after reparsing.  In consequence, it 
-           requires that parse traverser deliver a range of Mark 
-           subscripts belonging to the syntactic token.  The parser 
-           must then use this to reconstruct the Mark record when it 
-           reduces to an Est node. *) 
+           that belongs to the format syntax tree for an Est node that
+           has no children.  It leads to the parent Est node and gives
+           the format number of the Fs child it refers to. *)
       , LeftSibFmtNo 
       , RightSibFmtNo 
-        (* These kinds are used to indicate 
-           a point in an InsTok that belongs to the format syntax tree 
-           for a list node.  The EstNodeNo or EstRef leads to the child
-           Est node of which the Fs child is a left/right sibling. This
-           allows whole slices which contain Marks within to be sliced and 
-           respliced more easily.  This depends on the fact that the slice 
-           always is denoted to the parser by a sublist nonterminal 
-           uniquely associated with the full list nonterminal, and 
-           therefore, a list built from a list slice will have the same 
-           parent Est node kind after resplicing as before, with the same 
-           format syntax tree.  Only InsToks to the right of all Est 
-           children use RightSib. *)
+        (* These kinds are used to indicate a point in an InsTok that
+           belongs to the format syntax tree for an Est node with one
+           or more children.  The EstNodeNo or EstRef leads to the child
+           Est node of which the Fs child is a left/right sibling.  Only
+           InsToks to the right of all Est children use RightSib.
+
+           *SibFmtNo marks allow whole slices of a list that contains
+           Marks within to be sliced and respliced more easily.  This
+           depends on the fact that a list slice is denoted to the
+           parser by a sublist nonterminal uniquely associated with the
+           full list nonterminal, and therefore, a list built from a list
+           slice will have the same parent Est node kind after resplicing
+           as before, and with the same format syntax tree. *)
       } 
 
 ; PROCEDURE MarkKindImage ( Value : MarkKindTyp ) : TEXT 

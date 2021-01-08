@@ -3940,8 +3940,63 @@ TRUE OR
           , AFT . A_AssertBwdNoLostFixedChild__Lost_fixed_child
           ) 
       END (* IF *) 
-    END AssertBwdNoLostFixedChild 
+    END AssertBwdNoLostFixedChild
 
-; BEGIN (* TravUtil *) 
+; EXCEPTION NodeNoFound ( LbeStd . EstNodeNoTyp ) 
+
+(* EXPORTED: *) 
+; PROCEDURE NodeNoOfNodeRef
+    ( RootNodeRef , SoughtNodeRef : LbeStd . EstRootTyp ) 
+  : LbeStd . EstNodeNoTyp
+  (* LbeStd.EstNodNoNull, if not found. *)
+  RAISES { AssertionFailure } 
+
+  = PROCEDURE NnnrRecurse
+      ( NodeRef : LbeStd . EstRootTyp ; AbsNodeNo : LbeStd . EstNodeNoTyp )
+    RAISES { NodeNoFound , AssertionFailure } 
+
+    = VAR LChildAbsNodeNo : LbeStd . EstNodeNoTyp
+    ; VAR LEstTravInfo : EstTravInfoTyp
+
+    ; BEGIN
+        IF NodeRef = SoughtNodeRef
+        THEN RAISE NodeNoFound ( AbsNodeNo )
+        END (* IF *) 
+      ; TYPECASE NodeRef
+        OF NULL =>
+        
+        | EstHs . EstRefTyp ( TEstRef ) 
+        => InitEstTravInfoFwd
+             ( LEstTravInfo
+             , TEstRef
+             , EstHs . EstChildKindSetEmpty
+             , AbsNodeNo
+             )
+        ; IF LEstTravInfo . EtiChildCt = 0 THEN RETURN END (* IF *)
+        ; WHILE LEstTravInfo . EtiChildNo < LEstTravInfo . EtiChildCt
+          DO
+            LChildAbsNodeNo := AbsNodeNo + LEstTravInfo . EtiChildRelNodeNo 
+          ; IF LEstTravInfo . EtiChildLeafElem . LeChildRef = SoughtNodeRef
+            THEN RAISE NodeNoFound ( LChildAbsNodeNo ) 
+            END (* IF *)
+          ; NnnrRecurse
+              ( LEstTravInfo . EtiChildLeafElem . LeChildRef , LChildAbsNodeNo )
+          ; IncEstChild ( (* VAR *) LEstTravInfo ) 
+          END (* WHILE *)
+        ELSE 
+        END (* TYPECASE *) 
+      END NnnrRecurse
+
+  ; BEGIN 
+      TRY
+        NnnrRecurse ( RootNodeRef , AbsNodeNo := 0 )
+      ; RETURN LbeStd . EstNodeNoNull 
+      EXCEPT
+      | NodeNoFound ( ENodeNo )
+        => RETURN ENodeNo 
+      END (* EXCEPT *) 
+    END NodeNoOfNodeRef 
+  
+; BEGIN (* TravUtil *)
   END TravUtil 
 . 

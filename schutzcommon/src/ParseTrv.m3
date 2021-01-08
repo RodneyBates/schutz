@@ -1834,9 +1834,12 @@ END
              ; LDeferredInfo . Tok := WSif . SifTok 
              ; LDeferredInfo . SyntTokCt := 1 
              ; LDeferredInfo . FullTempMarkRange := NpsWaitingTempMarkRange 
-             ; LDeferredInfo . PatchTempMarkRange := ParseHs . TempMarkRangeEmpty 
-             ; LDeferredInfo . WaitingTempMarkRange := ParseHs . TempMarkRangeEmpty 
-             ; NpsWaitingTempMarkRange := ParseHs . TempMarkRangeEmpty (* Dead. *) 
+             ; LDeferredInfo . PatchTempMarkRange
+                 := ParseHs . TempMarkRangeEmpty 
+             ; LDeferredInfo . WaitingTempMarkRange
+                 := ParseHs . TempMarkRangeEmpty 
+             ; NpsWaitingTempMarkRange
+                 := ParseHs . TempMarkRangeEmpty (* Dead. *) 
              ; LDeferredInfo . ObjRef := LStringRef 
              ; LDeferredInfo . KindSet := LChildKindSet
              ; NpsDeliverState := DeliverStateTyp . DsDeliver 
@@ -4023,10 +4026,7 @@ END
 *)  
           ; IF NOT ParseHs . RangeIsEmpty ( NpsWaitingTempMarkRange ) 
             THEN
-              NpsPatchTmEstRefs 
-                ( LStringRef 
-                , MarkKindTyp . Plain  
-                ) 
+              NpsPatchTmEstRefs ( LStringRef , MarkKindTyp . Plain ) 
             ; LKindSet := LKindSet + EstHs . EstChildKindSetContainsTempMark  
             END (* IF *)
 

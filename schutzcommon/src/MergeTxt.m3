@@ -33,7 +33,7 @@ MODULE MergeTxt
 
 ; TYPE AFT = MessageCodes . T 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE MergeTextEdit 
     ( Lang : LbeStd . LangTyp 
     ; EstRootRef : EstHs . EstRefTyp 
@@ -313,7 +313,7 @@ MODULE MergeTxt
   ; PROCEDURE MteTraverseEst 
       ( EstRef : LbeStd . EstRootTyp 
       ; KindSet : EstHs . EstChildKindSetTyp 
-      ; RootAbsNodeNo : LbeStd . EstNodeNoTyp 
+      ; EstAbsNodeNo : LbeStd . EstNodeNoTyp 
       ; ParentFsNodeRef : LangUtil . FsNodeRefTyp 
       ; RootFsNodeRef : LangUtil . FsNodeRefTyp 
       ; EstFmtKind : LangUtil . FmtKindTyp 
@@ -2256,7 +2256,7 @@ MODULE MergeTxt
           (* Defer MteTeMaybeFinishBwdEdit to next Est level upward. *) 
           ; IF MteCharPos < MteTouchedToPos 
             THEN 
-              MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , RootAbsNodeNo ) 
+              MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , EstAbsNodeNo ) 
             END 
 
           ELSE 
@@ -2391,7 +2391,7 @@ MODULE MergeTxt
               END 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
-                       , RootAbsNodeNo 
+                       , EstAbsNodeNo 
                          + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
             ; IF MteItemCt > 0 
@@ -2428,7 +2428,7 @@ MODULE MergeTxt
               END 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
-                       , RootAbsNodeNo 
+                       , EstAbsNodeNo 
                          + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
             ; MteTeDecEstChild ( ) 
@@ -2536,7 +2536,7 @@ MODULE MergeTxt
           ; MteTeBwdBlanks ( ) 
           ; MaxTouchedNodeNo 
               := MAX ( MaxTouchedNodeNo 
-                     , RootAbsNodeNo 
+                     , EstAbsNodeNo 
                        + MteTeEstTravInfo . EtiChildRelNodeNo 
                      ) 
           ; MteTeDecEstChild ( )  
@@ -2684,7 +2684,7 @@ MODULE MergeTxt
                 ) 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
-                       , RootAbsNodeNo 
+                       , EstAbsNodeNo 
                          + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
             ELSE (* Entire string is to left of touched region. *)  
@@ -2712,7 +2712,7 @@ MODULE MergeTxt
               END (* IF *) 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
-                       , RootAbsNodeNo 
+                       , EstAbsNodeNo 
                          + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
             END (* IF *) 
@@ -3070,7 +3070,7 @@ MODULE MergeTxt
                 ) 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
-                       , RootAbsNodeNo 
+                       , EstAbsNodeNo 
                          + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
             END 
@@ -3096,7 +3096,7 @@ MODULE MergeTxt
               END (* IF *) 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
-                       , RootAbsNodeNo 
+                       , EstAbsNodeNo 
                          + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
             END (* IF *) 
@@ -3332,7 +3332,7 @@ MODULE MergeTxt
             , MteStateTyp . MteStateStartAtEnd 
             => MteTeSetIndentInfo ( )  
             ; IF StartTokMark . EstNodeNo 
-                 = RootAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo
+                 = EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo
                  AND StartTokMark . Kind = MarkKindTyp . Plain 
               THEN (* StartTokMark denotes this ModTok.  This means we are
                       starting at an implied Nl for the ModTok. *)  
@@ -3703,7 +3703,7 @@ MODULE MergeTxt
           ; MteTraverseEst 
               ( MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
               , MteTeEstTravInfo . EtiChildLeafElem . LeKindSet  
-              , RootAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
+              , EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
               , ParentFsNodeRef := FsNodeRef 
               , RootFsNodeRef := LChildFsNodeRef 
               , EstFmtKind := LChildFmtKind 
@@ -4107,7 +4107,7 @@ MODULE MergeTxt
               ; DEC ( MteItemCt ) 
               ; Assert ( MteItemCt <= 0 , AFT . A_MteTeTfsBegOfImageNotDone ) 
               ; Assert 
-                  ( RootAbsNodeNo = 0 
+                  ( EstAbsNodeNo = 0 
                   , AFT . A_MteTeTfsBegOfImageNotZeroNodeNo 
                   ) 
               ; MteTeMaybeFinishBwdEdit 
@@ -4171,7 +4171,7 @@ MODULE MergeTxt
             ; MteTeDecEstChild ( ) 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
-                       , RootAbsNodeNo 
+                       , EstAbsNodeNo 
                          + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
 
@@ -4399,7 +4399,7 @@ MODULE MergeTxt
             CASE MteState 
             OF MteStateTyp . MteStateStartAtBeg 
             , MteStateTyp . MteStateStartAtEnd 
-            => IF RootAbsNodeNo 
+            => IF EstAbsNodeNo 
                   + ORD ( MteTeEstTravInfo . EtiIsOptSingletonList )  
                   + EstUtil . EstNodeCt ( MteTeEstTravInfo . EtiNodeRef ) 
                   <= StartTokMark . EstNodeNo 
@@ -4505,7 +4505,7 @@ MODULE MergeTxt
                 THEN 
                   MaxTouchedNodeNo 
                     := MAX ( MaxTouchedNodeNo 
-                           , RootAbsNodeNo 
+                           , EstAbsNodeNo 
                              + MteTeEstTravInfo . EtiChildRelNodeNo 
                            ) 
                 END 
@@ -4641,7 +4641,7 @@ MODULE MergeTxt
       ; TYPE WhatNextTyp = { LeadingMods , FsItem , TrailingMods } 
 
       ; PROCEDURE MteTeTfsWhatNextForDescend 
-          ( RootAbsNodeNo : LbeStd . EstNodeNoTyp 
+          ( EstAbsNodeNo : LbeStd . EstNodeNoTyp 
           ; READONLY EstTravInfo : TravUtil . EstTravInfoTyp 
           ; StartTokMark : Marks . TokMarkTyp 
           ) 
@@ -4664,7 +4664,7 @@ MODULE MergeTxt
                    OF MarkKindTyp . LeftSibFmtNo 
                    , MarkKindTyp . RightSibFmtNo 
                    => IF StartTokMark . EstNodeNo 
-                         > RootAbsNodeNo + EstTravInfo . EtiChildRelNodeNo 
+                         > EstAbsNodeNo + EstTravInfo . EtiChildRelNodeNo 
                       THEN RETURN WhatNextTyp . LeadingMods 
                       ELSE RETURN WhatNextTyp . FsItem 
                       END (* IF *) 
@@ -4673,7 +4673,7 @@ MODULE MergeTxt
                    , MarkKindTyp . Plain 
                    , MarkKindTyp . BlankLine 
                    => IF StartTokMark . EstNodeNo 
-                         >= RootAbsNodeNo + EstTravInfo . EtiChildRelNodeNo 
+                         >= EstAbsNodeNo + EstTravInfo . EtiChildRelNodeNo 
                       THEN RETURN WhatNextTyp . LeadingMods 
                       ELSE RETURN WhatNextTyp . FsItem 
                       END (* IF *) 
@@ -4735,7 +4735,7 @@ MODULE MergeTxt
                , MteStateTyp . MteStateStartAtEnd  
                => LWhatNext 
                     := MteTeTfsWhatNextForDescend 
-                         ( RootAbsNodeNo , MteTeEstTravInfo , StartTokMark ) 
+                         ( EstAbsNodeNo , MteTeEstTravInfo , StartTokMark ) 
                ; LDelete := FALSE 
                ; LIsRepair := FALSE 
 
@@ -4870,11 +4870,11 @@ MODULE MergeTxt
             (* Subtree nodes. *) 
             | FsKindTyp. FsKindSubtreeVert 
             , FsKindTyp. FsKindSubtreeHoriz 
-            => MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , RootAbsNodeNo ) 
+            => MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , EstAbsNodeNo ) 
             ; MteTeTfsFsSubtree ( ) 
 
             | FsKindTyp. FsKindSubtreeFill 
-            => MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , RootAbsNodeNo ) 
+            => MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , EstAbsNodeNo ) 
             ; MteTeContainsFill := TRUE 
 (* FIX: ^This isn't really right.  It will leave MteTeContainsFill TRUE
          if we go up a level in the fs tree, to a place that is not
@@ -4928,7 +4928,7 @@ MODULE MergeTxt
           ; CASE MteState 
             OF MteStateTyp . MteStateStartAtBeg 
             , MteStateTyp . MteStateStartAtEnd 
-            => IF RootAbsNodeNo = StartTokMark . EstNodeNo 
+            => IF EstAbsNodeNo = StartTokMark . EstNodeNo 
                THEN (* StartTokMark identifies this parent node. *)  
                  CASE StartTokMark . Kind <* NOWARN *> 
                  OF MarkKindTyp . Plain 
@@ -4939,6 +4939,8 @@ MODULE MergeTxt
                       ( MteTeEstTravInfo . EtiParentRef = NIL 
                       , AFT . A_MergeTxt_MergeTextEdit_NotLeaf 
                       ) 
+                 ; TravUtil . InitEstTravInfo 
+                     ( MteTeEstTravInfo , EstRef , EstAbsNodeNo ) 
 
                  | MarkKindTyp . ChildFmtNo 
                  => Assert
@@ -4946,7 +4948,7 @@ MODULE MergeTxt
                       , AFT . A_MteTraverseEst_ChildFmtNo_Has_children
                       )  
                  ; TravUtil . InitEstTravInfoFwd 
-                     ( MteTeEstTravInfo , EstRef , KindSet , RootAbsNodeNo ) 
+                     ( MteTeEstTravInfo , EstRef , KindSet , EstAbsNodeNo ) 
 
                  | MarkKindTyp . LeftSibFmtNo 
                  , MarkKindTyp . RightSibFmtNo 
@@ -4956,12 +4958,12 @@ MODULE MergeTxt
                  TravUtil . InitToChildContainingNodeNo 
                    ( MteTeEstTravInfo 
                    , EstRef 
-                   , StartTokMark . EstNodeNo - RootAbsNodeNo 
+                   , StartTokMark . EstNodeNo - EstAbsNodeNo 
                    , KindSet
-                   , RootAbsNodeNo 
+                   , EstAbsNodeNo 
                    ) 
                ; IF StartTokMark . Kind = MarkKindTyp . RightSibFmtNo 
-                    AND RootAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
+                    AND EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
                         = StartTokMark . EstNodeNo 
                  THEN 
                    MteTeIncEstChild ( ) 
@@ -4972,25 +4974,22 @@ MODULE MergeTxt
             ; MteTeStartFmtNo := MteTeEstTravInfo . EtiChildFmtNo (* Default. *)
             ; CASE StartTokMark . Kind 
               OF MarkKindTyp . ChildFmtNo 
-              => IF RootAbsNodeNo = StartTokMark . EstNodeNo 
-                 THEN
-                   MteTeStartFmtNo := StartTokMark . FmtNo 
+              => IF EstAbsNodeNo = StartTokMark . EstNodeNo 
+                 THEN MteTeStartFmtNo := StartTokMark . FmtNo 
                  END (* IF *) 
 
               | MarkKindTyp . LeftSibFmtNo 
-              => IF RootAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
+              => IF EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
                     = StartTokMark . EstNodeNo 
-                 THEN 
-                   MteTeStartFmtNo := StartTokMark . FmtNo 
+                 THEN MteTeStartFmtNo := StartTokMark . FmtNo 
                  END (* IF *) 
 
               | MarkKindTyp . RightSibFmtNo 
               => IF MteTeEstTravInfo . EtiChildNo 
                     >= MteTeEstTravInfo . EtiChildCt 
-                    AND RootAbsNodeNo + MteTeRMChildRelNodeNo 
+                    AND EstAbsNodeNo + MteTeRMChildRelNodeNo 
                         = StartTokMark . EstNodeNo 
-                 THEN 
-                   MteTeStartFmtNo := StartTokMark . FmtNo 
+                 THEN MteTeStartFmtNo := StartTokMark . FmtNo 
                  END (* IF *) 
               ELSE 
               END (* CASE *) 
@@ -4999,7 +4998,7 @@ MODULE MergeTxt
             , MteStateTyp . MteStatePassingNl 
             , MteStateTyp . MteStateRightNlFound 
             => TravUtil . InitEstTravInfoFwd 
-                 ( MteTeEstTravInfo , EstRef , KindSet , RootAbsNodeNo ) 
+                 ( MteTeEstTravInfo , EstRef , KindSet , EstAbsNodeNo ) 
             ; MteTeStartFmtNo := EstHs . FmtNoNull 
             ; MteTeIsFirstLine := TRUE  
             ; MteTeIndentPos := EstIndentPos1 
@@ -5008,7 +5007,7 @@ MODULE MergeTxt
             , MteStateTyp . MteStateBwdNl 
             , MteStateTyp . MteStateDone  
             => TravUtil . InitEstTravInfoBwd 
-                 ( MteTeEstTravInfo , EstRef , KindSet , RootAbsNodeNo ) 
+                 ( MteTeEstTravInfo , EstRef , KindSet , EstAbsNodeNo ) 
             ; MteTeRMChildRef 
                 := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
             ; MteTeRMChildRelNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
@@ -5112,7 +5111,7 @@ MODULE MergeTxt
           END (* IF *) 
         ; IF MteTeParentIsTouched  
           THEN 
-            MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , RootAbsNodeNo ) 
+            MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , EstAbsNodeNo ) 
           END 
         ; NewEstRef := MteTeNewEstRef 
         ; EVAL MteTeNewEstRef (* For breakpoint. *)  
@@ -5242,7 +5241,7 @@ MODULE MergeTxt
       ; MteTraverseEst 
           ( EstRef := EstRootRef 
           , KindSet := EstHs . EstChildKindSetEmpty  
-          , RootAbsNodeNo := 0 
+          , EstAbsNodeNo := 0 
           , ParentFsNodeRef := NIL 
           , RootFsNodeRef := EstUtil . FsRuleForEstNode ( Lang , EstRootRef ) 
           , EstFmtKind := LangUtil . FmtKindTyp . FmtKindVert 
