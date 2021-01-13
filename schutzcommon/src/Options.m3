@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -20,7 +20,7 @@ MODULE Options
     ; ExpensiveChecking := DebugLevel >= 2
     ; LogMessages := DebugLevel >= 3  
     ; TreeBrowsing := DebugLevel >= 4 
-    ; ParseTracing := DebugLevel >= 5 
+    ; TraceParse := DebugLevel >= 5 
     ; AllowProceedAfterAssert := DebugLevel >= FIRST ( DebugLevelTyp )  
     ; AllowTerminateAfterAssert := DebugLevel >= FIRST ( DebugLevelTyp )  
     END SetDerivedDebugOptions 

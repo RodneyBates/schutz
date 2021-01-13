@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -31,7 +31,7 @@ INTERFACE Options
 ; VAR ExpensiveChecking : BOOLEAN 
 ; VAR LogMessages : BOOLEAN 
 ; VAR TreeBrowsing : BOOLEAN 
-; VAR ParseTracing : BOOLEAN 
+; VAR TraceParse : BOOLEAN 
 ; VAR AllowProceedAfterAssert : BOOLEAN 
 ; VAR AllowTerminateAfterAssert : BOOLEAN 
 ; VAR PreferGeneratedGrammar : BOOLEAN := FALSE

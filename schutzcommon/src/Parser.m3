@@ -1,4 +1,3 @@
-
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
 (* Copyright 1988..2020, Rodney M. Bates.                                    *)
@@ -100,7 +99,7 @@ MODULE Parser
 
   = <* FATAL Wr . Failure *>
     BEGIN 
-      IF Options . ParseTracing  
+      IF Options . TraceParse  
       THEN 
         IF Options . TraceWrT # NIL AND NOT Wr . Closed ( Options . TraceWrT ) 
         THEN Wr . Close ( Options . TraceWrT ) 
@@ -127,7 +126,7 @@ MODULE Parser
 
   = <* FATAL Wr . Failure *> 
     BEGIN 
-      IF Options . ParseTracing 
+      IF Options . TraceParse 
          AND Options . TraceWrT # NIL 
          AND NOT Wr . Closed ( Options . TraceWrT ) 
       THEN 
@@ -202,7 +201,7 @@ MODULE Parser
     BEGIN 
       LResult 
         := ParseTrv . NextParseTravState ( ParseInfo , FromStateRef , SuccKind ) 
-    ; IF Options . ParseTracing 
+    ; IF Options . TraceParse 
          AND Options . TraceWrT # NIL 
          AND NOT Wr . Closed ( Options . TraceWrT ) 
       THEN 
@@ -217,7 +216,7 @@ MODULE Parser
           ( Options . TraceWrT 
           , Fmt . Pad ( Misc . RefanyImage ( FromStateRef ) , RefanyPad ) 
           ) 
-      ; Wr . PutText ( Options . TraceWrT , ", SeqNo " ) 
+      ; Wr . PutText ( Options . TraceWrT , ", TravSeqNo " ) 
       ; Wr . PutText 
           ( Options . TraceWrT , Fmt . Int ( FromStateRef . PtsSeqNo ) ) 
       ; Wr . PutText ( Options . TraceWrT , ", " ) 
@@ -232,7 +231,7 @@ MODULE Parser
           ( Options . TraceWrT 
           , Fmt . Pad ( Misc . RefanyImage ( LResult ) , RefanyPad ) 
           ) 
-      ; Wr . PutText ( Options . TraceWrT , ", SeqNo " ) 
+      ; Wr . PutText ( Options . TraceWrT , ", TravSeqNo " ) 
       ; Wr . PutText ( Options . TraceWrT , Fmt . Int ( LResult . PtsSeqNo ) ) 
       ; Wr . PutText ( Options . TraceWrT , ", " ) 
       ; Wr . PutText 
@@ -264,7 +263,7 @@ MODULE Parser
 
   = <* FATAL Wr . Failure *> 
     BEGIN 
-      IF Options . ParseTracing  
+      IF Options . TraceParse  
          AND Options . TraceWrT # NIL 
          AND NOT Wr . Closed ( Options . TraceWrT )
       THEN 
@@ -459,6 +458,7 @@ MODULE Parser
 ; PROCEDURE Shift 
     ( READONLY ParseInfo : ParseHs . ParseInfoTyp 
     ; TokInfo : ParseHs . TokInfoTyp 
+    ; FromLRState : LbeStd . LRStateTyp 
     ; ShiftLRState : LbeStd . LRStateTyp 
     ; VAR (* IN OUT *) TrialState : TrialStateTyp 
     ; VAR (* IN OUT *) LastShifted : TrialStateTyp 
@@ -498,25 +498,27 @@ MODULE Parser
 
     = <* FATAL Wr . Failure *>
       BEGIN 
-        IF Options . ParseTracing  
+        IF Options . TraceParse  
            AND Options . TraceWrT # NIL 
            AND NOT Wr . Closed ( Options . TraceWrT ) 
-        THEN 
-          IF Repairing 
+        THEN
+          Wr . PutText ( Options . TraceWrT , "Shift " ) 
+        ; IF Repairing 
           THEN 
             Wr . PutText ( Options . TraceWrT , "(Repair) " )
           ELSE
             Wr . PutText
               ( Options . TraceWrT
-              , "(SeqNo="
+              , "(TravSeqNo="
                 & Fmt . Int ( TrialState . TsParseTravStateRef . PtsSeqNo )
-                & ")"
+                & ") "
               ) 
           END (* IF *) 
         ; Wr . PutText 
             ( Options . TraceWrT 
-            , "Shift "
-              & ParseHs . TokInfoImage ( TokInfo , ParseInfo . PiLang ) 
+            , ParseHs . TokInfoImage ( TokInfo , ParseInfo . PiLang ) 
+              & ", from LRState = " 
+              & Fmt . Int ( FromLRState )  
               & ", to LRState = " 
               & Fmt . Int ( ShiftLRState )  
               & ", Delete = " 
@@ -598,9 +600,10 @@ MODULE Parser
       ; MiTempMarkRangeTo : LbeStd . MarkNoTyp 
       END (* MergeInfoTyp *)
 
-; PROCEDURE TraceTempMarkList ( ListRef : ParseHs . TempMarkArrayRefTyp ; Msg : TEXT )
+; PROCEDURE TraceTempMarkList
+    ( ListRef : ParseHs . TempMarkArrayRefTyp ; Msg : TEXT )
   = BEGIN 
-      IF Options . ParseTracing 
+      IF Options . TraceParse 
          AND Options . TraceWrT # NIL 
          AND NOT Wr . Closed ( Options . TraceWrT ) 
       THEN 
@@ -659,7 +662,7 @@ MODULE Parser
      before), ParseTrv will have finished with all temp marks that are in the
      reduced-from tokens and subtrees.  Here, we copy any such changes to
      the evolving trial state's list. 
-  *)  
+  *) 
 
   = VAR LSeqNo : ParseHs . TmSeqNoTyp 
 
@@ -669,6 +672,7 @@ MODULE Parser
         ( "CopyFullTempMarks, range "
           & ParseHs . TempMarkRangeImage ( TokInfo . TiFullTempMarkRange )
         ) 
+    ; WriteParseTraceText ( Wr . EOL ) 
     ; IF ParseHs . RangeIsEmpty ( TokInfo . TiFullTempMarkRange )
       THEN
         TraceTempMarkList ( MergeInfo . MiTempMarkListRef , "     List:   " )
@@ -680,7 +684,7 @@ MODULE Parser
         IF LangUtil . TokClass ( ParseInfo . PiLang , TokInfo . TiTok )
            IN LbeStd . TokClassSetTerm
         THEN
-          LSeqNo := MergeInfo . MiTempMarkListRef ^ [ 0 ] . SeqNo 
+          LSeqNo := MergeInfo . MiTempMarkListRef ^ [ 0 ] . SeqNo
         ; TraceTempMarkList ( MergeInfo . MiTempMarkListRef , "     Before: " ) 
         ; FOR RTempMarkSs := TokInfo . TiFullTempMarkRange . From 
               TO TokInfo . TiFullTempMarkRange . To - 1
@@ -726,9 +730,11 @@ MODULE Parser
       IF NOT ParseHs . RangeIsEmpty ( TempMarkRange )
       THEN 
         WriteParseTraceText
-          ( "PatchTempMark FmtNos, range "
+          ( "PatchTempMarkRangeFmtNos, range "
             & ParseHs . TempMarkRangeImage ( TempMarkRange )
-          ) 
+          )
+      ; WriteParseTraceText ( " FmtNo " & EstHs . FmtNoImage ( FmtNo ) ) 
+      ; WriteParseTraceText ( Wr . EOL ) 
       ; TraceTempMarkList ( TempMarkListRef , "    Before : " ) 
       ; FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
         DO
@@ -751,9 +757,13 @@ MODULE Parser
       IF NOT ParseHs . RangeIsEmpty ( TempMarkRange )
       THEN 
         WriteParseTraceText
-          ( "PatchTempMarkRange, range "
+          ( "PatchTempMarkRangeKindsAndEstRefs, "
             & ParseHs . TempMarkRangeImage ( TempMarkRange )
           ) 
+      ; WriteParseTraceText
+          ( ", MarkKind " & Marks . MarkKindImage ( MarkKind ) ) 
+      ; WriteParseTraceText ( ", EstRef " & Misc . RefanyImage ( EstRef ) ) 
+      ; WriteParseTraceText ( Wr . EOL ) 
       ; TraceTempMarkList ( TempMarkListRef , "     Before: " ) 
       ; FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
         DO WITH WTempMarkRec = TempMarkListRef ^ [ RTempMarkSs ] 
@@ -793,9 +803,13 @@ MODULE Parser
       IF NOT IntSets . IsEmpty ( TempMarkSet )
       THEN 
         WriteParseTraceText
-          ( "PatchTempMark set "
+          ( "PatchTempMarkSetKindsAndEstRefs, Set "
             & IntSets . Image ( TempMarkSet , IntImage ) 
           ) 
+      ; WriteParseTraceText
+          ( ", MarkKind " & Marks . MarkKindImage ( MarkKind ) ) 
+      ; WriteParseTraceText ( ", EstRef " & Misc . RefanyImage ( EstRef ) ) 
+      ; WriteParseTraceText ( Wr . EOL ) 
       ; TraceTempMarkList ( TempMarkListRef , "     Before: " ) 
       ; IntSets . ForAllDo ( TempMarkSet , PtmVisit )
       ; TraceTempMarkList ( TempMarkListRef , "     After:  " ) 
@@ -2195,16 +2209,17 @@ TRUE OR
 
     ; <* FATAL Wr . Failure *>
       BEGIN 
-        IF Options . ParseTracing  
+        IF Options . TraceParse  
            AND Options . TraceWrT # NIL 
            AND NOT Wr . Closed ( Options . TraceWrT ) 
         THEN 
-          IF Repairing 
-          THEN Wr . PutText ( Options . TraceWrT , "(Repair) " )           
+          Wr . PutText ( Options . TraceWrT , "Reduce" )
+        ; IF Repairing 
+          THEN Wr . PutText ( Options . TraceWrT , " (Repair)" )           
           END (* IF *) 
         ; Wr . PutText 
             ( Options . TraceWrT 
-            , "Reduce , production "
+            , ", production "
               & Fmt . Int ( ProdNo ) 
               & ", " 
               & LangUtil . TokImage 
@@ -2215,7 +2230,8 @@ TRUE OR
             Wr . PutText 
               ( Options . TraceWrT 
               , " BUILD " 
-                & LangUtil . TokImage ( ReduceInfo . BuildTok , ParseInfo . PiLang ) 
+                & LangUtil . TokImage
+                    ( ReduceInfo . BuildTok , ParseInfo . PiLang ) 
               ) 
            END (* IF *) 
         ; Wr . PutText 
@@ -2293,7 +2309,7 @@ TRUE OR
 
     ; <* FATAL Wr . Failure *> 
       BEGIN 
-        IF Options . ParseTracing  
+        IF Options . TraceParse  
            AND Options . TraceWrT # NIL 
            AND NOT Wr . Closed ( Options . TraceWrT ) 
         THEN 
@@ -2303,7 +2319,8 @@ TRUE OR
             Wr . PutText ( Options . TraceWrT , "Parse top" )
           ; Wr . PutText 
               ( Options . TraceWrT 
-              , Fmt . Pad ( Misc . RefanyImage ( ParseStackTopRef ) , RefanyPad ) 
+              , Fmt . Pad
+                  ( Misc . RefanyImage ( ParseStackTopRef ) , RefanyPad ) 
               ) 
           ; Wr . PutText ( Options . TraceWrT , ", Tok " )
           ; Wr . PutText 
@@ -2380,11 +2397,15 @@ TRUE OR
         ; IF StateList . SlLatest = LOldLatest
           THEN (* No need to copy state or its temp mark list, which will never
                   be backtracked-to. *)
-            WriteParseTraceText
-              ( "Reuse temp mark list" 
-                & ParseHs . TempMarkListImage
-                    ( StateList . SlStates [ LOldLatest ] . TsTempMarkListRef ) 
+            WriteParseTraceText ( "Reuse temp mark list" ) 
+          ; WriteParseTraceText ( Wr . EOL ) 
+          ; WriteParseTraceText
+              ( ParseHs . TempMarkListImage
+                  ( StateList . SlStates [ LOldLatest ] . TsTempMarkListRef
+                  , "       List: "
+                  ) 
               ) 
+          ; WriteParseTraceText ( Wr . EOL ) 
           ELSE 
             WITH WOldTrialState = StateList . SlStates [ LOldLatest ] 
                  , WNewTrialState = StateList . SlStates [ StateList . SlLatest ]
@@ -2393,10 +2414,12 @@ TRUE OR
                 := ParseHs . CopyOfTempMarkList ( WOldTrialState . TsTempMarkListRef )
 
             (* Trace the copy. *)
+            ; WriteParseTraceText ( "Copy temp mark list" ) 
+            ; WriteParseTraceText ( Wr . EOL ) 
             ; TraceTempMarkList
-                ( WOldTrialState . TsTempMarkListRef , "Copy temp mark list from:" )
+                ( WOldTrialState . TsTempMarkListRef , "      from: " )
             ; TraceTempMarkList
-                ( WNewTrialState . TsTempMarkListRef , "Copy temp mark list to:  " )
+                ( WNewTrialState . TsTempMarkListRef , "        to: " )
 
             ; WNewTrialState . TsJustShifted := FALSE 
             END (* WITH *)
@@ -2408,10 +2431,6 @@ TRUE OR
           WTrialState = StateList . SlStates [ StateList . SlLatest ] 
         , WReduceInfo = ParseInfo . PiGram . ReduceInfoRef ^ [ ProdNo ] 
         DO
-IF WReduceInfo.BuildTok=225
-THEN
-  LNewParseStackElemRef := NIL 
-END ;
           LNewParseStackElemRef := NEW ( ParseHs . ParseStackElemRefTyp ) 
         ; LFsNodeRef 
             := LangUtil . FsRuleForTok 
@@ -2734,8 +2753,7 @@ END ;
            . PtsTokInfo 
     ; LLRState 
         := StateList . SlStates 
-             [ StateList . SlLatest ] 
-           . TsParseStackTopRef . PseLRState 
+             [ StateList . SlLatest ] . TsParseStackTopRef . PseLRState 
     ; LAction 
         := LRTable . Action 
              ( ParseInfo . PiGram , LLRState , LTokInfo . TiTok ) 
@@ -2824,10 +2842,6 @@ END ;
                 ( LAction < ParseInfo . PiGram . FirstReadRedAction 
                 , AFT . A_LRMachine_ShiftReduceOfNonterminal
                 ) 
-; IF LAction = 401 
-  THEN 
-    Assertions . DoNothing ( ) 
-  END 
             ; LParseTravState2 (* Trial state after the shift. *)  
                 := NextParseTravState 
                      ( ParseInfo 
@@ -2861,7 +2875,8 @@ END ;
               ELSE (* Go ahead and really shift the Ast NT. *)  
                 Shift 
                   ( ParseInfo 
-                  , LTokInfo 
+                  , LTokInfo
+                  , FromLRState := LLRState 
                   , ShiftLRState := LAction 
                     (* See comment on Shift call below. *) 
                   , TrialState := WTrialState 
@@ -2887,6 +2902,7 @@ END ;
               Shift 
                 ( ParseInfo 
                 , LTokInfo 
+                , FromLRState := LLRState 
                 , ShiftLRState := LAction 
                   (* If this is a shift-reduce action, this value will not 
                      be the right state to enter after the shift, but it 
@@ -2984,7 +3000,11 @@ END ;
         IF LangUtil . TokClass ( ParseInfo . PiLang , Tok ) 
            IN LbeStd . TokClassSetEstSentential 
         THEN 
-          LStringRef 
+          WriteParseTraceText ( "RepBuildTokInsertionRepairSlice, Tok " ) 
+        ; WriteParseTraceText
+            ( LangUtil . TokImage ( Tok , ParseInfo . PiLang ) ) 
+        ; WriteParseTraceText ( Wr . EOL ) 
+        ; LStringRef 
             := LangUtil . DisplayStringForTok ( ParseInfo . PiLang , Tok )
         ; LSliceListElemRef := NEW ( ParseHs . SliceListElemRefTyp ) 
         ; LSliceListElemRef ^ . SlePredLink := NIL 
@@ -3005,7 +3025,7 @@ END ;
       ; TokInfo . TiIsInsertionRepair := TRUE  
       ; TokInfo . TiSyntTokCt := 1 
       ; TokInfo . TiFullTempMarkRange := ParseHs . TempMarkRangeEmpty 
-      ; TokInfo . TiPatchTempMarkRange := ParseHs . TempMarkRangeNull 
+      ; TokInfo . TiPatchTempMarkRange := ParseHs . TempMarkRangeNull
       END RepBuildTokInsertionRepairSlice 
 
   ; PROCEDURE RepContinuationCost ( ContTok : LbeStd . TokTyp ) 
@@ -3102,6 +3122,7 @@ END ;
               ; Shift 
                   ( ParseInfo 
                   , LContTokInfo 
+                  , LLRState 
                   , LAction 
                   , StateList . SlStates [ StateList . SlLatest ] 
                   , StateList . SlLastShiftedAstStates [ StateList . SlLatest ]
@@ -3174,7 +3195,12 @@ END ;
         ELSE
         
         (* Build a ModTok. *)
-          LMergeInfo := NEW ( MergeInfoTyp ) 
+          WriteParseTraceText ( "Begin RepConstructAntideletion, Tok " ) 
+        ; WriteParseTraceText
+            ( LangUtil . TokImage ( TokInfo . TiTok , ParseInfo . PiLang ) ) 
+        ; WriteParseTraceText ( Wr . EOL )
+        
+        ; LMergeInfo := NEW ( MergeInfoTyp ) 
         ; InitMergeInfo ( TrialState , (* VAR *) LMergeInfo ) 
         ; EVAL EstBuild . InitMergeState 
                  ( LMergeInfo  
@@ -3219,6 +3245,11 @@ END ;
             , (* VAR *) ResultTreeRef := LNewEstRef 
             )
 
+        ; WriteParseTraceText ( "Finish RepConstructAntideletion, Tok " ) 
+        ; WriteParseTraceText
+            ( LangUtil . TokImage ( TokInfo . TiTok , ParseInfo . PiLang ) ) 
+        ; WriteParseTraceText ( " " & Misc . RefanyImage ( LMergeInfo ) ) 
+        ; WriteParseTraceText ( Wr . EOL ) 
         ; IF FALSE AND LDoPatch 
           THEN
             Assert
@@ -3276,7 +3307,8 @@ END ;
       ) 
     RAISES { AssertionFailure , Thread . Alerted } 
 
-    = VAR LInsertionNo : PortTypes . Int32Typ 
+    = VAR LLRState : LbeStd . LRStateTyp 
+    ; VAR LInsertionNo : PortTypes . Int32Typ 
     ; VAR LInsertionCt : PortTypes . Int32Typ 
     ; VAR LCostOfDeletions : LbeStd . RepairCostTyp 
     ; VAR LCost : LbeStd . RepairCostTyp 
@@ -3339,14 +3371,13 @@ END ;
           ; LStateList := LStateListAfterDeletions 
           ; LOOP (* Thru parsing actions that are possible when the proposed
                     to-be-inserted token is treated as the lookahead. 
-                 *) 
-              LAction 
-                := LRTable . Action 
-                     ( ParseInfo . PiGram 
-                     , LStateList . SlStates [ LStateList . SlLatest ] 
-                       . TsParseStackTopRef . PseLRState 
-                     , LTokInfo . TiTok 
-                     ) 
+                 *)
+              LLRState
+                := LStateList . SlStates [ LStateList . SlLatest ] 
+                     . TsParseStackTopRef . PseLRState 
+            ; LAction 
+                := LRTable . Action
+                     ( ParseInfo . PiGram , LLRState , LTokInfo . TiTok ) 
             ; IF LAction = ParseInfo . PiGram . AcceptAction 
               THEN (* This can't happen, because we never insert EOI. *) 
                 CantHappen 
@@ -3384,6 +3415,7 @@ END ;
               ; Shift 
                   ( ParseInfo 
                   , LTokInfo 
+                  , LLRState 
                   , LAction 
                   , LStateList . SlStates [ LStateList . SlLatest ] 
                   , LStateList . SlLastShiftedAstStates [ StateList . SlLatest ]
@@ -3893,6 +3925,7 @@ END ;
         Shift 
           ( ParseInfo 
           , WTrialState . TsParseTravStateRef . PtsTokInfo 
+          , FromLRState := WTrialState . TsParseStackTopRef . PseLRState 
           , ShiftLRState := ParseInfo . PiGram . AcceptAction 
           , TrialState := WTrialState 
           , LastShifted 

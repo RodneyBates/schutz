@@ -85,7 +85,7 @@ MODULE ParseHs
           ; Wr . PutText ( LWrT , LPrefix )
           END (* IF *) 
         ; Wr . PutText ( LWrT , "}" )
-        ; Wr . PutText ( LWrT , " SeqNo = " )
+        ; Wr . PutText ( LWrT , " TmSeqNo = " )
         ; Wr . PutText ( LWrT , Fmt . Int ( List ^ [ 0 ] . SeqNo ) )
         ; Wr . PutText ( LWrT , " list addr = " )
         ; Wr . PutText

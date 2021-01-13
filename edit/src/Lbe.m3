@@ -148,6 +148,7 @@ EXPORTS Main
     ; DL ( "                                May be the same file name as <pbfile>." ) 
     ; DL ( "    -t <integer>            " ) 
     ; DL ( "    --time <integer>         :Set playback delay to <integer>." ) 
+    ; DL ( "    --trace-parse            :Write a new SchutzParseTrace file for each parse." )
     ; DL ( "    -u                      " ) 
     ; DL ( "    --use-gen-grammar        :Prefer to parse with generated grammar." ) 
     ; DL ( "    -i                      " ) 
@@ -320,7 +321,11 @@ EXPORTS Main
             ELSE 
               RecordFileName := Params . Get ( GaArgNo + 1 ) 
             ; INC ( GaArgNo , 2 ) 
-            END (* IF *) 
+            END (* IF *)  
+          ELSIF Text . Equal ( Params . Get ( GaArgNo ) , "--trace-parse" ) 
+          THEN 
+            Options . TraceParse := TRUE 
+          ; INC ( GaArgNo ) 
           ELSIF Text . Equal ( Params . Get ( GaArgNo ) , "-u" ) 
                 OR Text . Equal 
                   ( Params . Get ( GaArgNo ) , "--use-gen-grammar" ) 
