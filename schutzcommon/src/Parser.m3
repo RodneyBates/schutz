@@ -2397,7 +2397,7 @@ TRUE OR
         ; IF StateList . SlLatest = LOldLatest
           THEN (* No need to copy state or its temp mark list, which will never
                   be backtracked-to. *)
-            WriteParseTraceText ( "Reuse temp mark list" ) 
+            WriteParseTraceText ( "Reuse temp mark list for reduce." ) 
           ; WriteParseTraceText ( Wr . EOL ) 
           ; WriteParseTraceText
               ( ParseHs . TempMarkListImage
@@ -2414,7 +2414,7 @@ TRUE OR
                 := ParseHs . CopyOfTempMarkList ( WOldTrialState . TsTempMarkListRef )
 
             (* Trace the copy. *)
-            ; WriteParseTraceText ( "Copy temp mark list" ) 
+            ; WriteParseTraceText ( "Copy temp mark list for reduce." ) 
             ; WriteParseTraceText ( Wr . EOL ) 
             ; TraceTempMarkList
                 ( WOldTrialState . TsTempMarkListRef , "      from: " )
@@ -3199,6 +3199,22 @@ TRUE OR
         ; WriteParseTraceText
             ( LangUtil . TokImage ( TokInfo . TiTok , ParseInfo . PiLang ) ) 
         ; WriteParseTraceText ( Wr . EOL )
+
+        ; IF NOT ParseHs . RangeIsEmpty ( TokInfo . TiPatchTempMarkRange )
+          THEN (* Will be changing TsTempMarkListRef^. *)
+(* CHECK: Is it enough to copy TsTempMarkListRef, or do we need to advance
+          to an entire new state, as is done for the first reduce after
+          shifts? *)
+            TrialState . TsTempMarkListRef
+              := ParseHs . CopyOfTempMarkList ( TrialState . TsTempMarkListRef )
+          (* Trace the copy. *)
+          ; WriteParseTraceText ( "Copy temp mark list for antideletion." ) 
+          ; WriteParseTraceText ( Wr . EOL ) 
+          ; TraceTempMarkList
+              ( TrialState . TsTempMarkListRef , "      from: " )
+          ; TraceTempMarkList
+              ( TrialState . TsTempMarkListRef , "        to: " )
+          END (* IF *) 
         
         ; LMergeInfo := NEW ( MergeInfoTyp ) 
         ; InitMergeInfo ( TrialState , (* VAR *) LMergeInfo ) 
@@ -3248,7 +3264,7 @@ TRUE OR
         ; WriteParseTraceText ( "Finish RepConstructAntideletion, Tok " ) 
         ; WriteParseTraceText
             ( LangUtil . TokImage ( TokInfo . TiTok , ParseInfo . PiLang ) ) 
-        ; WriteParseTraceText ( " " & Misc . RefanyImage ( LMergeInfo ) ) 
+        ; WriteParseTraceText ( " " & Misc . RefanyImage ( LNewEstRef ) ) 
         ; WriteParseTraceText ( Wr . EOL ) 
         ; IF FALSE AND LDoPatch 
           THEN
@@ -3435,7 +3451,7 @@ TRUE OR
               (* We have now shifted the inserted single token, so go 
                  back to parsing from the input stream. *) 
               ; LRMachine 
-                  ( ParseInfo 
+                  ( ParseInfo
                   , LStateList 
                   , LExpectedParseCheck 
                   , LActualParseCheck 

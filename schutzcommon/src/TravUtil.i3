@@ -413,7 +413,7 @@ INTERFACE TravUtil
   RAISES { AssertionFailure }
 
 ; PROCEDURE NodeNoOfNodeRef 
-    ( RootNodeRef , SoughtNodeRef : LbeStd . EstRootTyp ) 
+    ( RootNodeRef : LbeStd . EstRootTyp ; SoughtNodeRef : REFANY ) 
   : LbeStd . EstNodeNoTyp
   (* LbeStd.EstNodNoNull, if not found. *) 
   RAISES { AssertionFailure } 

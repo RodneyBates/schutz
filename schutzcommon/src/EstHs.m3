@@ -868,7 +868,9 @@ MODULE EstHs
         & ")" 
       *)
         & "} " 
-        & EstNodeKindImage ( Self . EstNodeKind ) 
+        & EstNodeKindImage ( Self . EstNodeKind )
+        & " EstNodeCt="
+        & LbeStd . EstNodeNoImage ( Self . KTreeNodeCt ( ) + 1 ) 
         & " EstHeight=" 
         & KTreeHeightImage ( Self . EstHeight ) 
     END EstRefImageBrief
