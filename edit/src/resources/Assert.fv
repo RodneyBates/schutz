@@ -2,9 +2,11 @@
 ;; -----------------------------------------------------------------------1- ;;
 ;; This file is part of the Schutz semantic editor.                          ;;
 ;; Copyright 1988..2020, Rodney M. Bates.                                    ;;
-;; rodney.bates@wichita.edu                                                  ;;
-;; Licensed under the Gnu Public License, version 2 or later.                ;;
+;; rodney.m.bates@acm.org                                                    ;;
+;; Licensed under the MIT License.                                           ;;
 ;; -----------------------------------------------------------------------2- ;;
+
+;; File edit/src/resources/Assert.fv
 
 (Shape
 (LabelFont ( Family "new century schoolbook" ) ) 
