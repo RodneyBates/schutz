@@ -184,6 +184,7 @@ EXPORTS Main
  (* ; Assertions . Callback := AssertDevel . AssertDialogCommandLine *) 
  (* ; Assertions . Callback := Assertions . NeverRaise *) 
     ; AssertDevel . DoStop := TRUE 
+    ; RTProcess . RegisterExitor ( Exitor )
     END SetDefaults 
 
 ; PROCEDURE GetArgs ( ) : BOOLEAN (* True iff should continue. *) 
@@ -353,9 +354,6 @@ EXPORTS Main
           ; INC ( GaArgNo ) 
           END (* IF *) 
         END (* LOOP *) 
-      ; IF NOT Options . Crash
-        THEN RTProcess . RegisterExitor ( AssertDevel . RuntimeFailureDialog )
-        END (* IF *) 
       ; IF GaHelp OR GaBadArgs 
         THEN 
           DisplayVersion ( ) 
@@ -380,7 +378,15 @@ EXPORTS Main
         ; RETURN TRUE  
         END (* IF *) 
       END (* Block *)
-    END GetArgs 
+    END GetArgs
+
+; PROCEDURE Exitor ( )
+  = BEGIN
+     IF NOT Options . Crash
+     THEN
+       AssertDevel . RuntimeFailureDialog ( ) 
+     END (* IF *) 
+    END Exitor 
 
 (* TODO: Make manual language loading and tree browsing devel gui functions. *) 
 ; VAR WantedThreadStackSize := 64000 (* Word.T's *) 
@@ -425,14 +431,6 @@ EXPORTS Main
       ELSE Assertions . TerminatingNormally := TRUE 
       END (* IF *)
     END Work
-
-; <* UNUSED *> PROCEDURE CauseRuntimeError ( ) 
-  RAISES { AssertionFailure } <* NOWARN *>
-  (* This is here for use in debugging. *) 
-
-  = BEGIN 
-      <* NOWARN *> EVAL VAL ( - 1 , CARDINAL ) 
-    END CauseRuntimeError 
 
 ; BEGIN (* Lbe *) 
     Misc . LoadYourself ( )

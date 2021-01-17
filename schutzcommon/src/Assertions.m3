@@ -45,7 +45,7 @@ MODULE Assertions
       END (* IF *) 
     END FailText 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE CantHappenText ( Message : TEXT ) RAISES { AssertionFailure } 
 
   = BEGIN (* CantHappenText *) 
@@ -54,7 +54,7 @@ MODULE Assertions
       END (*( IF *) 
     END CantHappenText 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE AssertText 
     ( Condition : BOOLEAN ; Message : TEXT ) RAISES { AssertionFailure } 
 
@@ -86,7 +86,7 @@ MODULE Assertions
       END (* IF *) 
     END Fail 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE CantHappen ( Code : AFT ) RAISES { AssertionFailure } 
 
   = BEGIN (* CantHappen *) 
@@ -95,7 +95,7 @@ MODULE Assertions
       END (* IF *) 
     END CantHappen 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE Message ( Code : AFT ) 
 
   = <* FATAL Thread . Alerted *> 
@@ -113,7 +113,7 @@ MODULE Assertions
     ; Wr . Flush ( Stdio . stderr ) 
     END Message 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE Assert 
     ( Condition : BOOLEAN ; Code : AFT ) RAISES { AssertionFailure } 
 
@@ -132,7 +132,7 @@ MODULE Assertions
       L := 0 
     END NYI 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE NotImplementedText ( Message : TEXT ) 
 
   = <* FATAL Thread . Alerted *> 
@@ -145,7 +145,7 @@ MODULE Assertions
     ; NYI ( ) 
     END NotImplementedText 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE MessageText ( Message : TEXT ) 
 
   = <* FATAL Thread . Alerted *> 
@@ -156,7 +156,7 @@ MODULE Assertions
     ; Wr . Flush ( Stdio . stderr ) 
     END MessageText 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE AlwaysRaise 
     ( <* UNUSED *> String1 : TEXT 
     ; <* UNUSED *>  String2 : TEXT 
@@ -170,7 +170,7 @@ MODULE Assertions
       RETURN TRUE 
     END AlwaysRaise  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE NeverRaise 
     ( <* UNUSED *> String1 : TEXT 
     ; <* UNUSED *> String2 : TEXT 
@@ -207,9 +207,10 @@ MODULE Assertions
       L := 0 
     END DoNothing 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE CauseRuntimeError ( <* UNUSED *> Msg : TEXT ) 
   RAISES { AssertionFailure } <* NOWARN *>
+  (* This is useful for debugging the catching of RT failures. *)
 
   = BEGIN 
       <* NOWARN *> EVAL VAL ( - 1 , CARDINAL ) 
