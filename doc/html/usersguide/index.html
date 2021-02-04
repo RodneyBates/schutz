@@ -1,0 +1,263 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+> Using Schutz. </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="NEXT"
+TITLE=" Using Schutz "
+HREF="x36.html"></HEAD
+><BODY
+CLASS="article"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="ARTICLE"
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="title"
+><A
+NAME="AEN2"
+>Using Schutz.</A
+></H1
+><H3
+CLASS="author"
+><A
+NAME="AEN4"
+>Rodney Bates</A
+></H3
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>1. <A
+HREF="index.html#quickstart"
+>Quick Start</A
+></DT
+><DT
+>2. <A
+HREF="x36.html"
+>Using Schutz</A
+></DT
+><DT
+>3. <A
+HREF="x60.html"
+>Key bindings</A
+></DT
+></DL
+></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="quickstart"
+>1. Quick Start</A
+></H1
+><P
+>&#13;      Start with the executable for Schutz on your path
+      as <TT
+CLASS="literal"
+>Lbe</TT
+>.  See Using Schutz For instructions
+      on doing this.  At the command line, <TT
+CLASS="literal"
+>cd</TT
+> into
+      a directory where you wish to develop code in Modula-3, and type
+      <TT
+CLASS="literal"
+>Lbe</TT
+>.  Keep this command line window open.
+    </P
+><P
+>&#13;      Use <TT
+CLASS="literal"
+>File-&#62;Open</TT
+> to open a file named
+      <TT
+CLASS="literal"
+>*.[im][3g]</TT
+> and containing Modula-3 code.
+      Schutz will parse the code in the file and display it, with
+      the layout regularized according to its language-dependent rules.
+      For the moment, Assume it is already syntactically correct.
+    </P
+><P
+>&#13;      Schutz uses the file name suffix to ascertain what language the
+      code in the file is in.  So to create a new file,
+      open a non-existent file with your desired file name.
+      For now, use the <TT
+CLASS="literal"
+>delete</TT
+>
+      key to erase the purple text.
+    </P
+><P
+>&#13;      Use the usual cursor-positioning and printable character keys
+      to edit the code on the screen.  Several common
+      <TT
+CLASS="literal"
+>emacs</TT
+> key bindings are available, see below.
+      New code you type will be displayed with an underline, meaning
+      it has yet to be parsed.  When you are ready, click the
+      now-red <TT
+CLASS="literal"
+>Unparsed</TT
+> button, to reparse your
+      edited code.  If there are no syntax errors, the botton will
+      turn green and say <TT
+CLASS="literal"
+>Parsed</TT
+>.  
+    </P
+><P
+>&#13;      At any time, you can use <TT
+CLASS="literal"
+>File-&#62;Save</TT
+> to save the current
+      code.  This will write a file in Schutz's internal format, whose
+      file name has an underscore appended to the name of the text file
+      you opened.  Later, you can reopen this file, which will leave
+      you in the same state. 
+      You can use <TT
+CLASS="literal"
+>File-&#62;Export</TT
+> to write your code as
+      pure text, which will use the original file name. 
+    </P
+><P
+>&#13;      If there are syntax errors, the parse button will be yellow and say
+      <TT
+CLASS="literal"
+>Misparsed</TT
+>.  In this case, there will be
+      syntax corrections displayed as token insertions, with blue
+      insertion carets below, and token deletions, with blue
+      strikeout through them.  Do not panic. These are only suggestions.
+      Except for possible layout changes, (which are reversible),
+      Schutz has so far not changed your code.  Any time you reparse, 
+      Schutz will treat the suggestions as not having been taken.
+    </P
+><P
+>&#13;      If you export the file (i.e., as text), the resulting file will also
+      be as if the suggestions are not taken.  This means
+      any suggested to-be-deleted tokens will be present in the
+      text file, but the suggested insertions will not, thus
+      appearing different in this respect from what is on-screen,
+      but containing the same actual code as Schutz has internally. 
+      If you later reopen this text file, the initial parse will
+      recreate the same suggestions, thus reproducing the on-screen
+      appearance. 
+    </P
+><P
+>&#13;      You can accept a suggested correction by placing the cursor
+      inside it and clicking
+      <TT
+CLASS="literal"
+>Analysis-&#62;Accept syntax repair</TT
+>.
+      This will leave the repair as if you had typed it that way.
+      Alternatively, you can make any alterations inside a suggested
+      repair just by typing as usual.  
+    </P
+><P
+>&#13;      In most cases, if Schutz suffers an assertion failure,
+      it will write a "checkpoint" file, named with two
+      underscores appended to the text file name, and inform
+      you of this with a dialog, which you can dismiss by clicking
+      the <TT
+CLASS="literal"
+>C</TT
+> box in the corner.  This file is almost
+      the same as s Schutz internal file, with slightly more information,
+      including a record of the command or operation that failed.
+      You can later open it, which will reinstate your code
+      to the state before the command or operation that
+      failed.  You would then have the option of
+      clicking <TT
+CLASS="literal"
+>Devel-&#62; Replay failing command</TT
+>,
+      but if you are not debugging Schutz, you probably want to
+      do something else.
+    </P
+><P
+>&#13;      Additionally, Schutz will pop a dialog describing the
+      assertion failure, with a button labelled
+      <TT
+CLASS="literal"
+>Back out</TT
+>.  Clicking this will (usually),
+      reset things to the state before the command or operation that
+      failed.  You can then try something different, possibly as
+      simple as moving the cursor, to try to circumvent the failure.
+      Or, you can save or close the file, to be later reopened. 
+    </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x36.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Using Schutz</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

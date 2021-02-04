@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Building Schutz. --> 
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+                  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
+  [ <!ENTITY schutz "Schutz">
+    <!ENTITY ldl0 "Ldl0">
+    <!ENTITY ldl1 "Ldl1">
+    <!ENTITY ast "AST">
+    <!ENTITY repo "repository">
+    <!ENTITY lbe "Lbe">
+  ]
+>
+
+<article id="schutz-building" lang="en">
+  <articleinfo>
+  <title> Building &schutz;. </title> 
+    <author> <firstname>Rodney</firstname> <surname>Bates</surname> </author>
+    <date> 2020-12-23 </date>  
+  </articleinfo>
+
+  <sect1 id="prereq">
+    <title> Prerequisites </title> 
+
+    <para>
+      &schutz; is mostly written in Modula-3, plus some common linux
+      tools and some specialized languages that it contains implementations
+      of.  It has so far only been developed to build and run on linux
+      systems and only compiled for AMD64_LINUX and LINUXLIBC Modula-3
+      target systems.
+    </para>
+        
+    <para>
+      Recently, it has been compiled only using the
+      packedVars branch of the Modula-3 CM3 compiler, which can be
+      found at github.com/modula3/cm3.  It will probably be compilable
+      by some earlier Modula-3 compilers, but the packedVars branch contains
+      improvements that, at least, will make it occupy less RAM.
+    </para>
+  
+    <para>
+      You will need:
+    </para>
+
+    <itemizedlist>
+    <listitem>
+      <para>
+        The Bash or similar shell, with commands mkdir, cd, rm, cp,
+        source, ls, cat, and ln.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        Addtional tools sed, awk, sort, diff, grep, date, and /lib/cpp.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        A Modula-3 compiler named cm3, including shipped libraries
+        m3core and libm3.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        Compiled and shipped libraries from the comm and ui groups of the
+        Modula-3 distribution.  Not all of these are needed, but the exact
+        list is unascertained.  Compiling ui will require installation of
+        the X11 Athena widget development library.
+        On Ubuntu and derived Linux distributions, package libxaw7
+        and libxaw7-dev should suffice. 
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        A copy of the &schutz; distribution, which can be found at
+        github.com/RodneyBates/schutz/master.
+      </para>
+    </listitem>
+    </itemizedlist>
+
+  </sect1>
+  
+  <sect1 id="steps">
+    <title> Build steps </title>
+    <para>
+      Directory paths in the following are relative to the root
+      of the of the git repository, i.e., parallel to its
+      <literal>.git</literal>
+      directory.  The following commands are all issued in the
+      <literal>./scripts</literal> subdirectory. 
+    </para>
+
+    <para>
+      If the &repo; is not entirely fresh, issue
+      <literal>./veryclean.sh</literal>.
+    </para>
+
+    <para>
+      Edit <literal>./sethostdep.sh</literal> to have the
+      Modula-3 target you are
+      building on.  There is, so far, no automatic detection
+      or setting of this. 
+    </para>
+
+    <para>
+      Issue 
+      <literal>./fullboot.sh</literal>.
+      This will go through an elaborate bootstrap process, involving
+      other scripts, creation of directories,
+      compilations, execution of compiled programs, 
+      generation of souce code and internal data,
+      checking for convergence, etc.
+      Do not panic over messages about states not being LALR.
+
+      At the end, this will have created directory <literal>./boot</literal>
+      and many
+      files within.  It will have built and shipped library
+      <literal>libschutzcommon</literal>,
+      built executables <literal>LdlBoot</literal>
+      and <literal>LdlBatch</literal> in <literal>./boot</literal>,
+      and executable <literal>&lbe;</literal> in
+      <literal>./edit/AMD64_LINUX</literal> (substitute your target system).
+    </para>
+
+    <para>
+      <literal>LdlBoot</literal> is used only in the bootstrap process.
+      You will have no
+      further need of it unless you do development work on the process.
+      <literal>LdlBatch</literal> adds languages to &schutz;.
+      You will not need it either,
+      unless you do development on a supported language or add a new
+      language.  <literal>&lbe;</literal> is the built editor.
+      At this stage, each
+      of these executables supports
+      only ldl0, a primitive language definition language used only
+      during bootstrapping.
+    </para>
+
+    <para>
+      Issue
+      <literal>AddLdl1.sh</literal>.
+      This will alter <literal>LdlBatch</literal> and
+      <literal>&lbe;</literal>, to additionally support ldl1,
+      the more general language definition language used in &schutz;.
+    </para>
+
+    <para>
+      Issue
+      <literal>AddM3.sh</literal>.
+      This will alter <literal>&lbe;</literal>,
+      to additionally support Modula-3.
+    </para>
+
+    <para>
+      You are done. 
+    </para>
+
+  </sect1>      
+
+
+</article><!-- Building Schutz. -->
+

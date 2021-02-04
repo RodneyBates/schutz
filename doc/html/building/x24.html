@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+> Build steps </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE=" Building Schutz. "
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE=" Building Schutz. "
+HREF="index.html"></HEAD
+><BODY
+CLASS="sect1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Schutz.</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="index.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+>&nbsp;</TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="steps"
+>2. Build steps</A
+></H1
+><P
+>&#13;      Directory paths in the following are relative to the root
+      of the of the git repository, i.e., parallel to its
+      <TT
+CLASS="literal"
+>.git</TT
+>
+      directory.  The following commands are all issued in the
+      <TT
+CLASS="literal"
+>./scripts</TT
+> subdirectory. 
+    </P
+><P
+>&#13;      If the repository is not entirely fresh, issue
+      <TT
+CLASS="literal"
+>./veryclean.sh</TT
+>.
+    </P
+><P
+>&#13;      Edit <TT
+CLASS="literal"
+>./sethostdep.sh</TT
+> to have the
+      Modula-3 target you are
+      building on.  There is, so far, no automatic detection
+      or setting of this. 
+    </P
+><P
+>&#13;      Issue 
+      <TT
+CLASS="literal"
+>./fullboot.sh</TT
+>.
+      This will go through an elaborate bootstrap process, involving
+      other scripts, creation of directories,
+      compilations, execution of compiled programs, 
+      generation of souce code and internal data,
+      checking for convergence, etc.
+      Do not panic over messages about states not being LALR.
+
+      At the end, this will have created directory <TT
+CLASS="literal"
+>./boot</TT
+>
+      and many
+      files within.  It will have built and shipped library
+      <TT
+CLASS="literal"
+>libschutzcommon</TT
+>,
+      built executables <TT
+CLASS="literal"
+>LdlBoot</TT
+>
+      and <TT
+CLASS="literal"
+>LdlBatch</TT
+> in <TT
+CLASS="literal"
+>./boot</TT
+>,
+      and executable <TT
+CLASS="literal"
+>Lbe</TT
+> in
+      <TT
+CLASS="literal"
+>./edit/AMD64_LINUX</TT
+> (substitute your target system).
+    </P
+><P
+>&#13;      <TT
+CLASS="literal"
+>LdlBoot</TT
+> is used only in the bootstrap process.
+      You will have no
+      further need of it unless you do development work on the process.
+      <TT
+CLASS="literal"
+>LdlBatch</TT
+> adds languages to Schutz.
+      You will not need it either,
+      unless you do development on a supported language or add a new
+      language.  <TT
+CLASS="literal"
+>Lbe</TT
+> is the built editor.
+      At this stage, each
+      of these executables supports
+      only ldl0, a primitive language definition language used only
+      during bootstrapping.
+    </P
+><P
+>&#13;      Issue
+      <TT
+CLASS="literal"
+>AddLdl1.sh</TT
+>.
+      This will alter <TT
+CLASS="literal"
+>LdlBatch</TT
+> and
+      <TT
+CLASS="literal"
+>Lbe</TT
+>, to additionally support ldl1,
+      the more general language definition language used in Schutz.
+    </P
+><P
+>&#13;      Issue
+      <TT
+CLASS="literal"
+>AddM3.sh</TT
+>.
+      This will alter <TT
+CLASS="literal"
+>Lbe</TT
+>,
+      to additionally support Modula-3.
+    </P
+><P
+>&#13;      You are done. 
+    </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Building Schutz.</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

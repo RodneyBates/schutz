@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Using Schutz. --> 
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+                  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
+  [ <!ENTITY schutz "Schutz">
+    <!ENTITY ldl0 "Ldl0">
+    <!ENTITY ldl1 "Ldl1">
+    <!ENTITY ast "AST">
+    <!ENTITY repo "repository">
+    <!ENTITY lbe "Lbe">
+  ]
+>
+
+<article id="schutz-using" lang="en">
+  <articleinfo>
+  <title> Using &schutz;. </title> 
+    <author> <firstname>Rodney</firstname> <surname>Bates</surname> </author>
+    <date> 2021-01-30 </date>  
+  </articleinfo>
+
+  <sect1 id="quickstart">
+    <title> Quick Start </title> 
+
+    <para>
+      Start with the executable for &schutz; on your path
+      as <literal>Lbe</literal>.  See Using &schutz; For instructions
+      on doing this.  At the command line, <literal>cd</literal> into
+      a directory where you wish to develop code in Modula-3, and type
+      <literal>Lbe</literal>.  Keep this command line window open.
+    </para>
+
+    <para>
+      Use <literal>File->Open</literal> to open a file named
+      <literal>*.[im][3g]</literal> and containing Modula-3 code.
+      &schutz; will parse the code in the file and display it, with
+      the layout regularized according to its language-dependent rules.
+      For the moment, Assume it is already syntactically correct.
+    </para>
+    
+    <para>
+      &schutz; uses the file name suffix to ascertain what language the
+      code in the file is in.  So to create a new file,
+      open a non-existent file with your desired file name.
+      For now, use the <literal>delete</literal>
+      key to erase the purple text.
+    </para>
+    
+    <para>
+      Use the usual cursor-positioning and printable character keys
+      to edit the code on the screen.  Several common
+      <literal>emacs</literal> key bindings are available, see below.
+      New code you type will be displayed with an underline, meaning
+      it has yet to be parsed.  When you are ready, click the
+      now-red <literal>Unparsed</literal> button, to reparse your
+      edited code.  If there are no syntax errors, the botton will
+      turn green and say <literal>Parsed</literal>.  
+    </para>
+    
+    <para>
+      At any time, you can use <literal>File->Save</literal> to save the current
+      code.  This will write a file in &schutz;'s internal format, whose
+      file name has an underscore appended to the name of the text file
+      you opened.  Later, you can reopen this file, which will leave
+      you in the same state. 
+      You can use <literal>File->Export</literal> to write your code as
+      pure text, which will use the original file name. 
+    </para>
+    
+    <para>
+      If there are syntax errors, the parse button will be yellow and say
+      <literal>Misparsed</literal>.  In this case, there will be
+      syntax corrections displayed as token insertions, with blue
+      insertion carets below, and token deletions, with blue
+      strikeout through them.  Do not panic. These are only suggestions.
+      Except for possible layout changes, (which are reversible),
+      &schutz; has so far not changed your code.  Any time you reparse, 
+      &schutz; will treat the suggestions as not having been taken.
+    </para>
+    
+    <para>
+      If you export the file (i.e., as text), the resulting file will also
+      be as if the suggestions are not taken.  This means
+      any suggested to-be-deleted tokens will be present in the
+      text file, but the suggested insertions will not, thus
+      appearing different in this respect from what is on-screen,
+      but containing the same actual code as &schutz; has internally. 
+      If you later reopen this text file, the initial parse will
+      recreate the same suggestions, thus reproducing the on-screen
+      appearance. 
+    </para>
+    
+    <para>
+      You can accept a suggested correction by placing the cursor
+      inside it and clicking
+      <literal>Analysis->Accept syntax repair</literal>.
+      This will leave the repair as if you had typed it that way.
+      Alternatively, you can make any alterations inside a suggested
+      repair just by typing as usual.  
+    </para>
+    
+    <para>
+      In most cases, if &schutz; suffers an assertion failure,
+      it will write a "checkpoint" file, named with two
+      underscores appended to the text file name, and inform
+      you of this with a dialog, which you can dismiss by clicking
+      the <literal>C</literal> box in the corner.  This file is almost
+      the same as s &schutz; internal file, with slightly more information,
+      including a record of the command or operation that failed.
+      You can later open it, which will reinstate your code
+      to the state before the command or operation that
+      failed.  You would then have the option of
+      clicking <literal>Devel-> Replay failing command</literal>,
+      but if you are not debugging &schutz;, you probably want to
+      do something else.
+    </para>
+    
+    <para>
+      Additionally, &schutz; will pop a dialog describing the
+      assertion failure, with a button labelled
+      <literal>Back out</literal>.  Clicking this will (usually),
+      reset things to the state before the command or operation that
+      failed.  You can then try something different, possibly as
+      simple as moving the cursor, to try to circumvent the failure.
+      Or, you can save or close the file, to be later reopened. 
+    </para>
+    
+  </sect1>
+
+  <sect1 id="using">
+    <title> Using &schutz; </title> 
+
+    <para>
+      &schutz; is a multi-language editor.  As of 2021-02-01, the
+      supported languages are Ldl0, Ldl1, and Modula-3. The first
+      two are for defining languages to &schutz;, and will be relevant
+      only if you are doing development work on &schutz; itself.
+      &schutz; identifies these by file name suffixes of
+      <literal>.ldl0</literal>
+      or <literal>.ldl1</literal>
+    </para>
+    
+    <para>
+      File name suffixes of <literal>*.[im][3g]</literal> denote
+      modula-3 as the language.  There is currently no mechanism to
+      check or create consistency between the file name and the
+      name or kind of a Modula-3 compilaton unit, so be careful
+      with file names. (This is yet to come.) 
+    </para>
+    
+    <para>
+      The altered-as-suggested code will be syntactically correct.
+      It is what &schutz; uses internally for doing layout and any
+      semantic actions.  Such actions are performed on the corrected
+      form of code only.  Currently, Modula-3 has no semantic actions
+      and Ldl0 and Ldl1 semantic actions are done only by separate
+      executables, in batch mode.   
+    </para>
+    
+    <para>
+      Parsing works on the uncorrected text.  It is incremental, only
+      reparsing where edits have changed things and nearby, as necessary.
+    </para>
+    
+    <para>
+      The syntax repair algorithm, which generates suggested corrections,
+      is quite sophisticated.  It can include a number of backtracking
+      actions, looking for a least cost total repair.  It still has lots of
+      room for tuning, including better costs.
+      Unfortunately, sophisticated may not necessarily
+      mean effective.  You will sometimes be shocked at how far off the
+      suggested repairs appear.  But since &schutz; is the only tool known to
+      me that visibly displays its syntax repairs, it is probable that
+      you have not had the opportunity to see the changes made by other
+      syntax-repairing parsers.  Perhaps they are no better. 
+    </para>
+    
+    <para>
+      You can select text by dragging through with the mouse.
+      <literal>Edit->Cut</literal>, <literal>Edit->Copy</literal>,
+      and <literal>Edit->Paste</literal> work as usual.
+    </para>
+    
+    <para>
+      &schutz; can parse and internally represent a syntactically
+      incomplete program by using certain grammar nonterminals,
+      referred to as <emphasis>placeholders</emphasis>.
+      These are displayed as identifiers enclosed in French quotes.
+      The syntax repair process may insert some of these, or you can type
+      them manually, if you know their names and how to type the
+      French quotes on your keyboard.  Unlike other insertions, placeholders
+      will be emitted in an exported text file.  They will be recognized
+      by the scanning and parsing done when such a file is later opened.
+    </para>
+    
+    <para>
+      &schutz; uses ISO 8859-1, also known as ISO-Latin-1, as
+      the character set of text files.  Opening and closing French
+      quotes have code point values 16_AB and 16_BB in this set.
+    </para>
+    
+    <para>
+      To see the list of possible placeholders for language
+      <literal>&lt lang&gt</literal>,
+      look in the &schutz; distribution at the generated file
+      <literal>./&lt lang&gt/derived/&lt LangTok&gt .i3</literal>.
+      Look under the commented headings
+      <literal>(* Abstract Plus Nodes: *)</literal>,
+      <literal>(*Abstract Star Nodes: *)</literal>,
+      and <literal>(* Abstract Fixed Nodes: *)</literal>
+      These are the the AST nodes of the language,
+      thus the placeholders, when enclosed in French quotes.
+    </para>
+    
+    <para>
+      In the view of a compiler, a placeholder would be a syntactic
+      (or, probably, lexical) error.  However, in &schutz;, it allows
+      for a weak kind of syntactic correctness and thus meaningful internal
+      parsed representation.  Its spelling also will, hopefully, be
+      a helpful suggestion as to what it should be replaced by, in order to
+      reach syntactic completeness.  Eventually, placeholders will
+      play a more significant role in partial semantic analysis and
+      maybe syntax-directed editing, when these functions are implemented.
+    </para>
+    
+  </sect1>
+
+
+  <sect1 id="keybindings">
+    <title> Key bindings </title>
+
+    <para>
+      Keys that are printable/displayable insert or overlay at
+      the cursor position, depending on overwrite mode.
+      Other keys have functions as follows:
+    </para>
+
+    <itemizedlist>
+      <listitem>
+        <para>
+          <literal>Ctl/A       </literal>Move cursor to beginning of line.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Ctl/C       </literal>Cancel current operation.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Ctl/D       </literal>Delete character (forward).
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Ctl/E       </literal>Move cursor to end of line.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Ctl/K       </literal>Delete to end of line.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Ctl/T       </literal>Transpose characters.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Backspace   </literal>Delete character backward.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Delete      </literal>Delete character (forward).
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Linefeed    </literal>Insert new line.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Return      </literal>Insert new line.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Tab         </literal>Insert blanks to next tab stop.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Left        </literal>Move cursor left.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Right       </literal>Move cursor right.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Up          </literal>Move cursor up.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Down        </literal>Move cursor down.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Begin       </literal>Move cursor to beginning of line.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>End         </literal>Move cursor to end of line.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Prior       </literal>Scroll up one window.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Next       </literal>Scroll down one window.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Home       </literal>To beginning of image.
+        </para>
+      </listitem>
+        
+      <listitem>
+        <para>
+          <literal>Insert     </literal>Toggle insert mode.
+        </para>
+      </listitem>
+        
+    </itemizedlist>
+
+  </sect1>
+  
+</article><!-- Using Schutz. -->
+

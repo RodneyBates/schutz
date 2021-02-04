@@ -1,0 +1,259 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+> Using Schutz </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE=" Using Schutz. "
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE=" Using Schutz. "
+HREF="index.html"><LINK
+REL="NEXT"
+TITLE=" Key bindings "
+HREF="x60.html"></HEAD
+><BODY
+CLASS="sect1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Using Schutz.</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="index.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x60.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="using"
+>2. Using Schutz</A
+></H1
+><P
+>&#13;      Schutz is a multi-language editor.  As of 2021-02-01, the
+      supported languages are Ldl0, Ldl1, and Modula-3. The first
+      two are for defining languages to Schutz, and will be relevant
+      only if you are doing development work on Schutz itself.
+      Schutz identifies these by file name suffixes of
+      <TT
+CLASS="literal"
+>.ldl0</TT
+>
+      or <TT
+CLASS="literal"
+>.ldl1</TT
+>
+    </P
+><P
+>&#13;      File name suffixes of <TT
+CLASS="literal"
+>*.[im][3g]</TT
+> denote
+      modula-3 as the language.  There is currently no mechanism to
+      check or create consistency between the file name and the
+      name or kind of a Modula-3 compilaton unit, so be careful
+      with file names. (This is yet to come.) 
+    </P
+><P
+>&#13;      The altered-as-suggested code will be syntactically correct.
+      It is what Schutz uses internally for doing layout and any
+      semantic actions.  Such actions are performed on the corrected
+      form of code only.  Currently, Modula-3 has no semantic actions
+      and Ldl0 and Ldl1 semantic actions are done only by separate
+      executables, in batch mode.   
+    </P
+><P
+>&#13;      Parsing works on the uncorrected text.  It is incremental, only
+      reparsing where edits have changed things and nearby, as necessary.
+    </P
+><P
+>&#13;      The syntax repair algorithm, which generates suggested corrections,
+      is quite sophisticated.  It can include a number of backtracking
+      actions, looking for a least cost total repair.  It still has lots of
+      room for tuning, including better costs.
+      Unfortunately, sophisticated may not necessarily
+      mean effective.  You will sometimes be shocked at how far off the
+      suggested repairs appear.  But since Schutz is the only tool known to
+      me that visibly displays its syntax repairs, it is probable that
+      you have not had the opportunity to see the changes made by other
+      syntax-repairing parsers.  Perhaps they are no better. 
+    </P
+><P
+>&#13;      You can select text by dragging through with the mouse.
+      <TT
+CLASS="literal"
+>Edit-&#62;Cut</TT
+>, <TT
+CLASS="literal"
+>Edit-&#62;Copy</TT
+>,
+      and <TT
+CLASS="literal"
+>Edit-&#62;Paste</TT
+> work as usual.
+    </P
+><P
+>&#13;      Schutz can parse and internally represent a syntactically
+      incomplete program by using certain grammar nonterminals,
+      referred to as <SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>placeholders</I
+></SPAN
+>.
+      These are displayed as identifiers enclosed in French quotes.
+      The syntax repair process may insert some of these, or you can type
+      them manually, if you know their names and how to type the
+      French quotes on your keyboard.  Unlike other insertions, placeholders
+      will be emitted in an exported text file.  They will be recognized
+      by the scanning and parsing done when such a file is later opened.
+    </P
+><P
+>&#13;      Schutz uses ISO 8859-1, also known as ISO-Latin-1, as
+      the character set of text files.  Opening and closing French
+      quotes have code point values 16_AB and 16_BB in this set.
+    </P
+><P
+>&#13;      To see the list of possible placeholders for language
+      <TT
+CLASS="literal"
+>&#60; lang&#62;</TT
+>,
+      look in the Schutz distribution at the generated file
+      <TT
+CLASS="literal"
+>./&#60; lang&#62;/derived/&#60; LangTok&#62; .i3</TT
+>.
+      Look under the commented headings
+      <TT
+CLASS="literal"
+>(* Abstract Plus Nodes: *)</TT
+>,
+      <TT
+CLASS="literal"
+>(*Abstract Star Nodes: *)</TT
+>,
+      and <TT
+CLASS="literal"
+>(* Abstract Fixed Nodes: *)</TT
+>
+      These are the the AST nodes of the language,
+      thus the placeholders, when enclosed in French quotes.
+    </P
+><P
+>&#13;      In the view of a compiler, a placeholder would be a syntactic
+      (or, probably, lexical) error.  However, in Schutz, it allows
+      for a weak kind of syntactic correctness and thus meaningful internal
+      parsed representation.  Its spelling also will, hopefully, be
+      a helpful suggestion as to what it should be replaced by, in order to
+      reach syntactic completeness.  Eventually, placeholders will
+      play a more significant role in partial semantic analysis and
+      maybe syntax-directed editing, when these functions are implemented.
+    </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x60.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Using Schutz.</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Key bindings</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

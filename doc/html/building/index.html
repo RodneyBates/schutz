@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+> Building Schutz. </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="NEXT"
+TITLE=" Build steps "
+HREF="x24.html"></HEAD
+><BODY
+CLASS="article"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="ARTICLE"
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="title"
+><A
+NAME="AEN2"
+>Building Schutz.</A
+></H1
+><H3
+CLASS="author"
+><A
+NAME="AEN4"
+>Rodney Bates</A
+></H3
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+>1. <A
+HREF="index.html#prereq"
+>Prerequisites</A
+></DT
+><DT
+>2. <A
+HREF="x24.html"
+>Build steps</A
+></DT
+></DL
+></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="prereq"
+>1. Prerequisites</A
+></H1
+><P
+>&#13;      Schutz is mostly written in Modula-3, plus some common linux
+      tools and some specialized languages that it contains implementations
+      of.  It has so far only been developed to build and run on linux
+      systems and only compiled for AMD64_LINUX and LINUXLIBC Modula-3
+      target systems.
+    </P
+><P
+>&#13;      Recently, it has been compiled only using the
+      packedVars branch of the Modula-3 CM3 compiler, which can be
+      found at github.com/modula3/cm3.  It will probably be compilable
+      by some earlier Modula-3 compilers, but the packedVars branch contains
+      improvements that, at least, will make it occupy less RAM.
+    </P
+><P
+>&#13;      You will need:
+    </P
+><P
+></P
+><UL
+><LI
+><P
+>&#13;        The Bash or similar shell, with commands mkdir, cd, rm, cp,
+        source, ls, cat, and ln.
+      </P
+></LI
+><LI
+><P
+>&#13;        Addtional tools sed, awk, sort, diff, grep, date, and /lib/cpp.
+      </P
+></LI
+><LI
+><P
+>&#13;        A Modula-3 compiler named cm3, including shipped libraries
+        m3core and libm3.
+      </P
+></LI
+><LI
+><P
+>&#13;        Compiled and shipped libraries from the comm and ui groups of the
+        Modula-3 distribution.  Not all of these are needed, but the exact
+        list is unascertained.  Compiling ui will require installation of
+        the X11 Athena widget development library.
+        On Ubuntu and derived Linux distributions, package libxaw7
+        and libxaw7-dev should suffice. 
+      </P
+></LI
+><LI
+><P
+>&#13;        A copy of the Schutz distribution, which can be found at
+        github.com/RodneyBates/schutz/master.
+      </P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x24.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Build steps</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>
