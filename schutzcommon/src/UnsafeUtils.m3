@@ -86,7 +86,6 @@ UNSAFE MODULE UnsafeUtils
     RTIO.Flush ();
   END PutExcept
 
-
 (* EXPORTED: *) 
 ; PROCEDURE DisplayException ( Tag : TEXT ; Addr : ADDRESS )
   (* Display, on command line, an interpretation of a value gotten from

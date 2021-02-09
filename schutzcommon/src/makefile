@@ -1,7 +1,7 @@
 
 ## -----------------------------------------------------------------------1- ##
 ## This file is part of the Schutz semantic editor.                          ##
-## Copyright 1988..2020, Rodney M. Bates.                                    ##
+## Copyright 1988..2021, Rodney M. Bates.                                    ##
 ## rodney.m.bates@acm.org                                                    ##
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
@@ -23,6 +23,7 @@ CPP  = /lib/cpp -P
 # Files to scan: 
 ERRORFILES = \
   Assertions.m3 \
+  AssertUnsafe.m3 \
   Coroutine.m3 \
   EstBuild.m3 \
   EstHs.m3 \

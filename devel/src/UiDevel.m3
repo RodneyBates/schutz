@@ -1423,7 +1423,7 @@ MODULE UiDevel
       ; TRY 
           Assertions . CantHappenText ( "User forced assertion" )  
         EXCEPT 
-          RuntimeError.E => Assertions . DoNothing ( ) 
+          RuntimeError . E => Assertions . DoNothing ( ) 
         | AssertionFailure  
           => Assertions . DoNothing ( ) 
         END (* TRY EXCEPT *) 

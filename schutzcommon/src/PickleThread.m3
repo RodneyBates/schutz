@@ -202,7 +202,8 @@ MODULE PickleThread
 ; VAR WorkerClosure : WorkerClosureTyp 
 ; VAR WorkerThread : Thread . T  
 
-; VAR WantedThreadStackSize := 1024000 (* Word.T's *) (* = 4 Meg Bytes. *)  
+; VAR WantedThreadStackSize
+        := 1024000 (* Word.T's *) (* = 4/8 Meg Bytes. *)  
 
 ; BEGIN (* PickleThread *) 
     Mu := NEW ( MUTEX ) 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2020, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -20,12 +20,15 @@ INTERFACE Assertions
       (* For convenience.  Clients can set this and 
          callbacks can use it to decide whether the 
          exception should be raised.
-      *)  
+      *)
+      
 ; VAR DoWriteCheckpoint : BOOLEAN := TRUE   
 
 ; TYPE AFT = MessageCodes . T 
 
 ; EXCEPTION AssertionFailure ( TEXT ) 
+
+; EXCEPTION Backout ( TEXT ) 
 
 ; PROCEDURE Assert 
     ( Condition : BOOLEAN ; Code : AFT ) RAISES { AssertionFailure } 
@@ -50,9 +53,9 @@ INTERFACE Assertions
         ; DoWriteCheckpoint : BOOLEAN 
         ) 
       : BOOLEAN 
-  (* When a callback is registered, an assertion failure
-     calls it with two strings describing the failure.  It
-     returns TRUE to ask that AssertionFailure be raised. *) 
+  (* When there is a registered callback, an assertion failure calls
+     it with two strings and a code describing the failure.  The callback 
+     returns TRUE to ask that AssertionFailure be raised. *)
 
 ; VAR Callback : CallbackTyp := AlwaysRaise  
 

@@ -1,7 +1,7 @@
 
 ## -----------------------------------------------------------------------1- ##
 ## This file is part of the Schutz semantic editor.                          ##
-## Copyright 1988..2020, Rodney M. Bates.                                    ##
+## Copyright 1988..2021, Rodney M. Bates.                                    ##
 ## rodney.m.bates@acm.org                                                    ##
 ## Licensed under the MIT License.                                           ##
 ## -----------------------------------------------------------------------2- ##
@@ -46,7 +46,7 @@ rm -f ../$TARGET/Ldl0Child.io # Force recompile.
 echo "    Ldl0Child.i3 reset to manual version:"
 ls -l Ldl0Child.i3
 
-# Rebuild schutzcommon and ldlboot.
+# Build schutzcommon and ldlboot.
 cd ../..
 ./scripts/innerscripts/buildcommon.sh
 
