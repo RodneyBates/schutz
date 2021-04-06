@@ -12,13 +12,50 @@ INTERFACE Assertions
    catch failures, print explanations, etc. 
 *) 
 
+; IMPORT Thread
+
 ; IMPORT MessageCodes 
+
+; TYPE QueryProcTyp 
+    = PROCEDURE 
+        ( String1 , String2 : TEXT 
+        ; Code : MessageCodes . T 
+        ; DoWriteCheckpoint : BOOLEAN 
+        ) 
+      : BOOLEAN 
+  (* When there is a registered QueryProc callback, an assertion failure
+     or runtime error calls it to query the user as to what to do. 
+     It returns TRUE to ask that AssertionFailure or Backout be raised. *)
+
+; VAR DefaultQueryProc : QueryProcTyp := AlwaysRaise
+
+; PROCEDURE InvokeQuery 
+    ( String1 , String2 : TEXT
+    ; Code : MessageCodes . T 
+    ; DoWriteCheckpoint : BOOLEAN 
+    ) 
+  : BOOLEAN 
+
+; TYPE ActionTyp
+         = { None
+           , Backout (* Query user and maybe raise Backout. *) 
+           , AssertionFailure (* Query user and maybe raise AssertionFailure. *) 
+           }
+
+(* Use this Thread.T subtype to create a thread with options about how
+   to handle a failure.  Generally, query the user. *) 
+
+; TYPE AssertThreadT
+    = Thread . T OBJECT
+        QueryProc : QueryProcTyp := AlwaysRaise  
+      ; AssertAction : ActionTyp 
+      END 
 
 ; VAR Checking : BOOLEAN := TRUE 
       (* Causes assertions to be checked. Clients can change it. *) 
 ; VAR RaiseOnFailure : BOOLEAN := FALSE 
       (* For convenience.  Clients can set this and 
-         callbacks can use it to decide whether the 
+         QueryProcs can use it to decide whether the 
          exception should be raised.
       *)
       
@@ -46,20 +83,7 @@ INTERFACE Assertions
 
 ; PROCEDURE MessageText ( Message : TEXT ) 
 
-; TYPE CallbackTyp 
-    = PROCEDURE 
-        ( String1 , String2 : TEXT 
-        ; Code : MessageCodes . T 
-        ; DoWriteCheckpoint : BOOLEAN 
-        ) 
-      : BOOLEAN 
-  (* When there is a registered callback, an assertion failure calls
-     it with two strings and a code describing the failure.  The callback 
-     returns TRUE to ask that AssertionFailure be raised. *)
-
-; VAR Callback : CallbackTyp := AlwaysRaise  
-
-(* Some convenient callbacks you might want to use: *) 
+(* Some convenient QueryProcs you might want to use: *) 
 
 ; PROCEDURE AlwaysRaise 
     ( String1 , String2 : TEXT 
@@ -83,7 +107,7 @@ INTERFACE Assertions
     ; DoWriteCheckpoint : BOOLEAN 
     ) 
   : BOOLEAN 
-  (* The default callback. Raises AssertionFailure iff RaiseOnFailure. *) 
+  (* The default QueryProc. Returns RaiseOnFailure. *) 
 
 ; PROCEDURE DoNothing ( ) 
   (* Call this for a do-nothing statement that will not be optimized away. *) 

@@ -19,30 +19,12 @@ MODULE Assertions
 
 ; IMPORT MessageCodes 
 
-; PROCEDURE InvokeQuery 
-    ( String1 , String2 : TEXT
-    ; Code : MessageCodes . T 
-    ; DoWriteCheckpoint : BOOLEAN 
-    ) 
-  : BOOLEAN
-  
-  = VAR LQueryProc : QueryProcTyp 
-
-  ; BEGIN
-      TYPECASE Thread . Self ( )
-      OF NULL => LQueryProc := DefaultQueryProc 
-      | AssertThreadT ( TThread ) => LQueryProc:= TThread . QueryProc  
-      ELSE LQueryProc := DefaultQueryProc 
-      END (* TYPECASE *)
-    ; RETURN LQueryProc ( String1 , String2 , Code , DoWriteCheckpoint ) 
-    END InvokeQuery 
-
 ; PROCEDURE AF ( ) 
 
   = VAR L : INTEGER 
 
   ; BEGIN (* AF *) 
-    (* This is just a place to set a breakpoint for an assertion failure. *) 
+    (* This is just a place to set a breakpoint. *) 
       L := 0 
     END AF 
 
@@ -56,7 +38,7 @@ MODULE Assertions
     ; Wr . PutText ( Stdio . stderr , Wr . EOL ) 
     ; Wr . Flush ( Stdio . stderr ) 
     ; AF ( ) 
-    ; IF InvokeQuery 
+    ; IF Callback 
            ( "" , Message , MessageCodes . T . NullCode , DoWriteCheckpoint )  
       THEN 
         RAISE AssertionFailure ( Message ) 
@@ -98,7 +80,7 @@ MODULE Assertions
     ; Wr . PutText ( Stdio . stderr , Wr . EOL ) 
     ; Wr . Flush ( Stdio . stderr ) 
     ; AF ( ) 
-    ; IF InvokeQuery ( "" , LMessage , Code , DoWriteCheckpoint )  
+    ; IF Callback ( "" , LMessage , Code , DoWriteCheckpoint )  
       THEN 
         RAISE AssertionFailure ( LMessage ) 
       END (* IF *) 
@@ -209,7 +191,7 @@ MODULE Assertions
     ; <* UNUSED *> DoWriteCheckpoint : BOOLEAN 
     ) 
   : BOOLEAN 
-  (* The default QueryProc. Returns RaiseOnFailure. *) 
+  (* The default callback. Raises AssertionFailure iff RaiseOnFailure. *) 
 
   = BEGIN 
       RETURN RaiseOnFailure  

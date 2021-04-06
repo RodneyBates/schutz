@@ -27,8 +27,7 @@ MODULE UiRecPlay
 ; IMPORT VBT 
 ; IMPORT Wr 
 
-; IMPORT Assertions 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Assertions IMPORT AssertionFailure
 ; IMPORT BuildLexMachine  
 ; IMPORT Display 
 ; IMPORT EditWindow 

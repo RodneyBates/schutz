@@ -6,9 +6,9 @@
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
-INTERFACE AssertUnsafe
+INTERFACE AssertUnsafe 
 
-(* It's all done in the module via registering a QueryProc callback. *) 
+(* It's all done in the module via registering a callback. *) 
 
 ; END AssertUnsafe
 .

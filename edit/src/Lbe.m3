@@ -417,6 +417,9 @@ EXPORTS Main
       ; EVAL LangUtil . LoadLanguage ( "m3" ) 
       ; 
 *)
+  Assertions . CauseRuntimeError ( "" )
+; Assertions . DoNothing ( )
+; 
         IF NOT Ui . Install 
                  ( Options . EditFileName 
                  , PlaybackFileName 
