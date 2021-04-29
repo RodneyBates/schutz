@@ -19,7 +19,7 @@ INTERFACE LangUtil
 ; IMPORT Thread 
 
 ; IMPORT Assertions 
-; IMPORT Coroutine 
+; IMPORT SchutzCoroutine 
 ; IMPORT EstHs 
 ; IMPORT IntSets 
 ; IMPORT LbeStd 
@@ -81,7 +81,7 @@ INTERFACE LangUtil
 (* Managing lexical scanners. *) 
 
 ; PROCEDURE RegisterScanner 
-    ( Lang : LbeStd . LangBuiltinTyp ; Scanner : Coroutine . ProcOfT ) 
+    ( Lang : LbeStd . LangBuiltinTyp ; Scanner : SchutzCoroutine . ProcOfT ) 
 
 ; PROCEDURE ScannerIfForLang ( Lang : LbeStd . LangTyp ) 
   : ScannerIf . ScanIfTyp  

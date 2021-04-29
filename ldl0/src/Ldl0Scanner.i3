@@ -8,9 +8,9 @@
 
 INTERFACE Ldl0Scanner 
 
-; IMPORT Coroutine 
+; IMPORT SchutzCoroutine 
 
-; PROCEDURE Scan ( Cr : Coroutine . T ) 
+; PROCEDURE Scan ( Cr : SchutzCoroutine . T ) 
 
 ; END Ldl0Scanner 
 . 

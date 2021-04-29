@@ -11,7 +11,7 @@ MODULE M3Scanner
 ; IMPORT TextIntTbl 
 
 ; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
-; IMPORT Coroutine 
+; IMPORT SchutzCoroutine 
 ; IMPORT LangUtil  
 ; IMPORT LbeStd 
 ; IMPORT M3InitTokStrings 
@@ -46,7 +46,7 @@ MODULE M3Scanner
     END InitTables
 
 (* VISIBLE *) 
-; PROCEDURE Scan ( Cr : Coroutine . T ) 
+; PROCEDURE Scan ( Cr : SchutzCoroutine . T ) 
 
 
   = VAR Sif : ScannerIf . ScanIfTyp 

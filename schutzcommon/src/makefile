@@ -24,7 +24,7 @@ CPP  = /lib/cpp -P
 ERRORFILES = \
   Assertions.m3 \
   AssertUnsafe.m3 \
-  Coroutine.m3 \
+  SchutzCoroutine.m3 \
   EstBuild.m3 \
   EstHs.m3 \
   EstUtil.m3 \

@@ -27,7 +27,7 @@ EXPORTS ParseTrv , ScannerIf
 
 ; IMPORT Assertions 
 ; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure
-; IMPORT Coroutine 
+; IMPORT SchutzCoroutine 
 ; IMPORT EstHs 
 ; IMPORT EstUtil
 ; IMPORT LangUtil 
@@ -122,7 +122,7 @@ EXPORTS ParseTrv , ScannerIf
             ( ScanIf . SifAccumString , LbeStd . LimitedCharNoInfinity ) 
         ; ScanIf . SifResumeKind := ScanResumeKindTyp . SrKindLexErr
         ; ScanIf . SifLexErrCode := LbeStd . LeTokTooLong 
-        ; Coroutine . Resume ( ScanIf ) 
+        ; SchutzCoroutine . Resume ( ScanIf ) 
         END (* IF *) 
       END (* IF *) 
     END AccumSlice 
@@ -150,7 +150,7 @@ EXPORTS ParseTrv , ScannerIf
       ScanIf . SifResumeKind := ScanResumeKindTyp . SrKindConsumeChars 
     ; ScanIf . SifConsumedCt := ConsumedCt 
     ; ScanIf . SifScanState := ScanState 
-    ; Coroutine . Resume ( ScanIf ) 
+    ; SchutzCoroutine . Resume ( ScanIf ) 
     ; ScanState := ScanIf . SifScanState 
     ; DeliverString := ScanIf . SifDeliverString 
     ; AreAllBlanks := ScanIf . SifAreAllBlanks 
@@ -181,7 +181,7 @@ EXPORTS ParseTrv , ScannerIf
     ; ScanIf . SifScanState := ScanState 
     ; ScanIf . SifTok := Tok 
     ; ScanIf . SifIsPlaceholder := IsPlaceholder 
-    ; Coroutine . Resume ( ScanIf ) 
+    ; SchutzCoroutine . Resume ( ScanIf ) 
     ; ScanState := ScanIf . SifScanState 
     ; DeliverString := ScanIf . SifDeliverString 
     ; AreAllBlanks := ScanIf . SifAreAllBlanks 
@@ -202,7 +202,7 @@ EXPORTS ParseTrv , ScannerIf
     ; ScanIf . SifAccumString 
         := Strings . Empty ( EventualLengthHint := BuildTokenLengthHint ) 
     ; ScanIf . SifScanState := ScanState 
-    ; Coroutine . Resume ( ScanIf ) 
+    ; SchutzCoroutine . Resume ( ScanIf ) 
     ; ScanIf . SifBegNoted := TRUE 
     END NoteBeg 
 
@@ -220,7 +220,7 @@ EXPORTS ParseTrv , ScannerIf
     ; ScanIf . SifAccumString 
         := Strings . Empty ( EventualLengthHint := BuildTokenLengthHint ) 
     ; ScanIf . SifScanState := ScanState 
-    ; Coroutine . Resume ( ScanIf ) 
+    ; SchutzCoroutine . Resume ( ScanIf ) 
     ; ScanIf . SifBegNoted := TRUE 
     END NoteBegPrevChar 
 
@@ -235,7 +235,7 @@ EXPORTS ParseTrv , ScannerIf
   = BEGIN (* LexErr *) 
       ScanIf . SifResumeKind := ScanResumeKindTyp . SrKindLexErr 
     ; ScanIf . SifLexErrCode := ErrCode 
-    ; Coroutine . Resume ( ScanIf ) 
+    ; SchutzCoroutine . Resume ( ScanIf ) 
     END LexErr 
 
 (* Interface to parser *) 
@@ -2202,7 +2202,7 @@ END
         (* Keep resuming scanner until it consumes some characters 
            and/or delivers a token. *) 
         ; LOOP 
-            Coroutine . Resume ( ParseInfo . PiScanIf ) 
+            SchutzCoroutine . Resume ( ParseInfo . PiScanIf ) 
           ; CASE ParseInfo . PiScanIf . SifResumeKind <* NOWARN *>
 
             OF ScanResumeKindTyp . SrKindDeliverTok 

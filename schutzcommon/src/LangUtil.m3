@@ -23,7 +23,7 @@ MODULE LangUtil
 
 ; IMPORT Assertions 
 ; FROM Assertions IMPORT Assert , AssertionFailure 
-; IMPORT Coroutine
+; IMPORT SchutzCoroutine
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
 ; IMPORT Files 
@@ -346,7 +346,8 @@ MODULE LangUtil
 
 ; TYPE RegisteredScannerTyp
   = RECORD
-      ScannerProc : Coroutine . ProcOfT ; ScannerIf : ScannerIf . ScanIfTyp
+      ScannerProc : SchutzCoroutine . ProcOfT
+    ; ScannerIf : ScannerIf . ScanIfTyp
     END
 
 ; CONST RegisteredScannerNull
@@ -360,7 +361,7 @@ MODULE LangUtil
 
 (* VISIBLE: *)
 ; PROCEDURE RegisterScanner
-    ( Lang : LbeStd . LangBuiltinTyp ; Scanner : Coroutine . ProcOfT )
+    ( Lang : LbeStd . LangBuiltinTyp ; Scanner : SchutzCoroutine . ProcOfT )
 
   = BEGIN
       WITH WRS = RegisteredScanners [ Lang ]
@@ -386,9 +387,8 @@ MODULE LangUtil
                 threads can initiate a parse. *) 
           THEN
             WRS . ScannerIf
-              := Coroutine . Init
-                   ( NEW ( ScannerIf . ScanIfTyp ) , WRS . ScannerProc
-                   )
+              := SchutzCoroutine . Init
+                   ( NEW ( ScannerIf . ScanIfTyp ) , WRS . ScannerProc )
           END (* IF *)
         ; RETURN WRS . ScannerIf
         END (* WITH *)
