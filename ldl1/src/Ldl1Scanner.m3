@@ -11,7 +11,7 @@ MODULE Ldl1Scanner
 ; IMPORT TextIntTbl 
 
 ; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
-; IMPORT Coroutine 
+; IMPORT SchutzCoroutine 
 ; IMPORT LangUtil  
 ; IMPORT LbeStd 
 ; IMPORT Ldl1Tok 
@@ -66,7 +66,7 @@ MODULE Ldl1Scanner
     END InitRwTable 
 
 (* VISIBLE *) 
-; PROCEDURE Scan ( Cr : Coroutine . T ) 
+; PROCEDURE Scan ( Cr : SchutzCoroutine . T ) 
 
   = VAR Sif : ScannerIf . ScanIfTyp 
   ; VAR InString : Strings . StringTyp 
