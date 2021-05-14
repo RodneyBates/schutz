@@ -870,29 +870,31 @@ MODULE Parser
     ; MergeInfo : MergeInfoTyp (* Fields can change. *)
     ; ChildRef : LbeStd . EstRootTyp
     )
+  RAISES { AssertionFailure } 
   (* Call this *before* merging ChildRef as an explicit EST child.  *) 
   = BEGIN
-      IF MergeInfo . MiRMChildRef = NIL 
-      THEN (* ChildRef will be the first, thus RM, child to be noted. 
+      IF MergeInfo . MiTempMarkListRef = NIL THEN RETURN END 
+    ; IF MergeInfo . MiTempMarkRangeTo <= 0 THEN RETURN END 
+    ; IF IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet )
+      THEN RETURN
+      END (* IF *)  
+    ; IF MergeInfo . MiRMChildRef = NIL 
+      THEN (* ChildRef will be the temporal first, thus RM, child to be noted. 
               Patch any deferred tempmarks as RightSib tempmarks.  These
               can only be trailing mods attached to this explicit child. *)
         Assert
           ( ChildRef # NIL
           , AFT . A_NoteEstChildImminent_temp_mark_on_nil_child
           )
-      ; IF NOT IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet )
-        THEN 
-          PatchTempMarkSetKindsAndEstRefs
-            ( MergeInfo . MiTempMarkListRef 
-            , MergeInfo . MiDeferredTempMarkSet 
-            , MarkKindTyp . RightSibFmtNo
-            , ChildRef
-            ) 
-        ; EstBuild . InclNextRightmostChildKindSet
-            ( MergeInfo , EstHs . EstChildKindSetContainsTempMark ) 
-        ; MergeInfo . MiDeferredTempMarkSet := IntSets . Empty ( ) 
-        END (* IF *) 
-
+      ; PatchTempMarkSetKindsAndEstRefs
+          ( MergeInfo . MiTempMarkListRef 
+          , MergeInfo . MiDeferredTempMarkSet 
+          , MarkKindTyp . RightSibFmtNo
+          , ChildRef
+          ) 
+      ; EstBuild . InclNextRightmostChildKindSet
+          ( MergeInfo , EstHs . EstChildKindSetContainsTempMark ) 
+      ; MergeInfo . MiDeferredTempMarkSet := IntSets . Empty ( ) 
       ; MergeInfo . MiRMChildRef := ChildRef 
       END (* IF *) 
     END NoteEstChildImminent 
