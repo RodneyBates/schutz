@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2021, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -719,8 +719,11 @@ MODULE EditWindow
                    , Point . Sub ( Window . EwSouthEastChar , Point1_1 ) 
                    ) 
           END (* IF *) 
-        ELSE 
-          CantHappen ( AFT . A_SetFont_NotFixedFont ) 
+        ELSE
+          Assertions . Message ( AFT . E_NoFixedFontFound )
+        ; Assertions . DoTerminate := TRUE 
+        ; RAISE Assertions . AssertionFailure
+                  ( MessageCodes . Image ( AFT . E_NoFixedFontFound ) ) 
         END (* CASE *) 
       ; Window . EwPaintOpBg 
           := PaintOp . FromRGB

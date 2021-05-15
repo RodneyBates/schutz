@@ -1,12 +1,10 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Scheutz semantic editor.                         *)
-(* Copyright 1988..2007, Rodney M. Bates.                                    *)
-(* rodney.bates@wichita.edu                                                  *)
+(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the Gnu Public License, version 2 or later.                *)
 (* -----------------------------------------------------------------------2- *)
-
-
 
 (* INTERFACE MessageCodes.  
    Rodney M. Bates JULY 2001 
@@ -21,7 +19,7 @@
 
    Message codes used should begin with 'E' for error, 'W' for
    warning, 'F' for translator failures, 'A' for assertion failure,
-   or 'I' for information.
+   ,'R' for runtime failure, or 'I' for information.
 
    To get the message text, this prefix is stripped, the words
    in what remains are separated by blanks and lower cased. 

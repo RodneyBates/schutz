@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2021, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -484,8 +484,12 @@ MODULE Worker
         AssertDevel . CheckpointForFailure ( CrashCode ) 
       END (* IF *) 
     ; LOCK Mu 
-      DO 
-        LInteractive := StoredClosure . IsInteractive 
+      DO IF StoredClosure # NIL
+        THEN LInteractive := StoredClosure . IsInteractive 
+        ELSIF QueuedClosure # NIL
+        THEN LInteractive := QueuedClosure . IsInteractive 
+        ELSE LInteractive := FALSE
+        END (* IF *) 
       END (* LOCK *)
     ; IF LInteractive 
       THEN  
@@ -493,8 +497,9 @@ MODULE Worker
         (* It would be more obviously right to show and remove this dialog  
            while holding Mu, but I can't figure out a way that satisfies a 
            consistent lock order.  In any case, unlocking Mu is OK, because
-           we will only get here when StoredState = WrtBusy, which means 
-           the only thing any other thread can do is wait on WaitingForIdle. 
+           we will only get here when StoredState = WrtBusyImmed or
+           WrtBusyQueued, which means the only thing any other thread
+           can do is wait on WaitingForIdle. 
         *) 
       ; LOCK Mu 
         DO
