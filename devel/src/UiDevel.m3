@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2021, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -1407,7 +1407,7 @@ MODULE UiDevel
 
 ; PROCEDURE ForceAssertWorkProc ( <* UNUSED *> Self : Worker . ClosureTyp ) 
 
-  = VAR LSavedCallback : Assertions . CallbackTyp 
+  = VAR LSavedCallback : Assertions . QueryProcTyp 
 
   ; BEGIN 
       UiRecPlay . Record ( UiRecPlay . CommandTyp . ForceAssert ) 
@@ -1418,8 +1418,8 @@ MODULE UiDevel
       => RETURN 
       END 
     ; TRY 
-        LSavedCallback := Assertions . Callback 
-      ; Assertions . Callback := Worker . Failure 
+        LSavedCallback := Assertions . DefaultQueryProc 
+      ; Assertions . DefaultQueryProc := Worker . Failure 
       ; TRY 
           Assertions . CantHappenText ( "User forced assertion" )  
         EXCEPT 
@@ -1428,7 +1428,7 @@ MODULE UiDevel
           => Assertions . DoNothing ( ) 
         END (* TRY EXCEPT *) 
       FINALLY
-        Assertions . Callback := LSavedCallback 
+        Assertions . DefaultQueryProc := LSavedCallback 
       END (* TRY FINALLY *) 
     END ForceAssertWorkProc 
 

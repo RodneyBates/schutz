@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2021, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -1061,7 +1061,7 @@ MODULE TextEdit
 
   ; PROCEDURE IfteUndoChanges ( ) 
 
-    = VAR LSavedCallback : Assertions . CallbackTyp 
+    = VAR LSavedCallback : Assertions . QueryProcTyp 
 
     ; BEGIN 
         FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
@@ -1102,14 +1102,14 @@ MODULE TextEdit
          chance of getting everything back the way it was before Ifte
          was called.
       *)
-      ; LSavedCallback := Assertions . Callback 
-      ; Assertions . Callback := Assertions . NeverRaise 
+      ; LSavedCallback := Assertions . DefaultQueryProc 
+      ; Assertions . DefaultQueryProc := Assertions . NeverRaise 
       ; TRY   
           BruteForceVerifyAllLinesRefs ( ImageRef , RepairIsOK := TRUE ) 
         EXCEPT 
         ELSE 
         END (* TRY EXCEPT *) 
-      ; Assertions . Callback := LSavedCallback 
+      ; Assertions . DefaultQueryProc := LSavedCallback 
 
       ; UnadjustLineMarksNodeNos 
           ( ImageRef 

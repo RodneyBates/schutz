@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2021, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -2178,7 +2178,7 @@ MODULE Display
   ; VAR LImagePers : PaintHs . ImagePersistentTyp 
   ; VAR LMark : PaintHs . LineMarkTyp 
   ; VAR LCursorMark : PaintHs . LineMarkMeatTyp 
-  ; VAR LSavedCallback : Assertions . CallbackTyp 
+  ; VAR LSavedCallback : Assertions . QueryProcTyp 
   ; VAR LLinesRef : PaintHs . LinesRefMeatTyp 
   ; VAR LMarkCt : LbeStd . MarkNoTyp 
   ; VAR LTrailingBlankLines : LbeStd . LineNoTyp 
@@ -2200,8 +2200,8 @@ MODULE Display
           LLinesListLooksOK := FALSE  
         ELSE 
           TRY 
-            LSavedCallback := Assertions . Callback 
-          ; Assertions . Callback := Assertions . AlwaysRaise 
+            LSavedCallback := Assertions . DefaultQueryProc 
+          ; Assertions . DefaultQueryProc := Assertions . AlwaysRaise 
           ; TRY 
               TextEdit . BruteForceVerifyAllLinesRefs 
                 ( ImageTrans , RepairIsOK := TRUE ) 
@@ -2218,7 +2218,7 @@ MODULE Display
               END (* TRY EXCEPT *) 
             ; LLinesListLooksOK := FALSE  
             END (* TRY EXCEPT *) 
-          FINALLY Assertions . Callback := LSavedCallback 
+          FINALLY Assertions . DefaultQueryProc := LSavedCallback 
           END (* TRY FINALLY *) 
         END (* IF *) 
 
@@ -2241,8 +2241,8 @@ MODULE Display
           LImagePers . IpMarkCt := 0  
         ELSE 
           TRY 
-            LSavedCallback := Assertions . Callback 
-          ; Assertions . Callback := Assertions . AlwaysRaise 
+            LSavedCallback := Assertions . DefaultQueryProc 
+          ; Assertions . DefaultQueryProc := Assertions . AlwaysRaise 
           ; TRY 
               PaintHs . BruteForceVerifyLineMarks 
                 ( ImageTrans , DoCheckOrder := TRUE ) 
@@ -2318,7 +2318,7 @@ MODULE Display
               END (* IF *) 
             ; LCursorMark := NIL 
             END (* TRY EXCEPT *) 
-          FINALLY Assertions . Callback := LSavedCallback 
+          FINALLY Assertions . DefaultQueryProc := LSavedCallback 
           END (* TRY FINALLY *) 
         END (* IF *) 
 (* TODO: Generalize the above for other marks and multiple windows. *) 

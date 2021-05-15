@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2021, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -180,9 +180,9 @@ EXPORTS Main
     ; Options . EnablePickleWrite := TRUE  
     ; Options . DoOptimizeSingletonLists := FALSE
     ; Options . Crash := FALSE 
-    ; Assertions . Callback := Worker . Failure   
- (* ; Assertions . Callback := AssertDevel . AssertDialogCommandLine *) 
- (* ; Assertions . Callback := Assertions . NeverRaise *) 
+    ; Assertions . DefaultQueryProc := Worker . Failure   
+ (* ; Assertions . DefaultQueryProc := AssertDevel . AssertDialogCommandLine *) 
+ (* ; Assertions . DefaultQueryProc := Assertions . NeverRaise *) 
     ; AssertDevel . DoStop := TRUE 
     ; RTProcess . RegisterExitor ( Exitor )
     END SetDefaults 
@@ -417,8 +417,10 @@ EXPORTS Main
       ; EVAL LangUtil . LoadLanguage ( "m3" ) 
       ; 
 *)
-  Assertions . CauseRuntimeError ( "" )
-; Assertions . DoNothing ( )
+  (* Assertions . CauseRuntimeError ( "" ) For testing
+     ; 
+*) 
+  Assertions . DoNothing ( )
 ; 
         IF NOT Ui . Install 
                  ( Options . EditFileName 
