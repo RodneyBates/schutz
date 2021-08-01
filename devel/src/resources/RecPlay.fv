@@ -1,7 +1,7 @@
 
 ;; -----------------------------------------------------------------------1- ;;
 ;; This file is part of the Schutz semantic editor.                          ;;
-;; Copyright 1988..2020, Rodney M. Bates.                                    ;;
+;; Copyright 1988..2021, Rodney M. Bates.                                    ;;
 ;; rodney.m.bates@acm.org                                                    ;;
 ;; Licensed under the MIT License.                                           ;;
 ;; -----------------------------------------------------------------------2- ;;
@@ -102,7 +102,7 @@
         ( VBox  
            ( Shape ; Title of whole window 
              ( Height + 0 ) 
-             ( HBox Fill ( Text "Scheutz Batch Record & Playback" ) Fill ) 
+             ( HBox Fill ( Text "Schutz Batch Record & Playback" ) Fill ) 
            ) 
            ( Glue 4 ) 
            ( Frame Lowered 
