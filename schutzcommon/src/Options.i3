@@ -56,9 +56,9 @@ INTERFACE Options
 ; VAR StoppersToRetain : LbeStd . LineNoTyp := 50 
 ; VAR DelNlAtBOL : BOOLEAN := TRUE 
 
-; VAR FontNamePlain := "-*-fixed-medium-r-*-*-13-*-*-*-*-*-*-*" 
-; VAR FontNameBold := "-*-fixed-bold-r-*-*-13-*-*-*-*-*-*-*" 
-; VAR FontNameItalic := "-*-fixed-medium-o-*-*-13-*-*-*-*-*-*-*" 
+; VAR FontNamePlain := "-*-fixed-medium-r-*-*-10-*-*-*-*-*-*-*" 
+; VAR FontNameBold := "-*-fixed-bold-r-*-*-10-*-*-*-*-*-*-*" 
+; VAR FontNameItalic := "-*-fixed-medium-o-*-*-10-*-*-*-*-*-*-*" 
 
 ; CONST PrimaryMax = 16_FFFF
 ; TYPE PrimaryTyp = [ 0 .. PrimaryMax ] 

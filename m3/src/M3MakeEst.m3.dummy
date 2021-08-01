@@ -1,9 +1,9 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
-(* rodney.bates@wichita.edu                                                  *)
-(* Licensed under the Gnu Public License, version 2 or later.                *)
+(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* rodney.m.bates@acm.org                                                    *)
+(* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
 (* A hand-written, do-nothing, dummy module, just to enable initially
