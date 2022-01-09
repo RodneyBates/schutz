@@ -1,0 +1,10 @@
+MODULE test13_83
+
+; BEGIN
+    IF (*S271*)
+       «Id»
+    THEN
+      A := B
+    END
+  END test13_83
+.

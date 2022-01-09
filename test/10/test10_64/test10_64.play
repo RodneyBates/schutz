@@ -19,6 +19,7 @@ CursorLeft
 CursorLeft
 CharType_Char '*'
 CharType_Char ')'
+
 SemParse
 MouseClickChar 2 24
 CharDelBwd
@@ -28,11 +29,13 @@ CharDelBwd
 CharDelBwd
 CharDelBwd
 CharDelBwd
+
 SemParse
 CursorDown
 CursorDown
 CursorUp
 CharDelBwd
+
 SemParse
 CursorUp
 CursorUp

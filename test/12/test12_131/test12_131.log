@@ -2,7 +2,7 @@
 <     ; SizeHint : INTEGER := 25 ; Space : Arr_ref := NIL END
 ---
 >       ; SizeHint : INTEGER := 25 ; Space : Arr_ref := NIL END
-39,85c39,87
+39,83c39,84
 <             ; INCR ( card_val ) RETURN card_val
 <               END
 < 
@@ -48,8 +48,6 @@
 <                      => high
 <               ; = Probe - 1
 <                 | compareEqual => mx := Probe
-<               ; Isequal := TRUE
-<               ; EXIT | compareGreater => low := Probe + 1
 ---
 >             ; INCR
 >                 ( card_val ) RETURN card_val
@@ -80,8 +78,7 @@
 >             ; VAR high : INTEGER
 >             ; VAR Lcompare : CompareTyp
 >             ; VAR Probe : INTEGER
->             ; IF Elem
->               . Space := NIL
+>             ; IF Elem . Space := NIL
 >               THEN mx := 0
 >             ; Isequal := FALSE
 >               ELSE ; low := 0
@@ -97,9 +94,7 @@
 >               compare . less
 >               => high ; = Probe - 1
 >               | compareEqual =>
->                 mx := Probe ; Isequal := TRUE ; EXIT | compareGreater
->               =>
->                 low := Probe + 1
+>                 mx := Probe
 test12_131.export.m3 not as expected
 ######################### F A I L E D #########################
 ----------------------------- Failed in /home/rodney/proj/lbe/git/test/12/test12_131

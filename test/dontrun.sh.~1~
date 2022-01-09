@@ -1,0 +1,10 @@
+if [ "$1" = "" ] ; then DIR="."; else DIR="$1"; fi
+#ABSPATH="`abspath $DIR`"
+#echo $ABSPATH
+ABSPATH="`cd $DIR; pwd`"
+#echo $ABSPATH
+#pwd 
+#echo "cd" $DIR
+cd $DIR
+touch NOTRUN
+echo "-------------- Not running In directory `pwd`" 

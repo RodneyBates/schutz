@@ -1,0 +1,267 @@
+$4 = RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; 
+    PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; 
+    PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; 
+    EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; 
+    PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; 
+    PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END
+Record has no field named "PiOrigTempMarkList".
+$5 = 16_0000000001594c18
+$6 = {RECORD TokMark = RECORD EstNodeNo = 15; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = ChildFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001881cf0; LineNo = 0; CharPos = 0; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_00000000015940d8; LineNo = 0; CharPos = 0; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_00000000015940d8; LineNo = 0; CharPos = 5; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 31; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001803af8; LineNo = 0; CharPos = 4; SeqNo = 0;  END}
+$7 = 16_0000000001594cd0
+$8 = {RECORD TokMark = RECORD EstNodeNo = 15; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = ChildFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001cc5b18; LineNo = 0; CharPos = 0; SeqNo = 1;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001881d28; LineNo = 0; CharPos = 0; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_00000000015940d8; LineNo = 0; CharPos = 9; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 31; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001803af8; LineNo = 0; CharPos = 4; SeqNo = 0;  END}
+$9 = 16_0000000001594cd0
+$10 = {RECORD TokMark = RECORD EstNodeNo = 15; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = ChildFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001cc5b18; LineNo = 0; CharPos = 0; SeqNo = 1;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001881d28; LineNo = 0; CharPos = 0; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_00000000015940d8; LineNo = 0; CharPos = 9; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 31; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001803af8; LineNo = 0; CharPos = 4; SeqNo = 0;  END}
+$11 = 2
+#16 0x000000000049b678 in RbmTraverseEst (EstRef=16_0000000001c49458, KindSet={}, EstChildNo=0, GrandparentEstRef=NIL, RootAbsNodeNo=2, 
+    RootFsNodeRef=16_000000000000024e, EstApproxFmtKind=FmtKindVert, EstRecomputeFmtKindProc=
+{"TempMark.ProcNoop", Declared at: ../src/TempMark.m3:1904}, EstIndentPos1=0, EstIndentPosN=0) at ../src/TempMark.m3:4491
+4491	              => RbmTeTraverseFsFixedChildren 
+$12 = (*16_0000000001c49458*) OBJECT KTreeEstChildCtLeftOfNl = 1; KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; 
+    WiIsNull = FALSE; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = TRUE; 
+    WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 29; KTreeElemCt = 1; EstSemRef = NIL; EstTok = 29; EstLeftTok = 18; 
+    EstRightTok = 18; EstNodeKind = EstNodeKindPlain; EstHeight = 1; EstRepairCost = 0; EstChildKindSet = {}; 
+    EstLeafArrayRef = 16_0000000001c49490;  END
+#15 0x000000000049c4ec in RbmTeTraverseFsFixedChildren (ParentFsNodeRef=16_0000000000a05a78, ApproxFmtKind=FmtKindVert, 
+    RecomputeFmtKindProc={"TempMark.ProcNoop", Declared at: ../src/TempMark.m3:1904}, FsChildCt=3, InitialFsChildNo=1)
+    at ../src/TempMark.m3:2420
+2420	              RbmTeTraverseFs 
+#14 0x000000000049ce04 in RbmTeTraverseFs (FsNodeRef=16_000000000000024e, FsApproxFmtKind=FmtKindVert, FsRecomputeFmtKindProc=
+{"TempMark.ProcNoop", Declared at: ../src/TempMark.m3:1904}) at ../src/TempMark.m3:4195
+4195	                   => RbmTeTfsEstChild ( IsEstList := FALSE ) 
+#13 0x00000000004a0ac2 in RbmTeTfsEstChild (IsEstList=FALSE) at ../src/TempMark.m3:3587
+3587	            => RbmTeTfsEstSubtree ( ) 
+#12 0x000000000049d962 in RbmTeTfsEstSubtree () at ../src/TempMark.m3:2706
+2706	              ; RbmTraverseEst 
+#11 0x000000000049b678 in RbmTraverseEst (EstRef=16_0000000001c427e8, KindSet={}, EstChildNo=0, GrandparentEstRef=16_0000000001c49458, 
+    RootAbsNodeNo=2, RootFsNodeRef=16_000000000000024e, EstApproxFmtKind=FmtKindVert, EstRecomputeFmtKindProc=
+Static links do not lead to a valid frame for procedure "RbmTeTfsEssRecomputeFmtKind".
+) at ../src/TempMark.m3:4491
+4491	              => RbmTeTraverseFsFixedChildren 
+$13 = (*16_0000000001c427e8*) OBJECT KTreeEstChildCtLeftOfNl = 9; KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; 
+    WiIsNull = FALSE; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = TRUE; 
+    WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 28; KTreeElemCt = 4; EstSemRef = NIL; EstTok = 156; EstLeftTok = 18; 
+    EstRightTok = 18; EstNodeKind = EstNodeKindPlain; EstHeight = 2; EstRepairCost = 0; EstChildKindSet = {}; 
+    EstNonleafArrayRef = 16_0000000001c42828; EstNonleafSliceEdgeInfoPair = RECORD SeiLeftEdgeInfo = RECORD EiTok = 0; EiFmtNo = 0; 
+    EiEdgeKind = EdgeKindLeadingMod;  END; SeiRightEdgeInfo = RECORD EiTok = 0; EiFmtNo = 0; EiEdgeKind = EdgeKindLeadingMod;  END;  END; 
+     END
+#10 0x000000000049c4ec in RbmTeTraverseFsFixedChildren (ParentFsNodeRef=16_00000000017e2398, ApproxFmtKind=FmtKindVert, 
+    RecomputeFmtKindProc=Static links do not lead to a valid frame for procedure "RbmTeTfsEssRecomputeFmtKind".
+) at ../src/TempMark.m3:2420
+2420	              RbmTeTraverseFs 
+#9  0x000000000049ca1b in RbmTeTraverseFs (FsNodeRef=16_000000000000024e, FsApproxFmtKind=FmtKindVert, FsRecomputeFmtKindProc=
+Static links do not lead to a valid frame for procedure "RbmTeTfsEssRecomputeFmtKind".
+) at ../src/TempMark.m3:4096
+4096	                => RbmTeTfsLeadingModsNoDel ( ) 
+#8  0x000000000049f1e7 in RbmTeTfsLeadingModsNoDel () at ../src/TempMark.m3:3144
+3144	              => IF RbmTeTfsModTok ( TEstRef ) (* SIDE EFFECTS! *) 
+#7  0x000000000049efcc in RbmTeTfsModTok (EstRef=16_0000000001c54eb0) at ../src/TempMark.m3:3075
+3075	            ; RbmTraverseEst 
+#6  0x000000000049b678 in RbmTraverseEst (EstRef=16_0000000001c54eb0, KindSet={}, EstChildNo=23, GrandparentEstRef=16_0000000001c427e8, 
+    RootAbsNodeNo=2, RootFsNodeRef=16_000000000000024e, EstApproxFmtKind=FmtKindHoriz, EstRecomputeFmtKindProc=
+Static links do not lead to a valid frame for procedure "RbmTeTfsEssRecomputeFmtKind".
+) at ../src/TempMark.m3:4491
+4491	              => RbmTeTraverseFsFixedChildren 
+$14 = (*16_0000000001c54eb0*) OBJECT KTreeEstChildCtLeftOfNl = 3; KTreeWidthInfo = RECORD WiNlTrigger = 254; WiWidth = 8; 
+    WiIsNull = FALSE; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; 
+    WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 2; KTreeElemCt = 3; EstSemRef = NIL; EstTok = 99; EstLeftTok = 18; 
+    EstRightTok = 17; EstNodeKind = EstNodeKindModTok; EstHeight = 1; EstRepairCost = 0; EstChildKindSet = {}; 
+    EstLeafArrayRef = 16_0000000001c54ee8;  END
+#5  0x000000000049c4ec in RbmTeTraverseFsFixedChildren (ParentFsNodeRef=16_000000000189d500, ApproxFmtKind=FmtKindHoriz, 
+    RecomputeFmtKindProc=Static links do not lead to a valid frame for procedure "RbmTeTfsEssRecomputeFmtKind".
+) at ../src/TempMark.m3:2420
+2420	              RbmTeTraverseFs 
+#4  0x000000000049ca1b in RbmTeTraverseFs (FsNodeRef=16_000000000000024e, FsApproxFmtKind=FmtKindHoriz, FsRecomputeFmtKindProc=
+Static links do not lead to a valid frame for procedure "RbmTeTfsEssRecomputeFmtKind".
+) at ../src/TempMark.m3:4096
+4096	                => RbmTeTfsLeadingModsNoDel ( ) 
+#3  0x000000000049f24b in RbmTeTfsLeadingModsNoDel () at ../src/TempMark.m3:3152
+3152	                   RbmTeLeafString 
+#2  0x000000000049c1dd in RbmTeLeafString (FsNodeRef=16_000000000189d6d8, ApproxFmtKind=FmtKindHoriz, String=16_0000000001803af8)
+    at ../src/TempMark.m3:2354
+2354	               Assert 
+$15 = (*16_0000000001803af8*) OBJECT StringNo = 1065; Tok = 17; Value = 16_00000000018bd7b8;  END
+$16 = (*16_00000000018bd7b8*) "\xABbd\xBB"
+#16 0x000000000049b678 in RbmTraverseEst (EstRef=16_0000000001c49458, KindSet={}, EstChildNo=0, GrandparentEstRef=NIL, RootAbsNodeNo=2, 
+    RootFsNodeRef=16_000000000000024e, EstApproxFmtKind=FmtKindVert, EstRecomputeFmtKindProc=
+{"TempMark.ProcNoop", Declared at: ../src/TempMark.m3:1904}, EstIndentPos1=0, EstIndentPosN=0) at ../src/TempMark.m3:4491
+4491	              => RbmTeTraverseFsFixedChildren 
+Can't find Modula-3 identifier: RbmEstTravInfo
+$17 = RECORD EtiNodeRef = 16_0000000001c49458; EtiParentRef = 16_0000000001c49458; EtiStringRef = NIL; EtiChildCt = 1; EtiChildNo = 0; 
+    EtiChildRelNodeNo = 1; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c427e8; LeCumNodeCt = 37; LeKindSet = {}; LeFmtNo = 1; 
+     END; EtiAbsNodeNo = 0; EtiChildFmtNo = 1; EtiIsOptSingletonList = FALSE;  END
+#11 0x000000000049b678 in RbmTraverseEst (EstRef=16_0000000001c427e8, KindSet={}, EstChildNo=0, GrandparentEstRef=16_0000000001c49458, 
+    RootAbsNodeNo=2, RootFsNodeRef=16_000000000000024e, EstApproxFmtKind=FmtKindVert, EstRecomputeFmtKindProc=
+Static links do not lead to a valid frame for procedure "RbmTeTfsEssRecomputeFmtKind".
+) at ../src/TempMark.m3:4491
+4491	              => RbmTeTraverseFsFixedChildren 
+$18 = RECORD EtiNodeRef = 16_0000000001c427e8; EtiParentRef = 16_0000000001c427e8; EtiStringRef = NIL; EtiChildCt = 26; EtiChildNo = 23; 
+    EtiChildRelNodeNo = 30; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001c54eb0; LeCumNodeCt = 7; LeKindSet = {}; LeFmtNo = 255; 
+     END; EtiAbsNodeNo = 1; EtiChildFmtNo = 15; EtiIsOptSingletonList = FALSE;  END
+#6  0x000000000049b678 in RbmTraverseEst (EstRef=16_0000000001c54eb0, KindSet={}, EstChildNo=23, GrandparentEstRef=16_0000000001c427e8, 
+    RootAbsNodeNo=2, RootFsNodeRef=16_000000000000024e, EstApproxFmtKind=FmtKindHoriz, EstRecomputeFmtKindProc=
+Static links do not lead to a valid frame for procedure "RbmTeTfsEssRecomputeFmtKind".
+) at ../src/TempMark.m3:4491
+4491	              => RbmTeTraverseFsFixedChildren 
+$19 = RECORD EtiNodeRef = 16_0000000001c54eb0; EtiParentRef = 16_0000000001c54eb0; EtiStringRef = NIL; EtiChildCt = 3; EtiChildNo = 2; 
+    EtiChildRelNodeNo = 3; EtiChildLeafElem = RECORD LeChildRef = 16_0000000001803af8; LeCumNodeCt = 1; LeKindSet = {}; LeFmtNo = 255; 
+     END; EtiAbsNodeNo = 31; EtiChildFmtNo = 0; EtiIsOptSingletonList = FALSE;  END
+#17 0x000000000049aa3e in RebuildMarkList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ImageRef=16_00000000012fba00, 
+    OldEstRef=16_00000000015943a0, NewEstRef=16_0000000001c49458) at ../src/TempMark.m3:4586
+4586	        ; RbmTraverseEst 
+[New Thread 139813810276096 (LWP 22629)]
+[Thread 139813810276096 (LWP 22629) exited]
+[New Thread 139813810276096 (LWP 22630)]
+[New Thread 139813785097984 (LWP 22631)]
+[Thread 139813810276096 (LWP 22630) exited]
+[Thread 139813785097984 (LWP 22631) exited]
+[Thread 139813818668800 (LWP 14136) exited]
+$20 = <void>
+#17 0x000000000049aa3e in RebuildMarkList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ImageRef=16_00000000012fba00, 
+    OldEstRef=16_00000000015943a0, NewEstRef=16_0000000001c49458) at ../src/TempMark.m3:4586
+4586	        ; RbmTraverseEst 
+Undefined command: "fraem".  Try "help".
+#2  0x000000000049c1dd in RbmTeLeafString (FsNodeRef=16_000000000189d6d8, ApproxFmtKind=FmtKindHoriz, String=16_0000000001803af8)
+    at ../src/TempMark.m3:2354
+2354	               Assert 
+$21 = 2
+$22 = RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; EstRef = 16_00000000015940d8; LineNo = 0; CharPos = 9; SeqNo = 0;  END
+#2  0x000000000049c1dd in RbmTeLeafString (FsNodeRef=16_000000000189d6d8, ApproxFmtKind=FmtKindHoriz, String=16_0000000001803af8)
+    at ../src/TempMark.m3:2354
+2354	               Assert 
+#17 0x000000000049aa3e in RebuildMarkList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ImageRef=16_00000000012fba00, 
+    OldEstRef=16_00000000015943a0, NewEstRef=16_0000000001c49458) at ../src/TempMark.m3:4586
+4586	        ; RbmTraverseEst 
+[New Thread 139813818668800 (LWP 26775)]
+[Thread 139813818668800 (LWP 26775) exited]
+[New Thread 139813818668800 (LWP 26801)]
+[New Thread 139813785097984 (LWP 26802)]
+[Thread 139813785097984 (LWP 26802) exited]
+[Thread 139813818668800 (LWP 26801) exited]
+$23 = <void>
+#17 0x000000000049aa3e in RebuildMarkList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ImageRef=16_00000000012fba00, 
+    OldEstRef=16_00000000015943a0, NewEstRef=16_0000000001c49458) at ../src/TempMark.m3:4586
+4586	        ; RbmTraverseEst 
+Can't find Modula-3 identifier: PiTravTempMarkListRef
+$24 = 16_0000000001594cd0
+$25 = {RECORD TokMark = RECORD EstNodeNo = 15; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = ChildFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001cc5b18; LineNo = 0; CharPos = 0; SeqNo = 1;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001881d28; LineNo = 0; CharPos = 0; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_00000000015940d8; LineNo = 0; CharPos = 9; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 31; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001803af8; LineNo = 0; CharPos = 4; SeqNo = 0;  END}
+$26 = {RECORD TokMark = RECORD EstNodeNo = 15; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = ChildFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001cc5b18; LineNo = 0; CharPos = 0; SeqNo = 1;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001881d28; LineNo = 0; CharPos = 0; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_00000000015940d8; LineNo = 0; CharPos = 9; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 31; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001803af8; LineNo = 0; CharPos = 4; SeqNo = 0;  END}
+$27 = {RECORD TokMark = RECORD EstNodeNo = 15; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = ChildFmtNo; 
+    StartAtEnd = FALSE; IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001881cf0; LineNo = 0; CharPos = 0; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_00000000015940d8; LineNo = 0; CharPos = 0; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 25; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_00000000015940d8; LineNo = 0; CharPos = 5; SeqNo = 0;  END,
+    RECORD TokMark = RECORD EstNodeNo = 31; EstNodeCt = 0; BlCharPos = 2147483647; Tok = 0; FmtNo = 0; Kind = Plain; StartAtEnd = FALSE; 
+    IsImpliedNewLine = FALSE;  END; EstRef = 16_0000000001803af8; LineNo = 0; CharPos = 4; SeqNo = 0;  END}
+#17 0x000000000049aa3e in RebuildMarkList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ImageRef=16_00000000012fba00, 
+    OldEstRef=16_00000000015943a0, NewEstRef=16_0000000001c49458) at ../src/TempMark.m3:4586
+4586	        ; RbmTraverseEst 
+ParseInfo = RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; 
+    PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; 
+    PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; 
+    EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; 
+    PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; 
+    PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END
+ImageRef = (*16_00000000012fba00*) OBJECT ItPers = 16_00000000012fba48; ItLangIdRef = 16_00000000013599f0; ItVisibleIn = {}; 
+    ItWindowList = 16_0000000000c60080; ItHistoryWrT = 16_00000000012fee20; ItScannerIf = NIL; ItIsSaved = FALSE;  END
+OldEstRef = (*16_00000000015943a0*) OBJECT KTreeEstChildCtLeftOfNl = 1; KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; 
+    WiIsNull = FALSE; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = TRUE; 
+    WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 27; KTreeElemCt = 1; EstSemRef = NIL; EstTok = 29; EstLeftTok = 18; 
+    EstRightTok = 18; EstNodeKind = EstNodeKindPlain; EstHeight = 1; EstRepairCost = 0; EstChildKindSet = {}; 
+    EstLeafArrayRef = 16_00000000015943d8;  END
+NewEstRef = (*16_0000000001c49458*) OBJECT KTreeEstChildCtLeftOfNl = 1; KTreeWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 254; 
+    WiIsNull = FALSE; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = TRUE; 
+    WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 29; KTreeElemCt = 1; EstSemRef = NIL; EstTok = 29; EstLeftTok = 18; 
+    EstRightTok = 18; EstNodeKind = EstNodeKindPlain; EstHeight = 1; EstRepairCost = 0; EstChildKindSet = {}; 
+    EstLeafArrayRef = 16_0000000001c49490;  END
+[New Thread 139813818668800 (LWP 26890)]
+[New Thread 139813785097984 (LWP 26891)]
+[Thread 139813818668800 (LWP 26890) exited]
+[Thread 139813785097984 (LWP 26891) exited]
+[New Thread 139813810276096 (LWP 26892)]
+[Thread 139813810276096 (LWP 26892) exited]
+[New Thread 139813810276096 (LWP 26893)]
+[Thread 139813810276096 (LWP 26893) exited]
+$28 = <void>
+#17 0x000000000049aa3e in RebuildMarkList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ImageRef=16_00000000012fba00, 
+    OldEstRef=16_00000000015943a0, NewEstRef=16_0000000001c49458) at ../src/TempMark.m3:4586
+4586	        ; RbmTraverseEst 
+Can't find Modula-3 qualified reference: ParseTrv.m3
+$29 = <void>
+#17 0x000000000049aa3e in RebuildMarkList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ImageRef=16_00000000012fba00, 
+    OldEstRef=16_00000000015943a0, NewEstRef=16_0000000001c49458) at ../src/TempMark.m3:4586
+4586	        ; RbmTraverseEst 
+#2  0x000000000049c1dd in RbmTeLeafString (FsNodeRef=16_000000000189d6d8, ApproxFmtKind=FmtKindHoriz, String=16_0000000001803af8)
+    at ../src/TempMark.m3:2354
+2354	               Assert 
+$30 = (*16_0000000001803af8*) OBJECT StringNo = 1065; Tok = 17; Value = 16_00000000018bd7b8;  END
+Object has no field or method named "value".
+$31 = (*16_00000000018bd7b8*) "\xABbd\xBB"
+#17 0x000000000049aa3e in RebuildMarkList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ImageRef=16_00000000012fba00, 
+    OldEstRef=16_00000000015943a0, NewEstRef=16_0000000001c49458) at ../src/TempMark.m3:4586
+4586	        ; RbmTraverseEst 
+$32 = (*16_0000000001881d28*) OBJECT StringNo = 1083; Tok = 121; Value = 16_0000000001afd208;  END
+Object has no field or method named "VAlue".
+$33 = (*16_0000000001afd208*) "RNDa"
+Object has no field or method named "Value".
+$34 = (*16_00000000015940d8*) OBJECT ModTextStringRef = 16_0000000001594120; ModTextLeftTokToPos = 3; ModTextFromPos = 4; 
+    ModTextToPos = 254; ModTextOrigToPos = 10;  END
+$35 = (*16_0000000001594120*) OBJECT StringNo = 1085; Tok = 23; Value = 16_00000000015940f8;  END
+unexpected junk after Modula-3 expression: "Value"
+$36 = (*16_00000000015940f8*) "RNDa;\xAB\xBB"
+#17 0x000000000049aa3e in RebuildMarkList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_0000000001594d88; PiFile = NIL; PiScanIf = 16_0000000001594aa8; PiOrigTempMarkListRef = 16_0000000001594c18; PiTravTempMarkListRef = 16_0000000001594cd0; PiFinalTempMarkListRef = 16_0000000001594cd0; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 6; PiAttemptedRepairActionCt = 5898; PiGram = 16_0000000001898e30; PiDeferredInfoRef = NIL; PiLineCtIncr = 65; PiSeqNo = 17; PiLineNo = 0; PiRegularTempMarkCt = 4; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ImageRef=16_00000000012fba00, 
+    OldEstRef=16_00000000015943a0, NewEstRef=16_0000000001c49458) at ../src/TempMark.m3:4586
+4586	        ; RbmTraverseEst 
+[New Thread 139813810276096 (LWP 27052)]
+[Thread 139813810276096 (LWP 27052) exited]
+[New Thread 139813785097984 (LWP 27053)]
+[Thread 139813785097984 (LWP 27053) exited]
+[New Thread 139813810276096 (LWP 27054)]
+[Thread 139813810276096 (LWP 27054) exited]
+$37 = <void>
+The program is running.  Exit anyway? (y or n) 

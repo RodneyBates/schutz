@@ -1,0 +1,1151 @@
+######################## Begin Parse Trace #####################
+Advance from  16_0000000002662608, SeqNo 0, Tok__Null
+        to    16_0000000002664610, SeqNo 1, {Id(121),1053,"MAsIntere"}, from LRState 1, Action 0 (Initial)
+(Repair) Shift "GENERIC"(56), to LRState = 12, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift "INTERFACE"(60), to LRState = 4, Delete = T, Full = [0,0), Patch = [32767,32767)
+(SeqNo=1)Shift {Id(121),1053,"MAsIntere"}, to LRState = 15, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000002664610, SeqNo 1, {Id(121),1053,"MAsIntere"}
+        to    16_00000000026666e0, SeqNo 2, Id(121), from LRState 15, Action 0 (Terminal shifted)
+(1,28)Single Tok "INTERFACE"(60) succeeded at total cost 9 < best cost 2147483647 with parse check 2, Accept = F
+(Repair) Shift "MODULE"(65), to LRState = 8, Delete = T, Full = [0,0), Patch = [32767,32767)
+(SeqNo=1)Shift {Id(121),1053,"MAsIntere"}, to LRState = 18, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000002664610, SeqNo 1, {Id(121),1053,"MAsIntere"}
+        to    16_00000000026666e0, SeqNo 2, Id(121), from LRState 18, Action 0 (Terminal shifted)
+(Repair) Shift "UNSAFE"(87), to LRState = 6, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsInterface(155),701,"첔sInterface�"}, to LRState = 3, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsInstInterface(156),702,"첔sInstInterface�"}, to LRState = 9, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsModule(157),703,"첔sModule�"}, to LRState = 7, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsInstModule(158),704,"첔sInstModule�"}, to LRState = 10, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsGenInterface(159),705,"첔sGenInterface�"}, to LRState = 11, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsGenModule(160),706,"첔sGenModule�"}, to LRState = 13, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsInterface(155),701,"첔sInterface�"}, to LRState = 3, Delete = T, Full = [0,0), Patch = [32767,32767)
+(1,245)Continuation Tok AsInterface(155) succeeded at total cost 1 < best cost 9
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=8
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=16
+                         } SeqNo = 2 list addr =  16_000000000266e3e8
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=8
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=16
+                         } SeqNo = 2 list addr =  16_000000000266e3e8
+(Repair) Reduce , production 0, Compilation(490) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_000000000266de60, Tok = AsInterface(155), LRState = 3
+    Deeper LR state = 1
+  BuildStack:
+    16_000000000266deb8, Tok = {AsInterface(155),701,"첔sInterface�"}, F, T, F
+    16_000000000266de80, Tok = Tok__Null, F, F, T
+  After reduce: Parse top 16_00000000028f1ae0, Tok Compilation(490), LRState 2, InputTok Id(121), Action 0
+  Build stack is empty.
+Advance from  16_0000000002664610, SeqNo 1, {Id(121),1053,"MAsIntere"}
+        to    16_00000000026666e0, SeqNo 2, Id(121), from LRState 1, Action 0 (Successor to deleted token)
+(Repair) Shift "GENERIC"(56), to LRState = 12, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift "INTERFACE"(60), to LRState = 4, Delete = T, Full = [0,0), Patch = [32767,32767)
+(SeqNo=2)Shift Id(121), to LRState = 15, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000026666e0, SeqNo 2, Id(121)
+        to    16_00000000028f4e90, SeqNo 3, ";"(94), from LRState 15, Action 21 (Terminal shifted)
+(SeqNo=3)Shift ";"(94), to LRState = 21, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000028f4e90, SeqNo 3, ";"(94)
+        to    16_00000000028f5b68, SeqNo 4, {Id(121),1058,"I"}, from LRState 21, Action 0 (Terminal shifted)
+(Repair) Shift "MODULE"(65), to LRState = 8, Delete = T, Full = [0,0), Patch = [32767,32767)
+(SeqNo=2)Shift Id(121), to LRState = 18, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000026666e0, SeqNo 2, Id(121)
+        to    16_00000000028f4e90, SeqNo 3, ";"(94), from LRState 18, Action 25 (Terminal shifted)
+(SeqNo=3)Shift ";"(94), to LRState = 25, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000028f4e90, SeqNo 3, ";"(94)
+        to    16_00000000028f5b68, SeqNo 4, {Id(121),1058,"I"}, from LRState 25, Action 0 (Terminal shifted)
+(Repair) Shift "UNSAFE"(87), to LRState = 6, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsInterface(155),701,"첔sInterface�"}, to LRState = 3, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsInstInterface(156),702,"첔sInstInterface�"}, to LRState = 9, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsModule(157),703,"첔sModule�"}, to LRState = 7, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsInstModule(158),704,"첔sInstModule�"}, to LRState = 10, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsGenInterface(159),705,"첔sGenInterface�"}, to LRState = 11, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsGenModule(160),706,"첔sGenModule�"}, to LRState = 13, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {AsInterface(155),701,"첔sInterface�"}, to LRState = 3, Delete = T, Full = [0,0), Patch = [32767,32767)
+(1,492)Continuation Tok AsInterface(155) succeeded at total cost 5 < best cost 9
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=8
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=16
+                         } SeqNo = 2 list addr =  16_00000000028fdbf8
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=8
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=16
+                         } SeqNo = 2 list addr =  16_00000000028fdbf8
+(Repair) Reduce , production 0, Compilation(490) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_00000000028fd638, Tok = AsInterface(155), LRState = 3
+    Deeper LR state = 1
+  BuildStack:
+    16_00000000028fd6c8, Tok = {AsInterface(155),701,"첔sInterface�"}, F, T, F
+    16_00000000028fd690, Tok = Id(121), F, F, T
+    16_00000000028fd658, Tok = Tok__Null, F, F, T
+  After reduce: Parse top 16_0000000002b113b0, Tok Compilation(490), LRState 2, InputTok Id(121), Action 0
+  Build stack is empty.
+Advance from  16_00000000026666e0, SeqNo 2, Id(121)
+        to    16_00000000028f4e90, SeqNo 3, ";"(94), from LRState 1, Action 0 (Successor to deleted token)
+Deleting Tok ";"(94) would cost 9, no better than best cost of 9
+(Repair) Shift ";"(94), to LRState = 21, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift "="(96), to LRState = 22, Delete = T, Full = [0,0), Patch = [32767,32767)
+(SeqNo=2)Shift Id(121), to LRState = 38, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000026666e0, SeqNo 2, Id(121)
+        to    16_00000000028f4e90, SeqNo 3, ";"(94), from LRState 38, Action 0 (Terminal shifted)
+(2,559)Single Tok "="(96) succeeded at total cost 9 < best cost 2147483647 with parse check 2, Accept = F
+(Repair) Shift ";"(94), to LRState = 21, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,740)Continuation Tok ";"(94) succeeded at total cost 1 < best cost 9
+(Repair) Shift {AsImportList(137),683,"첔sImportList�"}, to LRState = 30, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,741)Continuation Tok AsImportList(137) succeeded at total cost 2 < best cost 9
+(Repair) Shift {AsDeclList(138),684,"첔sDeclList�"}, to LRState = 51, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,743)Continuation Tok AsDeclList(138) succeeded at total cost 3 < best cost 9
+(Repair) Shift "END"(47), to LRState = 94, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,745)Continuation Tok "END"(47) succeeded at total cost 4 < best cost 9
+(SeqNo=2)Shift Id(121), to LRState = 148, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000026666e0, SeqNo 2, Id(121)
+        to    16_00000000028f4e90, SeqNo 3, ";"(94), from LRState 148, Action 0 (Terminal shifted)
+Advance from  16_00000000026666e0, SeqNo 2, Id(121)
+        to    16_00000000028f4e90, SeqNo 3, ";"(94), from LRState 15, Action 21 (Successor to deleted token)
+(SeqNo=3)Shift ";"(94), to LRState = 21, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000028f4e90, SeqNo 3, ";"(94)
+        to    16_00000000028f5b68, SeqNo 4, {Id(121),1058,"I"}, from LRState 21, Action 0 (Terminal shifted)
+(Repair) Shift ";"(94), to LRState = 21, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift "="(96), to LRState = 22, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift ";"(94), to LRState = 21, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,993)Continuation Tok ";"(94) succeeded at total cost 5 < best cost 9
+(Repair) Shift {AsImportList(137),683,"첔sImportList�"}, to LRState = 30, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,994)Continuation Tok AsImportList(137) succeeded at total cost 6 < best cost 9
+(Repair) Shift {AsDeclList(138),684,"첔sDeclList�"}, to LRState = 51, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,996)Continuation Tok AsDeclList(138) succeeded at total cost 7 < best cost 9
+(Repair) Shift "END"(47), to LRState = 94, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,998)Continuation Tok "END"(47) succeeded at total cost 8 < best cost 9
+Advance from  16_00000000028f4e90, SeqNo 3, ";"(94)
+        to    16_00000000028f5b68, SeqNo 4, {Id(121),1058,"I"}, from LRState 15, Action 0 (Successor to deleted token)
+(Repair) Shift ";"(94), to LRState = 21, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift "="(96), to LRState = 22, Delete = T, Full = [0,0), Patch = [32767,32767)
+(SeqNo=4)Shift {Id(121),1058,"I"}, to LRState = 38, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000028f5b68, SeqNo 4, {Id(121),1058,"I"}
+        to    16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}, from LRState 38, Action 0 (Terminal shifted)
+(Repair) Shift ";"(94), to LRState = 21, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,1246)Continuation Tok ";"(94) succeeded at total cost 6 < best cost 9
+(Repair) Shift {AsImportList(137),683,"첔sImportList�"}, to LRState = 30, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,1247)Continuation Tok AsImportList(137) succeeded at total cost 7 < best cost 9
+(Repair) Shift {AsDeclList(138),684,"첔sDeclList�"}, to LRState = 51, Delete = T, Full = [0,0), Patch = [32767,32767)
+(2,1249)Continuation Tok AsDeclList(138) succeeded at total cost 8 < best cost 9
+Deleting Tok {Id(121),1058,"I"} would cost 9, no better than best cost of 9
+(Repair) Shift "("(97), to LRState = 79, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift "("(97), to LRState = 79, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1496)Continuation Tok "("(97) succeeded at total cost 1 < best cost 2147483647
+(Repair) Shift {AsIdPlusList(135),681,"첔sIdPlusList�"}, to LRState = 130, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1497)Continuation Tok AsIdPlusList(135) succeeded at total cost 2 < best cost 2147483647
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1499)Continuation Tok ")"(98) succeeded at total cost 3 < best cost 2147483647
+(Repair) Shift "END"(47), to LRState = 332, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1501)Continuation Tok "END"(47) succeeded at total cost 4 < best cost 2147483647
+(Repair) Shift {Id(121),667,"첟d�"}, to LRState = 466, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1503)Continuation Tok Id(121) succeeded at total cost 6 < best cost 2147483647
+(Repair) Shift "."(95), to LRState = 643, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1505)Continuation Tok "."(95) succeeded at total cost 7 < best cost 2147483647
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=8
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=16
+                         } SeqNo = 2 list addr =  16_0000000002b2a0c0
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=8
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=16
+                         } SeqNo = 2 list addr =  16_0000000002b2a0c0
+(Repair) Reduce , production 54, AsInstInterface(156) BUILD AsInstInterface(156) ::= (RhsLen = 10), OptionIdSet = {}
+  ParseStack:
+    16_0000000002b29b90, Tok = "."(95), LRState = 643
+    16_0000000002b29040, Tok = Id(121), LRState = 466
+    16_0000000002b28248, Tok = "END"(47), LRState = 332
+    16_0000000002b27680, Tok = ")"(98), LRState = 189
+    16_0000000002b26a78, Tok = AsIdPlusList(135), LRState = 130
+    16_0000000002b25a80, Tok = "("(97), LRState = 79
+    16_0000000002b14cf8, Tok = Id(121), LRState = 38
+    16_0000000002b14680, Tok = "="(96), LRState = 22
+    16_0000000002666688, Tok = Id(121), LRState = 15
+    16_0000000002665d50, Tok = "INTERFACE"(60), LRState = 4
+    Deeper LR state = 1
+  BuildStack:
+    16_0000000002b29bb0, Tok = "."(95), F, T, F
+    16_0000000002b29060, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_0000000002b28268, Tok = "END"(47), F, T, F
+    16_0000000002b276a0, Tok = ")"(98), F, T, F
+    16_0000000002b26a98, Tok = {AsIdPlusList(135),681,"첔sIdPlusList�"}, F, T, F
+    16_0000000002b25ad8, Tok = "("(97), F, T, F
+    16_0000000002b25aa0, Tok = Tok__Null, F, F, T
+    16_0000000002b14d18, Tok = Id(121), F, F, F
+    16_0000000002b146d8, Tok = "="(96), F, T, F
+    16_0000000002b146a0, Tok = Tok__Null, F, F, T
+    16_00000000026666a8, Tok = {Id(121),1053,"MAsIntere"}, F, F, F
+    16_0000000002665da8, Tok = "INTERFACE"(60), F, T, F
+    16_0000000002665d70, Tok = Tok__Null, F, F, T
+  After reduce: Parse top 16_0000000002b2d7a8, Tok AsInstInterface(156), LRState 9, InputTok ";"(94), Action 0
+  Build top 16_0000000002d34290, Tok AsInstInterface(156), 
+(Repair) Reduce , production 1, Compilation(490) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002b2d7a8, Tok = AsInstInterface(156), LRState = 9
+    Deeper LR state = 1
+  BuildStack:
+    16_0000000002d34290, Tok = AsInstInterface(156), T, F, F
+  After reduce: Parse top 16_0000000002d34c10, Tok Compilation(490), LRState 2, InputTok ";"(94), Action 0
+  Build stack is empty.
+Advance from  16_00000000028f4e90, SeqNo 3, ";"(94)
+        to    16_00000000028f5b68, SeqNo 4, {Id(121),1058,"I"}, from LRState 38, Action 0 (Successor to deleted token)
+(Repair) Shift "("(97), to LRState = 79, Delete = T, Full = [0,0), Patch = [32767,32767)
+(SeqNo=4)Shift {Id(121),1058,"I"}, to LRState = 46, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000028f5b68, SeqNo 4, {Id(121),1058,"I"}
+        to    16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}, from LRState 46, Action 0 (Terminal shifted)
+(3,1573)Single Tok "("(97) succeeded at total cost 10 < best cost 2147483647 with parse check 2, Accept = F
+(Repair) Shift "("(97), to LRState = 79, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1753)Continuation Tok "("(97) succeeded at total cost 2 < best cost 10
+(Repair) Shift {AsIdPlusList(135),681,"첔sIdPlusList�"}, to LRState = 130, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1754)Continuation Tok AsIdPlusList(135) succeeded at total cost 3 < best cost 10
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1756)Continuation Tok ")"(98) succeeded at total cost 4 < best cost 10
+(Repair) Shift "END"(47), to LRState = 332, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,1758)Continuation Tok "END"(47) succeeded at total cost 5 < best cost 10
+(SeqNo=4)Shift {Id(121),1058,"I"}, to LRState = 466, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_00000000028f5b68, SeqNo 4, {Id(121),1058,"I"}
+        to    16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}, from LRState 466, Action 0 (Terminal shifted)
+Advance from  16_00000000028f5b68, SeqNo 4, {Id(121),1058,"I"}
+        to    16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}, from LRState 38, Action 0 (Successor to deleted token)
+(Repair) Shift "("(97), to LRState = 79, Delete = T, Full = [0,0), Patch = [32767,32767)
+(SeqNo=5)Shift {Id(121),1060,"ENDa"}, to LRState = 46, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}
+        to    16_0000000002d3e220, SeqNo 6, ","(99), from LRState 46, Action 89 (Terminal shifted)
+(SeqNo=6)Shift ","(99), to LRState = 89, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000002d3e220, SeqNo 6, ","(99)
+        to    16_0000000002d3f018, SeqNo 7, ","(99), from LRState 89, Action 0 (Terminal shifted)
+(Repair) Shift "("(97), to LRState = 79, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,2006)Continuation Tok "("(97) succeeded at total cost 6 < best cost 10
+(Repair) Shift {AsIdPlusList(135),681,"첔sIdPlusList�"}, to LRState = 130, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,2007)Continuation Tok AsIdPlusList(135) succeeded at total cost 7 < best cost 10
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,2009)Continuation Tok ")"(98) succeeded at total cost 8 < best cost 10
+(Repair) Shift "END"(47), to LRState = 332, Delete = T, Full = [0,0), Patch = [32767,32767)
+(3,2011)Continuation Tok "END"(47) succeeded at total cost 9 < best cost 10
+(SeqNo=5)Shift {Id(121),1060,"ENDa"}, to LRState = 466, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}
+        to    16_0000000002d3e220, SeqNo 6, ","(99), from LRState 466, Action 0 (Terminal shifted)
+Advance from  16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}
+        to    16_0000000002d3e220, SeqNo 6, ","(99), from LRState 38, Action 0 (Successor to deleted token)
+Deleting Tok ","(99) would cost 10, no better than best cost of 10
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000003034898
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000003034898
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000003037f80, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_0000000003039058, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000003039660
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000003039660
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_000000000303cd48, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_000000000303de20, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000303e428
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000303e428
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000003041b58, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_0000000003042c30, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000003043238
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000003043238
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000003046920, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_00000000030479f8, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000003048000
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000003048000
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_000000000304b6e8, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_000000000304c7c0, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000304cdc8
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000304cdc8
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027704d0, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_00000000027715a8, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift ","(99), to LRState = 89, Delete = T, Full = [0,0), Patch = [32767,32767)
+(SeqNo=5)Shift {Id(121),1060,"ENDa"}, to LRState = 141, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}
+        to    16_0000000002d3e220, SeqNo 6, ","(99), from LRState 141, Action 1468 (Reduce, Prod 536) (Terminal shifted)
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002773968
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002773968
+(Repair) Reduce , production 536, AsIdPlusList__Sub(257) ::= (RhsLen = 3), OptionIdSet = {}
+  ParseStack:
+    16_0000000002773238, Tok = Id(121), LRState = 141
+    16_0000000002772908, Tok = ","(99), LRState = 89
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002773258, Tok = {Id(121),1060,"ENDa"}, F, F, F
+    16_0000000002772960, Tok = ","(99), F, T, F
+    16_0000000002772928, Tok = Tok__Null, F, F, T
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002777050, Tok AsIdPlusList__Sub(257), LRState 47, InputTok ","(99), Action 90
+  Build stack is empty.
+(SeqNo=6)Shift ","(99), to LRState = 90, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000002d3e220, SeqNo 6, ","(99)
+        to    16_0000000002d3f018, SeqNo 7, ","(99), from LRState 90, Action 0 (Terminal shifted)
+(4,2082)Single Tok ","(99) succeeded at total cost 8 < best cost 2147483647 with parse check 3, Accept = F
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000277a950
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000277a950
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_000000000277e038, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_000000000277f110, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000277f718
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000277f718
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002782ef0, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_0000000002783fc8, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027845d0
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027845d0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002787cb8, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_0000000002788d90, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002789398
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002789398
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_000000000278ca80, Tok AsIdPlusList(135), LRState 130, InputTok Id(121), Action 0
+  Build top 16_000000000278db58, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(4,2260)Continuation Tok ")"(98) succeeded at total cost 1 < best cost 8
+(Repair) Shift "END"(47), to LRState = 332, Delete = T, Full = [0,0), Patch = [32767,32767)
+(4,2261)Continuation Tok "END"(47) succeeded at total cost 2 < best cost 8
+(SeqNo=5)Shift {Id(121),1060,"ENDa"}, to LRState = 466, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}
+        to    16_0000000002d3e220, SeqNo 6, ","(99), from LRState 466, Action 0 (Terminal shifted)
+Advance from  16_0000000002b21340, SeqNo 5, {Id(121),1060,"ENDa"}
+        to    16_0000000002d3e220, SeqNo 6, ","(99), from LRState 46, Action 89 (Successor to deleted token)
+(SeqNo=6)Shift ","(99), to LRState = 89, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000002d3e220, SeqNo 6, ","(99)
+        to    16_0000000002d3f018, SeqNo 7, ","(99), from LRState 89, Action 0 (Terminal shifted)
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002791cd8
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002791cd8
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027953c0, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_0000000002796498, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002796af8
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002796af8
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_000000000279a1e0, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_000000000279b2b8, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000279b918
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000279b918
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_000000000279f000, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027c0228, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027c0888
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027c0888
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027c3f70, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027c5048, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027c56a8
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027c56a8
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027c8d90, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027c9e68, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027ca4c8
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027ca4c8
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027cdbb0, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027cec88, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift ","(99), to LRState = 89, Delete = T, Full = [0,0), Patch = [32767,32767)
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027d0150
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027d0150
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027d3838, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027d4910, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027d4f70
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027d4f70
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027d8658, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027d9730, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027d9d90
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027d9d90
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027dd478, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027de550, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027debb0
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027debb0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027e2598, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027e3670, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(4,2509)Continuation Tok ")"(98) succeeded at total cost 5 < best cost 8
+(Repair) Shift "END"(47), to LRState = 332, Delete = T, Full = [0,0), Patch = [32767,32767)
+(4,2510)Continuation Tok "END"(47) succeeded at total cost 6 < best cost 8
+Advance from  16_0000000002d3e220, SeqNo 6, ","(99)
+        to    16_0000000002d3f018, SeqNo 7, ","(99), from LRState 46, Action 89 (Successor to deleted token)
+(SeqNo=7)Shift ","(99), to LRState = 89, Delete = F, Full = [0,2), Patch = [0,2)
+Advance from  16_0000000002d3f018, SeqNo 7, ","(99)
+        to    16_00000000027e63d0, SeqNo 8, Tok__EndOfImage, from LRState 89, Action 0 (Terminal shifted)
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027e67f0
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027e67f0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027e9ed8, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027eafb0, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027eb610
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_00000000027eb610
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000027eecf8, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000027efdd0, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002810448
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002810448
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002813b30, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_0000000002814c08, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002815268
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002815268
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002818950, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_0000000002819a28, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000281a088
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000281a088
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_000000000281d770, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_000000000281e848, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000281eea8
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000281eea8
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000028226b0, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_0000000002823788, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift ","(99), to LRState = 89, Delete = T, Full = [0,0), Patch = [32767,32767)
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002824cb0
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002824cb0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002828398, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_0000000002829470, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002829ad0
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002829ad0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_000000000282d1b8, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_000000000282e290, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000282e8f0
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000282e8f0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002831ff8, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_00000000028330d0, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002833730
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002833730
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002836e18, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_0000000002837ef0, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(4,2758)Continuation Tok ")"(98) succeeded at total cost 6 < best cost 8
+(Repair) Shift "END"(47), to LRState = 332, Delete = T, Full = [0,0), Patch = [32767,32767)
+(4,2759)Continuation Tok "END"(47) succeeded at total cost 7 < best cost 8
+Copy temp marks, old: { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                      , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                      } SeqNo = 1 list addr =  16_00000000026625a0
+Copy temp marks, new: { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                      , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                      } SeqNo = 1 list addr =  16_00000000026625a0
+Patch FmtNos, old: { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                   , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                   } SeqNo = 1 list addr =  16_00000000026625a0
+Patch FmtNos, new: { TokMark={28(0)PL0FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                   , TokMark={28(0)PL0FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                   } SeqNo = 1 list addr =  16_00000000026625a0
+Patch Range, old: { TokMark={28(0)PL0FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                  , TokMark={28(0)PL0FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                  } SeqNo = 1 list addr =  16_00000000026625a0
+Patch Range, new: { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                  , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                  } SeqNo = 1 list addr =  16_00000000026625a0
+Advance from  16_0000000002d3f018, SeqNo 7, ","(99)
+        to    16_00000000027e63d0, SeqNo 8, Tok__EndOfImage, from LRState 46, Action 0 (Successor to deleted token)
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d64678
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d64678
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002d67d60, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002d68e38, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d69378
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d69378
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002d6ca60, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002d6db38, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d6e078
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d6e078
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002d719c8, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002d72aa0, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d72fe0
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d72fe0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002d766c8, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002d777a0, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d77ce0
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d77ce0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002d7b3c8, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002d7c4a0, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d7c9e0
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d7c9e0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002d80150, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002d81228, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift ","(99), to LRState = 89, Delete = T, Full = [0,0), Patch = [32767,32767)
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d826a0
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d826a0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002d85d88, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002d86e60, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d873a0
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d873a0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002d8aa88, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002d8bb60, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d8c0a0
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002d8c0a0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002d8f788, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002ec0890, Tok AsIdPlusList(135), 
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002ec0dd0
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_0000000002ec0dd0
+(Repair) Reduce , production 534, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002d373f8, Tok = Id(121), LRState = 46
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002ec44b8, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000002ec5590, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(4,2851)Continuation Tok ")"(98) succeeded at total cost 7 < best cost 8
+Never delete EOI
+(Repair) Shift {Id(121),667,"첟d�"}, to LRState = 143, Delete = T, Full = [0,0), Patch = [32767,32767)
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 3 list addr =  16_0000000002ec70c8
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 3 list addr =  16_0000000002ec70c8
+(Repair) Reduce , production 538, AsIdPlusList__Sub(257) ::= (RhsLen = 3), OptionIdSet = {}
+  ParseStack:
+    16_0000000002ec7038, Tok = Id(121), LRState = 143
+    16_0000000002779d00, Tok = ","(99), LRState = 90
+    16_0000000002777050, Tok = AsIdPlusList__Sub(257), LRState = 47
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002ec7090, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_0000000002ec7058, Tok = Tok__Null, F, F, T
+    16_0000000002779d20, Tok = ","(99), F, F, F
+    16_0000000002773258, Tok = {Id(121),1060,"ENDa"}, F, F, F
+    16_0000000002772960, Tok = ","(99), F, T, F
+    16_0000000002772928, Tok = Tok__Null, F, F, T
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002eca7b0, Tok AsIdPlusList__Sub(257), LRState 47, InputTok ","(99), Action 90
+  Build stack is empty.
+(SeqNo=7)Shift ","(99), to LRState = 90, Delete = F, Full = [0,2), Patch = [0,2)
+Advance from  16_0000000002d3f018, SeqNo 7, ","(99)
+        to    16_00000000027e63d0, SeqNo 8, Tok__EndOfImage, from LRState 90, Action 0 (Terminal shifted)
+(5,2941)Single Tok {Id(121),667,"첟d�"} succeeded at total cost 11 < best cost 2147483647 with parse check 1, Accept = F
+(Repair) Shift AsIdPlusList__Sub(257), to LRState = 144, Delete = T, Full = [0,0), Patch = [32767,32767)
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 3 list addr =  16_0000000002ecf800
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 3 list addr =  16_0000000002ecf800
+(Repair) Reduce , production 539, AsIdPlusList__Sub(257) ::= (RhsLen = 3), OptionIdSet = {}
+  ParseStack:
+    16_0000000002ecf770, Tok = AsIdPlusList__Sub(257), LRState = 144
+    16_0000000002779d00, Tok = ","(99), LRState = 90
+    16_0000000002777050, Tok = AsIdPlusList__Sub(257), LRState = 47
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002ecf7c8, Tok = AsIdPlusList__Sub(257), F, T, F
+    16_0000000002ecf790, Tok = Tok__Null, F, F, T
+    16_0000000002779d20, Tok = ","(99), F, F, F
+    16_0000000002773258, Tok = {Id(121),1060,"ENDa"}, F, F, F
+    16_0000000002772960, Tok = ","(99), F, T, F
+    16_0000000002772928, Tok = Tok__Null, F, F, T
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002ed3008, Tok AsIdPlusList__Sub(257), LRState 47, InputTok ","(99), Action 90
+  Build stack is empty.
+(SeqNo=7)Shift ","(99), to LRState = 90, Delete = F, Full = [0,2), Patch = [0,2)
+Advance from  16_0000000002d3f018, SeqNo 7, ","(99)
+        to    16_00000000027e63d0, SeqNo 8, Tok__EndOfImage, from LRState 90, Action 0 (Terminal shifted)
+(5,3077)Single Tok AsIdPlusList__Sub(257) succeeded at total cost 10 < best cost 11 with parse check 1, Accept = F
+(Repair) Shift {Id(121),667,"첟d�"}, to LRState = 143, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3097)Continuation Tok Id(121) succeeded at total cost 2 < best cost 10
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 3 list addr =  16_0000000002ed8378
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 3 list addr =  16_0000000002ed8378
+(Repair) Reduce , production 538, AsIdPlusList__Sub(257) ::= (RhsLen = 3), OptionIdSet = {}
+  ParseStack:
+    16_0000000002ed7ea0, Tok = Id(121), LRState = 143
+    16_0000000002779d00, Tok = ","(99), LRState = 90
+    16_0000000002777050, Tok = AsIdPlusList__Sub(257), LRState = 47
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002ed7ef8, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_0000000002ed7ec0, Tok = Tok__Null, F, F, T
+    16_0000000002779d20, Tok = ","(99), F, F, F
+    16_0000000002773258, Tok = {Id(121),1060,"ENDa"}, F, F, F
+    16_0000000002772960, Tok = ","(99), F, T, F
+    16_0000000002772928, Tok = Tok__Null, F, F, T
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002edba60, Tok AsIdPlusList__Sub(257), LRState 47, InputTok ","(99), Action 90
+  Build stack is empty.
+(Repair) Reduce , production 535, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002edba60, Tok = AsIdPlusList__Sub(257), LRState = 47
+    Deeper LR state = 79
+  BuildStack:
+    16_0000000002ed7ef8, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_0000000002ed7ec0, Tok = Tok__Null, F, F, T
+    16_0000000002779d20, Tok = ","(99), F, F, F
+    16_0000000002773258, Tok = {Id(121),1060,"ENDa"}, F, F, F
+    16_0000000002772960, Tok = ","(99), F, T, F
+    16_0000000002772928, Tok = Tok__Null, F, F, T
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_0000000002edf018, Tok AsIdPlusList(135), LRState 130, InputTok ","(99), Action 0
+  Build top 16_0000000002ee1f10, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3098)Continuation Tok ")"(98) succeeded at total cost 3 < best cost 10
+(Repair) Shift "END"(47), to LRState = 332, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3100)Continuation Tok "END"(47) succeeded at total cost 4 < best cost 10
+(Repair) Shift {Id(121),667,"첟d�"}, to LRState = 466, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3102)Continuation Tok Id(121) succeeded at total cost 6 < best cost 10
+(Repair) Shift "."(95), to LRState = 643, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3104)Continuation Tok "."(95) succeeded at total cost 7 < best cost 10
+Copy temp mark list from:{ TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 4 list addr =  16_0000000002ee5778
+Copy temp mark list to:  { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                         , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                         } SeqNo = 4 list addr =  16_0000000002ee5778
+(Repair) Reduce , production 54, AsInstInterface(156) BUILD AsInstInterface(156) ::= (RhsLen = 10), OptionIdSet = {}
+  ParseStack:
+    16_0000000002ee5280, Tok = "."(95), LRState = 643
+    16_0000000002ee4768, Tok = Id(121), LRState = 466
+    16_0000000002ee39a8, Tok = "END"(47), LRState = 332
+    16_0000000002ee2e18, Tok = ")"(98), LRState = 189
+    16_0000000002edf018, Tok = AsIdPlusList(135), LRState = 130
+    16_0000000002d36ae0, Tok = "("(97), LRState = 79
+    16_0000000002b14cf8, Tok = Id(121), LRState = 38
+    16_0000000002b14680, Tok = "="(96), LRState = 22
+    16_0000000002666688, Tok = Id(121), LRState = 15
+    16_0000000002665d50, Tok = "INTERFACE"(60), LRState = 4
+    Deeper LR state = 1
+  BuildStack:
+    16_0000000002ee52a0, Tok = "."(95), F, T, F
+    16_0000000002ee4788, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_0000000002ee39c8, Tok = "END"(47), F, T, F
+    16_0000000002ee2e38, Tok = ")"(98), F, T, F
+    16_0000000002ee1f10, Tok = AsIdPlusList(135), T, F, F
+    16_0000000002d36b70, Tok = "("(97), F, T, F
+    16_0000000002d36b38, Tok = ";"(94), F, F, T
+    16_0000000002d36b00, Tok = Tok__Null, F, F, T
+    16_0000000002b14d18, Tok = Id(121), F, F, F
+    16_0000000002b146d8, Tok = "="(96), F, T, F
+    16_0000000002b146a0, Tok = Tok__Null, F, F, T
+    16_00000000026666a8, Tok = {Id(121),1053,"MAsIntere"}, F, F, F
+    16_0000000002665da8, Tok = "INTERFACE"(60), F, T, F
+    16_0000000002665d70, Tok = Tok__Null, F, F, T
+  After reduce: Parse top 16_0000000002ee8e60, Tok AsInstInterface(156), LRState 9, InputTok ","(99), Action 0
+  Build top 16_0000000002eefa00, Tok AsInstInterface(156), 
+(Repair) Reduce , production 1, Compilation(490) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000002ee8e60, Tok = AsInstInterface(156), LRState = 9
+    Deeper LR state = 1
+  BuildStack:
+    16_0000000002eefa00, Tok = AsInstInterface(156), T, F, F
+  After reduce: Parse top 16_00000000032303b8, Tok Compilation(490), LRState 2, InputTok ","(99), Action 0
+  Build stack is empty.
+Copy temp marks, old: { TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=-7
+                      , TokMark={28(0)PL2FF,Tok={Tok__0}},EstRef= 16_0000000002661748,LineNo=0,CharPos=1
+                      } SeqNo = 2 list addr =  16_0000000002773968
+Copy temp marks, new: { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                      , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                      } SeqNo = 1 list addr =  16_0000000002773968
+Patch FmtNos, old: { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                   , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                   } SeqNo = 1 list addr =  16_0000000002773968
+Patch FmtNos, new: { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                   , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                   } SeqNo = 1 list addr =  16_0000000002773968
+Patch Range, old: { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                  , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                  } SeqNo = 1 list addr =  16_0000000002773968
+Patch Range, new: { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_0000000003234b98,LineNo=0,CharPos=-7
+                  , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_0000000003234b98,LineNo=0,CharPos=1
+                  } SeqNo = 1 list addr =  16_0000000002773968
+Advance from  16_0000000002d3f018, SeqNo 7, ","(99)
+        to    16_00000000027e63d0, SeqNo 8, Tok__EndOfImage, from LRState 90, Action 0 (Successor to deleted token)
+(Repair) Shift {Id(121),667,"첟d�"}, to LRState = 143, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift AsIdPlusList__Sub(257), to LRState = 144, Delete = T, Full = [0,0), Patch = [32767,32767)
+(Repair) Shift {Id(121),667,"첟d�"}, to LRState = 143, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3352)Continuation Tok Id(121) succeeded at total cost 3 < best cost 10
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_0000000003234b98,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_0000000003234b98,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000323dbe8
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_0000000003234b98,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_0000000003234b98,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000323dbe8
+(Repair) Reduce , production 538, AsIdPlusList__Sub(257) ::= (RhsLen = 3), OptionIdSet = {}
+  ParseStack:
+    16_000000000323d6d8, Tok = Id(121), LRState = 143
+    16_0000000002779d00, Tok = ","(99), LRState = 90
+    16_0000000002777050, Tok = AsIdPlusList__Sub(257), LRState = 47
+    Deeper LR state = 79
+  BuildStack:
+    16_000000000323d768, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_000000000323d730, Tok = ","(99), F, F, T
+    16_000000000323d6f8, Tok = Tok__Null, F, F, T
+    16_0000000002779d20, Tok = ","(99), F, F, F
+    16_0000000002773258, Tok = {Id(121),1060,"ENDa"}, F, F, F
+    16_0000000002772960, Tok = ","(99), F, T, F
+    16_0000000002772928, Tok = Tok__Null, F, F, T
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+  After reduce: Parse top 16_00000000032413b0, Tok AsIdPlusList__Sub(257), LRState 47, InputTok Tok__EndOfImage, Action 0
+  Build stack is empty.
+(Repair) Reduce , production 535, AsIdPlusList(135) BUILD AsIdPlusList(135) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_00000000032413b0, Tok = AsIdPlusList__Sub(257), LRState = 47
+    Deeper LR state = 79
+  BuildStack:
+    16_000000000323d768, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_000000000323d730, Tok = ","(99), F, F, T
+    16_000000000323d6f8, Tok = Tok__Null, F, F, T
+    16_0000000002779d20, Tok = ","(99), F, F, F
+    16_0000000002773258, Tok = {Id(121),1060,"ENDa"}, F, F, F
+    16_0000000002772960, Tok = ","(99), F, T, F
+    16_0000000002772928, Tok = Tok__Null, F, F, T
+    16_0000000002d37418, Tok = {Id(121),1058,"I"}, F, F, F
+Copy temp marks, old: { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_0000000003234b98,LineNo=0,CharPos=-7
+                      , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_0000000003234b98,LineNo=0,CharPos=1
+                      } SeqNo = 2 list addr =  16_000000000323dbe8
+Copy temp marks, new: { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                      , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                      } SeqNo = 1 list addr =  16_000000000323dbe8
+  After reduce: Parse top 16_0000000003244cd8, Tok AsIdPlusList(135), LRState 130, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000003248038, Tok AsIdPlusList(135), 
+(Repair) Shift ")"(98), to LRState = 189, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3353)Continuation Tok ")"(98) succeeded at total cost 4 < best cost 10
+(Repair) Shift "END"(47), to LRState = 332, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3355)Continuation Tok "END"(47) succeeded at total cost 5 < best cost 10
+(Repair) Shift {Id(121),667,"첟d�"}, to LRState = 466, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3357)Continuation Tok Id(121) succeeded at total cost 7 < best cost 10
+(Repair) Shift "."(95), to LRState = 643, Delete = T, Full = [0,0), Patch = [32767,32767)
+(5,3359)Continuation Tok "."(95) succeeded at total cost 8 < best cost 10
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000324ede0
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 2 list addr =  16_000000000324ede0
+(Repair) Reduce , production 54, AsInstInterface(156) BUILD AsInstInterface(156) ::= (RhsLen = 10), OptionIdSet = {}
+  ParseStack:
+    16_000000000324e8e8, Tok = "."(95), LRState = 643
+    16_000000000324ddd0, Tok = Id(121), LRState = 466
+    16_000000000324d010, Tok = "END"(47), LRState = 332
+    16_000000000324c480, Tok = ")"(98), LRState = 189
+    16_0000000003244cd8, Tok = AsIdPlusList(135), LRState = 130
+    16_0000000002d36ae0, Tok = "("(97), LRState = 79
+    16_0000000002b14cf8, Tok = Id(121), LRState = 38
+    16_0000000002b14680, Tok = "="(96), LRState = 22
+    16_0000000002666688, Tok = Id(121), LRState = 15
+    16_0000000002665d50, Tok = "INTERFACE"(60), LRState = 4
+    Deeper LR state = 1
+  BuildStack:
+    16_000000000324e908, Tok = "."(95), F, T, F
+    16_000000000324ddf0, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_000000000324d030, Tok = "END"(47), F, T, F
+    16_000000000324c4a0, Tok = ")"(98), F, T, F
+    16_0000000003248038, Tok = AsIdPlusList(135), T, F, F
+    16_0000000002d36b70, Tok = "("(97), F, T, F
+    16_0000000002d36b38, Tok = ";"(94), F, F, T
+    16_0000000002d36b00, Tok = Tok__Null, F, F, T
+    16_0000000002b14d18, Tok = Id(121), F, F, F
+    16_0000000002b146d8, Tok = "="(96), F, T, F
+    16_0000000002b146a0, Tok = Tok__Null, F, F, T
+    16_00000000026666a8, Tok = {Id(121),1053,"MAsIntere"}, F, F, F
+    16_0000000002665da8, Tok = "INTERFACE"(60), F, T, F
+    16_0000000002665d70, Tok = Tok__Null, F, F, T
+  After reduce: Parse top 16_0000000003252598, Tok AsInstInterface(156), LRState 9, InputTok Tok__EndOfImage, Action 933 (Reduce, Prod 1)
+  Build top 16_0000000003259138, Tok AsInstInterface(156), 
+(Repair) Reduce , production 1, Compilation(490) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000003252598, Tok = AsInstInterface(156), LRState = 9
+    Deeper LR state = 1
+  BuildStack:
+    16_0000000003259138, Tok = AsInstInterface(156), T, F, F
+  After reduce: Parse top 16_00000000032599d0, Tok Compilation(490), LRState 2, InputTok Tok__EndOfImage, Action 14
+  Build stack is empty.
+(5,3360)Continuation Tok "."(95) succeeded at total cost 8 < best cost 10 with parse check 0, Accept = T
+Never delete EOI
+(SeqNo=8)Shift Tok__EndOfImage, to LRState = 14, Delete = F, Full = [0,0), Patch = [0,0)
+Copy temp mark list from:{ TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 3 list addr =  16_000000000325b508
+Copy temp mark list to:  { TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=-7
+                         , TokMark={28(0)CF0FF,Tok={Tok__0}},EstRef= 16_000000000283d518,LineNo=0,CharPos=1
+                         } SeqNo = 3 list addr =  16_000000000325b508
+Reduce , production 555, Tok__Augment BUILD Tok__Augment ::= (RhsLen = 2), OptionIdSet = {}
+  ParseStack:
+    16_000000000325b4b0, Tok = Tok__EndOfImage, LRState = 14
+    16_00000000032599d0, Tok = Compilation(490), LRState = 2
+    Deeper LR state = 1
+  BuildStack:
+    16_000000000325b4d0, Tok = Tok__EndOfImage, F, F, F
+    16_0000000003259138, Tok = AsInstInterface(156), T, F, F
+  After reduce: Parse top 16_000000000325ebf0, Tok Tok__Augment, LRState 0, InputTok Tok__EndOfImage, Action 0
+  Build top 16_000000000325ff98, Tok Tok__Augment, 
+######################## End Parse Trace ########################

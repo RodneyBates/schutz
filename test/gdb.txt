@@ -1,0 +1,76 @@
+#0  DefaultBackstop (a=
+    RECORD exception = 16_00007f7069de15a0; arg = 16_0000000000000001; module = 16_00007f706b7234e0; line = 216; pc = NIL; info0 = NIL; info1 = NIL; un_except = NIL; un_arg = NIL;  END, raises=FALSE) at ../src/runtime/common/RTException.m3:37
+#1  0x00007f7069b83f68 in InvokeBackstop (a=
+    RECORD exception = 16_00007f7069de15a0; arg = 16_0000000000000001; module = 16_00007f706b7234e0; line = 216; pc = NIL; info0 = NIL; info1 = NIL; un_except = NIL; un_arg = NIL;  END, raises=FALSE) at ../src/runtime/common/RTException.m3:25
+#2  0x00007f7069b9216e in Raise (act=
+    RECORD exception = 16_00007f7069de15a0; arg = 16_0000000000000001; module = 16_00007f706b7234e0; line = 216; pc = NIL; info0 = NIL; info1 = NIL; un_except = NIL; un_arg = NIL;  END) at ../src/runtime/ex_frame/RTExFrame.m3:88
+#3  0x00007f7069b6d032 in ReportFault (module=16_00007f706b7234e0, info=6913) at ../src/runtime/common/RTHooks.m3:111
+#4  0x00007f706b408d41 in _m3_fault (arg=6913) from /usr/local/cm3/bin/../lib/libSchutzCommon.so.5
+#5  0x00007f706b408d0e in CauseRuntimeError (Msg=16_000000000073c238) at ../src/Assertions.m3:216
+#6  0x00000000004c5b80 in Work () at ../src/Lbe.m3:420
+#7  0x00000000004c5d34 in Lbe (mode=1) at ../src/Lbe.m3:443
+#8  0x00007f7069b82e8e in RunMainBody (m=16_0000000000749960) at ../src/runtime/common/RTLinker.m3:408
+#9  0x00007f7069b82099 in AddUnitI (m=16_0000000000749960) at ../src/runtime/common/RTLinker.m3:115
+#10 0x00007f7069b82145 in AddUnit (b={"Lbe_M3", Declared at: ../src/Lbe.m3:438}) at ../src/runtime/common/RTLinker.m3:124
+#11 0x000000000040d5e2 in main (argc=1, argv=0x7ffd418c6ef8, envp=0x7ffd418c6f08) at _m3main.c:22
+#12 0x00007f7069781830 in __libc_start_main () from /lib/x86_64-linux-gnu/libc.so.6
+#13 0x000000000040d4d9 in _start ()
+Working directory /home/rodney/proj/lbe/git/test.
+#3  0x00007f7069b6d032 in ReportFault (module=16_00007f706b7234e0, info=6913) at ../src/runtime/common/RTHooks.m3:111
+111	    RTException.Raise (a);
+$1 = RECORD exception = 16_00007f7069de15a0; arg = 16_0000000000000001; module = 16_00007f706b7234e0; line = 216; pc = NIL; info0 = NIL; 
+    info1 = NIL; un_except = NIL; un_arg = NIL;  END
+$2 = 16_00007f7069de15a0
+$3 = RECORD uid = 1587724933; name = 16_00007f7069de15b8; implicit = 1;  END
+$4 = 16_00007f7069de15b8
+$5 = 'R'
+0x7f7069de15b8 <L_1+24>:	0x45656d69746e7552
+0x7f7069de15c0 <L_1+32>:	0x0000452e726f7272
+$6 = 16_00007f706b7234e0
+$7 = RECORD file = 16_00007f706b7006a8; type_cells = NIL; type_cell_ptrs = NIL; full_rev = NIL; partial_rev = NIL; 
+    proc_info = 16_00007f706b700590; try_scopes = NIL; var_map = NIL; gc_map = NIL; imports = 16_00007f706b723548; link_state = 3; 
+    binder = {"Assertions_M3", Declared at: ../src/Assertions.m3:219}; gc_flags = 3;  END
+$8 = 16_00007f706b7006a8
+0x7f706b7006a8 <L_1+808>:	0x412f6372732f2e2e
+0x7f706b7006b0 <L_1+816>:	0x6e6f697472657373
+module = 16_00007f706b7234e0
+info = 6913
+$9 = 1
+$10 = 16_0000000000001b01
+#2  0x00007f7069b9216e in Raise (act=
+    RECORD exception = 16_00007f7069de15a0; arg = 16_0000000000000001; module = 16_00007f706b7234e0; line = 216; pc = NIL; info0 = NIL; info1 = NIL; un_except = NIL; un_arg = NIL;  END) at ../src/runtime/ex_frame/RTExFrame.m3:88
+88	      IF (f = NIL) THEN InvokeBackstop (act, raises := FALSE); END;
+$11 = NIL
+#1  0x00007f7069b83f68 in InvokeBackstop (a=
+    RECORD exception = 16_00007f7069de15a0; arg = 16_0000000000000001; module = 16_00007f706b7234e0; line = 216; pc = NIL; info0 = NIL; info1 = NIL; un_except = NIL; un_arg = NIL;  END, raises=FALSE) at ../src/runtime/common/RTException.m3:25
+25	      THEN DefaultBackstop (a, raises);
+$12 = NIL
+#0  DefaultBackstop (a=
+    RECORD exception = 16_00007f7069de15a0; arg = 16_0000000000000001; module = 16_00007f706b7234e0; line = 216; pc = NIL; info0 = NIL; info1 = NIL; un_except = NIL; un_arg = NIL;  END, raises=FALSE) at ../src/runtime/common/RTException.m3:37
+37	    IF (a.exception = err) AND (a.arg = arg) THEN
+$13 = 16_00007f7069de15a0
+$14 = 16_000000000000000c
+$15 = {UnhandledException, BlockedException}
+$16 = 16_000000000000000d
+Can't find Modula-3 identifier: UnhandledException
+missing closing )
+$17 = 12
+$18 = 13
+$19 = RECORD uid = 1587724933; name = 16_00007f7069de15b8; implicit = 1;  END
+#0  DefaultBackstop (a=
+    RECORD exception = 16_00007f7069de15a0; arg = 16_0000000000000001; module = 16_00007f706b7234e0; line = 216; pc = NIL; info0 = NIL; info1 = NIL; un_except = NIL; un_arg = NIL;  END, raises=FALSE) at ../src/runtime/common/RTException.m3:37
+37	    IF (a.exception = err) AND (a.arg = arg) THEN
+$20 = 16_00007f7069de15a0
+$21 = 16_00007f7069de15a0
+$22 = 16_0000000000000001
+$23 = 16_000000000000000c
+40	    ELSIF (a.exception = err) AND (a.arg = not_arg) THEN
+43	      a.un_except := a.exception;
+44	      a.un_arg    := a.arg;
+45	      a.exception := err;
+46	      a.arg       := arg;
+47	      Raise (a);
+$24 = RECORD exception = 16_00007f7069de15a0; arg = 16_000000000000000c; module = 16_00007f706b7234e0; line = 216; pc = NIL; info0 = NIL; 
+    info1 = NIL; un_except = 16_00007f7069de15a0; un_arg = 16_0000000000000001;  END
+$25 = {"RTException.Raise", Declared at: ../src/runtime/ex_frame/RTExFrame.m3:76}
+Breakpoint 3 at 0x7f7069b92156: file ../src/runtime/ex_frame/RTExFrame.m3, line 88.

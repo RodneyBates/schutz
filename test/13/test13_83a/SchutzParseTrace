@@ -1,0 +1,648 @@
+######################## Begin Parse Trace #####################
+Advance from  16_000000000105c6f8, TravSeqNo 0, Tok__Null
+        to    16_000000000105f688, TravSeqNo 1, "MODULE"(65), from LRState 1, Action 8 (Initial)
+Shift (TravSeqNo=1) "MODULE"(65), from LRState = 1, to LRState = 8, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_000000000105f688, TravSeqNo 1, "MODULE"(65)
+        to    16_0000000000ad04a8, TravSeqNo 2, {Id(121),1047,"test13_83"}, from LRState 8, Action 18 (Terminal shifted)
+Shift (TravSeqNo=2) {Id(121),1047,"test13_83"}, from LRState = 8, to LRState = 18, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000000ad04a8, TravSeqNo 2, {Id(121),1047,"test13_83"}
+        to    16_0000000000ad1698, TravSeqNo 3, ";"(94), from LRState 18, Action 25 (Terminal shifted)
+Shift (TravSeqNo=3) ";"(94), from LRState = 18, to LRState = 25, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000000ad1698, TravSeqNo 3, ";"(94)
+        to    16_0000000000ad25c0, TravSeqNo 4, "BEGIN"(37), from LRState 25, Action 998 (Reduce, Prod 66) (Terminal shifted)
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce, production 66, AsImportList(137) BUILD AsImportList(137) ::= (RhsLen = 0), OptionIdSet = {}
+  ParseStack:
+    Deeper LR state = 25
+  BuildStack:
+  After reduce: Parse top 16_0000000000ad7070, Tok AsImportList(137), LRState 44, InputTok "BEGIN"(37), Action 1019 (Reduce, Prod 87)
+  Build top 16_0000000000ad7758, Tok AsImportList(137), 
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce, production 87, AsDeclList(138) BUILD AsDeclList(138) ::= (RhsLen = 0), OptionIdSet = {}
+  ParseStack:
+    Deeper LR state = 44
+  BuildStack:
+  After reduce: Parse top 16_0000000000adc180, Tok AsDeclList(138), LRState 86, InputTok "BEGIN"(37), Action 138
+  Build top 16_0000000000adc810, Tok AsDeclList(138), 
+Shift (TravSeqNo=4) "BEGIN"(37), from LRState = 86, to LRState = 138, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000000ad25c0, TravSeqNo 4, "BEGIN"(37)
+        to    16_0000000000add5a0, TravSeqNo 5, "IF"(57), from LRState 138, Action 285 (Terminal shifted)
+Shift (TravSeqNo=5) "IF"(57), from LRState = 138, to LRState = 285, Delete = F, Full = [0,3), Patch = [0,3)
+Advance from  16_0000000000add5a0, TravSeqNo 5, "IF"(57)
+        to    16_0000000000ade4e8, TravSeqNo 6, "THEN"(82), from LRState 285, Action 0 (Terminal shifted)
+Shift (Repair) "ARRAY"(35), from LRState = 285, to LRState = 238, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "BITS"(38), from LRState = 285, to LRState = 246, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "BRANDED"(39), from LRState = 285, to LRState = 229, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "NOT"(66), from LRState = 285, to LRState = 250, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "OBJECT"(67), from LRState = 285, to LRState = 227, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "PROCEDURE"(71), from LRState = 285, to LRState = 307, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "RECORD"(75), from LRState = 285, to LRState = 231, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "REF"(76), from LRState = 285, to LRState = 234, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "ROOT"(80), from LRState = 285, to LRState = 223, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "SET"(81), from LRState = 285, to LRState = 244, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "UNTRACED"(89), from LRState = 285, to LRState = 225, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "("(97), from LRState = 285, to LRState = 259, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "{"(103), from LRState = 285, to LRState = 241, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "["(108), from LRState = 285, to LRState = 248, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "+"(115), from LRState = 285, to LRState = 252, Delete = T, Full = [0,0), Patch = [32767,32767)
+Shift (Repair) "-"(116), from LRState = 285, to LRState = 253, Delete = T, Full = [0,0), Patch = [32767,32767)
+RepBuildTokInsertionRepairSlice, Tok Id(121)
+Shift (Repair) {Id(121),667,"첟d�"}, from LRState = 285, to LRState = 215, Delete = T, Full = [0,0), Patch = [32767,32767)
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 509, CsE8(520) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000000f77c30, Tok = Id(121), LRState = 215
+    Deeper LR state = 285
+  BuildStack:
+    16_0000000000f77c88, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_0000000000f77c50, Tok = Tok__Null, F, F, T
+  After reduce: Parse top 16_0000000000f7c0b0, Tok CsE8(520), LRState 214, InputTok "THEN"(82), Action 1329 (Reduce, Prod 397)
+  Build stack is empty.
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 397, G0(510) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000000f7c0b0, Tok = CsE8(520), LRState = 214
+    Deeper LR state = 285
+  BuildStack:
+    16_0000000000f77c88, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_0000000000f77c50, Tok = Tok__Null, F, F, T
+  After reduce: Parse top 16_0000000000d318e8, Tok G0(510), LRState 213, InputTok "THEN"(82), Action 1311 (Reduce, Prod 379)
+  Build stack is empty.
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 379, CsExpr(533) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000000d318e8, Tok = G0(510), LRState = 213
+    Deeper LR state = 285
+  BuildStack:
+    16_0000000000f77c88, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_0000000000f77c50, Tok = Tok__Null, F, F, T
+  After reduce: Parse top 16_0000000000d370f0, Tok CsExpr(533), LRState 429, InputTok "THEN"(82), Action 603
+  Build stack is empty.
+Shift (TravSeqNo=6) "THEN"(82), from LRState = 429, to LRState = 603, Delete = F, Full = [3,5), Patch = [3,5)
+Advance from  16_0000000000ade4e8, TravSeqNo 6, "THEN"(82)
+        to    16_0000000000d38c98, TravSeqNo 7, "END"(47), from LRState 603, Action 1117 (Reduce, Prod 185) (Terminal shifted)
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 185, AsStmtList(145) BUILD AsStmtList(145) ::= (RhsLen = 0), OptionIdSet = {}
+  ParseStack:
+    Deeper LR state = 603
+  BuildStack:
+  After reduce: Parse top 16_0000000000d3d790, Tok AsStmtList(145), LRState 712, InputTok "END"(47), Action 1204 (Reduce, Prod 272)
+  Build top 16_0000000000d3de78, Tok AsStmtList(145), 
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 272, AsIfThen(196) BUILD AsIfThen(196) ::= (RhsLen = 3), OptionIdSet = {}
+  ParseStack:
+    16_0000000000d3d790, Tok = AsStmtList(145), LRState = 712
+    16_0000000000d38c40, Tok = "THEN"(82), LRState = 603
+    16_0000000000d370f0, Tok = CsExpr(533), LRState = 429
+    Deeper LR state = 285
+  BuildStack:
+    16_0000000000d3de78, Tok = AsStmtList(145), T, F, F
+    16_0000000000d38c60, Tok = "THEN"(82), F, F, F
+    16_0000000000f77c88, Tok = {Id(121),667,"첟d�"}, F, T, F
+    16_0000000000f77c50, Tok = Tok__Null, F, F, T
+CopyFullTempMarks, range [3,5)
+     Before: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+     After:  { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+PatchTempMarkRangeFmtNos, range [3,5) FmtNo   2
+    Before : { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+     After:  { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [0,0)
+     List:   { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+PatchTempMarkSetKindsAndEstRefs, Set {3,4}, MarkKind RightSibFmtNo, EstRef 16_0000000000932738
+     Before: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=4
+             , TokMark={11(0)PL  2FF,Tok={Tok__0}},EstRef= 16_000000000105ac80,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+     After:  { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [32767,32767)
+     List:   { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+  After reduce: Parse top 16_0000000000d42938, Tok AsIfThen(196), LRState 428, InputTok "END"(47), Action 1198 (Reduce, Prod 266)
+  Build top 16_0000000000d44da8, Tok AsIfThen(196), 
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 266, AsIfThenPlusList(131) BUILD AsIfThenPlusList(131) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000000d42938, Tok = AsIfThen(196), LRState = 428
+    Deeper LR state = 285
+  BuildStack:
+    16_0000000000d44da8, Tok = AsIfThen(196), T, F, F
+CopyFullTempMarks, range [32767,32767)
+     List:   { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+  After reduce: Parse top 16_0000000000d6cbc8, Tok AsIfThenPlusList(131), LRState 427, InputTok "END"(47), Action 600
+  Build top 16_0000000000d6db10, Tok AsIfThenPlusList(131), 
+Shift (TravSeqNo=7) "END"(47), from LRState = 427, to LRState = 600, Delete = F, Full = [5,6), Patch = [5,6)
+Advance from  16_0000000000d38c98, TravSeqNo 7, "END"(47)
+        to    16_0000000000e02ef8, TravSeqNo 8, "END"(47), from LRState 600, Action 1196 (Reduce, Prod 264) (Terminal shifted)
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 264, AsIfStmt(195) BUILD AsIfStmt(195) ::= (RhsLen = 3), OptionIdSet = {}
+  ParseStack:
+    16_0000000000e02ea0, Tok = "END"(47), LRState = 600
+    16_0000000000d6cbc8, Tok = AsIfThenPlusList(131), LRState = 427
+    16_0000000000ade490, Tok = "IF"(57), LRState = 285
+    Deeper LR state = 138
+  BuildStack:
+    16_0000000000e02ec0, Tok = "END"(47), F, F, F
+    16_0000000000d6db10, Tok = AsIfThenPlusList(131), T, F, F
+    16_0000000000ade4b0, Tok = "IF"(57), F, F, F
+CopyFullTempMarks, range [5,6)
+     Before: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+     After:  { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+PatchTempMarkRangeFmtNos, range [5,6) FmtNo   7
+    Before : { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+     After:  { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+PatchTempMarkSetKindsAndEstRefs, Set {5}, MarkKind RightSibFmtNo, EstRef 16_0000000000e1ac00
+     Before: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_000000000105ada0,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+     After:  { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [32767,32767)
+     List:   { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [0,3)
+     Before: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+     After:  { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+PatchTempMarkRangeFmtNos, range [0,3) FmtNo   0
+    Before : { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+     After:  { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+PatchTempMarkRangeKindsAndEstRefs, [0,3), MarkKind LeftSibFmtNo, EstRef 16_0000000000e020a0
+     Before: { TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=3
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={7(0)PL  0FF,Tok={Tok__0}},EstRef= 16_0000000001058758,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+     After:  { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+  After reduce: Parse top 16_0000000000e07900, Tok AsIfStmt(195), LRState 284, InputTok "END"(47), Action 958 (Reduce, Prod 26)
+  Build top 16_0000000000e09940, Tok AsIfStmt(195), 
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 26, AsStmt(496) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000000e07900, Tok = AsIfStmt(195), LRState = 284
+    Deeper LR state = 138
+  BuildStack:
+    16_0000000000e09940, Tok = AsIfStmt(195), T, F, F
+  After reduce: Parse top 16_0000000000c36a70, Tok AsStmt(496), LRState 198, InputTok "END"(47), Action 1118 (Reduce, Prod 186)
+  Build stack is empty.
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 186, AsStmtList(145) BUILD AsStmtList(145) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000000c36a70, Tok = AsStmt(496), LRState = 198
+    Deeper LR state = 138
+  BuildStack:
+    16_0000000000e09940, Tok = AsIfStmt(195), T, F, F
+CopyFullTempMarks, range [32767,32767)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+  After reduce: Parse top 16_0000000000c3bd10, Tok AsStmtList(145), LRState 197, InputTok "END"(47), Action 339
+  Build top 16_0000000000c3cbb8, Tok AsStmtList(145), 
+Shift (TravSeqNo=8) "END"(47), from LRState = 197, to LRState = 339, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000000e02ef8, TravSeqNo 8, "END"(47)
+        to    16_0000000000c41f20, TravSeqNo 9, {Id(121),1047,"test13_83"}, from LRState 339, Action 1018 (Reduce, Prod 86) (Terminal shifted)
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 86, AsBlock(164) BUILD AsBlock(164) ::= (RhsLen = 4), OptionIdSet = {}
+  ParseStack:
+    16_0000000000c41ec8, Tok = "END"(47), LRState = 339
+    16_0000000000c3bd10, Tok = AsStmtList(145), LRState = 197
+    16_0000000000add548, Tok = "BEGIN"(37), LRState = 138
+    16_0000000000adc180, Tok = AsDeclList(138), LRState = 86
+    Deeper LR state = 44
+  BuildStack:
+    16_0000000000c41ee8, Tok = "END"(47), F, F, F
+    16_0000000000c3cbb8, Tok = AsStmtList(145), T, F, F
+    16_0000000000add568, Tok = "BEGIN"(37), F, F, F
+    16_0000000000adc810, Tok = AsDeclList(138), T, F, F
+CopyFullTempMarks, range [0,0)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [32767,32767)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [0,0)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+  After reduce: Parse top 16_0000000000c46b50, Tok AsBlock(164), LRState 85, InputTok Id(121), Action 137
+  Build top 16_0000000000c49260, Tok AsBlock(164), 
+Shift (TravSeqNo=9) {Id(121),1047,"test13_83"}, from LRState = 85, to LRState = 137, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000000c41f20, TravSeqNo 9, {Id(121),1047,"test13_83"}
+        to    16_0000000000c573b0, TravSeqNo 10, "."(95), from LRState 137, Action 196 (Terminal shifted)
+Shift (TravSeqNo=10) "."(95), from LRState = 137, to LRState = 196, Delete = F, Full = [0,0), Patch = [0,0)
+Advance from  16_0000000000c573b0, TravSeqNo 10, "."(95)
+        to    16_0000000000c58348, TravSeqNo 11, Tok__EndOfImage, from LRState 196, Action 988 (Reduce, Prod 56) (Terminal shifted)
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 56, AsModule(157) BUILD AsModule(157) ::= (RhsLen = 7), OptionIdSet = {}
+  ParseStack:
+    16_0000000000c582f0, Tok = "."(95), LRState = 196
+    16_0000000000c57358, Tok = Id(121), LRState = 137
+    16_0000000000c46b50, Tok = AsBlock(164), LRState = 85
+    16_0000000000ad7070, Tok = AsImportList(137), LRState = 44
+    16_0000000000ad2568, Tok = ";"(94), LRState = 25
+    16_0000000000ad1640, Tok = Id(121), LRState = 18
+    16_0000000000ad0450, Tok = "MODULE"(65), LRState = 8
+    Deeper LR state = 1
+  BuildStack:
+    16_0000000000c58310, Tok = "."(95), F, F, F
+    16_0000000000c57378, Tok = {Id(121),1047,"test13_83"}, F, F, F
+    16_0000000000c49260, Tok = AsBlock(164), T, F, F
+    16_0000000000ad7758, Tok = AsImportList(137), T, F, F
+    16_0000000000ad2588, Tok = ";"(94), F, F, F
+    16_0000000000ad1660, Tok = {Id(121),1047,"test13_83"}, F, F, F
+    16_0000000000ad0470, Tok = "MODULE"(65), F, F, F
+CopyFullTempMarks, range [0,0)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [0,0)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [32767,32767)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [0,0)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [0,0)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [0,0)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+  After reduce: Parse top 16_0000000000c5cbd8, Tok AsModule(157), LRState 7, InputTok Tok__EndOfImage, Action 934 (Reduce, Prod 2)
+  Build top 16_0000000000c60ef8, Tok AsModule(157), 
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce (Repair), production 2, Compilation(490) ::= (RhsLen = 1), OptionIdSet = {}
+  ParseStack:
+    16_0000000000c5cbd8, Tok = AsModule(157), LRState = 7
+    Deeper LR state = 1
+  BuildStack:
+    16_0000000000c60ef8, Tok = AsModule(157), T, F, F
+  After reduce: Parse top 16_0000000000c7f580, Tok Compilation(490), LRState 2, InputTok Tok__EndOfImage, Action 14
+  Build stack is empty.
+(1,89)Single Tok {Id(121),667,"첟d�"} succeeded at total cost 2 < best cost 2147483647 with parse check 6, Accept = T
+Begin RepConstructAntideletion, Tok "THEN"(82)
+Copy temp mark list for antideletion.
+      from: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+            , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+            , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+            , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+            , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+            , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+            } TmSeqNo = 2 list addr =  16_0000000000c80cc0
+        to: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+            , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+            , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+            , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+            , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+            , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+            } TmSeqNo = 2 list addr =  16_0000000000c80cc0
+CopyFullTempMarks, range [3,5)
+     Before: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 2 list addr =  16_0000000000c80cc0
+     After:  { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 2 list addr =  16_0000000000c80cc0
+PatchTempMarkRangeFmtNos, range [3,5) FmtNo   0
+    Before : { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 2 list addr =  16_0000000000c80cc0
+     After:  { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  0FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  0FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 2 list addr =  16_0000000000c80cc0
+Finish RepConstructAntideletion, Tok "THEN"(82) 16_0000000000ebaa40
+PatchTempMarkSetKindsAndEstRefs, Set {3,4}, MarkKind ChildFmtNo, EstRef 16_0000000000ebaa40
+     Before: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  0FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  0FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 2 list addr =  16_0000000000c80cc0
+     After:  { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)CF  0FF,Tok={Tok__0}},EstRef= 16_0000000000ebaa40,LineNo=0,CharPos=4
+             , TokMark={11(0)CF  0FF,Tok={Tok__0}},EstRef= 16_0000000000ebaa40,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 2 list addr =  16_0000000000c80cc0
+Advance from  16_0000000000ade4e8, TravSeqNo 6, "THEN"(82)
+        to    16_0000000000d38c98, TravSeqNo 7, "END"(47), from LRState 285, Action 0 (Successor to deleted token)
+Deleting Tok "END"(47) would cost 2, no better than best cost of 2
+Shift (TravSeqNo=11) Tok__EndOfImage, from LRState = 2, to LRState = 14, Delete = F, Full = [0,0), Patch = [0,0)
+Reuse temp mark list for reduce.
+       List: { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+Reduce, production 555, Tok__Augment BUILD Tok__Augment ::= (RhsLen = 2), OptionIdSet = {}
+  ParseStack:
+    16_0000000000ec4c88, Tok = Tok__EndOfImage, LRState = 14
+    16_0000000000c7f580, Tok = Compilation(490), LRState = 2
+    Deeper LR state = 1
+  BuildStack:
+    16_0000000000ec4ca8, Tok = Tok__EndOfImage, F, F, F
+    16_0000000000c60ef8, Tok = AsModule(157), T, F, F
+CopyFullTempMarks, range [0,0)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+CopyFullTempMarks, range [32767,32767)
+     List:   { TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=3
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={7(0)LF  0FF,Tok={Tok__0}},EstRef= 16_0000000000e020a0,LineNo=0,CharPos=11
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=4
+             , TokMark={11(0)RF  2FF,Tok={Tok__0}},EstRef= 16_0000000000932738,LineNo=0,CharPos=10
+             , TokMark={9(0)RF  7FF,Tok={Tok__0}},EstRef= 16_0000000000e1ac00,LineNo=0,CharPos=-4
+             } TmSeqNo = 1 list addr =  16_000000000105c5f0
+  After reduce: Parse top 16_0000000000ec90d0, Tok Tok__Augment, LRState 0, InputTok Tok__EndOfImage, Action 0
+  Build top 16_0000000000eca3d0, Tok Tok__Augment, 
+######################## End Parse Trace ########################

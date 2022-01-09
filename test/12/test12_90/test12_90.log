@@ -1,1 +1,10 @@
--------------------------- Succeeded in /home/rodney/proj/lbe/git/test/12/test12_90
+2,3c2,4
+< (*LFY1*) MODULE test12_90 (*TR*)
+<   x
+---
+> (*LFY1*) MODULE test12_90
+>  (*TR*)
+>   , x
+test12_90.export.m3 not as expected
+######################### F A I L E D #########################
+----------------------------- Failed in /home/rodney/proj/lbe/git/test/12/test12_90

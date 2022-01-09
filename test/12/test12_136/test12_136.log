@@ -59,7 +59,7 @@
 <               SetPassed . Elements [ j ] := SetPassed . Elements [ j - 1 ]
 ---
 >               i := i + 1
-139,145d127
+139,150d127
 <           ;
 < 
 <             SetPassed . Elements [ i ] := Value
@@ -67,12 +67,12 @@
 < 
 <             SetPassed . Used := SetPassed . Used + 1
 <           ;
-147,153c129,130
+< 
 <             flag := TRUE
 <           ;
 < 
 <           ELSE
-< 
+152,153c129,130
 <             SetPassed . Elements [ 0 ] := Value
 <           ;
 ---
@@ -172,13 +172,15 @@
 ---
 >         END
 >       ;
-214,215c186,196
+214,215c186,187
 <             SetPassed . Elements [ j ] := SetPassed . Elements [ j - 1 ]
 <           ;
 ---
 >         SetPassed . Elements := newarray
 >       ;
-> 
+217c189,200
+<             j := j - 1
+---
 >         WHILE ( i < SetPassed . Used )
 >         DO
 > 
@@ -187,9 +189,7 @@
 >           THEN
 > 
 >             EXIT
-217c198,200
-<             j := j - 1
----
+> 
 >           ELSE
 > 
 >             i := i + 1
@@ -231,298 +231,296 @@
 >         flag := TRUE
 240d232
 <     ;
-242c234,238
+242,243c234,237
 <       RETURN flag
+<     ;
 ---
 >     ELSE
 > 
->     flag
->   :=
->     FALSE
-245c241,247
+>     flag := FALSE
+>   ;
+245c239,241
 <     END InsertElem
 ---
->     END
->   ;
+>   END ;
 > 
->     RETURN flag
->   ;
-> 
->   END InsertElem
-248c250
+> RETURN flag
+248c244
 <   PROCEDURE IsIn ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
 ---
-> PROCEDURE IsIn ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
-250,251c252
+> END InsertElem ;
+250,251c246
 <   = VAR high : INTEGER := SetPassed . Used - 1
 <   ;
 ---
-> = VAR high : INTEGER := SetPassed . Used - 1 ;
-253,254c254
+> PROCEDURE IsIn ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
+253,254c248
 <     VAR low : INTEGER := 0
 <   ;
 ---
-> VAR low : INTEGER := 0 ;
-256,257c256
+> = VAR high : INTEGER := SetPassed . Used - 1 ;
+256,257c250
 <     VAR mid : INTEGER := 0
 <   ;
 ---
-> VAR mid : INTEGER := 0 ;
-259c258
+> VAR low : INTEGER := 0 ;
+259c252
 <     BEGIN
 ---
-> BEGIN
-261,262c260
+> VAR mid : INTEGER := 0 ;
+261,262c254
 <       IF SetPassed . Used # 0
 <       THEN
 ---
-> IF SetPassed . Used # 0 THEN
-264,265c262
+> BEGIN
+264,265c256
 <         WHILE high >= low
 <         DO
 ---
-> WHILE high >= low DO
-267,268c264
+> IF SetPassed . Used # 0 THEN
+267,268c258
 <           mid := ( high + low ) DIV 2
 <         ;
 ---
-> mid := ( high + low ) DIV 2 ;
-270,271c266
+> WHILE high >= low DO
+270,271c260
 <           IF Value . compare ( SetPassed . Elements [ mid ] , Value )
 <              = CompareTyp . Equal
 ---
-> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Equal
-273,275c268
+> mid := ( high + low ) DIV 2 ;
+273,275c262
 <           THEN
 <             RETURN TRUE
 <           ;
 ---
-> THEN RETURN TRUE ;
-277c270
+> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Equal
+277c264
 <           ELSE
 ---
-> ELSE
-279,280c272
+> THEN RETURN TRUE ;
+279,280c266
 <             IF Value . compare ( SetPassed . Elements [ mid ] , Value )
 <                = CompareTyp . Less
 ---
-> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Less
-282c274
+> ELSE
+282c268
 <             THEN
 ---
-> THEN
-284,285c276
+> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Less
+284,285c270
 <               low := mid + 1
 <             ;
 ---
-> low := mid + 1 ;
-287c278
+> THEN
+287c272
 <             ELSE
 ---
-> ELSE
-289,290c280
+> low := mid + 1 ;
+289,290c274
 <               high := mid - 1
 <             ;
 ---
-> high := mid - 1 ;
-292c282
+> ELSE
+292c276
 <             END
 ---
-> END
-294c284
+> high := mid - 1 ;
+294c278
 <           END
 ---
 > END
-296c286
+296c280
 <         END
 ---
 > END
-298,299c288
+298,299c282
 <       END
 <     ;
 ---
-> END ;
-301,302c290
+> END
+301,302c284
 <       RETURN FALSE
 <     ;
 ---
-> RETURN FALSE ;
-304,305c292
+> END ;
+304,305c286
 <     END IsIn
 < ;
 ---
+> RETURN FALSE ;
+306a288
 > END IsIn ;
-308c295
+308d289
 <   PROCEDURE RemoveElem ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
----
-> PROCEDURE RemoveElem ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
-310,311c297
+310,311c291
 <   = VAR high : INTEGER := SetPassed . Used - 1
 <   ;
 ---
+> PROCEDURE RemoveElem ( SetPassed : T ; Value : ElemTyp ) : BOOLEAN
+312a293
 > = VAR high : INTEGER := SetPassed . Used - 1 ;
-314,315c300
+314,315d294
 <     VAR low : INTEGER := 0
 <   ;
----
-> VAR low : INTEGER := 0 ;
-317,318c302
+317,318c296
 <     VAR mid : INTEGER := 0
 <   ;
 ---
-> VAR mid : INTEGER := 0 ;
-320,321c304
+> VAR low : INTEGER := 0 ;
+320,321c298
 <     VAR i : INTEGER := 0
 <   ;
 ---
-> VAR i : INTEGER := 0 ;
-323,324c306
+> VAR mid : INTEGER := 0 ;
+323,324c300
 <     VAR flag : BOOLEAN := FALSE
 <   ;
 ---
+> VAR i : INTEGER := 0 ;
+325a302
 > VAR flag : BOOLEAN := FALSE ;
-328c310
+328d304
 <     BEGIN
----
-> BEGIN
-330,331c312
+330,331c306
 <       WHILE high >= low
 <       DO
 ---
+> BEGIN
+332a308
 > WHILE high >= low DO
-334,335c315
+334,335d309
 <         mid := ( high + low ) DIV 2
 <       ;
----
-> mid := ( high + low ) DIV 2 ;
-337,339c317,318
+337,339c311
 <         IF Value . compare ( SetPassed . Elements [ mid ] , Value )
 <            = CompareTyp . Equal
 <         THEN
 ---
-> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Equal
-> THEN
-341,342c320
+> mid := ( high + low ) DIV 2 ;
+341,342c313,314
 <           flag := TRUE
 <         ;
 ---
-> flag := TRUE ;
-344,345c322
+> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Equal
+> THEN
+344,345c316
 <           EXIT
 <         ;
 ---
-> EXIT ;
-347c324
+> flag := TRUE ;
+347c318
 <         ELSE
 ---
-> ELSE
-349,351c326,327
+> EXIT ;
+349,351c320
 <           IF Value . compare ( SetPassed . Elements [ mid ] , Value )
 <              = CompareTyp . Less
 <           THEN
 ---
-> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Less
-> THEN
-353,354c329
+> ELSE
+353,354c322,323
 <             low := mid + 1
 <           ;
 ---
-> low := mid + 1 ;
-356c331
+> IF Value . compare ( SetPassed . Elements [ mid ] , Value ) = CompareTyp . Less
+> THEN
+356c325
 <           ELSE
 ---
-> ELSE
-358,359c333
+> low := mid + 1 ;
+358,359c327
 <             high := mid - 1
 <           ;
 ---
-> high := mid - 1 ;
-361c335
+> ELSE
+361c329
 <           END
 ---
-> END
-363c337
+> high := mid - 1 ;
+363c331
 <         END
 ---
 > END
-365,366c339
+365,366c333
 <       END
 <     ;
 ---
-> END ;
-368,369c341
+> END
+368,369c335
 <       IF flag = TRUE
 <       THEN
 ---
-> IF flag = TRUE THEN
-371,372c343
+> END ;
+371,372c337
 <         i := mid
 <       ;
 ---
-> i := mid ;
-374,375c345
+> IF flag = TRUE THEN
+374,375c339
 <         WHILE ( i < SetPassed . Used )
 <         DO
 ---
-> WHILE ( i < SetPassed . Used ) DO
-377,378c347
+> i := mid ;
+377,378c341
 <           SetPassed . Elements [ i ] := SetPassed . Elements [ i + 1 ]
 <         ;
 ---
-> SetPassed . Elements [ i ] := SetPassed . Elements [ i + 1 ] ;
-380,381c349
+> WHILE ( i < SetPassed . Used ) DO
+380,381c343
 <           i := i + 1
 <         ;
 ---
-> i := i + 1 ;
-383,384c351
+> SetPassed . Elements [ i ] := SetPassed . Elements [ i + 1 ] ;
+383,384c345
 <         END
 <       ;
 ---
-> END ;
-386,387c353
+> i := i + 1 ;
+386,387c347
 <         SetPassed . Used := SetPassed . Used - 1
 <       ;
 ---
-> SetPassed . Used := SetPassed . Used - 1 ;
-389,390c355
+> END ;
+389,390c349
 <       END
 <     ;
 ---
-> END ;
-392,393c357
+> SetPassed . Used := SetPassed . Used - 1 ;
+392,393c351
 <       RETURN flag
 <     ;
 ---
-> RETURN flag ;
-395,396c359
+> END ;
+395,396c353
 <     END RemoveElem
 < ;
 ---
+> RETURN flag ;
+397a355
 > END RemoveElem ;
-399c362
+399d356
 <   PROCEDURE Cardinality ( SetPassed : T ) : INTEGER
----
-> PROCEDURE Cardinality ( SetPassed : T ) : INTEGER
-401c364
+401c358
 <   = BEGIN
 ---
-> = BEGIN
-403,404c366
+> PROCEDURE Cardinality ( SetPassed : T ) : INTEGER
+403,404c360
 <       RETURN SetPassed . Used
 <     ;
 ---
-> RETURN SetPassed . Used ;
-406,407c368
+> = BEGIN
+406,407c362,364
 <     END Cardinality
 < ;
 ---
+> RETURN SetPassed . Used ;
+> 
 > END Cardinality ;
-410c371
+410c367
 <   BEGIN
 ---
 > BEGIN
-412,413c373
+412,413c369
 <   END Set
 < .
 ---

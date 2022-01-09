@@ -1,11 +1,14 @@
 File_Open_Text "test10_24.ldl1"
+STOP
 SemParse
 MouseClickChar 6 7
 MouseClickChar 6 6
 CharDelBwd
+STOP
 SemParse
 MouseClickChar 46 3
 CharDelBwd
+STOP
 SemParse
 CursorRight
 CursorRight
@@ -21,6 +24,7 @@ CursorRight
 CursorRight
 CursorRight
 CharType_Char 'x'
+STOP
 SemParse
 File_Save_Text "test10_24.ldl1"
 File_Export_Text "test10_24.export.ldl1"

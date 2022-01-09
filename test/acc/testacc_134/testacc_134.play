@@ -170,7 +170,7 @@ CharType_Char '='
 SemParse
 CursorRight
 CharDelBwd
-STOP
+
 SemParse
 CursorRight
 CharDelBwd
@@ -325,7 +325,6 @@ CursorLeft
 CursorLeft
 CharDelBwd
 CharType_Char ';'
-STOP
 
 SemParse
 CursorRight

@@ -1,0 +1,97 @@
+Continuing.
+
+Breakpoint 7, RedInsTok (FsNodeRef=16_0000000001464c18) at ../src/Parser.m3:1699
+1699	        RedMergeForFmtNo ( FsNodeRef . FsFmtNo , IsInsTok := TRUE ) 
+#1  0x00007ffff7b2a950 in RedTraverseFsTree (FsNodeRef=16_0000000001464c18, ReduceInfo=
+    RECORD LhsTok = 515; BuildTok = 225; RhsLen = 1; OptionIdSet = {};  END) at ../src/Parser.m3:2126
+2126	            RedInsTok ( FsNodeRef ) 
+#0  RedInsTok (FsNodeRef=16_0000000001464c18) at ../src/Parser.m3:1699
+1699	        RedMergeForFmtNo ( FsNodeRef . FsFmtNo , IsInsTok := TRUE ) 
+$1 = 98
+#1  0x00007ffff7b2a950 in RedTraverseFsTree (FsNodeRef=16_0000000001464c18, ReduceInfo=
+    RECORD LhsTok = 515; BuildTok = 225; RhsLen = 1; OptionIdSet = {};  END) at ../src/Parser.m3:2126
+2126	            RedInsTok ( FsNodeRef ) 
+#2  0x00007ffff7b2a3cb in RedTraverseFsTree (FsNodeRef=16_0000000001423ea8, ReduceInfo=
+    RECORD LhsTok = 515; BuildTok = 225; RhsLen = 1; OptionIdSet = {};  END) at ../src/Parser.m3:2033
+2033	            DO RedTraverseFsTree 
+#3  0x00007ffff7b2795f in Reduce (ParseInfo=
+    RECORD PiInitTravStateRef = 16_000000000096e5c0; PiFile = NIL; PiScanIf = 16_000000000096e330; PiOrigTempMarkListRef = 16_000000000096e4a0; PiTravTempMarkListRef = 16_000000000096e530; PiFinalTempMarkListRef = NIL; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 2; PiAttemptedRepairActionCt = 510; PiGram = 16_000000000091a0c8; PiDeferredInfoRef = NIL; PiLineCtIncr = 12; PiSeqNo = 24; PiLineNo = 0; PiRegularTempMarkCt = 3; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, ProdNo=21384216, StateList=
+    RECORD SlLatest = 0; SlOldest = 0; SlStates = {RECORD TsParseStackTopRef = 16_000000000108b398; TsBuildStackTopRef = 16_0000000001088da8; TsWaitingBuildStackElemRef = NIL; TsParseTravStateRef = 16_0000000000cd4170; TsTempMarkListRef = 16_000000000096e530; TsJustShifted = TRUE;  END, RECORD TsParseStackTopRef = NIL; TsBuildStackTopRef = NIL; TsWaitingBuildStackElemRef = NIL; TsParseTravStateRef = NIL; TsTempMarkListRef = NIL; TsJustShifted = FALSE;  END, RECORD TsParseStackTopRef = NIL; TsBuildStackTopRef = NIL; TsWaitingBuildStackElemRef = NIL; TsParseTravStateRef = NIL; TsTempMarkListRef = NIL; TsJustShifted = FALSE;  END, RECORD TsParseStackTopRef = NIL; TsBuildStackTopRef = NIL; TsWaitingBuildStackElemRef = NIL; TsParseTravStateRef = NIL; TsTempMarkListRef = NIL; TsJustShifted = FALSE;  END}; SlLastShiftedAstStates = {RECORD TsParseStackTopRef = NIL; TsBuildStackTopRef = NIL; TsWaitingBuildStackElemRef = NIL; TsParseTravStateRef = NIL; TsTempMarkListRef = NIL; TsJustShifted = FALSE;  END, RECORD TsParseStackTopRef = NIL; TsBuildStackTopRef = NIL; TsWaitingBuildStackElemRef = NIL; TsParseTravStateRef = NIL; TsTempMarkListRef = NIL; TsJustShifted = FALSE;  END, RECORD TsParseStackTopRef = NIL; TsBuildStackTopRef = NIL; TsWaitingBuildStackElemRef = NIL; TsParseTravStateRef = NIL; TsTempMarkListRef = NIL; TsJustShifted = FALSE;  END, RECORD TsParseStackTopRef = NIL; TsBuildStackTopRef = NIL; TsWaitingBuildStackElemRef = NIL; TsParseTravStateRef = NIL; TsTempMarkListRef = NIL; TsJustShifted = FALSE;  END};  END, Repairing=TRUE) at ../src/Parser.m3:2604
+2604	          ; RedTraverseFsTree ( LFsNodeRef , WReduceInfo ) 
+$2 = 16_0000000001088da8
+$3 = RECORD BseLink = 16_0000000001088908; BseTokInfo = RECORD TiSliceListRMRoot = NIL; TiInfo = NIL; 
+    TiFullTempMarkRange = RECORD From = 0; To = 0;  END; TiPatchTempMarkRange = RECORD From = 0; To = 0;  END; TiTok = 98; 
+    TiSyntTokCt = 1; TiIsInterior = FALSE; TiIsInsertionRepair = FALSE; TiIsDeletionRepair = FALSE;  END; BseWasInsertedByParser = FALSE; 
+    BseWasDeletedByParser = FALSE;  END
+#0  RedInsTok (FsNodeRef=16_0000000001464c18) at ../src/Parser.m3:1699
+1699	        RedMergeForFmtNo ( FsNodeRef . FsFmtNo , IsInsTok := TRUE ) 
+Can't find Modula-3 identifier: MergeInfo
+$4 = (*16_000000000108d968*) OBJECT MsEstTok = 225; MsFsNodeRef = 16_0000000001423ea8; MsLastEstRef = NIL; MsLastFromChildNo = -32768; 
+    MsLastToChildNo = -32768; MsEstRefToInheritFrom = NIL; MsHeight = 0; MsLeadingSyntTokCt = 0; MsTrailingSyntTokCt = 0; 
+    MsTrailingNeedsSep = FALSE; MsLeftTok = 0; MsLang = 10; MsTrailingWidthInfo = RECORD WiNlTrigger = 254; WiWidth = 0; WiIsNull = TRUE; 
+    WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END; 
+    MsLeadingWidthInfo = RECORD WiNlTrigger = 254; WiWidth = 0; WiIsNull = TRUE; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; 
+    WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END; MsHasLeadingNl = FALSE; 
+    MsWaitingRightmostKindSet = {}; MsLeafRow = RECORD MsLrObjRef = NIL; MsLrKindSet = {}; MsLrLeftTok = 0; MsLrRightTok = 0; 
+    MsLrEstChildCtLeftOfNl = 0; MsLrWidthInfo = RECORD WiNlTrigger = 0; WiWidth = 0; WiIsNull = TRUE; WiHasAbsFromPos = FALSE; 
+    WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; WiWholeLineModsOnly = FALSE;  END; MsLrSyntTokCt = 0; 
+    MsLrElemCt = 0; MsLrElems = {RECORD LeChildRef = NIL; LeCumNodeCt = 0; LeKindSet = {}; LeFmtNo = 0;  END, RECORD LeChildRef = NIL; 
+    LeCumNodeCt = 0; LeKindSet = {}; LeFmtNo = 0;  END, RECORD LeChildRef = NIL; LeCumNodeCt = 0; LeKindSet = {}; LeFmtNo = 0;  END, 
+    RECORD LeChildRef = NIL; LeCumNodeCt = 0; LeKindSet = {}; LeFmtNo = 0;  END, RECORD LeChildRef = NIL; LeCumNodeCt = 0; 
+    LeKindSet = {}; LeFmtNo = 0;  END, RECORD LeChildRef = NIL; LeCumNodeCt = 0; LeKindSet = {}; LeFmtNo = 0;  END, 
+    RECORD LeChildRef = NIL; LeCumNodeCt = 0; LeKindSet = {}; LeFmtNo = 0;  END, RECORD LeChildRef = NIL; LeCumNodeCt = 0; 
+    LeKindSet = {}; LeFmtNo = 0;  END};  END; MsLink = NIL; MsNonleafRowRefs = {NIL <repeats 30 times>}; MiDeferredTempMarkSet = NIL; 
+    MiLMNewChildRef = NIL; MiRMChildRef = NIL; MiRMSliceListElemRef = NIL; MiTempMarkListRef = 16_000000000096e530; 
+    MiTempMarkRangeTo = 0;  END
+Object has no field or method named "MiDeferredTempMarkElemSet".
+$5 = NIL
+Continuing.
+
+Breakpoint 8, RedAstStringOrEstChild (FsNodeRef=16_0000000001452cb8, ChildIsPresent=TRUE) at ../src/Parser.m3:1746
+1746	        ; RedMergeForFmtNo 
+$6 = NIL
+1: RedMergeInfo.MiDeferredTempMarkSet = NIL
+Continuing.
+
+Breakpoint 6, MergeSliceList (ParseInfo=
+    RECORD PiInitTravStateRef = 16_000000000096e5c0; PiFile = NIL; PiScanIf = 16_000000000096e330; PiOrigTempMarkListRef = 16_000000000096e4a0; PiTravTempMarkListRef = 16_000000000096e530; PiFinalTempMarkListRef = NIL; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 2; PiAttemptedRepairActionCt = 510; PiGram = 16_000000000091a0c8; PiDeferredInfoRef = NIL; PiLineCtIncr = 12; PiSeqNo = 24; PiLineNo = 0; PiRegularTempMarkCt = 3; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, MergeInfo=16_000000000108d968, TokInfo=
+    RECORD TiSliceListRMRoot = 16_0000000001088d68; TiInfo = 16_0000000001088d68; TiFullTempMarkRange = RECORD From = 32767; To = 32767;  END; TiPatchTempMarkRange = RECORD From = 32767; To = 32767;  END; TiTok = 240; TiSyntTokCt = 0; TiIsInterior = TRUE; TiIsInsertionRepair = FALSE; TiIsDeletionRepair = FALSE;  END, FmtNo=1, IsFirstOfGroup=TRUE) at ../src/Parser.m3:1156
+1156	          ; NoteEstChildImminent
+1: RedMergeInfo.MiDeferredTempMarkSet = warning: This could be the wrong instance of procedure Reduce, if a proc param with a nested procedure value was called.
+NIL
+Continuing.
+
+Breakpoint 10, MergeChild (MergeState=16_000000000108d968, EstRef=16_0000000001088cd8, KindSet={}, IsFirstOfGroup=TRUE, GroupFmtNo=1)
+    at ../src/EstBuild.m3:1667
+1667	    ; LInsertionRef := NIL 
+1: RedMergeInfo.MiDeferredTempMarkSet = warning: This could be the wrong instance of procedure Reduce, if a proc param with a nested procedure value was called.
+NIL
+$7 = (*16_0000000001088cd8*) OBJECT KTreeEstChildCtLeftOfNl = 1; KTreeWidthInfo = RECORD WiNlTrigger = 254; WiWidth = 26; 
+    WiIsNull = FALSE; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; 
+    WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 7; KTreeElemCt = 4; EstSemRef = NIL; EstTok = 240; EstLeftTok = 121; 
+    EstRightTok = 121; EstNodeKind = EstNodeKindPlain; EstHeight = 1; EstRepairCost = 0; EstChildKindSet = {}; 
+    EstLeafArrayRef = 16_0000000001088d10;  END
+Continuing.
+
+Breakpoint 7, RedInsTok (FsNodeRef=16_0000000001464a78) at ../src/Parser.m3:1699
+1699	        RedMergeForFmtNo ( FsNodeRef . FsFmtNo , IsInsTok := TRUE ) 
+1: RedMergeInfo.MiDeferredTempMarkSet = NIL
+$8 = 97
+
+Breakpoint 3, DeferTempMarkRange (MergeInfo=16_000000000108d968, TempMarkRange=RECORD From = 0; To = 1;  END) at ../src/Parser.m3:642
+642	        MergeInfo . MiDeferredTempMarkSet
+1: RedMergeInfo.MiDeferredTempMarkSet = warning: This could be the wrong instance of procedure Reduce, if a proc param with a nested procedure value was called.
+NIL
+#1  0x00007ffff7b24400 in TempMarksForInsTok (ParseInfo=
+    RECORD PiInitTravStateRef = 16_000000000096e5c0; PiFile = NIL; PiScanIf = 16_000000000096e330; PiOrigTempMarkListRef = 16_000000000096e4a0; PiTravTempMarkListRef = 16_000000000096e530; PiFinalTempMarkListRef = NIL; PiString = RECORD Text = NIL; Space = NIL; FromSs = 0; ToSs = 0; EventualLengthHint = 0;  END; PiAttemptedRepairCt = 2; PiAttemptedRepairActionCt = 510; PiGram = 16_000000000091a0c8; PiDeferredInfoRef = NIL; PiLineCtIncr = 12; PiSeqNo = 24; PiLineNo = 0; PiRegularTempMarkCt = 3; PiLang = 10; PiParseKind = ParseKindTrav; PiEof = FALSE; PiNlIsWaiting = FALSE; PiInsertNilFixedChildren = FALSE;  END, MergeInfo=16_000000000108d968, TokInfo=
+    RECORD TiSliceListRMRoot = 16_0000000000c803d0; TiInfo = 16_0000000000c803d0; TiFullTempMarkRange = RECORD From = 0; To = 1;  END; TiPatchTempMarkRange = RECORD From = 0; To = 1;  END; TiTok = 97; TiSyntTokCt = 1; TiIsInterior = FALSE; TiIsInsertionRepair = FALSE; TiIsDeletionRepair = FALSE;  END, FmtNo=0, TempMarksExist=TRUE) at ../src/Parser.m3:840
+840	          DeferTempMarkRange ( MergeInfo , TokInfo . TiPatchTempMarkRange )
+$9 = TRUE
+$10 = 225
+$11 = TokClassAsFixed
+$12 = (*16_0000000001088cd8*) OBJECT KTreeEstChildCtLeftOfNl = 1; KTreeWidthInfo = RECORD WiNlTrigger = 254; WiWidth = 26; 
+    WiIsNull = FALSE; WiHasAbsFromPos = FALSE; WiHasNlBefore = FALSE; WiHasNlAfter = FALSE; WiHasNlWithin = FALSE; 
+    WiWholeLineModsOnly = FALSE;  END; KTreeSyntTokCt = 7; KTreeElemCt = 4; EstSemRef = NIL; EstTok = 240; EstLeftTok = 121; 
+    EstRightTok = 121; EstNodeKind = EstNodeKindPlain; EstHeight = 1; EstRepairCost = 0; EstChildKindSet = {}; 
+    EstLeafArrayRef = 16_0000000001088d10;  END
+The program is running.  Exit anyway? (y or n) 
