@@ -603,7 +603,9 @@ MODULE EditWindow
              . metrics 
 (* TODO: Checks on consistency of font metrics. *) 
       ; CASE LMetrics . spacing 
-        OF ScrnFont . Spacing . Monospaced , ScrnFont . Spacing . CharCell 
+        OF ScrnFont . Spacing . Monospaced
+        , ScrnFont . Spacing . CharCell 
+     (* , ScrnFont . Spacing . Any *)  
         => LFontBoundingBox := LMetrics . maxBounds . boundingBox 
         ; Window . EwCharSize 
             := Point . Sub 
