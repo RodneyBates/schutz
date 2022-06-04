@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -62,7 +62,7 @@ MODULE LangUtilLo
 ; PROCEDURE TokClassLastTok  
     ( LangInfo : LangInfoRefTyp ; TokClass : TokClassTyp ) : TokTyp 
   (* Highest numbered token belonging to TokClass, not counting LbeStd
-     builtin tokens.  Not that if the class is empty, this will be one
+     builtin tokens.  Note that if the class is empty, this will be one
      less than the result of TokClassFirstTok.  
   *) 
 

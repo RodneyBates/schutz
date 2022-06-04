@@ -73,6 +73,7 @@ MODULE Ui
                     { (* "-*-courier-medium-r-*-*-*-140-*-*-*-*-*-*" *)
                       LFvFontName 
                     }
+                 , useXft := FALSE 
                  ) 
     ; LWindow := EditWindow . Init 
         ( NEW ( EditWindow . T ) 

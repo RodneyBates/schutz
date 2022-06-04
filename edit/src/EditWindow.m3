@@ -587,11 +587,14 @@ MODULE EditWindow
       IF Window . EwScreenType # NIL 
       THEN 
         Window . EwFonts [ PaintHs . TaFontPlain ]  
-          := Font . FromName ( ARRAY OF TEXT { Options . FontNamePlain } ) 
+          := Font . FromName
+               ( ARRAY OF TEXT { Options . FontNamePlain } , useXft := FALSE ) 
       ; Window . EwFonts [ PaintHs . TaFontBold ]  
-          := Font . FromName ( ARRAY OF TEXT { Options . FontNameBold } ) 
+          := Font . FromName
+               ( ARRAY OF TEXT { Options . FontNameBold } , useXft := FALSE ) 
       ; Window . EwFonts [ PaintHs . TaFontItalic ]  
-          := Font . FromName ( ARRAY OF TEXT { Options . FontNameItalic } ) 
+          := Font . FromName
+               ( ARRAY OF TEXT { Options . FontNameItalic } , useXft := FALSE ) 
       ; Window . EwFonts [ PaintHs . TaFontBoldItalic ]  
           := Window . EwFonts [ PaintHs . TaFontItalic ]  
 
