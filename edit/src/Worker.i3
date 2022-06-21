@@ -16,7 +16,8 @@ INTERFACE Worker
 ; IMPORT VBT 
 
 ; IMPORT Assertions  
-; IMPORT EditWindow 
+; IMPORT EditWindow
+; IMPORT Failures 
 ; IMPORT MessageCodes
 ; IMPORT PaintHs 
 
@@ -139,14 +140,8 @@ INTERFACE Worker
      involve querying the user, if appropriate. 
   *)    
 
-; TYPE FailureActionTyp 
-    = { FaTerminate (* Terminate the program. *)  
-      , FaProceed   (* Ignore the failure and proceed. *) 
-      , FaBackout   (* Back out the action. *) 
-      } 
-
 ; PROCEDURE ReportAssertDialog  
-    ( FailureAction : FailureActionTyp ) 
+    ( FailureAction : Failures . FailureActionTyp ) 
   <* LL.sup <= VBT.mu *> 
   (* Gui threads call this to report user response to an assertion dialog. *) 
 

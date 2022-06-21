@@ -592,7 +592,7 @@
            (Text Center (LabelFont (PointSize 120) ) 
               "The usually marvelous Schutz editor has suffered a humiliating" 
            ) 
-           (Text Center (LabelFont (PointSize 240) ) "ASSERTION FAILURE!" ) 
+           (Text Center (LabelFont (PointSize 240) ) "RUNTIME ERROR!" ) 
            Ridge 
            (HBox 
              (Text LeftAlign "Location:" ) 

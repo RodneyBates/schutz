@@ -23,37 +23,37 @@ CPP  = /lib/cpp -P
 # Files to scan: 
 ERRORFILES = \
   Assertions.m3 \
-  AssertUnsafe.m3 \
-  SchutzCoroutine.m3 \
+  AstView.m3 \
   EstBuild.m3 \
   EstHs.m3 \
   EstUtil.m3 \
+  Failures.m3 \
+  Files.m3 \
   FsTreeUtils.m3\
+  GenConstEst.m3 \
+  LangMap.m3 \
   LangUtil.m3 \
   LangUtilLo.m3 \
   LbeStd.m3 \
+  LdlSemantics.m3 \
   LineMarks.m3 \
+  LRTable.m3 \
   Marks.m3 \
   MergeTxt.m3 \
   ModHs.m3 \
+  PaintHs.m3 \
   ParseHs.m3 \
   ParseTrv.m3 \
   Parser.m3 \
   PortTypes.m3 \
+  SchutzCoroutine.m3 \
   SharedStrings.m3 \
   Strings.m3 \
   TravUtil.m3 \
-  WriteTrv.m3 \
-  LdlSemantics.m3 \
-  AstView.m3 \
-  LangMap.m3 \
+  TreeBrowse.m3 \
   TextIntSymbolTable.m3 \
   TokRelation.m3 \
-  LRTable.m3 \
-  GenConstEst.m3 \
-  Files.m3 \
-  TreeBrowse.m3 \
-  PaintHs.m3 \
+  WriteTrv.m3 \
   GrammarGen.m3 \
   Layout.m3 \
   ../../edit/src/Ui.m3 \

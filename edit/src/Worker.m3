@@ -27,7 +27,8 @@ MODULE Worker
 ; IMPORT Assertions 
 ; FROM Assertions IMPORT AssertionFailure 
 ; IMPORT Display 
-; IMPORT Errors 
+; IMPORT Errors
+; FROM Failures IMPORT FailureActionTyp 
 ; IMPORT MessageCodes 
 ; IMPORT Options
 ; IMPORT UiDevel 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -28,6 +28,9 @@ INTERFACE Assertions
      It returns TRUE to ask that AssertionFailure or Backout be raised. *)
 
 ; VAR DefaultQueryProc : QueryProcTyp := AlwaysRaise
+  (* This query procedure will be used when an assertion failure or runtime
+     error occurs on a thread that is not of type AssertThreadT.
+     It can be changed by client code. *)
 
 ; PROCEDURE InvokeQuery 
     ( String1 , String2 : TEXT
@@ -64,8 +67,6 @@ INTERFACE Assertions
 ; TYPE AFT = MessageCodes . T 
 
 ; EXCEPTION AssertionFailure ( TEXT ) 
-
-; EXCEPTION Backout ( TEXT ) 
 
 ; PROCEDURE Assert 
     ( Condition : BOOLEAN ; Code : AFT ) RAISES { AssertionFailure } 

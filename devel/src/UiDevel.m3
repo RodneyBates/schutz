@@ -34,7 +34,8 @@ MODULE UiDevel
 ; IMPORT Boot 
 ; IMPORT Display 
 ; IMPORT EditWindow 
-; IMPORT EstUtil 
+; IMPORT EstUtil
+; IMPORT Failures 
 ; IMPORT Files 
 ; IMPORT GenConstEst 
 ; IMPORT Images 
@@ -1767,7 +1768,7 @@ MODULE UiDevel
 
   = BEGIN 
       Worker . ReportAssertDialog 
-        ( Worker . FailureActionTyp . FaBackout ) 
+        ( Failures . FailureActionTyp . FaBackout ) 
     END AssertBackoutProc 
 
 ; PROCEDURE AssertProceedProc 
@@ -1779,7 +1780,7 @@ MODULE UiDevel
 
   = BEGIN 
       Worker . ReportAssertDialog 
-        ( Worker . FailureActionTyp . FaProceed ) 
+        ( Failures . FailureActionTyp . FaProceed ) 
     END AssertProceedProc 
 
 ; PROCEDURE AssertTerminateProc 
@@ -1791,7 +1792,7 @@ MODULE UiDevel
 
   = BEGIN 
       Worker . ReportAssertDialog 
-        ( Worker . FailureActionTyp . FaTerminate ) 
+        ( Failures . FailureActionTyp . FaTerminate ) 
     END AssertTerminateProc 
 
 (* VISIBLE: *) 
