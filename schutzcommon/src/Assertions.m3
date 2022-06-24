@@ -19,24 +19,6 @@ MODULE Assertions
 
 ; IMPORT MessageCodes 
 
-; PROCEDURE InvokeQuery 
-    ( String1 , String2 : TEXT
-    ; Code : MessageCodes . T 
-    ; DoWriteCheckpoint : BOOLEAN 
-    ) 
-  : BOOLEAN
-  
-  = VAR LQueryProc : QueryProcTyp 
-
-  ; BEGIN
-      TYPECASE Thread . Self ( )
-      OF NULL => LQueryProc := DefaultQueryProc 
-      | AssertThreadT ( TThread ) => LQueryProc:= TThread . QueryProc  
-      ELSE LQueryProc := DefaultQueryProc 
-      END (* TYPECASE *)
-    ; RETURN LQueryProc ( String1 , String2 , Code , DoWriteCheckpoint ) 
-    END InvokeQuery 
-
 ; PROCEDURE AF ( ) 
 
   = VAR L : INTEGER 
@@ -56,11 +38,7 @@ MODULE Assertions
     ; Wr . PutText ( Stdio . stderr , Wr . EOL ) 
     ; Wr . Flush ( Stdio . stderr ) 
     ; AF ( ) 
-    ; IF InvokeQuery 
-           ( "" , Message , MessageCodes . T . NullCode , DoWriteCheckpoint )  
-      THEN 
-        RAISE AssertionFailure ( Message ) 
-      END (* IF *) 
+    ; RAISE AssertionFailure ( Message ) 
     END FailText 
 
 (* EXPORTED: *) 
@@ -98,10 +76,7 @@ MODULE Assertions
     ; Wr . PutText ( Stdio . stderr , Wr . EOL ) 
     ; Wr . Flush ( Stdio . stderr ) 
     ; AF ( ) 
-    ; IF InvokeQuery ( "" , LMessage , Code , DoWriteCheckpoint )  
-      THEN 
-        RAISE AssertionFailure ( LMessage ) 
-      END (* IF *) 
+    ; RAISE AssertionFailure ( LMessage ) 
     END Fail 
 
 (* EXPORTED: *) 

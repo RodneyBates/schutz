@@ -53,7 +53,7 @@ UNSAFE MODULE UnsafeUtils
     END AdrToRT0_ActivationPtr
 
 (* PutExcept is copied from RTExFrame.  A (possibly) different) version
-   is in RtExStack.  Its signature needs to go into RTExxception.i3, to
+   is in RtExStack.  Its signature needs to go into RTException.i3, to
    do this properly.  That is a runtime system change, not to be undertaken
    lightly.  This is a temporary expedient to keep moving forward on
    schutz. *)

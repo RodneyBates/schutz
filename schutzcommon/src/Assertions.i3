@@ -14,6 +14,7 @@ INTERFACE Assertions
 
 ; IMPORT Thread
 
+; IMPORT Failures 
 ; IMPORT MessageCodes 
 
 ; TYPE QueryProcTyp 
@@ -32,26 +33,21 @@ INTERFACE Assertions
      error occurs on a thread that is not of type AssertThreadT.
      It can be changed by client code. *)
 
-; PROCEDURE InvokeQuery 
-    ( String1 , String2 : TEXT
-    ; Code : MessageCodes . T 
-    ; DoWriteCheckpoint : BOOLEAN 
-    ) 
-  : BOOLEAN 
-
-; TYPE ActionTyp
-         = { None
-           , Backout (* Query user and maybe raise Backout. *) 
-           , AssertionFailure (* Query user and maybe raise AssertionFailure. *) 
-           }
+; CONST AllowedActions
+    = Failures . FailureActionSetTyp
+        { Failures . FailureActionTyp . FaCrash
+        , Failures . FailureActionTyp . FaBackout
+        , Failures . FailureActionTyp . FaBackout
+        } 
 
 (* Use this Thread.T subtype to create a thread with options about how
    to handle a failure.  Generally, query the user. *) 
 
-; TYPE AssertThreadT
+; TYPE xAssertThreadT
     = Thread . T OBJECT
-        QueryProc : QueryProcTyp := AlwaysRaise  
-      ; AssertAction : ActionTyp 
+        QueryProc : QueryProcTyp := AlwaysRaise
+      ; ThreadInfoRef : Failures . ThreadInfoRefTyp 
+   (* ; AssertAction : Failures . FailureActionTyp *)
       END 
 
 ; VAR Checking : BOOLEAN := TRUE 

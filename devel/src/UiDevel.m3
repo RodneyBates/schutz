@@ -1780,7 +1780,7 @@ MODULE UiDevel
 
   = BEGIN 
       Worker . ReportAssertDialog 
-        ( Failures . FailureActionTyp . FaProceed ) 
+        ( Failures . FailureActionTyp . FaIgnore ) 
     END AssertProceedProc 
 
 ; PROCEDURE AssertTerminateProc 
@@ -1792,7 +1792,7 @@ MODULE UiDevel
 
   = BEGIN 
       Worker . ReportAssertDialog 
-        ( Failures . FailureActionTyp . FaTerminate ) 
+        ( Failures . FailureActionTyp . FaCrash ) 
     END AssertTerminateProc 
 
 (* VISIBLE: *) 

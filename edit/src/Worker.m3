@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -19,7 +19,8 @@
 MODULE Worker 
 
 ; IMPORT FormsVBT 
-; IMPORT Process 
+; IMPORT Process
+; IMPORT RT0 
 ; IMPORT Thread 
 (* ; IMPORT VBT (* Used in LL pragmas. *) *) 
 
@@ -28,7 +29,7 @@ MODULE Worker
 ; FROM Assertions IMPORT AssertionFailure 
 ; IMPORT Display 
 ; IMPORT Errors
-; FROM Failures IMPORT FailureActionTyp 
+; IMPORT Failures 
 ; IMPORT MessageCodes 
 ; IMPORT Options
 ; IMPORT UiDevel 
@@ -104,7 +105,7 @@ MODULE Worker
          may or may not have gotten it.  If also StoredState = WrtBusy,  
          then worker is working on it. 
       *) 
-; VAR StoredFailureAction : FailureActionTyp 
+; VAR StoredFailureAction : Failures . FailureActionTyp 
 ; VAR QueuedClosure : ClosureTyp := NIL
       (* ^When QueuedClosure # NIL, it is either queued or being worked on.
          If also StoredClosure # NIL, then immediate work was accepted or in
@@ -117,7 +118,7 @@ MODULE Worker
       *) 
 (* End of Mu-protected variables. *)
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE RequestWork 
     ( Closure : ClosureTyp 
     ; Interactive : BOOLEAN := FALSE  
@@ -189,7 +190,7 @@ MODULE Worker
       END (* IF *) 
     END RequestWork 
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE RequestWorkInteractive 
     ( Closure : ClosureTyp 
     ; Granularity : GranularityTyp := GranularityTyp . Global 
@@ -259,7 +260,7 @@ MODULE Worker
       END (* IF *) 
     END RequestWorkInteractive  
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE CancelImmedWork 
     ( WaitToFinish : BOOLEAN := FALSE 
       (* ^Don't return until worker thread has stopped. *) 
@@ -287,7 +288,7 @@ MODULE Worker
       END (* LOCK *)  
     END CancelImmedWork 
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE RequestQueuedWork 
     ( Closure : ClosureTyp 
     ; Granularity : GranularityTyp := GranularityTyp . Global 
@@ -315,7 +316,7 @@ MODULE Worker
     ; RETURN LResult  
     END RequestQueuedWork
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE CancelQueuedWork 
     ( WaitToFinish : BOOLEAN := FALSE 
       (* ^Don't return until worker thread has stopped. *) 
@@ -345,7 +346,7 @@ MODULE Worker
     ; RETURN LResult  
     END CancelQueuedWork
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE ExistingQueuedWork ( ) 
   : ClosureTyp (* The queued closure, or NIL. *) 
   <* LL.sup <= VBT.mu *> 
@@ -360,7 +361,7 @@ MODULE Worker
     ; RETURN LResult  
     END ExistingQueuedWork
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE IsIdle ( ) : BOOLEAN 
 
   = VAR LResult : BOOLEAN 
@@ -373,7 +374,7 @@ MODULE Worker
     ; RETURN LResult  
     END IsIdle 
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE AwaitIdle ( ) 
   : WorkResultTyp 
     (* ^Of doubtful use, since who knows what work just finished. *) 
@@ -461,7 +462,65 @@ MODULE Worker
       END (* LOCK *)  
     END BecomeIdle  
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
+; PROCEDURE FailureQuery
+    ( ActPtr : RT0 . ActivationPtr
+    ; ExceptionText , ActivationText : TEXT 
+    ; AllowedActions : Failures . FailureActionSetTyp
+    )
+  : Failures . FailureActionTyp 
+
+  <* LL.sup < VBT.mu *>
+  (* This is a callback, invoked from within Failures, when a runtime error
+     occurs on the worker thread.  The runtime error could be secondary to
+     a blocked or unhandled exception, especially Assertions.AssertionFailure,
+     which gets some special treatment.  It notifies the user, either on the
+     command line in a dialog, and queries the user's desire what to do. 
+  *)    
+
+  = VAR LInteractive : BOOLEAN 
+  ; VAR LResult : Failures . FailureActionTyp 
+
+  ; BEGIN 
+      IF DoWriteCheckpoint 
+      THEN 
+        AssertDevel . CheckpointForFailure ( CrashCode ) 
+      END (* IF *) 
+    ; LOCK Mu 
+      DO IF StoredClosure # NIL
+        THEN LInteractive := StoredClosure . IsInteractive 
+        ELSIF QueuedClosure # NIL
+        THEN LInteractive := QueuedClosure . IsInteractive 
+        ELSE LInteractive := FALSE
+        END (* IF *) 
+      END (* LOCK *)
+    ; IF LInteractive 
+      THEN  
+        UiDevel . ShowGuiAssertDialog ( FailureText , ActivationText ) 
+        (* It would be more obviously right to show and remove this dialog  
+           while holding Mu, but I can't figure out a way that satisfies a 
+           consistent lock order.  In any case, unlocking Mu is OK, because
+           we will only get here when StoredState = WrtBusyImmed or
+           WrtBusyQueued, which means the only thing any other thread
+           can do is wait on WaitingForIdle. 
+        *) 
+      ; LOCK Mu 
+        DO
+          QueryingAssert := TRUE 
+        ; WHILE QueryingAssert 
+          DO Thread . Wait ( Mu , WaitingForAssertDialog ) 
+          END (* WHILE *)
+        ; LResult := StoredFailureAction 
+        END (* LOCK *)  
+      ; UiDevel . RemoveGuiAssertDialog ( ) 
+      ELSE 
+        Assertions . DoTerminate := TRUE 
+      ; LResult := TRUE (* Always raise AssertionFailure in batch. *) 
+      END (* IF *) 
+    ; RETURN 
+    END FailureQuery 
+
+(*EXPORTED*) 
 ; PROCEDURE Failure 
     ( String1 : TEXT 
     ; String2 : TEXT 
@@ -509,12 +568,12 @@ MODULE Worker
           DO Thread . Wait ( Mu , WaitingForAssertDialog ) 
           END (* WHILE *) 
         ; CASE StoredFailureAction 
-          OF FailureActionTyp . FaTerminate
+          OF Failures . FailureActionTyp . FaTerminate
           => Assertions . DoTerminate := TRUE 
           ; LResult := TRUE (* Raise AssertionFailure. *) 
-          | FailureActionTyp . FaBackout 
+          | Failures . FailureActionTyp . FaBackout 
           => LResult := TRUE (* Raise AssertionFailure. *) 
-          | FailureActionTyp . FaProceed   
+          | Failures . FailureActionTyp . FaProceed   
           => LResult := FALSE (* Do not raise AssertionFailure. *) 
           END (* CASE *) 
         END (* LOCK *)  
@@ -526,11 +585,12 @@ MODULE Worker
     ; RETURN LResult 
     END Failure 
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE ReportAssertDialog  
-    ( FailureAction : FailureActionTyp ) 
+    ( FailureAction : Failures . FailureActionTyp ) 
   <* LL.sup <= VBT.mu *> 
-  (* Gui threads call this to report user response to an assertion dialog. *) 
+  (* Gui threads call this to report to us, the user's response to
+     a failure dialog. *) 
 
   = BEGIN 
       LOCK Mu 
@@ -581,14 +641,14 @@ MODULE Worker
 ; VAR WorkerThreadClosure : WorkerThreadClosureTyp 
 ; VAR WorkerThread : Thread . T  
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE IAmWorkerThread ( ) : BOOLEAN 
 
   = BEGIN 
       RETURN WorkerThread # NIL AND Thread . Self ( ) = WorkerThread 
     END IAmWorkerThread 
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE DoGuiActions ( ) : BOOLEAN  
 
   = BEGIN 
@@ -598,7 +658,7 @@ MODULE Worker
       END (* LOCK *) 
     END DoGuiActions 
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE Init ( ) 
   (* Things that must be done later than module initialization. *) 
 
