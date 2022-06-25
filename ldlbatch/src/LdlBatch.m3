@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -111,9 +111,6 @@ EXPORTS Main
 ; VAR DoInsertNilFixedChildren := FALSE 
 ; VAR UseGenGrammar := FALSE 
 
-; VAR ResourceDirDefault : TEXT := "/home/rodney/proj/lbe/git/rodneyDevel/resources"  
-; VAR ResourceDir : TEXT := ResourceDirDefault 
-
 ; VAR GFileName : TEXT := ""
 ; VAR GImageRef : PaintHs . ImageTransientTyp 
 ; VAR GDevelWritePath : TEXT := "" 
@@ -174,7 +171,7 @@ EXPORTS Main
                 ; LCharNo := 0 
                 END (* IF *)    
               ; LChar := Text . GetChar ( LParam , LCharNo ) 
-              ; ResourceDir := Text . Sub ( LParam , LCharNo , LParamLength )
+              ; Options . ResourceDir := Text . Sub ( LParam , LCharNo , LParamLength )
               ; LCharNo := LParamLength 
             | 'e' => DoWriteMakeEst := TRUE 
             | 'f' => DoWriteFsTrees := TRUE 
@@ -256,7 +253,7 @@ EXPORTS Main
          )
     ; WL ( "  -d<n> or -d <n> Set debug level to <n>. (Not yet implemented.)" ) 
     ; WL ( "  -D<dir> or -D <dir> Use <dir> to find resources." ) 
-    ; WL ( "     (default: " & ResourceDirDefault ) 
+    ; WL ( "     (default: " & Options . ResourceDir ) 
     ; WL ( "  -e Write module <Lang>" & MakeEstFileNameSuffix ) 
     ; WL ( "  -f Write format syntax tree dump file <Lang>" 
                  & FsTreesFileNameSuffix 
@@ -686,7 +683,7 @@ EXPORTS Main
       Options . ResourcePath 
         := RefList . AppendD 
              ( Rsrc . BuildPath 
-                 ( ResourceDir , "$LBERESOURCE" ) 
+                 ( Options . ResourceDir , "$LBERESOURCE" ) 
              , Rsrc . BuildPath 
                  ( Ldl0Bundle . Get ( ) , Ldl1Bundle . Get ( ) ) 
              ) 
@@ -962,11 +959,18 @@ EXPORTS Main
 
 ; TYPE FPTyp = RECORD byte: FPArrayTyp END
 
-; VAR FP := FPTyp { byte := FPArrayTyp { 109,125,137,63,246,33,196,22 } }  
+; VAR FP := FPTyp { byte := FPArrayTyp { 109,125,137,63,246,33,196,22 } }
+
+; PROCEDURE SetDefaults ( )
+
+  = BEGIN
+      Options . ResourceDir := Options . ResourceDirDefault
+    END SetDefaults 
 
 ; BEGIN
     Misc . LoadYourself ( )
-    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *)  ; GetParams ( ) 
+    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *)  ; GetParams ( )
+  ; SetDefaults ( ) 
   ; IF DoDisplayHelp 
     THEN 
       DisplayVersion ( ) 

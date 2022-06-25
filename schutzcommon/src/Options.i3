@@ -40,6 +40,10 @@ INTERFACE Options
 ; PROCEDURE SetDerivedDebugOptions ( ) 
 
 ; VAR EnablePickleWrite : BOOLEAN 
+
+; CONST ResourceDirDefault : TEXT = "/home/rodney/proj/lbe/git/rodneyDevel/resources"  
+; VAR ResourceDir : TEXT := ResourceDirDefault 
+
 ; VAR ResourcePath : Rsrc . Path 
 
 ; VAR ParseCheckMin : LbeStd . LimitedTokCtTyp := 4 

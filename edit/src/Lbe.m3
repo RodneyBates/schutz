@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -63,8 +63,6 @@ EXPORTS Main
 ; CONST M3SemFileName = "M3Sem.pkl" 
 ; CONST DefaultDebugLevel = 3 
 
-; VAR ResourceDirDefault : TEXT := "/home/rodney/proj/lbe/git/resources"  
-; VAR ResourceDir : TEXT 
 ; VAR PlaybackFileName : TEXT 
 ; VAR RecordFileName : TEXT 
 ; VAR DelayTime : INTEGER := FIRST ( INTEGER ) 
@@ -128,7 +126,7 @@ EXPORTS Main
     ; DL ( "    -r <resdir> " ) 
     ; DL ( "    --resource <resdir>      :Get resources from directory <resdir>." 
          ) 
-    ; DL ( "                              (default: " & ResourceDirDefault ) 
+    ; DL ( "                              (default: " & Options . ResourceDir ) 
     ; DL ( "    -b <integer>" ) 
     ; DL ( "    --debug <integer>        :Set debug level ("
                     & Fmt . Int ( FIRST ( Options . DebugLevelTyp ) ) 
@@ -169,7 +167,7 @@ EXPORTS Main
         END (* IF *) 
       ; 
       END (* IF *) 
-    ; ResourceDir := ResourceDirDefault
+    ; Options . ResourceDir := Options . ResourceDirDefault
     ; PlaybackFileName := "" 
     ; DoRunPlayback := FALSE 
     ; RespectStops := TRUE 
@@ -180,7 +178,7 @@ EXPORTS Main
     ; Options . EnablePickleWrite := TRUE  
     ; Options . DoOptimizeSingletonLists := FALSE
     ; Options . Crash := FALSE 
-    ; Assertions . DefaultQueryProc := Worker . Failure   
+ (* ; Assertions . DefaultQueryProc := Worker . Failure *)
  (* ; Assertions . DefaultQueryProc := AssertDevel . AssertDialogCommandLine *) 
  (* ; Assertions . DefaultQueryProc := Assertions . NeverRaise *) 
     ; AssertDevel . DoStop := TRUE 
@@ -294,7 +292,7 @@ EXPORTS Main
               GaBadArgs := TRUE 
             ; EXIT 
             ELSE 
-              ResourceDir := Params . Get ( GaArgNo + 1 ) 
+              Options . ResourceDir := Params . Get ( GaArgNo + 1 ) 
             ; INC ( GaArgNo , 2 ) 
             END (* IF *) 
           ELSIF Text . Equal ( Params . Get ( GaArgNo ) , "-p" ) 
@@ -367,7 +365,7 @@ EXPORTS Main
           Options . ResourcePath 
             := RefList . AppendD 
                  ( Rsrc . BuildPath 
-                     ( ResourceDir , "$LBERESOURCE" , LbeBundle . Get ( ) ) 
+                     ( Options . ResourceDir , "$LBERESOURCE" , LbeBundle . Get ( ) ) 
                  , Rsrc . BuildPath 
                      ( Ldl0Bundle . Get ( ) 
                      , Ldl1Bundle . Get ( ) 
