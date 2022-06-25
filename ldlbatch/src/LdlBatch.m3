@@ -111,7 +111,7 @@ EXPORTS Main
 ; VAR DoInsertNilFixedChildren := FALSE 
 ; VAR UseGenGrammar := FALSE 
 
-; VAR ResourceDirDefault : TEXT := "/home/rodney/proj/lbe/git/resources"  
+; VAR ResourceDirDefault : TEXT := "/home/rodney/proj/lbe/git/rodneyDevel/resources"  
 ; VAR ResourceDir : TEXT := ResourceDirDefault 
 
 ; VAR GFileName : TEXT := ""
@@ -174,7 +174,8 @@ EXPORTS Main
                 ; LCharNo := 0 
                 END (* IF *)    
               ; LChar := Text . GetChar ( LParam , LCharNo ) 
-              ; ResourceDir := Text . Sub ( LParam , LCharNo , LParamLength )  
+              ; ResourceDir := Text . Sub ( LParam , LCharNo , LParamLength )
+              ; LCharNo := LParamLength 
             | 'e' => DoWriteMakeEst := TRUE 
             | 'f' => DoWriteFsTrees := TRUE 
             | 'g' => DoFactorGenGrammar := TRUE 

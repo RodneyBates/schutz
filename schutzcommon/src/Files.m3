@@ -225,7 +225,9 @@ MODULE Files
 
   ; BEGIN (* ReadLangPickle *) 
       TRY 
-        Reader := Rsrc . Open ( FileName , ResourcePath ) 
+        Reader := Rsrc . Open ( FileName , ResourcePath )
+(* TODO: Find a way to get the description of where on ResourcePath
+         the Reader was opened, and display it. *)
       EXCEPT Thread . Alerted 
       => RAISE Thread . Alerted 
       ELSE
@@ -276,7 +278,7 @@ MODULE Files
     ; TRY 
         LangUtil . LoadLanguage ( LSuffix ) 
       EXCEPT LangUtil . LangError ( EMsg ) 
-      => LMsg := EMsg & ", for image file \"" & FileName & "\"" 
+      => LMsg := EMsg & ", needed by image file \"" & FileName & "\"" 
       ; RAISE Error ( LMsg ) 
       END (* TRY EXCEPT *) 
     ; LSuffixInfo := LangUtil . RetSuffixInfo ( LSuffix ) 
@@ -407,7 +409,7 @@ MODULE Files
     ; TRY 
         LangUtil . LoadLanguage ( LSuffix ) 
       EXCEPT LangUtil . LangError ( EMsg ) 
-      => LMsg := EMsg & ", for image file \"" & ImageName & "\"" 
+      => LMsg := EMsg & ", needed for new file \"" & ImageName & "\"" 
       ; RAISE Error ( LMsg ) 
       END (* TRY EXCEPT *) 
     ; LSuffixInfo := LangUtil . RetSuffixInfo ( LSuffix ) 
@@ -417,7 +419,7 @@ MODULE Files
       ; RAISE Error ( LMsg ) 
       ELSE 
         LResult := NEW ( PaintHs . ImageTransientTyp ) . initDefaults ( ) 
-      ; LImagePers := NEW ( PaintHs . ImagePersistentTyp ) . initDefaults ( ) 
+      ; LImagePers := NEW ( PaintHs . ImagePersistentTyp ) . initDefaults ( )
       ; LResult . ItPers := LImagePers 
       ; Options . OpeningImageRef := LResult 
       ; LImagePers . IpLang := LSuffixInfo . Lang 
@@ -528,8 +530,7 @@ MODULE Files
     ; TRY 
         LangUtil . LoadLanguage ( LSuffix ) 
       EXCEPT LangUtil . LangError ( EMsg ) 
-      => LMsg 
-           := EMsg & "," & Wr . EOL & "  for image file \"" & FileName & "\"" 
+      => LMsg := EMsg & ", needed by text file \"" & FileName & "\"" 
       ; RAISE Error ( LMsg ) 
       END (* TRY EXCEPT *) 
     ; LSuffixInfo := LangUtil . RetSuffixInfo ( LSuffix ) 

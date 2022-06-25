@@ -10,6 +10,13 @@
 
 # Create directories to hold generated files. 
 
+# At top level: 
+if test ! -d resources 
+then 
+  echo "  Create directory ./resources:"
+  mkdir resources
+fi
+
 # In subdirectory ldl0: 
 cd ../ldl0
 if test ! -d derived 
