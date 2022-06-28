@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -42,7 +42,7 @@ MODULE Check
 ; IMPORT LRTable 
 ; FROM LRTable IMPORT AssocTyp , NontermKindTyp , PrecedenceNull  
 ; IMPORT MessageCodes 
-; FROM Messages IMPORT SemError0 , TextOnly 
+; IMPORT Messages 
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -561,7 +561,7 @@ MODULE Check
       ; <* FATAL ANY *> BEGIN 
           IntSets . ForAllDo ( ConflictingLookaheadSet , RisToken )  
         END (* Block *) 
-      ; TextOnly 
+      ; Messages . TextOnly 
           ( MessageCodes . Image ( AFT . I_StateIsNotLR ) 
             & ": " 
             & Fmt . Int ( StateSs ) 
@@ -570,52 +570,53 @@ MODULE Check
       ; IF InformNormalSublist 
            AND NOT IntSets . IsEmpty ( RisSublistSet ) 
         THEN 
-          SemError0 ( AFT . I_NormalSublistConflict ) 
+          Messages . SemError0 ( AFT . I_NormalSublistConflict ) 
         ; Infos . WriteTokSet ( Gram , RisSublistSet ) 
         END (* IF *) 
       ; IF NOT IntSets . IsEmpty ( RisShiftRedSet ) 
         THEN 
-          SemError0 ( AFT . E_ShiftReduceConflict ) 
+          Messages . SemError0 ( AFT . E_ShiftReduceConflict ) 
         ; Infos . WriteTokSet ( Gram , RisShiftRedSet ) 
         END (* IF *) 
       ; IF NOT IntSets . IsEmpty ( RisRedRedSet ) 
         THEN 
-          SemError0 ( AFT . E_ReduceReduceConflict ) 
+          Messages . SemError0 ( AFT . E_ReduceReduceConflict ) 
         ; Infos . WriteTokSet ( Gram , RisRedRedSet ) 
         END (* IF *) 
       ; IF NOT IntSets . IsEmpty ( RisShiftRedRedSet ) 
         THEN 
-          SemError0 ( AFT . E_ShiftReduceReduceConflict ) 
+          Messages . SemError0 ( AFT . E_ShiftReduceReduceConflict ) 
         ; Infos . WriteTokSet ( Gram , RisShiftRedRedSet ) 
         END (* IF *) 
       ; IF NOT IntSets . IsEmpty ( RisRepShiftRedSet ) 
         THEN 
-          SemError0 ( AFT . I_RepairedShiftReduceConflict ) 
+          Messages . SemError0 ( AFT . I_RepairedShiftReduceConflict ) 
         ; Infos . WriteTokSet ( Gram , RisRepShiftRedSet ) 
         END (* IF *) 
       ; IF NOT IntSets . IsEmpty ( RisRepRedRedSet ) 
         THEN 
-          SemError0 ( AFT . I_RepairedReduceReduceConflict ) 
+          Messages . SemError0 ( AFT . I_RepairedReduceReduceConflict ) 
         ; Infos . WriteTokSet ( Gram , RisRepRedRedSet ) 
         END (* IF *) 
       ; IF NOT IntSets . IsEmpty ( RepReadRedRedSet ) 
         THEN 
-          SemError0 ( AFT . I_RepairedShiftReduceReduceConflict ) 
+          Messages . SemError0 ( AFT . I_RepairedShiftReduceReduceConflict ) 
         ; Infos . WriteTokSet ( Gram , RepReadRedRedSet ) 
         END (* IF *) 
       ; IF NOT IntSets . IsEmpty ( RisAutoRepShiftRedSet ) 
         THEN 
-          SemError0 ( AFT . W_DefaultRepairedShiftReduceConflict ) 
+          Messages . SemError0 ( AFT . W_DefaultRepairedShiftReduceConflict ) 
         ; Infos . WriteTokSet ( Gram , RisAutoRepShiftRedSet ) 
         END (* IF *) 
       ; IF NOT IntSets . IsEmpty ( RisAutoRepRedRedSet ) 
         THEN 
-          SemError0 ( AFT . W_DefaultRepairedReduceReduceConflict ) 
+          Messages . SemError0 ( AFT . W_DefaultRepairedReduceReduceConflict ) 
         ; Infos . WriteTokSet ( Gram , RisAutoRepRedRedSet ) 
         END (* IF *) 
       ; IF NOT IntSets . IsEmpty ( RisAutoRepShiftRedRedSet ) 
         THEN 
-          SemError0 ( AFT . W_DefaultRepairedShiftReduceReduceConflict ) 
+          Messages . SemError0
+            ( AFT . W_DefaultRepairedShiftReduceReduceConflict ) 
         ; Infos . WriteTokSet ( Gram , RisAutoRepShiftRedRedSet ) 
         END (* IF *) 
       ; IF VerboseDebug THEN DebugEnd ( ) END (* IF *) 
@@ -722,7 +723,7 @@ FALSE AND              IntSets . IsElement ( WItem . ReadTok , LListSet )
            END (* IF *) 
          END (* WITH WState *) 
       END (* FOR All states *) 
-    ; TextOnly 
+    ; Messages . TextOnly 
         ( MessageCodes . Image ( AFT . I_Non_LR_State_Count ) 
           & " = " 
           & Fmt . Int ( LAttemptedRepairSetCt ) 

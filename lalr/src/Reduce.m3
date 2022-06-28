@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -33,7 +33,7 @@ MODULE Reduce
 ; IMPORT LRTable 
 ; FROM LRTable IMPORT NontermKindTyp
 ; IMPORT MessageCodes 
-; FROM Messages IMPORT SemErrorText 
+; IMPORT Messages 
 ; IMPORT PortTypes 
 
 ; TYPE AFT = MessageCodes . T 
@@ -132,7 +132,7 @@ MODULE Reduce
       DO IF RTok >= LbeStd . Tok__FirstLangDep 
             AND NOT IntSets . IsElement ( RTok , DerivableSet ) 
          THEN 
-           SemErrorText 
+           Messages . SemErrorText 
              ( " " & Gram . tokImage ( RTok ) 
              , AFT . W_Terminal_is_not_derivable 
              ) 
@@ -147,7 +147,7 @@ MODULE Reduce
 (* REVIEW:  ^Isn't this identically true because of loop bounds? *) 
             AND NOT IntSets . IsElement ( RTok , BuildableSet ) 
         THEN 
-          SemErrorText 
+          Messages . SemErrorText 
             ( " " & Gram . tokImage ( RTok ) 
             , AFT . W_abstract_nonterminal_is_not_buildable 
             ) 
@@ -161,7 +161,7 @@ MODULE Reduce
             IN LRTable . NontermKindSetShouldBeDerivable 
             AND NOT IntSets . IsElement ( RTok , DerivableSet ) 
         THEN 
-          SemErrorText 
+          Messages . SemErrorText 
             ( " " & Gram . tokImage ( RTok ) 
             , AFT . W_Concrete_nonterminal_is_not_derivable 
             ) 
@@ -240,12 +240,12 @@ MODULE Reduce
             THEN 
               IF WNtInfo . Used = 0 
               THEN 
-                SemErrorText 
+                Messages . SemErrorText 
                   ( " " & Gram . tokImage ( Nonterm ) 
                   , AFT . E_Concrete_nonterminal_has_no_production 
                   ) 
               ELSE 
-                SemErrorText 
+                Messages . SemErrorText 
                   ( " " & Gram . tokImage ( Nonterm ) 
                   , AFT . E_Concrete_nonterminal_does_not_terminate 
                   ) 
@@ -258,12 +258,12 @@ MODULE Reduce
                       unreachable, this may be useful information. *) 
                 IF WNtInfo . Used = 0 
                 THEN 
-                  SemErrorText 
+                  Messages . SemErrorText 
                     ( " " & Gram . tokImage ( Nonterm ) 
                     , AFT . I_Unreachable_concrete_nonterminal_has_no_production 
                     ) 
                 ELSE 
-                  SemErrorText 
+                  Messages . SemErrorText 
                     ( " " & Gram . tokImage ( Nonterm ) 
                     , AFT . I_Unreachable_concrete_nonterminal_does_not_terminate 
                     ) 
