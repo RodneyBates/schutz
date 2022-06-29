@@ -126,6 +126,7 @@ INTERFACE Worker
   : ClosureTyp (* The queued closure, or NIL. *) 
   <* LL.sup <= VBT.mu *> 
 
+(*
 ; PROCEDURE Failure 
     ( String1 : TEXT 
     ; String2 : TEXT 
@@ -138,7 +139,8 @@ INTERFACE Worker
   (* Worker thread calls this from inside an assertion failure.
      Failure does not return until it is known what to do, which could
      involve querying the user, if appropriate. 
-  *)    
+  *)
+*)
 
 ; PROCEDURE ReportAssertDialog  
     ( FailureAction : Failures . FailureActionTyp ) 

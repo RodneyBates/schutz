@@ -1471,7 +1471,7 @@ Enabled := FALSE ;
                 | CommandTyp . EndSweepSelection   
                 => EditWindow . ReplayEndSweepSelection ( Window ) 
 
-                | CommandTyp . WriteCheckpoint
+                | CommandTyp . WriteCheckpoint 
                 => UiDevel . ReplayWriteCheckpoint ( ) 
 
                 | CommandTyp . SetDebugLevel 

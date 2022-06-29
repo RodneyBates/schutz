@@ -969,7 +969,8 @@ EXPORTS Main
 
 ; BEGIN
     Misc . LoadYourself ( )
-    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *)  ; GetParams ( )
+    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *)
+  ; GetParams ( )
   ; SetDefaults ( ) 
   ; IF DoDisplayHelp 
     THEN 

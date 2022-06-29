@@ -8,7 +8,7 @@
 
 ;; File edit/src/resources/Schutz.fv
 
-(Shape %Fv_Window (Height 500 - 400 + Inf ) (Width 450 - 200 + Inf )
+(Shape %Fv_Window (Height 700 - 400 + Inf ) (Width 450 - 200 + Inf )
   ( Macro BG_COLOR ( ) '( 0.754 0.832 0.664 ) )
   (LabelFont (Family "new century schoolbook" ) ) 
   (Font "fixed" ) 
@@ -588,31 +588,30 @@
               (DarkShadow "SlateBlue")
       (Shape (Width 400 + Inf - 200) (Height 100 + Inf - 50)
         (VBox 
-           (Text Center (LabelFont (PointSize 240) ) "O H   N O !" ) 
+           (Text Center (LabelFont (PointSize 240) ) "O H   N O !" )
+           (Glue 2)
            (Text Center (LabelFont (PointSize 120) ) 
               "The usually marvelous Schutz editor has suffered a humiliating" 
            ) 
+           (Glue 2)
            (Text Center (LabelFont (PointSize 240) ) "RUNTIME ERROR!" ) 
            Ridge 
-           (HBox 
-             (Text LeftAlign "Location:" ) 
+           (HBox
+             (Shape (Width 30) (Text LeftAlign "Failure:" ) )
+             (TypeIn %Fv_Assert_Failure ReadOnly )
+           ) 
+           (HBox
+             (Shape (Width 30) (Text LeftAlign "Problem:") )
              (TypeIn %Fv_Assert_Location ReadOnly )
-           ) 
+           )
+           (Glue 5)
            (HBox
-             (Text LeftAlign "Problem:")
-             (TypeIn %Fv_Assert_Message ReadOnly )
-           ) 
-           (HBox
+              (Fill)
               (Shape (Width 0 + 1000)
                  (Rim(Pen 1) 
                    (Button %Fv_Assert_Backout "Back out")
               )  )
-              (Shape (Width 0 + 1000)
-                 (Rim(Pen 1) 
-                    ( Filter (Dormant TRUE) 
-                      ( Button %Fv_Assert_Proceed "Ignore and Proceed")
-                    ) 
-              )  )
+              (Fill)
               (Shape (Width 0 + 1000)
                  (Rim(Pen 1) 
                     ( Filter (Dormant TRUE) 
@@ -620,6 +619,14 @@
                     )
                  )
               )
+              (Fill)
+              (Shape (Width 0 + 1000)
+                 (Rim(Pen 1) 
+                    ( Filter (Dormant TRUE) 
+                      ( Button %Fv_Assert_Proceed "Ignore and Proceed")
+                    ) 
+              )  )
+              (Fill)
            ) 
         )
       )

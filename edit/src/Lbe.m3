@@ -182,7 +182,7 @@ EXPORTS Main
  (* ; Assertions . DefaultQueryProc := AssertDevel . AssertDialogCommandLine *) 
  (* ; Assertions . DefaultQueryProc := Assertions . NeverRaise *) 
     ; AssertDevel . DoStop := TRUE 
-    ; RTProcess . RegisterExitor ( Exitor )
+ (* ; RTProcess . RegisterExitor ( Exitor ) *)
     END SetDefaults 
 
 ; PROCEDURE GetArgs ( ) : BOOLEAN (* True iff should continue. *) 

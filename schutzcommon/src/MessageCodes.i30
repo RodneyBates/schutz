@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -13,7 +13,7 @@
    Various sed, sort, awk, cpp, etc. scripts extract the message codes
    from their uses in whatever source files contain them. 
    These and information derived from them are inserted, giving
-   file MessageCodes.I3, which is Modula-3.
+   file MessageCodes.i3, which is Modula-3.
 
    Be sure to edit MessageCodes.i30, not MessageCodes.i3 
 

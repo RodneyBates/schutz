@@ -43,13 +43,6 @@ INTERFACE Assertions
 (* Use this Thread.T subtype to create a thread with options about how
    to handle a failure.  Generally, query the user. *) 
 
-; TYPE xAssertThreadT
-    = Thread . T OBJECT
-        QueryProc : QueryProcTyp := AlwaysRaise
-      ; ThreadInfoRef : Failures . ThreadInfoRefTyp 
-   (* ; AssertAction : Failures . FailureActionTyp *)
-      END 
-
 ; VAR Checking : BOOLEAN := TRUE 
       (* Causes assertions to be checked. Clients can change it. *) 
 ; VAR RaiseOnFailure : BOOLEAN := FALSE 
@@ -118,7 +111,10 @@ INTERFACE Assertions
      do undo actions.
   *) 
 
-; VAR TerminatingNormally : BOOLEAN := FALSE 
+; VAR TerminatingNormally : BOOLEAN := FALSE
+
+  (* This is no longer needed.  RT errors are now caught by a callback
+     coded in Failures, registered as an alternative backstop.  *) 
   (* Set this true before terminating in any way, to notify any registered
      Exitor routine that it should not do anything.  This kludge is the only
      way I can think of, without changing the Modula-3 RT code, to allow an 

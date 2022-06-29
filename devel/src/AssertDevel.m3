@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -27,12 +27,38 @@ MODULE AssertDevel
 ; IMPORT UiRecPlay   
 ; IMPORT Worker 
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE WriteCheckpoint 
     ( ImageRef : PaintHs . ImageTransientTyp (* Noop if NIL. *) 
-    ; <* UNUSED *> Message : TEXT 
+    ; Message : TEXT 
     ; DoCreateVersion : BOOLEAN 
     ) 
+  (* Writes messages to stderr and shows them in a dialog box, if
+     interactive. *)
+  = VAR LResultMessage : TEXT
+  ; VAR LGui : BOOLEAN 
+
+  ; BEGIN
+      LGui := Worker . DoGuiActions ( ) 
+    ; LResultMessage 
+        := WriteCheckpointNoGui ( ImageRef , Message , DoCreateVersion )
+    ; IF LGui
+         AND LResultMessage # NIL AND NOT Text . Equal ( LResultMessage , "" )
+      THEN
+        UiDevel . ShowCheckpointNotice ( LResultMessage ) 
+      END (*IF *)
+    END WriteCheckpoint 
+
+; PROCEDURE WriteCheckpointNoGui  
+    ( ImageRef : PaintHs . ImageTransientTyp (* Noop if NIL. *) 
+    ; Message : TEXT 
+    ; DoCreateVersion : BOOLEAN 
+    ) 
+  : TEXT (* For display in a dialog box. *) (* May be NIL. *)
+  (* Returns messages, in case caller already has things locked
+     which would try to reaxquire the same mutex on same thread.
+  *)
+
 (* TODO: Is this really the right place for this procedure? *) 
 
   = VAR LCheckpointName : TEXT 
@@ -43,8 +69,9 @@ MODULE AssertDevel
 
   ; <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
-    BEGIN 
-      IF ImageRef # NIL 
+    BEGIN
+      LMessage := NIL  
+    ; IF ImageRef # NIL 
       THEN 
         LCheckpointName 
           := Misc . CheckpointName ( ImageRef . ItPers . IpAbsPklFileName )  
@@ -54,7 +81,6 @@ MODULE AssertDevel
             := Misc . AbsFileName ( Misc . CheckpointName ( DefaultFileName ) )
         END (* IF *) 
       ; ImageRef . ItPers . IpCrashCommand := UiRecPlay . CurrentCommand ( ) 
-      ; LGui := Worker . DoGuiActions ( ) 
       ; TRY 
           Files .WriteImagePickle 
             ( Images . PersistentImageToSave ( ImageRef , ForSave := FALSE )  
@@ -86,12 +112,10 @@ MODULE AssertDevel
                  & Wr . EOL 
                  & "\"" & LCheckpointName & "\""  
           ; IF DoCreateVersion 
-            THEN
-              LMessage := LMessage & Wr . EOL & "It is a new version." 
-            ELSE 
-              LMessage := LMessage & Wr . EOL & "It is NOT a new version." 
+            THEN LMessage := LMessage & Wr . EOL & "It is a new version." 
+            ELSE LMessage := LMessage & Wr . EOL & "It is NOT a new version." 
             END (* IF *) 
-          ; UiDevel . ShowCheckpointNotice ( LMessage ) 
+       (* ; UiDevel . ShowCheckpointNotice ( LMessage ) *) 
           END (* IF *) 
 
         EXCEPT (* Checkpoint write failed. *) 
@@ -112,7 +136,7 @@ MODULE AssertDevel
                  & "\"" & LCheckpointName & "\""  
                  & Wr . EOL 
                  & EMessage 
-          ; UiDevel . ShowCheckpointNotice ( LMessage ) 
+       (* ; UiDevel . ShowCheckpointNotice ( LMessage ) *) 
           END (* IF *) 
         ELSE 
           Wr . PutText 
@@ -127,21 +151,24 @@ MODULE AssertDevel
               := "Unable to write a checkpoint to file:" 
                  & Wr . EOL 
                  & "\"" & LCheckpointName & "\"" 
-          ; UiDevel . ShowCheckpointNotice ( LMessage ) 
+       (* ; UiDevel . ShowCheckpointNotice ( LMessage ) *) 
           END (* IF *) 
         END (* TRY EXCEPT *) 
       ELSE 
         Wr . PutText ( Stdio . stderr , "No Image to checkpoint." & Wr . EOL ) 
       END (* IF *) 
     ; Wr . Flush ( Stdio . stderr )
-    END WriteCheckpoint 
+    ; RETURN LMessage 
+    END WriteCheckpointNoGui  
 
-(* VISIBLE: *) 
-; PROCEDURE CheckpointForFailure ( CrashCode : MessageCodes . T ) 
+(*EXPORTED*) 
+; PROCEDURE CheckpointForFailure
+    ( CrashCode : MessageCodes . T ; DisplayGui := TRUE )
+  : TEXT (* Message to user. *)  
 
   = VAR LWindow : PaintHs . WindowRefTyp 
   ; VAR LImageRef : PaintHs . ImageTransientTyp 
-  ; VAR LMessage : TEXT 
+  ; VAR LMessage , LReason: TEXT 
 
   ; <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -166,13 +193,22 @@ MODULE AssertDevel
       ; IF LImageRef # NIL 
         THEN 
           LImageRef . ItPers . IpCrashCode := ORD ( CrashCode )  
-        ; LMessage := MessageCodes . Image ( CrashCode ) 
-        ; WriteCheckpoint ( LImageRef , LMessage , DoCreateVersion := TRUE ) 
+        ; LReason := MessageCodes . Image ( CrashCode ) 
+        ; IF DisplayGui
+          THEN
+            WriteCheckpoint ( LImageRef , LReason , DoCreateVersion := TRUE )
+          ; LMessage := "" 
+          ELSE 
+            LMessage
+              := WriteCheckpointNoGui
+                   ( LImageRef , LReason , DoCreateVersion := TRUE )
+(* TODO: Something with LMessage. *) 
+          END (* IF *) 
         END (* IF *) 
       END (* IF *) 
     END CheckpointForFailure 
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE AssertDialogCommandLine 
     ( <*UNUSED*> String1 : TEXT 
     ; <*UNUSED*> String2 : TEXT 
@@ -201,7 +237,7 @@ MODULE AssertDevel
           & "ASSERTION FAILURE!" 
           & Wr . EOL  
         ) 
-    ; CheckpointForFailure ( Code ) 
+    ; EVAL CheckpointForFailure ( Code ) 
     ; IF DoStop 
       THEN 
         Wr . PutText 
@@ -290,7 +326,7 @@ MODULE AssertDevel
           & "RUNTIME ERROR!" 
           & Wr . EOL  
         ) 
-    ; CheckpointForFailure ( MessageCodes . T . RuntimeError ) 
+    ; EVAL CheckpointForFailure ( MessageCodes . T . RuntimeError ) 
     ; IF DoStop 
       THEN 
         Wr . PutText 
@@ -306,12 +342,14 @@ MODULE AssertDevel
       END (* IF *) 
     END InnerRuntimeFailureDialog 
 
-(* VISIBLE: *) 
+(*EXPORTED*) 
 ; PROCEDURE RuntimeFailureDialog ( ) 
   (* Conduct a command line dialog about a runtime error. *) 
 
   = BEGIN 
-      IF NOT Assertions . TerminatingNormally
+      IF
+TRUE OR
+         NOT Assertions . TerminatingNormally
       THEN 
         InnerRuntimeFailureDialog ( ) 
       END (* IF *) 

@@ -194,9 +194,7 @@ UNSAFE MODULE Failures
   = VAR LResult : TEXT
 
   ; BEGIN
-      IF Exc = NIL
-      THEN RETURN "<unknown>"
-      ELSIF Exc . name = NIL 
+      IF Exc = NIL OR Exc . name = NIL 
       THEN RETURN "<unknown>"
       ELSE
         LResult := M3toC . StoT ( LOOPHOLE ( Exc . name , ADDRESS ) )
@@ -321,9 +319,28 @@ UNSAFE MODULE Failures
     ; RTIO . PutText ( Wr . EOL )
     ; RTIO . Flush ( ) 
     ; RTProcess.Crash (NIL) 
-    END Crash 
+    END Crash
 
-; PROCEDURE Backstop ( VAR Act : RT0 . RaiseActivation ; raises : BOOLEAN )
+; CONST SecondaryMap 
+   = ARRAY BOOLEAN (* wasBlocked *)
+     OF RuntimeError . T
+          { RuntimeError . T . UnhandledException
+          , RuntimeError . T . BlockedException
+          }
+
+; PROCEDURE BackstopPrimary
+    ( VAR Act : RT0 . RaiseActivation ; wasBlocked : BOOLEAN )
+  (* Turn the fault into a secondary RT error and reraise. *)
+
+  = BEGIN
+      Act . un_except := Act . exception
+    ; Act . un_arg    := Act . arg
+    ; Act . exception := RuntimeError.Self ( )
+    ; Act . arg := LOOPHOLE ( ORD ( SecondaryMap [ wasBlocked ] ) , ADDRESS ) 
+    ; RTException . Raise ( Act ) 
+    END BackstopPrimary 
+
+; PROCEDURE Backstop ( VAR Act : RT0 . RaiseActivation ; wasBlocked : BOOLEAN )
     RAISES ANY
   (* Come here at raise time of an exception that is either blocked
      or unhandled. *) 
@@ -337,98 +354,89 @@ UNSAFE MODULE Failures
   ; VAR LKindMsg : TEXT 
   
   ; BEGIN
-      TRY (* FINALLY *) 
-        EVAL RTException . SetBackstop ( GOldBackstop )
-        (* ^Temporarily revert to the RT system's default backstop
-            so we can delegate to it. *)
-      ; LExc := Act . exception 
-      ; IF LExc # RuntimeError . Self ( ) (* Programmer-declared exception. *) 
-        THEN RTException . InvokeBackstop ( Act , raises )
-             (* ^Will turn it into a secondary RT error. *)
-        ELSE (* RTExcepton.E => runtime error. *) 
-          LIntArg := LOOPHOLE ( Act . arg , INTEGER ) 
-        ; IF LIntArg < ORD ( FIRST ( RuntimeError . T ) ) 
-             OR LIntArg > ORD ( LAST ( RuntimeError . T ) )
-          THEN LIntArg := ORD ( RuntimeError . T . Unknown )
-          END (* IF *)
-        ; IF NOT VAL ( LIntArg , RuntimeError . T ) IN SecondaryRtes  
-          THEN (* Primary RT error. *)
-            RTException . InvokeBackstop ( Act , raises )
-            (* ^Will turn it into a secondary RT error. *)
-          ELSE (* Secondary RT error (Unhandled or blocked), which
-                  is now also Unhandled or blocked. *)
-            LIntUnArg := LOOPHOLE ( Act . un_arg , INTEGER ) 
-          ; IF LIntUnArg < ORD ( FIRST ( RuntimeError . T ) ) 
-               OR LIntUnArg > ORD ( LAST ( RuntimeError . T ) )
-            THEN LIntUnArg := ORD ( RuntimeError . T . Unknown )
-            END (* IF *)
-          ; CASE <* NOWARN *> VAL ( LIntArg , RuntimeError . T )
-            OF RuntimeError . T . UnhandledException
-            => LKindMsg := "Unhandled: " 
-            | RuntimeError . T . BlockedException
-            => LKindMsg := "Not in RAISES clause: "
-            END (* CASE *) 
-          ; IF Act . un_except = BackoutRef ( )
-               (* Primary was Failures.Backout. *) 
-            THEN 
-              Crash ( Act , LIntArg , LKindMsg , "Failures.Backout" ) 
-            ELSIF Act . exception = IgnoreRef ( ) 
-               (* Primary was Failures.Ignore.  This should not happen
-                  in the absence of bugs in Assertions, which should
-                  always catch Ignore. *) 
-            THEN 
-              Crash ( Act , LIntArg , LKindMsg , "Failures.Ignore" )
-            ELSE (* Client code has passed on two chances to catch: the original
-                    exception and a secondary exception (RT error: unhandled or
-                    blocked), which also is now unhandled or blocked.  Now give
-                    the human user some options. *)
-              IF Act . un_except = AssertionFailureRef ( )
-              THEN (* Only for AssertionFailure, is it clear that just raising
-                      and catching an exception (Ignore) will resume execution
-                      at the right place to ignore. *)  
-                LAllowedActions := Assertions . AllowedActions 
-              ELSE 
-                LAllowedActions
-                  := FailureActionSetTyp
-                       { FailureActionTyp . FaCrash
-                       , FailureActionTyp . FaBackout
-                       }
-              END (* IF *)
-            ; LThreadInfoRef := ThreadInfoRef ( ) 
-            ; LAction
-                := LThreadInfoRef . QueryProc
-                     ( Act
-                     , LKindMsg & ExcNameInternal ( Act , LExc , LIntArg )
-                     , ActivationImage ( Act ) 
-                     , LAllowedActions
-                     ) 
-            ; CASE LAction 
-              OF FailureActionTyp . FaBackout  
-                => (* Change to Failures.Backout, which client code
-                      can catch to recover from the original exception. *)
-                  Act . exception := BackoutRef ( ) 
-                ; RTException . Raise ( Act ) 
-              | FailureActionTyp . FaIgnore 
-                => (* This will work only when the original exception was
-                      Assertions.AssertionFailure, and thus something
-                      in Assertions is in the call chain, where it can catch
-                      Failures.Ignore and return without action action. *)
-                  Act . exception := IgnoreRef ( ) 
-                ; RTException . Raise ( Act ) 
-              | FailureActionTyp . FaCrash 
-                => Crash
-                     ( Act
-                     , LIntArg
-                     , LKindMsg
-                     , ExcNameInternal ( Act , LExc , LIntArg )
-                     ) 
-              END (* CASE *)
-            END (* IF *)
-          END (* IF *) 
+       LExc := Act . exception 
+    ; IF LExc # RuntimeError . Self ( ) (* Programmer-declared exception. *) 
+      THEN BackstopPrimary ( Act , wasBlocked )
+      ELSE (* RTExcepton.E => runtime error. *) 
+        LIntArg := LOOPHOLE ( Act . arg , INTEGER ) 
+      ; IF LIntArg < ORD ( FIRST ( RuntimeError . T ) ) 
+           OR LIntArg > ORD ( LAST ( RuntimeError . T ) )
+        THEN LIntArg := ORD ( RuntimeError . T . Unknown )
         END (* IF *)
-      FINALLY (* Rehook ourself as backstop, for next time. *) 
-        EVAL RTException . SetBackstop ( Backstop )
-      END (* FINALLY *) 
+      ; IF NOT VAL ( LIntArg , RuntimeError . T ) IN SecondaryRtes  
+        THEN (* Primary RT error. *)
+          BackstopPrimary ( Act , wasBlocked )
+        ELSE (* Secondary RT error (Unhandled or blocked), which
+                is now also Unhandled or blocked. *)
+          LIntUnArg := LOOPHOLE ( Act . un_arg , INTEGER ) 
+        ; IF LIntUnArg < ORD ( FIRST ( RuntimeError . T ) ) 
+             OR LIntUnArg > ORD ( LAST ( RuntimeError . T ) )
+          THEN LIntUnArg := ORD ( RuntimeError . T . Unknown )
+          END (* IF *)
+        ; CASE <* NOWARN *> VAL ( LIntArg , RuntimeError . T )
+          OF RuntimeError . T . UnhandledException
+          => LKindMsg := "Unhandled: " 
+          | RuntimeError . T . BlockedException
+          => LKindMsg := "Not in RAISES clause: "
+          END (* CASE *) 
+        ; IF Act . un_except = BackoutRef ( )
+             (* Primary was Failures.Backout. *) 
+          THEN 
+            Crash ( Act , LIntArg , LKindMsg , "Failures.Backout" ) 
+          ELSIF Act . exception = IgnoreRef ( ) 
+             (* Primary was Failures.Ignore.  This should not happen
+                in the absence of bugs in Assertions, which should
+                always catch Ignore. *) 
+          THEN 
+            Crash ( Act , LIntArg , LKindMsg , "Failures.Ignore" )
+          ELSE (* Client code has passed on two chances to catch: the original
+                  exception and a secondary exception (RT error: unhandled or
+                  blocked), which also is now unhandled or blocked.  Now give
+                  the human user some options. *)
+            IF Act . un_except = AssertionFailureRef ( )
+            THEN (* Only for AssertionFailure, is it clear that just raising
+                    and catching an exception (Ignore) will resume execution
+                    at the right place to ignore. *)  
+              LAllowedActions := Assertions . AllowedActions 
+            ELSE 
+              LAllowedActions
+                := FailureActionSetTyp
+                     { FailureActionTyp . FaCrash
+                     , FailureActionTyp . FaBackout
+                     }
+            END (* IF *)
+          ; LThreadInfoRef := ThreadInfoRef ( ) 
+          ; LAction
+              := LThreadInfoRef . QueryProc
+                   ( Act
+                   , LKindMsg & ExcNameInternal ( Act , LExc , LIntArg )
+                   , ActivationImage ( Act ) 
+                   , LAllowedActions
+                   ) 
+          ; CASE LAction 
+            OF FailureActionTyp . FaBackout  
+              => (* Change to Failures.Backout, which client code
+                    can catch to recover from the original exception. *)
+                Act . exception := BackoutRef ( ) 
+              ; RTException . Raise ( Act ) 
+            | FailureActionTyp . FaIgnore 
+              => (* This will work only when the original exception was
+                    Assertions.AssertionFailure, and thus something
+                    in Assertions is in the call chain, where it can catch
+                    Failures.Ignore and return without action action. *)
+                Act . exception := IgnoreRef ( ) 
+              ; RTException . Raise ( Act ) 
+            | FailureActionTyp . FaCrash 
+              => Crash
+                   ( Act
+                   , LIntArg
+                   , LKindMsg
+                   , ExcNameInternal ( Act , LExc , LIntArg )
+                   ) 
+            END (* CASE *)
+          END (* IF *)
+        END (* IF *) 
+      END (* IF *)
     END Backstop 
 
 (* Getting RT0.ExceptionPtr values for certain declared exceptions: *)

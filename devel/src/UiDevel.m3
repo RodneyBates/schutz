@@ -1419,18 +1419,10 @@ MODULE UiDevel
       => RETURN 
       END 
     ; TRY 
-        LSavedCallback := Assertions . DefaultQueryProc 
-      ; Assertions . DefaultQueryProc := Worker . Failure 
-      ; TRY 
-          Assertions . CantHappenText ( "User forced assertion" )  
-        EXCEPT 
-          RuntimeError . E => Assertions . DoNothing ( ) 
-        | AssertionFailure  
-          => Assertions . DoNothing ( ) 
-        END (* TRY EXCEPT *) 
-      FINALLY
-        Assertions . DefaultQueryProc := LSavedCallback 
-      END (* TRY FINALLY *) 
+        Assertions . CantHappenText ( "User forced assertion" )  
+      EXCEPT
+        Failures . Backout => (* Necessary? Would be caught outer? *)
+      END (* TRY EXCEPT *) 
     END ForceAssertWorkProc 
 
 (* VISIBLE: *) 

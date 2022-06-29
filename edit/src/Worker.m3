@@ -462,9 +462,10 @@ MODULE Worker
       END (* LOCK *)  
     END BecomeIdle  
 
-(*EXPORTED*) 
+(*EXPORTED*)
+(* Registered as a callback. *)
 ; PROCEDURE FailureQuery
-    ( ActPtr : RT0 . ActivationPtr
+    ( READONLY Act : RT0 . RaiseActivation
     ; ExceptionText , ActivationText : TEXT 
     ; AllowedActions : Failures . FailureActionSetTyp
     )
@@ -478,14 +479,14 @@ MODULE Worker
      command line in a dialog, and queries the user's desire what to do. 
   *)    
 
-  = VAR LInteractive : BOOLEAN 
+  = VAR LInteractive : BOOLEAN
+  ; VAR LMessage : TEXT 
   ; VAR LResult : Failures . FailureActionTyp 
 
   ; BEGIN 
-      IF DoWriteCheckpoint 
-      THEN 
-        AssertDevel . CheckpointForFailure ( CrashCode ) 
-      END (* IF *) 
+      LMessage
+        := AssertDevel . CheckpointForFailure 
+             ( MessageCodes . T . NullCode , DisplayGui := FALSE ) 
     ; LOCK Mu 
       DO IF StoredClosure # NIL
         THEN LInteractive := StoredClosure . IsInteractive 
@@ -495,8 +496,9 @@ MODULE Worker
         END (* IF *) 
       END (* LOCK *)
     ; IF LInteractive 
-      THEN  
-        UiDevel . ShowGuiAssertDialog ( FailureText , ActivationText ) 
+      THEN
+(* TODO: put message into the dialog. *)
+        UiDevel . ShowGuiAssertDialog ( ExceptionText , ActivationText ) 
         (* It would be more obviously right to show and remove this dialog  
            while holding Mu, but I can't figure out a way that satisfies a 
            consistent lock order.  In any case, unlocking Mu is OK, because
@@ -513,15 +515,17 @@ MODULE Worker
         ; LResult := StoredFailureAction 
         END (* LOCK *)  
       ; UiDevel . RemoveGuiAssertDialog ( ) 
-      ELSE 
+      ELSE
+(* TODO: Query command line, depending on option. *) 
         Assertions . DoTerminate := TRUE 
-      ; LResult := TRUE (* Always raise AssertionFailure in batch. *) 
+      ; LResult := Failures . FailureActionTyp . FaCrash 
       END (* IF *) 
-    ; RETURN 
-    END FailureQuery 
-
+    ; RETURN LResult 
+    END FailureQuery
+    
+(*Old version: remove someday. 
 (*EXPORTED*) 
-; PROCEDURE Failure 
+; PROCEDURE xFailure 
     ( String1 : TEXT 
     ; String2 : TEXT 
     ; CrashCode : MessageCodes . T 
@@ -568,12 +572,12 @@ MODULE Worker
           DO Thread . Wait ( Mu , WaitingForAssertDialog ) 
           END (* WHILE *) 
         ; CASE StoredFailureAction 
-          OF Failures . FailureActionTyp . FaTerminate
+          OF Failures . FailureActionTyp . FaCrash
           => Assertions . DoTerminate := TRUE 
           ; LResult := TRUE (* Raise AssertionFailure. *) 
           | Failures . FailureActionTyp . FaBackout 
           => LResult := TRUE (* Raise AssertionFailure. *) 
-          | Failures . FailureActionTyp . FaProceed   
+          | Failures . FailureActionTyp . FaIgnore   
           => LResult := FALSE (* Do not raise AssertionFailure. *) 
           END (* CASE *) 
         END (* LOCK *)  
@@ -583,7 +587,8 @@ MODULE Worker
       ; LResult := TRUE (* Always raise AssertionFailure in batch. *) 
       END (* IF *) 
     ; RETURN LResult 
-    END Failure 
+    END Failure
+*)
 
 (*EXPORTED*) 
 ; PROCEDURE ReportAssertDialog  
@@ -608,8 +613,9 @@ MODULE Worker
 
   = VAR LClosure : ClosureTyp 
 
-  ; BEGIN 
-      LOOP 
+  ; BEGIN
+      Failures . RegisterQueryProc ( FailureQuery ) 
+    ; LOOP 
         GetWork ( LClosure  ) 
       ; TRY 
           LClosure . apply ( ) 
