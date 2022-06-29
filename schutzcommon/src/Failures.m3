@@ -414,7 +414,7 @@ UNSAFE MODULE Failures
                    , LAllowedActions
                    ) 
           ; CASE LAction 
-            OF FailureActionTyp . FaBackout  
+            OF FailureActionTyp . FaBackout 
               => (* Change to Failures.Backout, which client code
                     can catch to recover from the original exception. *)
                 Act . exception := BackoutRef ( ) 
