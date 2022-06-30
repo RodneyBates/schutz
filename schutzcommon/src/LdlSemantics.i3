@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -19,7 +19,7 @@ INTERFACE LdlSemantics
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT AssertionFailure    
+; FROM Failures IMPORT Backout    
 ; IMPORT AstView 
 ; IMPORT EstHs 
 ; IMPORT IntSets 
@@ -249,7 +249,7 @@ INTERFACE LdlSemantics
     ; LdlLang : LbeStd . LangTyp := LbeStd . LangNull 
     ; VAR Info : LangInfoRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Set initial values of fields of Info^. *) 
 
 (* Semantic attributes for individual tree nodes, attached via 
@@ -425,11 +425,11 @@ INTERFACE LdlSemantics
 ; PROCEDURE MkAstRef 
     ( LangInfo : LangInfoRefTyp ; NodeNo : LbeStd . EstNodeNoTyp ) 
   : AstView . AstRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE MapAstRef 
     ( LangInfo : LangInfoRefTyp ; AstRef : AstView . AstRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Store a rule in the SemMap of LangInfo, mapping the node number
      of AstRef to its node pointer, if non-NIL.
      PRE: the SemMap must be big enough.
@@ -440,7 +440,7 @@ INTERFACE LdlSemantics
     ( LangInfo : LangInfoRefTyp 
     ; READONLY AstRefs : AstView . AstRefArrayTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* For all element of AstRefs, call MapAstRef. *) 
 
 ; PROCEDURE SemDeclOfTok ( LangInfo : LangInfoRefTyp ; Tok : LbeStd . TokTyp ) 
@@ -523,7 +523,7 @@ INTERFACE LdlSemantics
 ; PROCEDURE InsertionString 
     ( LdlString : SharedStrings . T ; Tok : LbeStd . TokTyp ) 
   : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Convert a quoated string, as in an Ldl definition, into the string
      to be displayed, by removing quotes and escape sequences.
      PRE: LdlString is quoted. 
@@ -535,7 +535,7 @@ INTERFACE LdlSemantics
 ; PROCEDURE PlaceholderString 
     ( LdlString : SharedStrings . T ; Tok : LbeStd . TokTyp ) 
   : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Prepend and append placeholder delimiters to LdlString, if they
      are not already there.
   *) 
@@ -548,34 +548,34 @@ INTERFACE LdlSemantics
 ; PROCEDURE ModTokString 
     ( LdlString : SharedStrings . T ; Tok : LbeStd . TokTyp ) 
   : SharedStrings . T 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
 
 ; PROCEDURE ModTokText ( FString : SharedStrings . T ) : TEXT 
 
 ; PROCEDURE SublistString 
     ( LdlString : SharedStrings . T ; Tok : LbeStd . TokTyp ) 
   : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE EmptyListString 
     ( LdlString : SharedStrings . T ; Tok : LbeStd . TokTyp ) 
   : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE SingletonListString 
     ( LdlString : SharedStrings . T ; Tok : LbeStd . TokTyp ) 
   : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE PluralListString 
     ( LdlString : SharedStrings . T ; Tok : LbeStd . TokTyp ) 
   : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE PartialString 
     ( LdlString : SharedStrings . T ; Tok : LbeStd . TokTyp ) 
   : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; TYPE AnalyzeProcTyp 
     = PROCEDURE  
@@ -583,7 +583,7 @@ INTERFACE LdlSemantics
         ; LdlLang : LbeStd . LangTyp := LbeStd . LangNull 
         ) 
       : LangInfoRefTyp  
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE RegisterAnalyzer 
     ( Lang : LbeStd . LangBuiltinTyp ; Analyzer : AnalyzeProcTyp ) 
@@ -594,14 +594,14 @@ INTERFACE LdlSemantics
     ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
     ) 
   : LangInfoRefTyp 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* If Lang is a builtin language, call its registered analyzer,
      passing Est and Lang to it.
   *) 
 
 ; PROCEDURE ManLRGen  
     ( LangInfo : LangInfoRefTyp ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Do LR generation for handwritten grammar. *) 
 
 ; PROCEDURE CountOfNonclassTokSetProductions 
@@ -616,7 +616,7 @@ INTERFACE LdlSemantics
     ; ClassMembers : IntSets . T 
     ; ReplaceListCardToks : BOOLEAN := FALSE 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* For all members M of the class identified by ClassTok that are not 
      classes themselves, generate a singleton production ClassTok ::= M.
   *) 
@@ -668,12 +668,12 @@ INTERFACE LdlSemantics
 
 ; PROCEDURE WriteLdlChildInterfaceToStream 
     ( Writer : Wr . T ; LangInfo : LangInfoRefTyp ; InterfaceName : TEXT ) 
-  RAISES { AssertionFailure , Thread . Alerted , Wr . Failure }
+  RAISES { Backout , Thread . Alerted , Wr . Failure }
   (* Write a child-name-declaring interface to an already-open Wr.T *) 
 
 ; PROCEDURE WriteLdlChildInterfaceForName 
     ( LangInfo : LangInfoRefTyp ; LangName : TEXT ) 
-  RAISES { AssertionFailure , Thread . Alerted , Wr . Failure }
+  RAISES { Backout , Thread . Alerted , Wr . Failure }
   (* Write a child-name-declaring interface to a created file. *) 
 
 ; PROCEDURE WriteInitTokStringsModuleToStream  
@@ -709,7 +709,7 @@ INTERFACE LdlSemantics
     ; Gram : LRTable . GrammarTyp 
     ; ProdCount : LRTable . ProdNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Do the LR generation on Gram of LangInfo, with ProdCount productions. *) 
 
 ; PROCEDURE AssignCosts 
@@ -796,7 +796,7 @@ INTERFACE LdlSemantics
     ; Card : ListCardTyp 
     ) 
   : LbeStd . TokTyp  
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* The list cardinality token for Card of list ListTok. 
      Identity if ListTok is not known to be an abstract list token. 
   *) 
@@ -808,7 +808,7 @@ INTERFACE LdlSemantics
     ; MustBePresent : BOOLEAN := FALSE  
     ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* An atom (WRT LangInfo) token for the pair (ListAsTok,CardSet),
      allocated in the token space of GcsChildToks.
   *) 
@@ -823,7 +823,7 @@ INTERFACE LdlSemantics
     ; MustBePresent : BOOLEAN := FALSE  
     ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* WARNING: This function has SIDE EFFECTS! 
               1) Adds a rule to LangInfo ^ . ClassTable, if not there
               2) Increments its UseCount by UseCountIncrement 
@@ -843,7 +843,7 @@ INTERFACE LdlSemantics
     ; MustBePresent : BOOLEAN := FALSE  
     ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* An atom (WRT LangInfo) token for the token string Right,
      allocated in the token space of GcsChildToks.
   *) 
@@ -852,7 +852,7 @@ INTERFACE LdlSemantics
   (* The name following "LDL" in an ldl description. *) 
 
 ; PROCEDURE StackTokCounts1 ( LangInfo : LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Stack up the counts of token kinds in LangInto.TokCounts, into
      LangInfo.TokPart, with each member of the partition set to the 
      starting token number for its namesake tokens.  Do this for
@@ -871,7 +871,7 @@ INTERFACE LdlSemantics
   *) 
 
 ; PROCEDURE CheckTokPart ( LangInfo : LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; END LdlSemantics 
 . 

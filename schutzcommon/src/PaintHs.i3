@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -15,6 +15,7 @@ INTERFACE PaintHs
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 ; IMPORT LangUtil 
 ; IMPORT LbeStd 
 ; IMPORT Marks 
@@ -320,11 +321,11 @@ INTERFACE PaintHs
 
 ; PROCEDURE LinkLineMarkToLeft 
     ( InsertToLeftOfRef : LineMarkTyp ; RefToInsert : LineMarkMeatTyp ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE LinkLineMarkToRight 
     ( InsertToRightOfRef : LineMarkTyp ; RefToInsert : LineMarkMeatTyp ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE UnlinkLineMark ( LineMark : LineMarkMeatTyp ) 
   (* Delete LineMark from whatever list it is in. 
@@ -343,7 +344,7 @@ INTERFACE PaintHs
     ; PredMark : LineMarkTyp 
     ; Image : ImageTransientTyp := NIL 
     )
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Higher-level.  Links in and also takes care of IpMarkCt and LrHasMark. *) 
 
 ; PROCEDURE InsertLineMarkToLeft 
@@ -351,7 +352,7 @@ INTERFACE PaintHs
     ; SuccMark : LineMarkTyp 
     ; Image : ImageTransientTyp := NIL 
     )
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Higher-level.  Links in and also takes care of IpMarkCt and LrHasMark. *) 
 
 ; PROCEDURE InsertLineMark
@@ -367,7 +368,7 @@ INTERFACE PaintHs
       *) 
     )
   : BOOLEAN (* Success. *) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Even higher-level yet.  Sorts into the right place. *) 
 
 ; PROCEDURE DeleteLineMark
@@ -383,7 +384,7 @@ INTERFACE PaintHs
 
 ; PROCEDURE CompareLineMarks ( Left , Right : LineMarkMeatTyp ) 
   : [ - 1 .. 1 ] 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Takes into account LmTokMark , LmLineNo, and LmCharPos *) 
 
 ; PROCEDURE GetMarksInOrder 
@@ -392,20 +393,20 @@ INTERFACE PaintHs
     ; VAR Left : LineMarkMeatTyp
     ; VAR Right : LineMarkMeatTyp
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Put Mark1 and Mark2 into nondescending order. *) 
 
 ; PROCEDURE BruteForceVerifyLineMarks 
     ( ImageTrans : ImageTransientTyp ; DoCheckOrder : BOOLEAN := TRUE ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE TextAttrArrayCt 
     ( ImageTrans : ImageTransientTyp ) : CARDINAL 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE TextAttrElemCt 
     ( ImageTrans : ImageTransientTyp ) : CARDINAL 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE DisplayTextAttrStats ( ImageTrans : ImageTransientTyp ) 
 

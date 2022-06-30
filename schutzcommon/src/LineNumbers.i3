@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -13,21 +13,21 @@ INTERFACE LineNumbers
 ; IMPORT Wr 
 ; IMPORT Thread 
 
-; IMPORT PaintHs  
 ; IMPORT EstHs  
+; FROM Failures IMPORT Backout 
 ; IMPORT LbeStd 
-; IMPORT Assertions 
+; IMPORT PaintHs  
 
 ; PROCEDURE LineCtExport ( ImageRef : PaintHs . ImageTransientTyp ) 
   : LbeStd . LineNoTyp 
-  RAISES { Assertions . AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Count of lines as would be exported to a text file, i.e., with
      proposed but not accepted syntactic corrections removed. *)  
 
 ; PROCEDURE LineCtDisplay 
     ( ImageRef : PaintHs . ImageTransientTyp ) 
   : LbeStd . LineNoTyp 
-  RAISES { Assertions . AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Count of lines as would appear in a window.  This can differ
      from LineCtExport in case of repairs shown in a window but not in a file. 
   *)  
@@ -35,7 +35,7 @@ INTERFACE LineNumbers
 
 ; PROCEDURE WriteDisplay 
     ( ImageRef : PaintHs . ImageTransientTyp ; WrT : Wr . T ) 
-  RAISES { Assertions . AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Write to WrT, by repeated invocation of LineMarks . GetNextLine *) 
 
 ; PROCEDURE EstimateOfLinesInSubtree 
@@ -43,7 +43,7 @@ INTERFACE LineNumbers
     ; LineBreakCt : LbeStd . LineNoSignedTyp 
     ) 
   : LbeStd . LineNoSignedTyp  
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Actually, of the number of new lines at the top level. *) 
 
 ; PROCEDURE EstimateLineNo
@@ -52,7 +52,7 @@ INTERFACE LineNumbers
     ; VAR LineNo : LbeStd . LineNoTyp 
     ; VAR IsExact : BOOLEAN 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; END LineNumbers 
 . 

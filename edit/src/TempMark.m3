@@ -1,6 +1,7 @@
+
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -24,7 +25,8 @@ MODULE TempMark
 
 ; IMPORT Assertions 
 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure  
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout   
 ; IMPORT Display  
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
@@ -60,7 +62,7 @@ MODULE TempMark
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; VAR ParseInfo : ParseHs . ParseInfoTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   (* Convert the marks in an Est into a temp mark list 
      and mark bits in the Est nodes. 
@@ -118,7 +120,7 @@ MODULE TempMark
   ; VAR BtmEstListChildrenToPass : LbeStd . EstChildNoTyp 
 
   ; PROCEDURE BtmEnterLine ( LinesRef : PaintHs . LinesRefMeatTyp )  
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = VAR LLineTextPos : LbeStd . CharNoTyp 
 
@@ -152,7 +154,7 @@ MODULE TempMark
       END BtmEnterLine 
 
   ; PROCEDURE BtmOrphanedMarksExistAtEOL ( ) : BOOLEAN 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: We are at end of line.  *) 
     (* There is a mark in this line that did not get converted to a TempMark. 
        This happens if the line had nothing parser-visible that a TempMark
@@ -172,7 +174,7 @@ MODULE TempMark
                  <= 0 
           EXCEPT Marks . Unordered 
           => RAISE 
-               AssertionFailure 
+               Backout 
                  ( MessageCodes . Image 
                      ( AFT . A_BtmOrphanedMarksExistAtEOL_Unordered_marks ) 
                  ) 
@@ -196,7 +198,7 @@ MODULE TempMark
          the Est subtree is formatted vertically. *) 
       ; VAR MarkFound : BOOLEAN 
       ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = VAR BtmTeStartFmtNo : EstHs . FmtNoTyp 
     ; VAR BtmTeEstTravInfo : TravUtil . EstTravInfoTyp 
@@ -247,7 +249,7 @@ MODULE TempMark
         ; KindSet : EstHs . EstChildKindSetTyp 
         ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           TravUtil . InitEstTravInfoFwd 
@@ -262,7 +264,7 @@ MODULE TempMark
         ; KindSet : EstHs . EstChildKindSetTyp 
         ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           TravUtil . InitToChildContainingNodeNo 
@@ -276,7 +278,7 @@ MODULE TempMark
         END BtmTeInitToChildContainingNodeNo 
 
     ; PROCEDURE BtmTeIncEstChild ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* BtmTeIncEstChild *) 
           BtmTeRMChildRef := BtmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
@@ -316,7 +318,7 @@ MODULE TempMark
         END BtmTePosForTok 
 
     ; PROCEDURE BtmTeMarkEst ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Mark node with absolute number BtmTmEstNodeNo as having a TempMark.
          This is messy.  In cases where we have hit a Nl and are putting 
          leftover marks onto some previous token, the previous token can 
@@ -374,7 +376,7 @@ MODULE TempMark
 
     ; PROCEDURE BtmTeBuildTempMarksForTok 
         ( TokToPos : LbeStd . LimitedCharNoTyp ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
       (* Build temp marks for any marked points that are:
          1) In prior lines.  This can happen if they are in deleted insertion
             tokens and could not be moved to the left on their own line, or
@@ -460,7 +462,7 @@ MODULE TempMark
                            ) 
                   EXCEPT Marks . Unordered 
                   => RAISE 
-                       AssertionFailure 
+                       Backout 
                          ( MessageCodes . Image 
                              ( AFT . A_BtmTeBuildTempMarksForTok_Unordered_marks ) 
                          ) 
@@ -489,7 +491,7 @@ MODULE TempMark
         ( FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FmtKind : FmtKindTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = BEGIN (* BtmTeAstString *) 
           IF BtmTeEstTravInfo . EtiNodeRef # NIL 
@@ -516,7 +518,7 @@ MODULE TempMark
         ; FmtKind : FmtKindTyp
         ; InitialFsChildNo : LangUtil . FsChildNoTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
       ; VAR LFsChildCt : LangUtil . FsChildNoTyp 
@@ -553,7 +555,7 @@ MODULE TempMark
         ; FmtKind : FmtKindTyp 
         ; InitialFsChildNo : LangUtil . FsChildNoTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
       ; VAR LFsChildCt : LangUtil . FsChildNoTyp 
@@ -593,7 +595,7 @@ MODULE TempMark
         ( FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FsFmtKind : FmtKindTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = PROCEDURE BtmTeTfsSetIndentInfo ( )  
 
@@ -618,7 +620,7 @@ MODULE TempMark
           ; EstChildNoToPatch : LbeStd . EstChildNoTyp 
           ; EstNodeNo : LbeStd . EstNodeNoTyp 
           ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* If EstChildRef is NIL, change it to point to a dummy.  There
            has to be something for the temp mark to point to.  Change 
            both cached pointer (EstChildRef) and the original in the Est.
@@ -657,7 +659,7 @@ MODULE TempMark
           END BtmTeTfsPrepareLeafMark
 
       ; PROCEDURE BtmTeTfsPrepareFmtNoMark ( ) 
-        RAISES { AssertionFailure }
+        RAISES { Backout }
         (* Set the following nonlocal variables, in preparation to
            create a temp mark to an item identified by a FmtNo: 
            BtmTmEstRef, BtmTeEstNodeNo, BtmTmKind, BtmTmFmtNo,
@@ -707,7 +709,7 @@ MODULE TempMark
           END BtmTeTfsPrepareFmtNoMark 
 
       ; PROCEDURE BtmTeTfsEstSubtree ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
         (* Does NOT handle ModTok. *) 
 
         = VAR LFsNodeRef : LangUtil . FsNodeRefTyp 
@@ -800,7 +802,7 @@ MODULE TempMark
       (* Mods. *) 
 
       ; PROCEDURE BtmTeTfsModBlankLineInterior ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
         (* Handle marks inside the blank line mod. *) 
 
         = BEGIN
@@ -821,7 +823,7 @@ MODULE TempMark
                 ) 
               EXCEPT Marks . Unordered 
               => RAISE 
-                   AssertionFailure 
+                   Backout 
                      ( MessageCodes . Image 
                          ( AFT . A_BtmTeTfsModBlankLineInterior_Unordered_marks ) 
                      ) 
@@ -831,7 +833,7 @@ MODULE TempMark
 
       ; PROCEDURE BtmTeTfsModBlankLine 
           ( <* UNUSED *> ModBlankLine : ModHs . ModBlankLineTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* BtmTeTfsModBlankLine  *) 
             CASE BtmState 
@@ -870,7 +872,7 @@ MODULE TempMark
           END BtmTeTfsModBlankLine 
 
       ; PROCEDURE BtmTeTfsModCmnt ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* BtmTeTfsModCmnt *) 
             IF BtmState = BtmStateTyp . BtmStateStartAtEnd 
@@ -1015,7 +1017,7 @@ MODULE TempMark
           END BtmTeTfsModCmnt 
 
       ; PROCEDURE BtmTeTfsLeadingModText ( ModText : ModHs . ModTextTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* BtmTeTfsLeadingModText *) 
             IF BtmState = BtmStateTyp . BtmStateStartAtEnd 
@@ -1101,7 +1103,7 @@ MODULE TempMark
           END BtmTeTfsLeadingModText 
 
       ; PROCEDURE BtmTeTfsModTok ( EstRef : EstHs . EstRefTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildFsNodeRef : LangUtil . FsNodeRefTyp 
         ; VAR LMarkFound : BOOLEAN 
@@ -1183,7 +1185,7 @@ MODULE TempMark
             (* ^A tok delete mod applies to next tok. *) 
           ; VAR IsRepair : BOOLEAN 
           ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildRef : LbeStd . EstRootTyp 
         ; VAR LModDelIsFinished : BOOLEAN 
@@ -1264,7 +1266,7 @@ MODULE TempMark
           END BtmTeTfsLeadingMods 
 
       ; PROCEDURE BtmTeTfsTrailingMods ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* BtmTeTfsTrailingMods *) 
             LOOP 
@@ -1298,7 +1300,7 @@ MODULE TempMark
       (* Format syntax trees *) 
 
       ; PROCEDURE BtmTeTfsInsTok ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LDelete : BOOLEAN 
         ; VAR LIsRepair : BOOLEAN 
@@ -1364,7 +1366,7 @@ MODULE TempMark
           END BtmTeTfsInsTok 
 
       ; PROCEDURE BtmTeTfsLineBreak ( FsKind : FsKindTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LDelete : BOOLEAN 
         ; VAR LIsRepair : BOOLEAN 
@@ -1439,7 +1441,7 @@ MODULE TempMark
           END BtmTeTfsLineBreak 
 
       ; PROCEDURE BtmTeTfsEstChild ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LDelete : BOOLEAN 
         ; VAR LIsRepair : BOOLEAN 
@@ -1522,7 +1524,7 @@ MODULE TempMark
           END BtmTeTfsEstChild 
 
       ; PROCEDURE BtmTeTfsFsSubtree ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildFmtKind : FmtKindTyp 
         ; VAR LInitialChildNo : LangUtil . FsChildNoTyp 
@@ -1568,7 +1570,7 @@ MODULE TempMark
           END BtmTeTfsFsSubtree
 
       ; PROCEDURE BtmTeTfsTraverseCondFmtChildren ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LFsChildNo : LangUtil . FsChildNoTyp 
         ; VAR LPredicate : BOOLEAN 
@@ -1903,7 +1905,7 @@ MODULE TempMark
 
 (*********************************************************) 
 
-; TYPE ProcTyp = PROCEDURE ( ) RAISES { AssertionFailure }  
+; TYPE ProcTyp = PROCEDURE ( ) RAISES { Backout }  
 
 ; PROCEDURE ProcNoop ( ) = BEGIN (* ProcNoop *) END ProcNoop
 
@@ -1916,7 +1918,7 @@ MODULE TempMark
     ; <* UNUSED *> OldEstRef : LbeStd . EstRootTyp 
     ; NewEstRef : LbeStd . EstRootTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   (* Rebuild line marks from temporary marks after reparse. *) 
 
@@ -1994,7 +1996,7 @@ MODULE TempMark
   ; VAR RbmFsUpFmtKindCt : CARDINAL 
   ; VAR RbmFsFwdFmtKindCt : CARDINAL 
 
-  ; PROCEDURE RbmReenterStateDescend ( ) RAISES { AssertionFailure }  
+  ; PROCEDURE RbmReenterStateDescend ( ) RAISES { Backout }  
 
     = BEGIN 
         IF RbmTempMarkElemNo <= RbmDescendTempMarkElemNo
@@ -2013,7 +2015,7 @@ MODULE TempMark
   ; PROCEDURE RbmIncTempMark 
       ( CurrentMarkEstRef : LbeStd . EstRootTyp ) 
     : BOOLEAN (* Finished with all temp marks in token. *) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* RbmIncTempMark *) 
         INC ( RbmTempMarkElemNo ) 
@@ -2092,7 +2094,7 @@ MODULE TempMark
         (* ^EstIndentPos1 and EstIndentPosN are maintained assuming
            the Est subtree is formatted vertically. *) 
       ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = VAR RbmTeRMChildRef : LbeStd . EstRootTyp 
     ; VAR RbmTeRMChildRelNodeNo : LbeStd . EstNodeNoTyp 
@@ -2143,7 +2145,7 @@ MODULE TempMark
         END RbmTeInitNodeToPatch 
 
     ; PROCEDURE RbmTeSetToNextTempMark ( )
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           TravUtil . SetToNextInKindSet 
@@ -2162,7 +2164,7 @@ MODULE TempMark
         ; KindSet : EstHs . EstChildKindSetTyp 
         ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           TravUtil . InitEstTravInfoFwd 
@@ -2175,7 +2177,7 @@ MODULE TempMark
         ; KindSet : EstHs . EstChildKindSetTyp 
         ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           TravUtil . InitEstTravInfoBwd 
@@ -2184,7 +2186,7 @@ MODULE TempMark
         END RbmTeInitEstTravInfoBwd 
 
     ; PROCEDURE RbmTeIncEstChild ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* RbmTeIncEstChild *) 
           RbmTeRMChildRef := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
@@ -2199,7 +2201,7 @@ MODULE TempMark
         END RbmTeIncEstChild 
 
     ; PROCEDURE RbmTeDecEstChild ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* RbmTeDecEstChild *) 
           TravUtil . DecEstChild ( RbmTeEstTravInfo ) 
@@ -2236,7 +2238,7 @@ MODULE TempMark
         ( TokBegPos : LbeStd . LimitedCharNoTyp 
         ; ToPos : LbeStd . LimitedCharNoTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* POST: Finished with all temp marks in current token. *) 
 
       = BEGIN (* RbmTeSqueezeTrailingTempMarks *) 
@@ -2267,7 +2269,7 @@ MODULE TempMark
 
     ; PROCEDURE RbmTeBuildSomeMarksForTok 
         ( CurrentEstRef : LbeStd . EstRootTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       (* RbmTeBuildSomeMarksForTok assumes caller has already 
          verified that the next mark belongs in the current token, 
@@ -2315,7 +2317,7 @@ MODULE TempMark
 
     ; PROCEDURE RbmTeBuildAnyMarksForPlainTok 
         ( CurrentEstRef : LbeStd . EstRootTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       (* RbmTeBuildAnyMarksForPlainTok does not assume 
          that the next mark belongs in the current token, and thus 
@@ -2347,7 +2349,7 @@ MODULE TempMark
         ; ApproxFmtKind : FmtKindTyp 
         ; String : SharedStrings . T 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* RbmTeLeafString *) 
           IF RbmTempMarkElemNo < RbmTempMarkElemCt 
@@ -2408,7 +2410,7 @@ MODULE TempMark
         ; FsChildCt : LangUtil . FsChildNoTyp 
         ; InitialFsChildNo : LangUtil . FsChildNoSignedTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
 
@@ -2458,7 +2460,7 @@ MODULE TempMark
         ; FsChildCt : LangUtil . FsChildNoTyp 
         ; InitialFsChildNo : LangUtil . FsChildNoTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
 
@@ -2512,7 +2514,7 @@ MODULE TempMark
              we discover Either ApproxFmtKind = FmtKindVert, or we are in
              StateFwdNl. *) 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = PROCEDURE RbmTeTfsSetIndentInfo ( Bwd : BOOLEAN )  
 
@@ -2540,7 +2542,7 @@ MODULE TempMark
           END RbmTeTfsEnterStateFwdNl  
 
       ; PROCEDURE RbmTeTfsEstSubtree ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR EssChildFsNodeRef : LangUtil . FsNodeRefTyp 
         ; VAR EssChildIndentPos1 : LbeStd . LimitedCharNoTyp 
@@ -2548,7 +2550,7 @@ MODULE TempMark
         ; VAR EssOrigChildFmtKind : FmtKindTyp 
 
         ; PROCEDURE RbmTeTfsEssRecomputeFmtKind ( ) 
-          RAISES { AssertionFailure } 
+          RAISES { Backout } 
           (* A callback.  Called when we start traversing Fwd (which becomes 
              known at a leaf site).  Uses environment of the Est subtree to 
              compute its FmtKind.  These callbacks are laced through and 
@@ -2742,7 +2744,7 @@ MODULE TempMark
 
       ; PROCEDURE RbmTeTfsBlankLine 
           ( ModBlankLine : ModHs . ModBlankLineTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* RbmTeTfsBlankLine *) 
             IF RbmTempMarkElemNo < RbmTempMarkElemCt 
@@ -2840,7 +2842,7 @@ MODULE TempMark
           END RbmTeTfsBlankLine 
 
       ; PROCEDURE RbmTeTfsCmntFwdNl ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN 
             RbmCharPos 
@@ -2880,7 +2882,7 @@ MODULE TempMark
           END RbmTeTfsCmntFwdNl  
 
       ; PROCEDURE RbmTeTfsBolCmntIntoFwdNl ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* Transition into FwdNl, at a comment known to have a NlBefore. *) 
 
         = VAR LTok : LbeStd . TokTyp 
@@ -3021,7 +3023,7 @@ MODULE TempMark
 
       ; PROCEDURE RbmTeTfsModTok ( EstRef : EstHs . EstRefTyp ) 
         : BOOLEAN (* Done with leading mods. *) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LFsNodeRef : LangUtil . FsNodeRefTyp 
         ; VAR LChildFmtKind : FmtKindTyp 
@@ -3070,7 +3072,7 @@ MODULE TempMark
           END RbmTeTfsModTok 
 
       ; PROCEDURE RbmTeTfsLeadingModsNoDel ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
         (* Handle any leading mods, except for a delete mod. *) 
 
         = BEGIN (* RbmTeTfsLeadingModsNoDel *)  
@@ -3166,7 +3168,7 @@ MODULE TempMark
 
       ; PROCEDURE RbmTeTfsModCmntTrailingFwdNl 
           ( ModCmntTrailing : ModHs . ModCmntTrailingTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         (* Handles ModHs . ModCmntTrailingTyp *) 
 
@@ -3268,7 +3270,7 @@ MODULE TempMark
           ; RbmTeIncEstChild ( ) 
           END RbmTeTfsModCmntTrailingFwdNl 
 
-      ; PROCEDURE RbmTeTfsTrailingMods ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE RbmTeTfsTrailingMods ( ) RAISES { Backout } 
 
         = BEGIN (* RbmTeTfsTrailingMods *) 
             LOOP 
@@ -3324,7 +3326,7 @@ MODULE TempMark
 
       ; PROCEDURE RbmTeTfsFwdLeadingDel 
           ( VAR Delete : BOOLEAN ; VAR IsRepair : BOOLEAN ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* When RebuildMarkList is used, the only delete mods should have
            IsRepair, and these are considered present.  So nothing is
            ever treated as deleted.  Still, for consistency and in
@@ -3377,7 +3379,7 @@ MODULE TempMark
 
       ; PROCEDURE RbmTeTfsBwdLeadingDel 
           ( VAR Delete : BOOLEAN ; VAR IsRepair : BOOLEAN ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* When RebuildMarkList is used, the only delete mods should have
            IsRepair, and these are considered present.  So nothing is
            ever treated as deleted.  Still, for consistency and in
@@ -3426,7 +3428,7 @@ MODULE TempMark
 
       (* Format syntax trees *) 
 
-      ; PROCEDURE RbmTeTfsInsTok ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE RbmTeTfsInsTok ( ) RAISES { Backout } 
 
         = BEGIN (* RbmTeTfsInsTok *) 
             IF RbmTempMarkElemNo < RbmTempMarkElemCt 
@@ -3543,7 +3545,7 @@ MODULE TempMark
           END RbmTeTfsInsTok 
 
       ; PROCEDURE RbmTeTfsEstChild ( IsEstList : BOOLEAN ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* RbmTeTfsEstChild *) 
             CASE RbmState 
@@ -3623,7 +3625,7 @@ MODULE TempMark
             END (* CASE *) 
           END RbmTeTfsEstChild 
 
-      ; PROCEDURE RbmTeTfsBuildFmtNoMark ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE RbmTeTfsBuildFmtNoMark ( ) RAISES { Backout } 
         (* Call this when EstTravInfo is going forward. *) 
 
         = VAR LTok : LbeStd . TokTyp 
@@ -3691,7 +3693,7 @@ MODULE TempMark
           END RbmTeTfsBuildFmtNoMark 
 
       ; PROCEDURE RbmTeTfsLineBreak ( FsKind : FsKindTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* RbmTeTfsLineBreak *) 
             CASE RbmState 
@@ -3769,13 +3771,13 @@ MODULE TempMark
           END RbmTeTfsLineBreak 
 
       ; PROCEDURE RbmTeTfsFsSubtree ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR FssChildFmtKind : FmtKindTyp 
         ; VAR FssOrigChildFmtKind : FmtKindTyp 
 
         ; PROCEDURE RbmTeTfsFssRecomputeFmtKind ( )  
-          RAISES { AssertionFailure } 
+          RAISES { Backout } 
           (* A callback.  Called when we start traversing fwd (which becomes 
              known at a leaf site).  Uses environment of the Fs subtree to 
              compute its FmtKind.  These callbacks are laced through and 
@@ -3907,7 +3909,7 @@ MODULE TempMark
           END RbmTeTfsFsSubtree
 
       ; PROCEDURE RbmTeTfsTraverseCondFmtChildren ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LFsChildCt : LangUtil . FsChildNoTyp 
         ; VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -4212,7 +4214,7 @@ MODULE TempMark
         END RbmTeTraverseFs 
 
     ; PROCEDURE RbmTeComputeEstAndFmtNoForDescend ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Ascertain whether a marked descendent exists in this 
          Est subtree, (set RbmTeDoneWEst to NOT exists), and if it exists, 
          the format number which leads toward it (set RbmTeFmtNo to this). 
@@ -4336,7 +4338,7 @@ FALSE AND             WTempMark . EstRef
         END RbmTeComputeEstAndFmtNoForDescend 
 
     ; PROCEDURE RbmMaybeNilRMDummy ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           IF RbmTeEstTravInfo . EtiChildCt > 0 
@@ -4596,7 +4598,7 @@ FALSE AND             WTempMark . EstRef
     ( EstRef : LbeStd . EstRootTyp 
     ; EstAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   (* Remove any leftover temp mark mark bits in the Est. 
      This is needed for the OLD Est, after reparsing. 
@@ -4706,7 +4708,7 @@ FALSE AND             WTempMark . EstRef
     ( ImageTrans : PaintHs . ImageTransientTyp 
     ; VAR SavedMarkListRef : ParseHs . TempMarkArrayRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LElemCt : LbeStd . MarkNoTyp 
   ; VAR LElemNo : LbeStd . MarkNoTyp 

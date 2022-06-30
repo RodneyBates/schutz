@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -18,7 +18,8 @@ MODULE Display
 
 ; IMPORT AssertDevel  
 ; IMPORT Assertions  
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT EditWindow 
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
@@ -87,7 +88,7 @@ MODULE Display
 ; PROCEDURE LineCtOfBolTokMark 
     ( EstRoot : LbeStd . EstRootTyp ; TokMark : Marks . TokMarkTyp ) 
   : LbeStd . LineNoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* For a TokMark identifying a regular LinesRef (not Blank Lines), will be 
      zero.  Also zero for a blank line, start at end. 
      otherwise the count of blank lines. *) 
@@ -175,7 +176,7 @@ MODULE Display
     ; DesiredLinesRef : PaintHs . LinesRefMeatTyp 
     ) 
   : LbeStd . LineNoSignedTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* DesiredLinesRef points to a line rec known to be visible in 
      the window described by WindowRef. Return the window-relative 
      line number of the first line represented by DesiredLinesRef. 
@@ -222,7 +223,7 @@ MODULE Display
     ; VAR (* OUT *) LinesRef : PaintHs . LinesRefMeatTyp 
     ; VAR (* OUT *) LineNo : LbeStd . LineNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LLinesRef : PaintHs . LinesRefTyp 
   ; VAR LLineNoInWindow : LbeStd . LineNoSignedTyp 
@@ -257,7 +258,7 @@ MODULE Display
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   (* Ensure that the successor of LinesRef is really the 
      following line, i.e. LinesRef does not have GapAfter. *) 
@@ -424,7 +425,7 @@ MODULE Display
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; LeftLinesRef : PaintHs . LinesRefMeatTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: LeftLinesRef is not the header. 
           LeftLinesRef . LrGapAfter.  
           LeftLinesRef and its successor denote the same line.
@@ -513,7 +514,7 @@ MODULE Display
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Ensure that the predecessor of LinesRef is really the 
      previous line, i.e. it does not have GapAfter. *) 
 
@@ -739,7 +740,7 @@ MODULE Display
     ; RightEdgePos : LbeStd . CharNoTyp 
     ; VAR Info : HiliteInfoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LLeftCompare : [ - 1 .. 1 ] 
   ; VAR LRightCompare : [ - 1 .. 1 ] 
@@ -839,7 +840,7 @@ MODULE Display
     ; LineNo : LbeStd . LineNoTyp 
     ; READONLY TextAttrArray : PaintHs . TextAttrArrayTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LLeftSelMark : PaintHs . LineMarkMeatTyp  
   ; VAR LRightSelMark : PaintHs . LineMarkMeatTyp  
@@ -1035,7 +1036,7 @@ MODULE Display
     ; READONLY BolTokMark : Marks . TokMarkTyp 
     ; LineNo : LbeStd . LineNoTyp 
     ) 
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
 
   = BEGIN 
     (* All this trouble, just so we can pass a SUBARRAY to InnerPaintLine, 
@@ -1077,7 +1078,7 @@ MODULE Display
     ; LineNoInWindow : LbeStd . LineNoSignedTyp 
     ; LinesRef : PaintHs . LinesRefMeatTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* PaintUneditedNonblankLine *) 
       IF WindowRef # NIL AND WindowRef . WrImageRef # NIL 
@@ -1120,7 +1121,7 @@ MODULE Display
     ; ThruLinesRef : PaintHs . LinesRefMeatTyp  
     ; ThruLineNo : LbeStd . LineNoTyp
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: ImageTrans # NIL 
           AND Window # NIL 
           AND FromLinesRef # NIL 
@@ -1273,7 +1274,7 @@ MODULE Display
     ; ThruLinesRef : PaintHs . LinesRefMeatTyp  
     ; ThruLineNo : LbeStd . LineNoTyp
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LImageTrans : PaintHs . ImageTransientTyp 
   ; VAR LImagePers : PaintHs . ImagePersistentTyp 
@@ -1308,7 +1309,7 @@ MODULE Display
     ; ThruLinesRef : PaintHs . LinesRefMeatTyp  
     ; ThruLineNo : LbeStd . LineNoTyp
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LImagePers : PaintHs . ImagePersistentTyp 
   ; VAR LTempEditRef : PaintHs . TempEditRefTyp 
@@ -1412,14 +1413,14 @@ MODULE Display
     ; VAR ToLineNo : LbeStd . LineNoSignedTyp 
     ) 
 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR PwLineNoInWindow : LbeStd . LineNoSignedTyp 
   ; VAR PwLinesRef : PaintHs . LinesRefMeatTyp 
   ; VAR PwLineNo : LbeStd . LineNoSignedTyp 
   ; VAR PwTempEditRef : PaintHs . TempEditRefTyp 
 
-  ; PROCEDURE PwTryTempEdit ( ) : BOOLEAN RAISES { AssertionFailure } 
+  ; PROCEDURE PwTryTempEdit ( ) : BOOLEAN RAISES { Backout } 
 
     (* Has SIDE EFFECTS! If this is a temp edited line, paints it. 
        Result is whether this happened.. *) 
@@ -1668,7 +1669,7 @@ MODULE Display
     ; VAR (* IN OUT *) MustRepaint : BOOLEAN 
       (* Set true if anything requiring a repaint happens. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Will scroll WindowRef if necessary to keep cursor inside. *) 
 
   = VAR LCursorMovement : EditWindow . CharCoordTyp 
@@ -1832,7 +1833,7 @@ MODULE Display
     ( WindowRef : PaintHs . WindowRefTyp 
     ; CursorMovement : EditWindow . CharCoordTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Will scroll WindowRef if necessary to keep cursor inside. *) 
 
   = VAR LMustRepaint : BOOLEAN := FALSE 
@@ -1898,7 +1899,7 @@ MODULE Display
 (* VISIBLE: *) 
 ; PROCEDURE HorizMoveCursorToEndAndRepaint 
     ( WindowRef : PaintHs . WindowRefTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = BEGIN 
       IF WindowRef # NIL AND WindowRef . WrImageRef# NIL 
@@ -1926,7 +1927,7 @@ MODULE Display
           Even if NOT DoDragCursor, it will be dragged to 
           prevent its getting outside the window. *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   (* Cursor moves along with window. *) 
 
@@ -2014,7 +2015,7 @@ MODULE Display
     ; Movement : LbeStd . LineNoTyp 
     ; VAR (* OUT *) ActualMovement : LbeStd . LineNoSignedTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Adjust LinesRef and LineNo to denote the Movement-th predecessor of
      their original values.  Secure predecessors as needed.  Also, mark each
      LinesRef visited as visible in Window. 
@@ -2056,7 +2057,7 @@ MODULE Display
     ; Movement : LbeStd . LineNoTyp 
     ; VAR (* OUT *) ActualMovement : LbeStd . LineNoSignedTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Adjust LinesRef and LineNo to denote the Movement-th succcessor of
      their original values.  Secure succcessors as needed.  Also, mark each
      LinesRef visited as visible in Window. 
@@ -2119,7 +2120,7 @@ MODULE Display
     ; VAR LinesRef : PaintHs . LinesRefMeatTyp 
     ; VAR LineNo : LbeStd . LineNoTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LMovement : LbeStd . LineNoTyp 
   ; VAR LActualMovement : LbeStd . LineNoSignedTyp 
@@ -2166,7 +2167,7 @@ MODULE Display
 
 (* VISIBLE: *) 
 ; PROCEDURE InitImageFirstWindow ( ImageTrans : PaintHs . ImageTransientTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Creates a mark list if there is none.  
      Creates a cursor at BOI if there is no cursor. 
      Leaves line list untouched. 
@@ -2206,7 +2207,7 @@ MODULE Display
               TextEdit . BruteForceVerifyAllLinesRefs 
                 ( ImageTrans , RepairIsOK := TRUE ) 
             ; LLinesListLooksOK := TRUE   
-            EXCEPT AssertionFailure 
+            EXCEPT Backout 
             => TRY 
                 Wr . PutText 
                   ( Stdio . stderr 
@@ -2296,7 +2297,7 @@ MODULE Display
                   ) 
               ; LImagePers . IpMarkCt := LMarkCt 
               END (* IF *) 
-            EXCEPT AssertionFailure 
+            EXCEPT Backout 
             => (* Something is wrong with the mark list. *) 
               TRY 
                 Wr . PutText 
@@ -2413,7 +2414,7 @@ MODULE Display
     ( (* IN OUT *) WindowRef : PaintHs . WindowRefTyp 
     ; VAR BlankLinesAtEnd : LbeStd . LineNoTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted }   
+  RAISES { Backout , Thread . Alerted }   
   (* The cursor must point to a valid LinesRef. *) 
 
   = VAR LImageTrans : PaintHs . ImageTransientTyp 
@@ -2501,7 +2502,7 @@ MODULE Display
 (* VISIBLE: *) 
 ; PROCEDURE ReconstructLinesAndPaint 
     ( (* IN OUT *) ImageRef : PaintHs . ImageTransientTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Any temp edits have been flushed.  
      Depends only on the list of MarkRecs.  Completely rebuilds 
      LinesRefs for the image and all the pointers thereto from 
@@ -2615,7 +2616,7 @@ MODULE Display
     ( FromLinesRef : PaintHs . LinesRefMeatTyp 
     ; ThruLinesRef : PaintHs . LinesRefMeatTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LLinesRef : PaintHs . LinesRefMeatTyp 
 
@@ -2652,7 +2653,7 @@ MODULE Display
          None of these pointers should be used or stored 
          by the caller. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* FromLinesRef .. ThruLinesRef, belonging to ImageRef, have 
      become invisible altogether.  Unlink any LinesRefs which 
      should no longer be retained. *) 
@@ -2818,7 +2819,7 @@ MODULE Display
          pointers should be used or stored by the caller. *) 
     ; WindowNo : PaintHs . WindowNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* FromLinesRef .. ThruLinesRef are no longer visible in WindowNo. 
      Note this in the LinesRefs' LrVisibleIn fields. 
      If some of the LinesRefs become invisible altogether, 
@@ -2902,7 +2903,7 @@ MODULE Display
          pointers should be used or stored by the caller. *) 
     ; WindowNo : PaintHs . WindowNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LFromLinesRef : PaintHs . LinesRefMeatTyp 
   ; VAR LThruLinesRef : PaintHs . LinesRefMeatTyp 
@@ -2945,7 +2946,7 @@ MODULE Display
     ; VAR (* IN OUT *) MustRepaint : BOOLEAN 
       (* Set true if anything requiring a repaint happens. *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Move thru the necessary LinesRefs and MarkRecs for the cursor move. 
      DOES NOT update WindowRef . WrCursorLineNoInWindow 
   *)
@@ -2955,7 +2956,7 @@ MODULE Display
 
   ; PROCEDURE McLinesToNext ( Mark : PaintHs . LineMarkMeatTyp ) 
     : LbeStd . LineNoSignedTyp  
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
     (* Has SIDE EFFECT of calling SecureSucc. *) 
 
     = VAR LLinesToLastNonblankLine : LbeStd . LineNoSignedTyp 
@@ -3189,7 +3190,7 @@ MODULE Display
     ; VAR (* IN OUT *) MustRepaint : BOOLEAN 
       (* Set true if anything requiring a repaint happens. *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* DOES NOT update WindowRef . WrCursorLineNoInWindow *) 
 
   = VAR LImageRef : PaintHs . ImageTransientTyp 
@@ -3311,7 +3312,7 @@ MODULE Display
     ; VAR (* OUT *) ActualMovement : EditWindow . CharPointTyp 
     ; VAR (* IN OUT *) MustRepaint : BOOLEAN 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LCursorLineNoInWindow : LbeStd . LineNoSignedTyp 
   ; VAR LActualMovement : LbeStd . LineNoSignedTyp 
@@ -3387,7 +3388,7 @@ MODULE Display
     ( WindowRef : PaintHs . WindowRefTyp 
     ; WantedMovement : EditWindow . CharPointTyp 
     )
-  RAISES { AssertionFailure , Thread . Alerted }  
+  RAISES { Backout , Thread . Alerted }  
 
   = VAR LActualMovement : EditWindow . CharPointTyp 
   ; VAR LMustRepaint : BOOLEAN := FALSE 
@@ -3417,7 +3418,7 @@ MODULE Display
 ; PROCEDURE AbsoluteCursorPositionInWindow 
     ( WindowRef : PaintHs . WindowRefTyp ) 
   : EditWindow . CharPointTyp 
-  RAISES { AssertionFailure , Thread . Alerted } <* NOWARN *> 
+  RAISES { Backout , Thread . Alerted } <* NOWARN *> 
   (* AbsPosition must lie within the window. *) 
 
   = VAR LResult : EditWindow . CharPointTyp 
@@ -3450,7 +3451,7 @@ MODULE Display
     ( WindowRef : PaintHs . WindowRefTyp 
     ; AbsPosition : EditWindow . CharPointTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* AbsPosition must lie within the window. *) 
 
   = VAR LHorizPositionInWindow : EditWindow . CharCoordTyp 
@@ -3518,7 +3519,7 @@ MODULE Display
     ; VAR (* OUT *) ActualMovement : LbeStd . LineNoSignedTyp 
     ; VAR (* IN OUT *) MustRepaint : BOOLEAN 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LMovementPoint : EditWindow . CharPointTyp 
   ; VAR LActualMovementPoint : EditWindow . CharPointTyp 
@@ -3575,7 +3576,7 @@ MODULE Display
           Even if NOT DoDragCursor, it will be dragged to 
           prevent its getting outside the window. *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LMustRepaint : BOOLEAN 
   ; VAR LActualMovement : LbeStd . LineNoSignedTyp 
@@ -3610,7 +3611,7 @@ MODULE Display
     ; OldSize : EditWindow . CharPointTyp 
     ; NewSize : EditWindow . CharPointTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LFromLinesRef : PaintHs . LinesRefMeatTyp 
   ; VAR LFromLineNo : LbeStd . LineNoTyp 
@@ -3781,7 +3782,7 @@ MODULE Display
 
 (* VISIBLE: *) 
 ; PROCEDURE Reparse ( (* IN OUT *) ImageRef : PaintHs . ImageTransientTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LImagePers : PaintHs . ImagePersistentTyp 
   ; VAR LSavedMarkListRef : ParseHs . TempMarkArrayRefTyp 
@@ -3868,7 +3869,7 @@ MODULE Display
         ; NoteImageSavedState ( ImageRef , FALSE ) 
         ; NoteImageParsedState ( ImageRef , TRUE ) 
         ; NoteImageAnalyzedState ( ImageRef , FALSE ) 
-        EXCEPT AssertionFailure ( EMessage )  
+        EXCEPT Backout ( EMessage )  
         => LImagePers . IpEstRoot := LOldEstRef 
         ; TempMark . RestorePermanentMarks ( ImageRef , LSavedMarkListRef ) 
         (* Now we are in a mess.  I hope this works. *) 
@@ -3877,7 +3878,7 @@ MODULE Display
         ; EstUtil . UnmarkContainsTempMark ( LNewEstRef ) 
         ; TRY 
             ReconstructLinesAndPaint ( ImageRef ) 
-          EXCEPT AssertionFailure => (* Ignore this one *)  
+          EXCEPT Backout => (* Ignore this one *)  
           END (* IF *) 
         ; AssertDevel . WriteCheckpoint 
             ( ImageRef := ImageRef 
@@ -3890,7 +3891,7 @@ MODULE Display
         ; NoteImageSavedState ( ImageRef , FALSE ) 
         ; NoteImageParsedState ( ImageRef , FALSE ) 
         ; NoteImageAnalyzedState ( ImageRef , FALSE ) 
-        ; RAISE AssertionFailure ( EMessage ) 
+        ; RAISE Backout ( EMessage ) 
         END (* TRY EXCEPT *) 
       END (* IF *) 
     END Reparse 

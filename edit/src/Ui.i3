@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -11,8 +11,8 @@ INTERFACE Ui
 ; IMPORT Thread 
 ; IMPORT VBT 
 
-; IMPORT Assertions 
 ; IMPORT EditWindow 
+; FROM Failures IMPORT Backout 
 ; IMPORT LbeStd 
 ; IMPORT PaintHs 
 ; IMPORT ScannerIf
@@ -56,7 +56,7 @@ INTERFACE Ui
 
 ; PROCEDURE PromptAndCloseAllImages 
     ( Closure : Worker . ClosureTyp ; QuitAfter : BOOLEAN ) 
-  RAISES { Assertions . AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Form only is set. Image is chosen inside. *)  
   (* On Worker thread. *) 
 
@@ -77,7 +77,7 @@ INTERFACE Ui
     ; DelayTime : INTEGER 
     ) 
   : BOOLEAN (* => Success. *) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 (* Convenience procedures for setting standard fields of closures. *) 
 

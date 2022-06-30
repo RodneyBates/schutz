@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -10,8 +10,8 @@ INTERFACE LRUtils
 
 (* Collected utilities for CFG analysis. *) 
 
-; IMPORT Assertions 
-; IMPORT IntSets
+; FROM Failures IMPORT Backout
+; IMPORT IntSets 
 ; IMPORT LbeStd 
 ; IMPORT LALRTypes 
 ; IMPORT LRTable 
@@ -65,7 +65,7 @@ INTERFACE LRUtils
     ; AutomatonKind : LALRTypes . AutomatonKindTyp 
     ) 
   : BOOLEAN 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* We only look at the core items, since sets with the same core will 
      either have the same closure or will have sets of closure items that 
      differ only in the insertion of Tok__Empty in one or more places. 

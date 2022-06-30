@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -16,7 +16,8 @@ MODULE Selection
 
 ; IMPORT AssertDevel 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , AssertionFailure 
+; FROM Assertions IMPORT Assert 
+; FROM Failures IMPORT Backout  
 ; IMPORT Display 
 ; IMPORT EditWindow 
 ; IMPORT LbeStd 
@@ -28,7 +29,7 @@ MODULE Selection
 
 (* VISIBLE: *) 
 ; PROCEDURE ClearSelection ( ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Does not clear preselection or SelText. *) 
 
   = VAR LOldSel : SelectionTyp 
@@ -92,7 +93,7 @@ MODULE Selection
               , Image := LOldSel . SelImage 
               ) 
           ; RAISE Thread . Alerted 
-          | AssertionFailure ( EArg ) 
+          | Backout ( EArg ) 
           => PaintHs . InsertLineMarkToRight 
               ( InsertMark := LRightMark 
               , PredMark := LRightMarkPred 
@@ -106,7 +107,7 @@ MODULE Selection
             (* ^This will rewrite the checkpoint already written from inside
                 AssertDevel, but with the changes undone. 
             *) 
-          ; RAISE AssertionFailure ( EArg ) 
+          ; RAISE Backout ( EArg ) 
           END (* TRY EXCEPT *) 
         EXCEPT Thread . Alerted 
         => PaintHs . InsertLineMarkToRight 
@@ -116,7 +117,7 @@ MODULE Selection
             ) 
         ; Current := LOldSel 
         ; RAISE Thread . Alerted 
-        | AssertionFailure ( EArg ) 
+        | Backout ( EArg ) 
         => PaintHs . InsertLineMarkToRight 
             ( InsertMark := LLeftMark 
             , PredMark := LLeftMarkPred 
@@ -131,14 +132,14 @@ MODULE Selection
           (* ^This will rewrite the checkpoint already written from inside
               AssertDevel, but with the changes undone. 
           *) 
-        ; RAISE AssertionFailure ( EArg ) 
+        ; RAISE Backout ( EArg ) 
         END (* TRY EXCEPT *) 
       END (* IF *) 
     END ClearSelection  
 
 (* VISIBLE: *) 
 ; PROCEDURE Preselect ( Window : PaintHs . WindowRefTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } <* NOWARN *>
+  RAISES { Backout , Thread . Alerted } <* NOWARN *>
   (* Notes the current cursor location as preselection.  Leaves any 
      actual selection alone, in case there is no drag done. 
   *) 
@@ -195,7 +196,7 @@ MODULE Selection
         ; Current := LNewSel 
         ; TRY 
             PaintHs . BruteForceVerifyLineMarks ( Window . WrImageRef ) 
-          EXCEPT AssertionFailure ( EArg ) 
+          EXCEPT Backout ( EArg ) 
           => PaintHs . DeleteLineMark 
               ( Mark := LNewSel . PreselMark 
               , (* VAR *) PredMark := LPredMark (* Dead *) 
@@ -220,7 +221,7 @@ MODULE Selection
             (* ^This will rewrite the checkpoint already written from inside
                 AssertDevel, but with the changes undone. 
             *) 
-          ; RAISE AssertionFailure ( EArg ) 
+          ; RAISE Backout ( EArg ) 
           END (* TRY EXCEPT *) 
         END (* WITH *) 
       END (* IF *) 
@@ -231,7 +232,7 @@ MODULE Selection
     ( Window : PaintHs . WindowRefTyp 
     ; AbsPosition : EditWindow . CharPointTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LCommandString : TEXT 
   ; VAR LOldEndPredMark : PaintHs . LineMarkTyp 
@@ -303,7 +304,7 @@ MODULE Selection
             ) 
         ; TRY 
             PaintHs . BruteForceVerifyLineMarks ( Window . WrImageRef ) 
-          EXCEPT AssertionFailure ( EArg ) 
+          EXCEPT Backout ( EArg ) 
           => PaintHs . InsertLineMarkToRight 
                ( InsertMark := LOldSel . SelEndMark 
                , PredMark := LOldEndPredMark 
@@ -317,7 +318,7 @@ MODULE Selection
             (* ^This will rewrite the checkpoint already written from 
                 inside AssertDevel, but with the changes undone. 
             *) 
-          ; RAISE AssertionFailure ( EArg ) 
+          ; RAISE Backout ( EArg ) 
           END (* TRY EXCEPT *) 
         END (* IF *) 
       ; WITH WCursorMark 
@@ -357,7 +358,7 @@ MODULE Selection
                ) 
             ; Current := LOldSel 
             ; RAISE Thread . Alerted 
-            | AssertionFailure ( EArg ) 
+            | Backout ( EArg ) 
             => PaintHs . InsertLineMarkToRight 
                ( InsertMark := LOldSel . SelEndMark 
                , PredMark := LOldEndPredMark 
@@ -372,7 +373,7 @@ MODULE Selection
               (* ^This will rewrite the checkpoint already written from 
                   inside AssertDevel, but with the changes undone. 
               *) 
-            ; RAISE AssertionFailure ( EArg ) 
+            ; RAISE Backout ( EArg ) 
             END (* TRY EXCEPT *) 
           ELSE 
             LNewSel . SelEndMark := NEW ( PaintHs . LineMarkMeatTyp ) 
@@ -420,7 +421,7 @@ MODULE Selection
                 ) 
             ; Current := LOldSel 
             ; RAISE Thread . Alerted 
-            | AssertionFailure ( EArg ) 
+            | Backout ( EArg ) 
             => PaintHs . InsertLineMarkToRight 
                 ( InsertMark := LOldSel . SelEndMark 
                 , PredMark := LOldEndPredMark 
@@ -440,7 +441,7 @@ MODULE Selection
               (* ^This will rewrite the checkpoint already written from 
                   inside AssertDevel, but with the changes undone. 
               *) 
-            ; RAISE AssertionFailure ( EArg ) 
+            ; RAISE Backout ( EArg ) 
             END (* TRY EXCEPT *) 
           END (* IF *) 
         END (* WITH *) 
@@ -450,7 +451,7 @@ MODULE Selection
 
 (* VISIBLE: *) 
 ; PROCEDURE ManifestSelectionAsText ( ) : TEXT 
-  RAISES { AssertionFailure , Thread . Alerted } <* NOWARN *> 
+  RAISES { Backout , Thread . Alerted } <* NOWARN *> 
 
   = VAR LSel : SelectionTyp 
   ; VAR LLeftMark : PaintHs . LineMarkMeatTyp 

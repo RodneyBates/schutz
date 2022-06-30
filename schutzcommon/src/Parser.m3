@@ -1,6 +1,6 @@
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -41,7 +41,8 @@ MODULE Parser
 ; IMPORT VersionedFiles 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , AssertionFailure , CantHappen 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -189,7 +190,7 @@ MODULE Parser
     ; Comment : TEXT := NIL  
     ) 
   : ParseHs . ParseTravStateRefTyp 
-  RAISES { Thread . Alerted , AssertionFailure } 
+  RAISES { Thread . Alerted , Backout } 
   (* This is a wrapper around ParseTrv . NextParseTravState, that 
      conditionally writes trace output. 
   *) 
@@ -636,7 +637,7 @@ MODULE Parser
     ( MergeInfo : MergeInfoTyp (* Fields can change. *)  
     ; TempMarkRange : ParseHs . TempMarkRangeTyp
     ) 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
   (* Put the numbers in TempMarkRange into the deferred set. *)
 
   = BEGIN
@@ -656,7 +657,7 @@ MODULE Parser
     ; READONLY MergeInfo : MergeInfoTyp (* Fields may change. *) 
     ; READONLY TokInfo : ParseHs . TokInfoTyp 
     ) 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
   (* ParseTrv will be making changes to its temp mark list, as it traverses
      the tree.  By the time of a reduce, when this is called, (but hot much
      before), ParseTrv will have finished with all temp marks that are in the
@@ -870,7 +871,7 @@ MODULE Parser
     ; MergeInfo : MergeInfoTyp (* Fields can change. *)
     ; ChildRef : LbeStd . EstRootTyp
     )
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Call this *before* merging ChildRef as an explicit EST child.  *) 
   = BEGIN
       IF MergeInfo . MiTempMarkListRef = NIL THEN RETURN END 
@@ -922,7 +923,7 @@ MODULE Parser
     ; FmtNo : EstHs . FmtNoTyp 
     ; IsFirstOfGroup : BOOLEAN 
     ) 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
   (* Merging right to left.  The slices are linked R to L too. *) 
 
   = BEGIN (* MergeSliceList *)  
@@ -1200,7 +1201,7 @@ MODULE Parser
     ; MergeInfo : MergeInfoTyp (* Fields can change. *) 
     ; EstRef : EstHs . EstRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN 
       IF NOT IntSets . IsEmpty ( MergeInfo . MiDeferredTempMarkSet ) 
@@ -1224,7 +1225,7 @@ MODULE Parser
     ; VAR EstChildKindSet : EstHs . EstChildKindSetTyp 
     ) 
 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* There will be at most one Est child in a slice list.  *) 
 
   = VAR LSliceListElemRef : ParseHs . SliceListElemRefTyp 
@@ -1279,7 +1280,7 @@ MODULE Parser
     ; VAR StateList : StateListTyp 
     ; Repairing : BOOLEAN 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR RedInsertionRepairIsWithin : BOOLEAN 
   ; VAR RedOldParseStackElemRef : ParseHs . ParseStackElemRefTyp 
@@ -1394,7 +1395,7 @@ MODULE Parser
  
   ; PROCEDURE RedIsOmittableEmptyListChild 
       ( FsNodeRef : LangUtil . FsNodeRefTyp ) : BOOLEAN 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* The subtree to be merged is an explicit list node with no children,
        and it can be omitted entirely from the node being built. *) 
 
@@ -1452,7 +1453,7 @@ MODULE Parser
       ( FsEstChildNodeRef : LangUtil . FsNodeRefTyp 
       ; VAR (* IN OUT *) TokInfo : ParseHs . TokInfoTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Possibly do a singleton list optimization on TokInfo. *) 
 
     = VAR LSliceListElemRef : ParseHs . SliceListElemRefTyp  
@@ -1526,7 +1527,7 @@ MODULE Parser
       ; IsInsTok : BOOLEAN 
       ; DoOmitChild : BOOLEAN := FALSE 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: A matching Bse is next, in RedOldBuildStackElemRef. *) 
     (* POST: RedOldBuildStackElemRef has been popped for the token
              and any insertions to its left.
@@ -1643,7 +1644,7 @@ MODULE Parser
       ( FsNodeRef : LangUtil . FsNodeRefTyp  
       ; READONLY ReduceInfo : LRTable . ReduceInfoTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Set RedEstChildForPredicateIsPresent.  
        If TRUE, starting from the current build stack element and searching 
        leftward, find the RM Est child in the range covered by the current 
@@ -1706,7 +1707,7 @@ MODULE Parser
       END RedFindEstChildRefForPredicate  
 
   ; PROCEDURE RedInsTok ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* The Fs node is an insertion token. *) 
 
     = BEGIN
@@ -1726,7 +1727,7 @@ MODULE Parser
 
   ; PROCEDURE RedAstStringOrEstChild 
       ( FsNodeRef : LangUtil . FsNodeRefTyp ; ChildIsPresent : BOOLEAN ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* The Fs node is a string or Est child. *) 
 
     = VAR LChild : LbeStd . EstRootTyp 
@@ -1816,7 +1817,7 @@ MODULE Parser
       ; READONLY ReduceInfo : LRTable . ReduceInfoTyp 
       ) 
     : BOOLEAN 
-    RAISES { AssertionFailure }
+    RAISES { Backout }
     (* PRE: FsNodeRef.FsKind = FsKindCondFmt. *)  
 
     = BEGIN (* RedEvalPredicate *)
@@ -1880,7 +1881,7 @@ MODULE Parser
       END RedEvalPredicate 
 
   ; PROCEDURE RedPostCheckPredicate ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Used only for generated concrete grammar. *) 
 
     = VAR LSliceListElemRef : ParseHs . SliceListElemRefTyp  
@@ -1933,12 +1934,12 @@ MODULE Parser
       ( FsNodeRef : LangUtil . FsNodeRefTyp 
       ; READONLY ReduceInfo : LRTable . ReduceInfoTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsNodeRef.FsKind = FsKindCondFmt. *) 
     (* PRE: FsNodeRef is the first alternative. *) 
 
     = PROCEDURE RedTcfRecurse ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Called only within the chosen alternative. *) 
 
       = VAR LChildIsPresent : BOOLEAN 
@@ -2026,7 +2027,7 @@ MODULE Parser
       ( FsNodeRef : LangUtil . FsNodeRefTyp 
       ; READONLY ReduceInfo : LRTable . ReduceInfoTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LFsChildNo : LangUtil . FsChildNoSignedTyp 
     ; VAR LChildIsPresent : BOOLEAN 
@@ -2305,7 +2306,7 @@ TRUE OR
       ; ParseStackTopRef : ParseHs . ParseStackElemRefTyp 
       ; LookaheadTok : LbeStd . TokTyp 
       ) 
-    RAISES { Thread . Alerted , AssertionFailure } 
+    RAISES { Thread . Alerted , Backout } 
 
     = VAR LAction : LbeStd . LRStateTyp  
 
@@ -2736,7 +2737,7 @@ TRUE OR
           ActualParseCheck < MaxParseCheck AND NOT Accepted. *) 
     ; Repairing : BOOLEAN 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LParseCheck : LbeStd . LimitedTokCtTyp 
   ; VAR LLRState : LbeStd . LRStateTyp 
@@ -2984,7 +2985,7 @@ TRUE OR
     ; ErrCode : LbeStd . ErrCodeTyp 
     ; VAR Accepted : BOOLEAN 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted }  
+  RAISES { Backout , Thread . Alerted }  
 
   = VAR RepBestCost : LbeStd . RepairCostTyp 
   ; VAR RepBestAccepted : BOOLEAN 
@@ -3059,7 +3060,7 @@ TRUE OR
                    doing so would give >= best cost. 
                Success => one token has been shifted in StateList *) 
       ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     (* Add a continuation token by doing continuation reductions 
        and one continuation shift, Adjusting StateList. 
@@ -3173,7 +3174,7 @@ TRUE OR
       ( VAR (* IN OUT *) TokInfo : ParseHs . TokInfoTyp 
       ; VAR (* IN OUT *) TrialState : TrialStateTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Construct a ModTok to reverse a parser deletion of TokInfo, and
        put it into the TokIinfo's slice list, as a leading mod. *) 
 
@@ -3323,7 +3324,7 @@ TRUE OR
       ( READONLY StateList : StateListTyp 
       ; ExtraParseCheck : LbeStd . LimitedTokCtTyp 
       ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = VAR LLRState : LbeStd . LRStateTyp 
     ; VAR LInsertionNo : PortTypes . Int32Typ 
@@ -3870,7 +3871,7 @@ TRUE OR
     ; ParseTravStateRef : ParseHs . ParseTravStateRefTyp
     ; VAR NewTreeRef : LbeStd . EstRootTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LActualParseCheck : LbeStd . LimitedTokCtTyp 
   ; VAR LErrCode : LbeStd . ErrCodeTyp 

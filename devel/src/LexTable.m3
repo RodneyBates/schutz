@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -16,7 +16,8 @@ MODULE LexTable
 
 ; IMPORT Text 
 
-; FROM Assertions IMPORT Assert , AssertionFailure 
+; FROM Assertions IMPORT Assert 
+; FROM Failures IMPORT Backout 
 ; IMPORT LexTableRep 
 ; IMPORT MessageCodes 
 ; IMPORT PortTypes 
@@ -93,7 +94,7 @@ MODULE LexTable
 
 (* VISIBLE: *) 
 ; PROCEDURE ValueFromText ( Table : T ; Name : TEXT ) : ValueTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* ValueNull if Name is not in Table. *) 
 
   = VAR LChars : ARRAY [ 0 .. MaxStringLength - 1 ] OF CHAR 

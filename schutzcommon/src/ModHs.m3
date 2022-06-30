@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -18,7 +18,8 @@ MODULE ModHs
 ; IMPORT SharedStrings 
 ; IMPORT MessageCodes 
 
-; FROM Assertions IMPORT CantHappen , AssertionFailure 
+; FROM Assertions IMPORT CantHappen 
+; FROM Failures IMPORT Backout  
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -109,7 +110,7 @@ MODULE ModHs
 
 (* VISIBLE: *) 
 ; PROCEDURE CopyOfModCmnt ( Old : ModCmntTyp ) : ModCmntTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Make a copy. *) 
 
   = VAR LResult : ModCmntTyp 

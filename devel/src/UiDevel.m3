@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -30,7 +30,7 @@ MODULE UiDevel
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT Boot 
 ; IMPORT Display 
 ; IMPORT EditWindow 
@@ -332,7 +332,7 @@ MODULE UiDevel
 (* Write statistics. *) 
 
 ; PROCEDURE WriteStatsWorkProc ( Closure : WorkerClosureWriteTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted }   
+  RAISES { Backout , Thread . Alerted }   
   (* PRE: Closure . Window, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *) 
 
@@ -495,7 +495,7 @@ MODULE UiDevel
 (* Generate Est module. *) 
 
 ; PROCEDURE GenEstModuleWorkProc ( Closure : WorkerClosureWriteTyp )  
-  RAISES { AssertionFailure , Thread . Alerted }   
+  RAISES { Backout , Thread . Alerted }   
   (* PRE: Closure . Window, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)   
 
@@ -947,7 +947,7 @@ MODULE UiDevel
 (* Generate child interface. *) 
 
 ; PROCEDURE GenChildInterfaceWorkProc ( Closure : WorkerClosureWriteTyp )  
-  RAISES { AssertionFailure , Thread . Alerted }   
+  RAISES { Backout , Thread . Alerted }   
   (* PRE: Closure . Window, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)  
 
@@ -1235,7 +1235,7 @@ MODULE UiDevel
 (* Repaint. *) 
 
 ; PROCEDURE RepaintWorkProc ( Closure : Worker . ClosureTyp )  
-  RAISES { AssertionFailure , Thread . Alerted }   
+  RAISES { Backout , Thread . Alerted }   
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
  
@@ -1296,7 +1296,7 @@ MODULE UiDevel
 (* Reconstruct lines. *)   
 
 ; PROCEDURE ReconstructLinesWorkProc ( Closure : Worker . ClosureTyp )  
-  RAISES { AssertionFailure , Thread . Alerted }   
+  RAISES { Backout , Thread . Alerted }   
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -1351,7 +1351,7 @@ MODULE UiDevel
 (* Verify LinesRefs. *) 
 
 ; PROCEDURE VerifyLinesRefsWorkProc ( Closure : Worker . ClosureTyp )  
-  RAISES { AssertionFailure , Thread . Alerted }   
+  RAISES { Backout , Thread . Alerted }   
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
  
@@ -1504,7 +1504,7 @@ MODULE UiDevel
 (* MergeText. *) 
 
 ; PROCEDURE MergeTextWorkProc ( Closure : Worker . ClosureTyp )  
-  RAISES { AssertionFailure , Thread . Alerted }   
+  RAISES { Backout , Thread . Alerted }   
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)  
  
@@ -1576,7 +1576,7 @@ MODULE UiDevel
               ) 
     ; TRY 
         TreeBrowse . Interp ( LSession ) 
-      EXCEPT AssertionFailure => (* Disregard. *) 
+      EXCEPT Backout => (* Disregard. *) 
       END (* TRY EXCEPT *) 
     ; Trestle . Delete ( Self . Form ) 
     ; RETURN NIL 

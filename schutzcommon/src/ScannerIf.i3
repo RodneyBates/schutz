@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -20,7 +20,7 @@ INTERFACE ScannerIf
 ; IMPORT Strings 
 ; IMPORT SchutzCoroutine 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; TYPE Public = SchutzCoroutine . T OBJECT END (* OBJECT *) 
 
@@ -38,11 +38,11 @@ INTERFACE ScannerIf
     ; VAR DeliverString : Strings . StringTyp 
     ; VAR AreAllBlanks : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Retrieve Initial information delivered to scanner. *) 
 
 ; PROCEDURE AccumSlice ( ScanIf : ScanIfTyp ; Slice : Strings . StringTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Accumulate Slice as part of the token being scanned. *) 
   (* AccumSlice runs on the scanner's coroutine, but may also resume 
      parse traverser. *) 
@@ -58,7 +58,7 @@ INTERFACE ScannerIf
       (* ^NextSlice delivered to scanner. *) 
     ; VAR AreAllBlanks : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Consume the first ConsumedCt of the substring last delivered to 
      the scanner. *) 
   (* ConsumeChars runs on the scanner's coroutine, 
@@ -77,27 +77,27 @@ INTERFACE ScannerIf
     ; VAR AreAllBlanks : BOOLEAN 
     ; IsPlaceholder : BOOLEAN := FALSE 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Do what ConsumeChars does, plus deliver a token in Tok. *) 
   (* DeliverTok runs on the scanner's coroutine, 
      but resumes parse traverser *) 
 
 ; PROCEDURE NoteBeg 
     ( ScanIf : ScanIfTyp ; ScanState : LbeStd . ScanStateTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Note that the current character is the first of a token *) 
   (* NoteBeg runs on the scanner's coroutine, 
      but resumes parse traverser *) 
 
 ; PROCEDURE NoteBegPrevChar 
     ( ScanIf : ScanIfTyp ; ScanState : LbeStd . ScanStateTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Note that the previous character is the first of a token *) 
   (* NoteBegPrevChar runs on the scanner's coroutine, 
      but resumes parse traverser *) 
 
 ; PROCEDURE LexErr ( ScanIf : ScanIfTyp ; ErrCode : LbeStd . ErrCodeTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Attach a lexical error message to the current token *) 
   (* LexErr runs on the scanner's coroutine, 
      but resumes parse traverser *) 

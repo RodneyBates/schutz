@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -10,7 +10,7 @@ INTERFACE Search
 
 ; IMPORT Thread 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT LbeStd 
 ; IMPORT PaintHs 
 
@@ -34,7 +34,7 @@ INTERFACE Search
     ; PredHintMark : PaintHs . LineMarkMeatTyp := NIL 
     ; SuccHintMark : PaintHs . LineMarkMeatTyp := NIL 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE StringSearchFwd  
     ( Window : PaintHs . WindowRefTyp 
@@ -43,7 +43,7 @@ INTERFACE Search
     ; StartAtBOI : BOOLEAN := FALSE 
     ) 
   : BOOLEAN (* String was found (and cursor moved to it.) *) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE StringSearchBwd  
     ( Window : PaintHs . WindowRefTyp 
@@ -52,7 +52,7 @@ INTERFACE Search
     ; StartAtEOI : BOOLEAN := FALSE 
     ) 
   : BOOLEAN (* String was found (and cursor moved to it.) *) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; TYPE ReplaceKindTyp 
     = { Once (* Only replace matched string. *) 
@@ -69,7 +69,7 @@ INTERFACE Search
     ; CaseSensitive : BOOLEAN 
     ; ReplaceKind : ReplaceKindTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; END Search 
 . 

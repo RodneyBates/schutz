@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -42,7 +42,7 @@ INTERFACE Worker
         (* Will be set by RequestWork*.  apply overrides can test this. *) 
       ; Granularity : GranularityTyp (* For now, treat everything as Global. *)
       METHODS
-        apply ( ) RAISES { Assertions . AssertionFailure , Thread . Alerted } 
+        apply ( ) RAISES { Failures . Backout , Thread . Alerted } 
       END 
 
 ; TYPE WorkResultTyp 
@@ -134,7 +134,7 @@ INTERFACE Worker
     ; DoWriteCheckpoint : BOOLEAN 
       (* ^Requests Failure to write a checkpoint. *) 
     ) 
-  : BOOLEAN (* Raise AssertionFailure. *) 
+  : BOOLEAN (* Raise Backout. *) 
   <* LL.sup < VBT.mu *>
   (* Worker thread calls this from inside an assertion failure.
      Failure does not return until it is known what to do, which could

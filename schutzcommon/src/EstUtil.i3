@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -16,7 +16,7 @@ INTERFACE EstUtil
 ; IMPORT LangUtil 
 ; IMPORT ModHs 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 (* Information about Est nodes of any subtype: *) 
 
@@ -24,7 +24,7 @@ INTERFACE EstUtil
 
 ; PROCEDURE EstTok ( NodeRef : LbeStd . EstRootTyp ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* If NodeRef is a string object, returns its token. 
      Otherwise, the EstTok stored in the node. 
   *) 
@@ -32,14 +32,14 @@ INTERFACE EstUtil
 ; PROCEDURE FsRuleForEstNode  
     ( Lang : LbeStd . LangTyp ; NodeRef : LbeStd . EstRootTyp ) 
   : LangUtil . FsNodeRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* The FsNodeRef of the root of the format tree for an Est node,
      or an FsNode of FsKindAstString, for an AstString. 
   *) 
 
 ; PROCEDURE EstChildKindSet ( NodeRef : LbeStd . EstRootTyp ) 
   : EstHs . EstChildKindSetTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* WARNING: EstChildKindContainsInsertionRepair and 
               EstChildKindContainsSyntMod can't be ascertained from
               the node itself, for ModDel and AstString, nor can
@@ -50,7 +50,7 @@ INTERFACE EstUtil
 ; PROCEDURE EstIsPlaceholder 
     ( Lang : LbeStd . LangTyp ; NodeRef : LbeStd . EstRootTyp ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Either from a SharedString . T or an Est node. *) 
 
 ; PROCEDURE EstChildCt 
@@ -68,13 +68,13 @@ INTERFACE EstUtil
 ; PROCEDURE EstMiscInfo 
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : EstHs . EstMiscInfoTyp 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
 (* MAYBE: Make this result a VAR parameter? *)
 
 ; PROCEDURE EstEdgeKind  
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : EstHs . EdgeKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE EstIthChildEdgeKind  
     ( Lang : LbeStd . LangTyp 
@@ -82,24 +82,24 @@ INTERFACE EstUtil
     ; I : LbeStd . EstChildNoTyp 
     ) 
   : EstHs . EdgeKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE LeftTokForEst 
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE RightTokForEst 
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE GetKTreeSliceEdgeInfoPair 
     ( Lang : LbeStd . LangTyp 
     ; KTreeRef : EstHs . KTreeRefTyp 
     ; VAR SliceEdgeInfoPair : EstHs . SliceEdgeInfoPairTyp 
     ) 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
 
 ; PROCEDURE VarTermImage
     ( NodeRef : LbeStd . EstRootTyp
@@ -116,7 +116,7 @@ INTERFACE EstUtil
     ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
     ) 
   : TEXT 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* ^Also works on NIL, giving "NIL" *) 
 
 ; PROCEDURE EstNodeImage 
@@ -128,7 +128,7 @@ INTERFACE EstUtil
     ; Mnemonic : BOOLEAN := FALSE 
     ) 
   : TEXT 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* ^Also works on NIL, giving "NIL" *) 
 
 ; PROCEDURE EstLeavesImage
@@ -194,7 +194,7 @@ INTERFACE EstUtil
     ; READONLY Right : EstHs . WidthInfoTyp 
     ) 
   : LbeStd . LimitedCharNoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Prepend a left starting CharPos to a right WidthInfo, giving an ending
      CharPos. *) 
   (* Return infinity if won't fit on a full-length line. *) 
@@ -211,7 +211,7 @@ INTERFACE EstUtil
     ; ChildNo : LbeStd . EstChildNoTyp 
     ) 
   : EstHs . ElemNoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 (* Operations on child lists *) 
 
@@ -225,12 +225,12 @@ INTERFACE EstUtil
          relative to the parent rooted at NodeRef. *) 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE IthChildRef 
     ( EstRef : EstHs . EstRefTyp ; I : LbeStd . EstChildNoTyp ) 
   : LbeStd . EstRootTyp   
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
 
 ; PROCEDURE GetIthChild 
     ( EstRef : EstHs . EstRefTyp 
@@ -242,7 +242,7 @@ INTERFACE EstUtil
       *) 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE GetParent 
     ( RootRef : EstHs . EstRefTyp 
@@ -251,7 +251,7 @@ INTERFACE EstUtil
     ; VAR ResultNodeNo : LbeStd . EstNodeNoTyp 
     ; VAR ResultNodeRef : EstHs . EstRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* If NodeNo is either an optimized singleton list or its element, will 
      give the parent of the list. *)  
   (* ^This is pretty pedantic.  Prefer to use it only in maintenance. *) 
@@ -261,7 +261,7 @@ INTERFACE EstUtil
     ; NodeNo : LbeStd . EstNodeNoTyp 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* If NodeNo is an optimized singleton list, will give its element. *)  
   (* ^This is pretty pedantic.  Prefer to use it only in maintenance. *) 
 
@@ -272,7 +272,7 @@ INTERFACE EstUtil
     ; VAR WasAlreadyFALSE : BOOLEAN 
       (* ^The value there was already FALSE. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE SetChildKindBitTRUE 
     ( EstRef : EstHs . EstRefTyp 
@@ -281,14 +281,14 @@ INTERFACE EstUtil
     ; VAR WasAlreadyTRUE : BOOLEAN 
       (* ^The value there was already TRUE. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE SetDescendentKindBitTRUE 
     ( EstRef : EstHs . EstRefTyp 
     ; NodeNo : LbeStd . EstNodeNoTyp 
     ; KindBit : EstHs . EstChildKindTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Also copies KindBit up, if KindBit IN EstChildKindSetCopyUp *) 
 
 ; PROCEDURE SetChildRef 
@@ -296,7 +296,7 @@ INTERFACE EstUtil
     ; ChildNo : LbeStd . EstChildNoTyp 
     ; NewChildRef : LbeStd . EstRootTyp  
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Violently change a child ref in place, without any changes to kind sets, 
      width info, etc.  Violates the usual immutability rule.  Use on your
      own recognizance.  
@@ -310,7 +310,7 @@ INTERFACE EstUtil
     ; VAR ResultChildRelNodeNo : LbeStd . EstNodeNoTyp 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 (* Beginning with the StartChildNo-th element (inclusive), 
     search for and return the subscript, root node number, 
     and leaf elem of the next element whose kind set intersects 
@@ -327,13 +327,13 @@ INTERFACE EstUtil
     ; VAR ResultChildRelNodeNo : LbeStd . EstNodeNoTyp 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PrevInKindSet is like NextInKinds, but search backwards. *) 
   (* If not found, ResultChildNo = - 1 *) 
 
 ; PROCEDURE ApproxChildCt ( Root : LbeStd . EstRootTyp ) 
   : ModHs . EstApproxChildCtTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 (* Predicates, used in conditional formatting *) 
 
@@ -344,7 +344,7 @@ INTERFACE EstUtil
     ; KindSet : EstHs . EstChildKindSetTyp 
     ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE UnmarkContainsTempMark ( EstRef : LbeStd . EstRootTyp ) 
 
@@ -377,7 +377,7 @@ INTERFACE EstUtil
 
 ; PROCEDURE Statistics 
     ( Parent : EstHs . KTreeRefTyp ; VAR Result : StatisticsTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; END EstUtil 
 . 

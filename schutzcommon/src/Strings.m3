@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -18,6 +18,7 @@ MODULE Strings EXPORTS Strings
 
 ; IMPORT MessageCodes 
 ; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 
 ; FROM Assertions IMPORT Assert 
 
@@ -89,7 +90,7 @@ MODULE Strings EXPORTS Strings
     END FromText 
 
 ; PROCEDURE ForceToHaveExactText 
-    ( VAR String : T ) RAISES { Assertions . AssertionFailure } 
+    ( VAR String : T ) RAISES { Backout } 
 
   (* Force to have a TEXT, whose entire contents are the 
      represented string. *) 
@@ -129,7 +130,7 @@ MODULE Strings EXPORTS Strings
 (* VISIBLE: *) 
 ; PROCEDURE ToText 
     ( String : T ; From : StringSsTyp := 0 ) : TEXT 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
   = BEGIN (* ToText *) 
       IF From = 0 
@@ -152,7 +153,7 @@ MODULE Strings EXPORTS Strings
 (* VISIBLE: *) 
 ; PROCEDURE ToTextNonNIL 
     ( String : T ; From : StringSsTyp := 0 ) : TEXT 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
   = VAR LResult : TEXT 
 
@@ -215,7 +216,7 @@ MODULE Strings EXPORTS Strings
 (* VISIBLE: *) 
 ; PROCEDURE FetchChars 
     ( VAR Chars : ARRAY OF CHAR ; String : T ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
   (* Truncate or leave suffix of Chars unchanged if lengths are # *) 
 
   = VAR LLength := MIN ( String . FromSs - String . ToSs , NUMBER ( Chars ) ) 
@@ -265,7 +266,7 @@ MODULE Strings EXPORTS Strings
     END MergeEventualLengthHint 
 
 ; PROCEDURE ForceToHaveSpaceOnly 
-    ( VAR String : T ) RAISES { Assertions . AssertionFailure } 
+    ( VAR String : T ) RAISES { Backout } 
 
   (* AND, Space to have MAX ( EventualLengthHint , Length ) CHARs *) 
 
@@ -308,7 +309,7 @@ MODULE Strings EXPORTS Strings
     ; Ch : CHAR 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { SsOutOfBounds , Assertions . AssertionFailure } 
+    RAISES { SsOutOfBounds , Backout } 
 
   = BEGIN (* StoreIthChar *) 
       IF I < 0 OR I + String . FromSs >= String . ToSs 
@@ -327,7 +328,7 @@ MODULE Strings EXPORTS Strings
     ; Right : T 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
   = VAR LLeftLength , LRightLength , LResultLength : StringSsTyp 
 
@@ -360,7 +361,7 @@ MODULE Strings EXPORTS Strings
     ; Right : TEXT (* Can be NIL *) 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
   = VAR LLeftLength , LRightLength , LResultLength : StringSsTyp 
 
@@ -391,7 +392,7 @@ MODULE Strings EXPORTS Strings
     ; Ch : CHAR 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
   = BEGIN (* AppendCharInPlace *) 
       MergeEventualLengthHint ( Left , EventualLengthHint ) 
@@ -427,7 +428,7 @@ MODULE Strings EXPORTS Strings
 (* VISIBLE: *) 
 ; PROCEDURE TruncateInPlace 
     ( VAR (* IN OUT *)  String : T ; ToLength : StringSsTyp ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
   (* NOOP if ToLength > Length ( String *) 
 
   = BEGIN (* TruncateInPlace *) 
@@ -459,7 +460,7 @@ MODULE Strings EXPORTS Strings
 (* VISIBLE: *) 
 ; PROCEDURE LeftTruncateInPlace 
     ( VAR (* IN OUT *) String : T ; ToLength : StringSsTyp ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
   (* Remove characters from the left, shortening the string 
      to ToLength. *) 
   (* NOOP if ToLength > Length ( String *) 
@@ -489,7 +490,7 @@ MODULE Strings EXPORTS Strings
     ; BlankCount : INTEGER 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { SsOutOfBounds , Assertions . AssertionFailure } 
+    RAISES { SsOutOfBounds , Backout } 
   (* After the prefix, insert BlankCount blanks, shifting 
      the suffix right and extending the string by BlankCount *) 
 
@@ -530,7 +531,7 @@ MODULE Strings EXPORTS Strings
     ; PrefixLength : StringSsTyp 
     ; DeleteCount : INTEGER 
     ) 
-    RAISES { SsOutOfBounds , Assertions . AssertionFailure } 
+    RAISES { SsOutOfBounds , Backout } 
   (* After the prefix, delete DeleteCount characters, 
      shifting the suffix left and shortening the string 
      by DeleteCount. Attempting to delete beyond the 
@@ -578,7 +579,7 @@ MODULE Strings EXPORTS Strings
     ; From : StringSsTyp := 0 
     ; For : StringSsTyp := LAST ( StringSsTyp ) 
     ) : T 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
   = VAR LLength : StringSsTyp 
   ; VAR LResult : T 
@@ -791,7 +792,7 @@ MODULE Strings EXPORTS Strings
 (* VISIBLE: *) 
 ; PROCEDURE PosOf1stNonblank 
     ( READONLY String : T ) : StringSsTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
   = VAR LSs : StringSsTyp := String . FromSs 
 
@@ -822,7 +823,7 @@ MODULE Strings EXPORTS Strings
 (* VISIBLE: *) 
 ; PROCEDURE PosOfLastNonblank 
     ( READONLY String : T ) : StringSsSignedTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
   = VAR LSs : StringSsSignedTyp := String . ToSs 
 
@@ -857,7 +858,7 @@ MODULE Strings EXPORTS Strings
 (* VISIBLE: *) 
 ; PROCEDURE InvokeWithArrayOfChar 
     ( String : T ; Proc : ProcArrayOfChar ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
   = TYPE EmptyArrayOfCharTyp = ARRAY [ 0 .. - 1 ] OF CHAR 
 
@@ -877,7 +878,7 @@ MODULE Strings EXPORTS Strings
 
 (* VISIBLE: *) 
 ; PROCEDURE AtLeastBlanks ( MinLength : StringSsTyp ) : T 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
   (* Return a string that is all blanks and of at least MinLength *) 
   (* Depends on clients' not mutating the result. *) 

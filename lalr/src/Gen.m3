@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -29,7 +29,7 @@ MODULE Gen
 ; IMPORT Time 
 ; IMPORT Wr 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT Compress 
 ; IMPORT Default 
 ; IMPORT IntSets 
@@ -74,7 +74,7 @@ MODULE Gen
     END MarkReachableByAstNT 
 
 ; PROCEDURE ClassifyStates ( Gram : LRTable . GrammarTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Zustaende klassifizieren und mit einer neuen Nummer versehen *) 
 
   = VAR LItemSs : LALRTypes . ItemSsTyp 
@@ -497,7 +497,7 @@ MODULE Gen
 
 (* VISIBLE: *) 
 ; PROCEDURE GenTables ( Gram : LRTable . GrammarTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Thread . Alerted *> 
     <* FATAL Wr . Failure *> 

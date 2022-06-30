@@ -1,13 +1,14 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
 INTERFACE EditWindow 
 
+; FROM Failures IMPORT Backout 
 ; IMPORT FormsVBT  
 ; IMPORT Point 
 ; IMPORT Font 
@@ -15,7 +16,6 @@ INTERFACE EditWindow
 
 ; IMPORT Strings 
 ; IMPORT PaintHs 
-; IMPORT Assertions 
 
 <* PRAGMA LL *> 
 
@@ -44,7 +44,7 @@ INTERFACE EditWindow
     ; VertGap : PixelCoordTyp := MinVertGap 
     ) 
   : T 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; TYPE CursorStateTyp 
     = { CsBlinkingOff   (* Used only in stored state *) 

@@ -1,6 +1,6 @@
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -10,7 +10,8 @@ MODULE TravUtil
 (* Common procedures used by several tree traversers. *) 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
 ; IMPORT LangUtil 
@@ -94,7 +95,7 @@ MODULE TravUtil
     ; EstChildRef : LbeStd . EstRootTyp 
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* EstChildRef is the single list child of an Est list node omitted by the
      singleton-list optimization.  Construct a fake EstTravInfo for this list,
      setting EstChildRef as its only element.  
@@ -137,7 +138,7 @@ MODULE TravUtil
          we are not at a FirstOfGroup now, then the old value of 
          EtiChildFmtNo is correct. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: EstTravInfo is initialized.  
      PRE: EtiChildNo of EtiParentRef exists and EtiChildLeafElem is set. 
      PRE: NOT EtiIsOptSingletonList 
@@ -191,7 +192,7 @@ MODULE TravUtil
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ; IsOptSingletonList : BOOLEAN := FALSE 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Sets EtiNodeRef , EtiParentRef , EtiStringRef , EtiChildCt.
      and EtiIsOptSingletonList. *) 
 
@@ -231,7 +232,7 @@ MODULE TravUtil
     ; KindSet : EstHs . EstChildKindSetTyp 
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* For an element of an optimized singleton list, trump up a suitable
      EstTravInfo.  Otherwise, set it up for forward traversal of the
      children of EstNodeRef with ParentAbsNodeNo.
@@ -256,7 +257,7 @@ MODULE TravUtil
     ; KindSet : EstHs . EstChildKindSetTyp 
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* For an element of an optimized singleton list, trump up a suitable
      EstTravInfo.  Otherwise, set it up for backward traversal of the
      children of EstNodeRef with ParentAbsNodeNo.
@@ -283,7 +284,7 @@ MODULE TravUtil
     ; KindSet : EstHs . EstChildKindSetTyp := EstHs . EstChildKindSetEmpty  
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
 
   = BEGIN 
       IF EstHs . EstChildKindOptSingletonList IN KindSet 
@@ -303,7 +304,7 @@ MODULE TravUtil
 
 (* EXPORTED: *) 
 ; PROCEDURE GetLMEstChild ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp )
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
   (* PRE: EstTravInfo is initialized. *) 
   (* Set EtiChildCt from EtiParentRef and EtiIsOptSingletonList.  
      Set EtiChildNo to the leftmost child number (always zero).  
@@ -363,7 +364,7 @@ MODULE TravUtil
 
 (* EXPORTED: *) 
 ; PROCEDURE GetRMEstChild ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp )
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
   (* PRE: EstTravInfo is initialized. *) 
   (* Set EtiChildCt from EtiParentRef and EtiIsOptSingletonList.  
      Set EtiChildNo to the rightmost child number.  
@@ -436,7 +437,7 @@ MODULE TravUtil
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
     ; I : LbeStd . EstChildNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: EstTravInfo is initialized. *) 
   (* Move to Ith child. Set ChildNo, ChildRelNodeNo, ChildLeafElem, 
      and ChildFmtNo. 
@@ -498,7 +499,7 @@ MODULE TravUtil
     ; EstRelNodeNo : LbeStd . EstNodeNoTyp 
       (* ^Node number relative to the parent of EstTravInfo. *) 
     )
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
   (* PRE: EstTravInfo is initialized. *) 
 
   = BEGIN (* SetToChildContainingNodeNo *) 
@@ -546,7 +547,7 @@ MODULE TravUtil
 
 (* EXPORTED: *) 
 ; PROCEDURE IncEstChild ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: EstTravInfo is initialized. *) 
   (* Increase ChildNo. If there is another child, set 
      ChildLeafElem and ChildFmtNo accordingly. 
@@ -614,7 +615,7 @@ MODULE TravUtil
 
 (* EXPORTED: *) 
 ; PROCEDURE DecEstChild ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: EstTravInfo is initialized. *) 
   (* Decrease ChildNo. If there is an earlier child, set 
      ChildLeafElem and ChildFmtNo accordingly. 
@@ -684,7 +685,7 @@ MODULE TravUtil
     ; StartChildNo : LbeStd . EstChildNoTyp 
     ; KindSet : EstHs . EstChildKindSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: EstTravInfo is initialized. *) 
 
   = BEGIN (* SetToNextInKindSet *) 
@@ -731,7 +732,7 @@ MODULE TravUtil
     ; StartChildNo : LbeStd . EstChildNoTyp 
     ; KindSet : EstHs . EstChildKindSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: EstTravInfo is initialized. *) 
 
   = BEGIN (* SetToPrevInKindSet *) 
@@ -777,7 +778,7 @@ MODULE TravUtil
     ; VAR ChildIndentPosN : LbeStd . LimitedCharNoTyp 
     ; IsFirstLine : BOOLEAN := FALSE 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN    
       IF FsEstChildNodeRef = NIL 
@@ -861,7 +862,7 @@ MODULE TravUtil
     ; Bwd : BOOLEAN 
     )  
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* "First line" in the layout sense that does not consider New lines 
      inserted by modifiers.
   *) 
@@ -980,7 +981,7 @@ MODULE TravUtil
     ; VAR (* OUT *) RelevantModRef : LbeStd . EstRootTyp 
     ; VAR (* OUT *) ModDelIsFinished : BOOLEAN 
     )
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
   (* For forward traversals. 
      RelevantModRef # NIL iff the next child is a mod for this fs item, 
      in which case it points to the relevant mod. 
@@ -1050,7 +1051,7 @@ MODULE TravUtil
     ; FsNodeRef : LangUtil . FsNodeRefTyp 
     ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   (* When traversing forwards and FsNode is a CondFmtNode, 
      ascertain whether the conditional format insertions 
@@ -1161,7 +1162,7 @@ MODULE TravUtil
     ; FsNodeRef : LangUtil . FsNodeRefTyp 
     ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* When traversing backwards and FsNode is a CondFmtNode, 
      ascertain whether the conditional format insertions 
      are to be done. *) 
@@ -1255,7 +1256,7 @@ MODULE TravUtil
     ; VAR KindSet : EstHs . EstChildKindSetTyp 
     ; VAR IsOptSingletonList : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* IsOptSingletonList means EstNodeNo is for an optimized-away singleton list,
      and EstRef and KindSet denote its one element, whose actual NodeNo is 
      EstNodeNo + 1.
@@ -1333,7 +1334,7 @@ MODULE TravUtil
       (* ^Node number relative to Root. *) 
     ) 
   : LbeStd . EstNodeNoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LEstRef : LbeStd . EstRootTyp
   ; VAR LKindSet : EstHs . EstChildKindSetTyp  
@@ -1363,7 +1364,7 @@ MODULE TravUtil
     ; VAR FsChildNo : LangUtil . FsChildNoTyp 
     ; Bwd : BOOLEAN := FALSE
     ) 
-   RAISES { AssertionFailure } 
+   RAISES { Backout } 
   (* When descending through a CondFmt node, call this to check the predicate
      and find the appropriate immediate child number. *) 
 
@@ -1422,7 +1423,7 @@ MODULE TravUtil
     ; ChildKindSet : EstHs . EstChildKindSetTyp 
     )
   : LangUtil . FsNodeRefTyp
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Return the Fs leaf that has FmtNo.  Will evaluate predicates if
      necessary, to get to the correct alternative FsEstChild. 
   *)
@@ -1481,7 +1482,7 @@ MODULE TravUtil
     ; VAR ParentFsNodeRef : LangUtil . FsNodeRefTyp 
     ; VAR ParentIndentPos : LbeStd . LimitedCharNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
  
   = VAR LParentKindSet : EstHs . EstChildKindSetTyp 
   ; VAR LParentIndentPos1 , LParentIndentPosN : LbeStd . LimitedCharNoTyp 
@@ -1621,7 +1622,7 @@ MODULE TravUtil
     ; TokMark : Marks . TokMarkTyp 
     ) 
   : LbeStd . LimitedCharNoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: TokMark denotes a new line. *) 
   (* The actual indent position for the text beginning on a new line at the 
      point TokMark denotes, in the tree rooted at EstRoot.  
@@ -1809,7 +1810,7 @@ MODULE TravUtil
           (* ^This many Est list children will fit on the line, before looking
              for LastFmtNoOnLine. *)
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Ascertain how much text of this FsTree we can get onto the current line, 
      starting at the spot given by the parameters and assuming optional line
      breaks are NOT taken.  The last item that fits includes 
@@ -1887,10 +1888,10 @@ MODULE TravUtil
       END PtlCountFloatingTok 
 
   ; PROCEDURE PtlTraverseFs ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
-    = PROCEDURE PtlTfsEstSubtree ( ) RAISES { AssertionFailure } 
+    = PROCEDURE PtlTfsEstSubtree ( ) RAISES { Backout } 
 
       (* Do not descend into the child.  Just use its width. *) 
 
@@ -1940,7 +1941,7 @@ MODULE TravUtil
     (* Leading mods. *) 
 
     ; PROCEDURE PtlTfsModCmnt ( ModCmntRef : ModHs . ModCmntTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
       = BEGIN (* PtlTfsModCmnt *) 
@@ -2056,7 +2057,7 @@ MODULE TravUtil
         END PtlTfsModCmnt 
 
     ; PROCEDURE PtlTfsModText ( ModTextRef : ModHs . ModTextTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
       = BEGIN (* PtlTfsModText *) 
@@ -2095,7 +2096,7 @@ MODULE TravUtil
           (* ^A delete mod applies to next token. *) 
         ; VAR IsRepair : BOOLEAN 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
       = VAR LModRef : LbeStd . EstRootTyp 
@@ -2181,7 +2182,7 @@ MODULE TravUtil
 
     (* Trailing mods: *) 
 
-    ; PROCEDURE PtlTfsTrailingMods ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE PtlTfsTrailingMods ( ) RAISES { Backout } 
       (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
       = VAR LHangingTrailingMods : BOOLEAN 
@@ -2221,7 +2222,7 @@ MODULE TravUtil
 
     (* Format syntax trees *) 
 
-    ; PROCEDURE PtlTfsInsTok ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE PtlTfsInsTok ( ) RAISES { Backout } 
       (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
       = VAR LDelete : BOOLEAN 
@@ -2250,7 +2251,7 @@ MODULE TravUtil
           END (* IF*) 
         END PtlTfsInsTok 
 
-    ; PROCEDURE PtlTfsEstChild ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE PtlTfsEstChild ( ) RAISES { Backout } 
       (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
       = VAR LDelete : BOOLEAN 
@@ -2303,7 +2304,7 @@ MODULE TravUtil
 
     ; PROCEDURE PtlTfsTraverseFsFixedChildren 
         ( FromFsChildNo : LangUtil . FsChildNoTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
       = VAR LFsChildCt : LangUtil . FsChildNoTyp 
@@ -2328,7 +2329,7 @@ MODULE TravUtil
 
     ; PROCEDURE PtlTfsTraverseFsListChildren 
         ( FromFsChildNo : LangUtil . FsChildNoTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
       = VAR LFsChildCt : LangUtil . FsChildNoTyp 
@@ -2361,7 +2362,7 @@ MODULE TravUtil
         END PtlTfsTraverseFsListChildren 
 
     ; PROCEDURE PtlTfsTraverseCondFmtChildren ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: PtlState # PtlStateTyp . PtlStateDone *) 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -2518,7 +2519,7 @@ MODULE TravUtil
 ; PROCEDURE EstChildHasZeroWidth 
      ( Lang : LbeStd . LangTyp ; READONLY EstTravInfo : EstTravInfoTyp ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
 
@@ -2551,7 +2552,7 @@ MODULE TravUtil
   (* True iff any item of nonzero width is found to the right on the line
      and within the stuff formatted by SubtreeFsNodeRef. *)
   (* PRE: We are descending towards a Nl. *) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = TYPE NzwrStateTyp 
          = { NzwrStateDescending 
@@ -2565,10 +2566,10 @@ MODULE TravUtil
   ; VAR NzwrResult : BOOLEAN 
 
   ; PROCEDURE NzwrTraverseFs ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = PROCEDURE NzwrTfsEstOrMod ( IsZeroWidth : BOOLEAN ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           CASE NzwrState <* NOWARN *> 
@@ -2595,7 +2596,7 @@ MODULE TravUtil
           (* ^A tok delete mod applies to next tok. *) 
         ; VAR IsRepair : BOOLEAN 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: NzwrState # NzwrStateTyp . NzwrStateDone *) 
 
       = VAR LModRef : LbeStd . EstRootTyp 
@@ -2671,7 +2672,7 @@ MODULE TravUtil
 
     (* Trailing mods: *) 
 
-    ; PROCEDURE NzwrTfsTrailingMods ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE NzwrTfsTrailingMods ( ) RAISES { Backout } 
       (* PRE: NzwrState # NzwrStateTyp . NzwrStateDone *) 
 
       = BEGIN (* NzwrTfsTrailingMods *) 
@@ -2702,7 +2703,7 @@ MODULE TravUtil
 
     ; PROCEDURE NzwrTfsTraverseFsFixedChildren 
         ( FromFsChildNo : LangUtil . FsChildNoTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: NzwrState # NzwrStateTyp . NzwrStateDone *) 
 
       = VAR LFsChildCt : LangUtil . FsChildNoTyp 
@@ -2730,7 +2731,7 @@ MODULE TravUtil
         END NzwrTfsTraverseFsFixedChildren 
 
     ; PROCEDURE NzwrTfsTraverseCondFmtChildren ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: NzwrState # NzwrStateTyp . NzwrStateDone *) 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -2870,7 +2871,7 @@ MODULE TravUtil
      (but not including) the current Est child in EstTravInfo, within 
      the line and within the stuff formatted by SubtreeFsNodeRef. *)
   (* PRE: We are descending towards a Nl. *) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = TYPE NzwlStateTyp 
          = { NzwlStateDescending 
@@ -2884,10 +2885,10 @@ MODULE TravUtil
   ; VAR NzwlResult : BOOLEAN 
 
   ; PROCEDURE NzwlTraverseFs ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = PROCEDURE NzwlTfsEstOrMod ( IsZeroWidth : BOOLEAN ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           CASE NzwlState <* NOWARN *> 
@@ -2910,7 +2911,7 @@ MODULE TravUtil
         END NzwlTfsEstOrMod  
 
     ; PROCEDURE NzwlTfsLeadingModsNoDel ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: NzwlState # NzwlStateTyp . NzwlStateDone *) 
 
       = BEGIN (* NzwlTfsLeadingModsNoDel *) 
@@ -2977,7 +2978,7 @@ MODULE TravUtil
 
     ; PROCEDURE NzwlTfsCheckLeadingDel 
         ( VAR Delete : BOOLEAN ; VAR IsRepair : BOOLEAN ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Caller must ensure only a deletable FsNode is current. *) 
 
       = BEGIN (* NzwlTfsCheckLeadingDel *) 
@@ -3016,7 +3017,7 @@ MODULE TravUtil
 
     (* Trailing mods: *) 
 
-    ; PROCEDURE NzwlTfsTrailingMods ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE NzwlTfsTrailingMods ( ) RAISES { Backout } 
       (* PRE: NzwlState # NzwlStateTyp . NzwlStateDone *) 
 
       = BEGIN (* NzwlTfsTrailingMods *) 
@@ -3047,7 +3048,7 @@ MODULE TravUtil
 
     ; PROCEDURE NzwlTfsTraverseFsFixedChildren 
         ( FromFsChildNo : LangUtil . FsChildNoSignedTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: NzwlState # NzwlStateTyp . NzwlStateDone *) 
 
       = VAR LFsChildCt : LangUtil . FsChildNoTyp 
@@ -3076,7 +3077,7 @@ MODULE TravUtil
         END NzwlTfsTraverseFsFixedChildren 
 
     ; PROCEDURE NzwlTfsTraverseCondFmtChildren ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: NzwlState # NzwlStateTyp . NzwlStateDone *) 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -3275,7 +3276,7 @@ MODULE TravUtil
       (* ^FALSE merely means we don't know. *)
     ) 
   : LangUtil . FmtKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Use when descending into an Est, toward a line mark. *)
 
   = VAR LResultIfNotHoriz : LangUtil . FmtKindTyp 
@@ -3391,7 +3392,7 @@ TRUE OR
     ; EstRef : LbeStd . EstRootTyp 
     ) 
   : LangUtil . FmtKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Use when traversing into the Est from one end or the other. *) 
 (* CHECK: Works Bwd?  Do we need it to? *) 
 
@@ -3530,7 +3531,7 @@ TRUE OR
       (* ^FALSE merely means we don't know. *)
     ) 
   : LangUtil . FmtKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Use when descending into an FsSubtree, preferably toward a line mark. *)
 
   = VAR LResultIfNotHoriz : LangUtil . FmtKindTyp 
@@ -3746,7 +3747,7 @@ TRUE OR
     ; VAR (* IN OUT *) EstListChildrenToPass : LbeStd . EstChildNoTyp 
     ) 
   : LangUtil . FmtKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Use when traversing into the Fs subtree from one end or the other,
      when info about the current line is known. *) 
 (* CHECK: Works Bwd?  Do we need it to? *) 
@@ -3826,7 +3827,7 @@ TRUE OR
     ; VAR (* IN OUT *) EstListChildrenToPass : LbeStd . EstChildNoTyp 
     ) 
   : BOOLEAN 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
   (* The line break must be undeleted. 
      This function has a SIDE EFFECT.  If the line break is not to be taken,
      notes that it has been passed, which must happen exactly once, so that
@@ -3901,7 +3902,7 @@ TRUE OR
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LTreeFmtNo : EstHs . FmtNoTyp 
 
@@ -3929,7 +3930,7 @@ TRUE OR
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN 
       IF NOT FsNodeRef . FsIsInsideList 
@@ -3949,11 +3950,11 @@ TRUE OR
     ( RootNodeRef : LbeStd . EstRootTyp ; SoughtNodeRef : REFANY ) 
   : LbeStd . EstNodeNoTyp
   (* LbeStd.EstNodNoNull, if not found. *)
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = PROCEDURE NnnrRecurse
       ( NodeRef : LbeStd . EstRootTyp ; AbsNodeNo : LbeStd . EstNodeNoTyp )
-    RAISES { NodeNoFound , AssertionFailure } 
+    RAISES { NodeNoFound , Backout } 
 
     = VAR LChildAbsNodeNo : LbeStd . EstNodeNoTyp
     ; VAR LEstTravInfo : EstTravInfoTyp

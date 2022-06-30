@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -13,7 +13,7 @@ INTERFACE EstHs
    mutator procedures in here.  
 *) 
 
-; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 ; IMPORT PortTypes 
 ; IMPORT LbeStd 
 
@@ -140,7 +140,7 @@ INTERFACE EstHs
 ; PROCEDURE MakeWidthInfoNull ( VAR WidthInfo : WidthInfoTyp ) 
 
 ; PROCEDURE WidthInfoIsNull ( WidthInfo : WidthInfoTyp ) : BOOLEAN 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 (* Use MakeWidthInfoInfinity to assign WidthInfoInfinity, because 
    Pm3-1.1.15, LINUXLIBC6, generates bad code for := WidthInfoNull, 

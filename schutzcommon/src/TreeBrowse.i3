@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -13,7 +13,7 @@ INTERFACE TreeBrowse
 ; IMPORT Rd 
 ; IMPORT Wr 
 
-; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 ; IMPORT LbeStd 
 
 ; TYPE T <: Public 
@@ -61,12 +61,12 @@ INTERFACE TreeBrowse
     ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
     ; TreeId : TEXT := "" 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* A complete browse, using Stdio. *) 
 (* TODO: Several places duplicate this proc.  Remove them. *) 
 
 ; PROCEDURE Interp ( Session : SessionTyp ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; END TreeBrowse 
 . 

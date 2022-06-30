@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -15,7 +15,8 @@
 ; IMPORT Thread 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
 ; IMPORT LangUtil 
@@ -39,7 +40,7 @@
     ; DoGenerateText : BOOLEAN := TRUE 
     ; DoGenerateErrors : BOOLEAN := FALSE 
     ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
   = VAR WtxCharPos : LbeStd . LimitedCharNoTyp 
   ; VAR WtxPrevTok : LbeStd . TokTyp 
@@ -50,7 +51,7 @@
   ; VAR WtxEstListChildrenToPass : LbeStd . EstChildNoTyp 
 
   ; PROCEDURE WtxAccumChar 
-      ( Ch : CHAR ) RAISES { AssertionFailure } 
+      ( Ch : CHAR ) RAISES { Backout } 
 
     = BEGIN (* WtxAccumChar *) 
         IF DoGenerateText 
@@ -62,7 +63,7 @@
 
   ; PROCEDURE WtxBlankFillTo 
       ( ToCharPos : LbeStd . LimitedCharNoSignedTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* WtxBlankFillTo *) 
         IF ToCharPos < LbeStd . LimitedCharNoInfinity 
@@ -77,7 +78,7 @@
 
   ; PROCEDURE WtxAccumString 
       ( StringRef : SharedStrings . T ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
     = BEGIN (* WtxAccumString *) 
         IF DoGenerateText AND StringRef # NIL 
@@ -91,7 +92,7 @@
       END WtxAccumString 
 
   ; PROCEDURE WtxAccumText 
-      ( FText : TEXT ) RAISES { AssertionFailure } 
+      ( FText : TEXT ) RAISES { Backout } 
 
     = BEGIN (* WtxAccumText *) 
         IF DoGenerateText AND FText # NIL 
@@ -103,7 +104,7 @@
       END WtxAccumText 
 
   ; PROCEDURE WtxDeliverLine ( ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = BEGIN (* WtxDeliverLine *) 
         DeliverLineProc ( ImageRef , WtxLineImage ) 
@@ -128,7 +129,7 @@
       END WtxDeliverLine 
 
   ; PROCEDURE WtxFlushLine ( ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = BEGIN (* WtxFlushLine *) 
         IF WtxPrevTok # LbeStd . Tok__BegOfLine 
@@ -148,7 +149,7 @@
       (* EstIndentPos1 and EstIndentPosN are maintained assuming
          the Est subtree is formatted vertically. *) 
       ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
     = VAR WtxTeEstTravInfo : TravUtil . EstTravInfoTyp 
     ; VAR WtxTeIndentPos : LbeStd . LimitedCharNoTyp 
@@ -159,7 +160,7 @@
 
     ; PROCEDURE WtxTeTraverseFsFixedChildren 
         ( ParentFsNodeRef : LangUtil . FsNodeRefTyp ; FmtKind : LangUtil . FmtKindTyp ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = BEGIN (* WtxTeTraverseFsFixedChildren *) 
           IF ParentFsNodeRef . FsChildren # NIL 
@@ -173,7 +174,7 @@
 
     ; PROCEDURE WtxTeTraverseFsListChildren 
         ( ParentFsNodeRef : LangUtil . FsNodeRefTyp ; FmtKind : LangUtil . FmtKindTyp ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = VAR LFsChildCt : LangUtil . FsChildNoTyp 
       ; VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -207,7 +208,7 @@
 
     ; PROCEDURE WtxTeAstString 
         ( FsNodeRef : LangUtil . FsNodeRefTyp ; FmtKind : LangUtil . FmtKindTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           IF WtxTeEstTravInfo . EtiNodeRef # NIL 
@@ -239,12 +240,12 @@
 
     ; PROCEDURE WtxTeTraverseFs 
         ( FsNodeRef : LangUtil . FsNodeRefTyp ; FsFmtKind : LangUtil . FmtKindTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
       (* Leading and trailing mods. *) 
 
       = PROCEDURE WtxTeTfsModCmnt ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* WtxTeTfsModCmnt *) 
             TYPECASE ModCmnt <* NOWARN *> 
@@ -299,7 +300,7 @@
 
       ; PROCEDURE WtxTeTfsModText 
           ( ModText : ModHs . ModTextTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* WtxTeTfsModText *) 
             IF ModText . ModTextLeftTokToPos = 0 (* Nl before *) 
@@ -330,7 +331,7 @@
           ( VAR Delete : BOOLEAN 
             (* ^A tok delete mod applies to next tok. *) 
           ) 
-          RAISES { AssertionFailure , Thread . Alerted } 
+          RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildRef : LbeStd . EstRootTyp 
         ; VAR LChildFsNodeRef : LangUtil . FsNodeRefTyp 
@@ -442,7 +443,7 @@
           END WtxTeTfsLeadingMods 
 
       ; PROCEDURE WtxTeTfsTrailingMods ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* WtxTeTfsTrailingMods *) 
             LOOP 
@@ -468,7 +469,7 @@
           END WtxTeTfsTrailingMods 
 
       ; PROCEDURE WtxTeTfsEstChild ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
         (* PRE: FsNodeRef . FsKind 
                 IN { FsKindEstChildOfFixed , FsKindEstChildOfList } 
         *) 
@@ -739,7 +740,7 @@
     ; DeliverTokProc : DeliverTokProcTyp 
     ; CmntsWanted : BOOLEAN 
     ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
   = VAR WtkLang : LbeStd . LangTyp 
 
@@ -748,18 +749,18 @@
       ; KindSet : EstHs . EstChildKindSetTyp 
       ; AbsNodeNo : LbeStd . EstNodeNoTyp 
       ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
     = VAR WtkTeEstTravInfo : TravUtil . EstTravInfoTyp 
 
     ; PROCEDURE WtkTeTraverseFs 
         ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       (* Leading mods. *) 
 
       = PROCEDURE WtkTeTfsModCmnt ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* WtkTeTfsModCmnt *) 
             IF CmntsWanted 
@@ -770,7 +771,7 @@
           END WtkTeTfsModCmnt 
 
       ; PROCEDURE WtkTeTfsModText ( ModText : ModHs . ModTextTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* WtkTeTfsModText *) 
             DeliverTokProc ( ImageRef , ModText . ModTextStringRef ) 
@@ -781,7 +782,7 @@
           ( VAR Delete : BOOLEAN 
             (* ^A tok delete mod applies to next tok. *) 
           ) 
-          RAISES { AssertionFailure , Thread . Alerted } 
+          RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildRef : LbeStd . EstRootTyp 
         ; VAR LModDelIsFinished : BOOLEAN 
@@ -847,7 +848,7 @@
           END WtkTeTfsLeadingMods 
 
       ; PROCEDURE WtkTeTfsTrailingMods ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* WtkTeTfsTrailingMods *) 
             LOOP 
@@ -873,7 +874,7 @@
           END WtkTeTfsTrailingMods 
 
       ; PROCEDURE WtkTeTfsTraverseFsFixedChildren 
-          ( ) RAISES { AssertionFailure , Thread . Alerted } 
+          ( ) RAISES { Backout , Thread . Alerted } 
 
         = BEGIN (* WtkTeTfsTraverseFsFixedChildren *) 
             IF FsNodeRef . FsChildren # NIL 
@@ -885,7 +886,7 @@
           END WtkTeTfsTraverseFsFixedChildren 
 
       ; PROCEDURE WtkTeTfsTraverseFsListChildren 
-          ( ) RAISES { AssertionFailure , Thread . Alerted } 
+          ( ) RAISES { Backout , Thread . Alerted } 
 
         = VAR LFsChildCt : LangUtil . FsChildNoTyp 
         ; VAR LFsChildNo : LangUtil . FsChildNoTyp 

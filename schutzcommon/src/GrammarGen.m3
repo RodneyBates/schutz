@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -18,7 +18,8 @@ MODULE GrammarGen
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT Automaton
 ; IMPORT ClassInfo 
 ; IMPORT IntSets
@@ -257,7 +258,7 @@ MODULE GrammarGen
          AS child. *)
     )
   : LRTable . TokArrayRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* A token string containing the tokens FsAltNodeRef will format to,
      with the Est child token replaced by PrincipalChildTok.  
      Always allocates a new token string.  Never mutates or reuses a
@@ -299,7 +300,7 @@ MODULE GrammarGen
   ; VAR AfNextSs : PortTypes . Int32Typ 
 
   ; PROCEDURE AfFill ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN
         CASE FsNodeRef . FsKind <* NOWARN *> 
@@ -614,7 +615,7 @@ MODULE GrammarGen
 
 ; PROCEDURE Pass1FsRule 
     ( LangInfo : LangInfoRefTyp ; FsRuleNodeRef : LangUtil . FsNodeRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* 1) Count concrete syntax rules needed for this FS rule, 
         in LangInfo ^ . GenProductions. 
      2) Set the FsAltFragCt fields of each predicate and unconditional principal
@@ -642,7 +643,7 @@ CLEAN UP^ Not so, at least not yet.
       ; IsExplicitElse : BOOLEAN 
       )
     : CARDINAL (* Count of fragments. *)  
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Handle every case that satisfies both FsAltCardSet and the FsAlt*TokSet
        fields.   These are all for the same format alternative, denoted by
        FsNodeRef. *) 
@@ -756,7 +757,7 @@ CLEAN UP^ Not so, at least not yet.
 
   ; PROCEDURE P1fsrPredicate ( FsPredNodeRef : LangUtil . FsNodeRefTyp ) 
     : CARDINAL (* Count of fragments. *)  
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsPredNodeRef has FsKind EstChildOf*, Subtree*, or CondFmt. *) 
 
     = VAR LListCard : CARDINAL 
@@ -931,7 +932,7 @@ CLEAN UP^ Not so, at least not yet.
   ; PROCEDURE P1fsrCondConstruct 
       ( VAR FsCondFmtNodeRef : LangUtil . FsNodeRefTyp ) 
     : CARDINAL (* Count of fragments. *)  
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsCondFmtNodeRef has FsKind EstChildOf*, Subtree*, or CondFmt. *) 
     (* NOT to be called recursively for subsequent predicates. *) 
 
@@ -974,7 +975,7 @@ CLEAN UP^ Not so, at least not yet.
   ; PROCEDURE P1fsrUncondPrincipalChild 
       ( FsChildNodeRef : LangUtil . FsNodeRefTyp )
     : CARDINAL (* Fragment count. *) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsChildNodeRef is a principal child that is NOT inside a conditional
        construct.  It could still have multiple alternatives if it's optional 
        or contains list(s).
@@ -1047,7 +1048,7 @@ CLEAN UP^ Not so, at least not yet.
   ; PROCEDURE P1fsrUncondFsSubtree 
       ( FsSubtreeNodeRef : LangUtil . FsNodeRefTyp ) 
     : CARDINAL (* Fragment count. *) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsSubtreeNodeRef has FsKindEstFixed* or FsKindSubtree*. *) 
     (* PRE: We are NOT inside a conditional construct. *) 
 
@@ -1079,7 +1080,7 @@ CLEAN UP^ Not so, at least not yet.
   ; PROCEDURE P1fsrUncondFsChild 
       ( VAR FsChildNodeRef : LangUtil . FsNodeRefTyp ) 
     : CARDINAL (* Fragment count. *) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Called only when outside a conditional construct. *) 
     (* Mostly a dispatching procedure. *) 
 
@@ -1111,7 +1112,7 @@ CLEAN UP^ Not so, at least not yet.
       END P1fsrUncondFsChild 
 
   ; PROCEDURE P1fsrFixedRule ( FsFixedRuleNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsFixedRuleNodeRef has FsKindEstFixed*. *) 
 
     = VAR LFragCt : CARDINAL  
@@ -1123,7 +1124,7 @@ CLEAN UP^ Not so, at least not yet.
 
   ; PROCEDURE P1fsrListRule 
       ( FsListRuleNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsFixedRuleNodeRef has FsKindEstList*. *) 
 
     = VAR LFragCt : CARDINAL   
@@ -1210,7 +1211,7 @@ CLEAN UP^ Not so, at least not yet.
 
 ; PROCEDURE BetweenPass2And3
     ( LangInfo : LangInfoRefTyp ; Gram : GrammarSubTyp ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Between pass 2 and pass 3:
        1) Expand the token map to hold generated CS tokens.
        2) Initialize the LR automaton.
@@ -1287,7 +1288,7 @@ CLEAN UP^ Not so, at least not yet.
 
 ; PROCEDURE GenProdsForDeclaredClass 
     ( LangInfo : LangInfoRefTyp ; Tok : LbeStd . TokTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* If Tok is an ldl-declared class, generate productions for its members 
      and also note it is a concrete only token.
   *) 
@@ -1331,7 +1332,7 @@ CLEAN UP^ Not so, at least not yet.
     ; Gram : GrammarSubTyp 
     ; FsRuleNodeRef : LangUtil . FsNodeRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Generate Concrete syntax rules from one FS rule. *) 
   (* This is unnested from Generate, just to keep things from getting 
      too deep. 
@@ -1347,7 +1348,7 @@ CLEAN UP^ Not so, at least not yet.
       ; FragString : LRTable . TokArrayRefTyp 
       ; OptionIdSet : LRTable . OptionIdSetTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Fills exactly one fragment in P4fsrCondResultRef. *) 
 
     = VAR LFragTok : LbeStd . TokTyp 
@@ -1395,7 +1396,7 @@ CLEAN UP^ Not so, at least not yet.
         (* ^LbeStd.Tok__Null means omit principal child from the fragment. *)
       ; OptionIdSet : LRTable . OptionIdSetTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Fills exactly one fragment in P4fsrCondResultRef. *) 
 
     = VAR LAltFrag : LRTable . TokArrayRefTyp
@@ -1411,13 +1412,13 @@ CLEAN UP^ Not so, at least not yet.
       ; TokSet : TokSetTyp  
       ; OptionIdSet : LRTable . OptionIdSetTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Fill fragments formatted by FsNodeRef, but with each member of TokSet
        replacing the one principal child. *) 
     (* Checks FsCondDoParse. *) 
 
     = PROCEDURE P4fsrFtsfVisit ( PrincipalChildTok : IntSets . ValidElemT ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           P4fsrFillAltFrag ( FsNodeRef , PrincipalChildTok , OptionIdSet ) 
@@ -1436,7 +1437,7 @@ CLEAN UP^ Not so, at least not yet.
       ; ListTok : LbeStd . TokTyp  
       ; OptionIdSet : LRTable . OptionIdSetTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Fills one fragment, with an empty list. *) 
     (* Checks FsCondDoParse. *) 
 
@@ -1461,7 +1462,7 @@ CLEAN UP^ Not so, at least not yet.
       ; ListToksSubset : TokSetTyp 
       ; OptionIdSet : LRTable . OptionIdSetTyp 
       ) 
-    RAISES { AssertionFailure }
+    RAISES { Backout }
     (* PRE:  P4fsrCondResultRef ^ has enough space, starting at 
              P4fsrCondResultSs, for IntSets . Card ( ListToksSubset ) fragments.
        POST: P4fsrCondResultRef ^ has been filled with the fragments formatted 
@@ -1472,7 +1473,7 @@ CLEAN UP^ Not so, at least not yet.
     (* Checks FsCondDoParse. *) 
 
     = PROCEDURE P4fsrFsfVisit ( ListTok : IntSets . ValidElemT ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LSingletonTok : LbeStd . TokTyp 
 
@@ -1503,7 +1504,7 @@ CLEAN UP^ Not so, at least not yet.
       ; ListToksSubset : TokSetTyp 
       ; OptionIdSet : LRTable . OptionIdSetTyp 
       ) 
-    RAISES { AssertionFailure }
+    RAISES { Backout }
     (* PRE:  P4fsrCondResultRef ^ has enough space, starting at 
              P4fsrCondResultSs, for IntSets . Card ( ListToksSubset ) fragments.
        POST: P4fsrCondResultRef ^ has been filled with the fragments formatted 
@@ -1514,7 +1515,7 @@ CLEAN UP^ Not so, at least not yet.
     (* Checks FsCondDoParse. *) 
 
     = PROCEDURE P4fsrFpfVisit ( ListTok : IntSets . ValidElemT ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LPluralTok : LbeStd . TokTyp 
 
@@ -1546,7 +1547,7 @@ CLEAN UP^ Not so, at least not yet.
       ; ListCard : LdlSemantics . ListCardTyp 
       ; VAR (* IN OUT *) FragTokSet : TokSetTyp 
       ) 
-    RAISES { AssertionFailure }
+    RAISES { Backout }
     (* Include into FragTokSet, a token for each string formatted by FsNodeRef,
        with the list cardinality token for cardinality ListCard of a member
        of ListChildTokSet substituted for its one Ast child.   
@@ -1554,7 +1555,7 @@ CLEAN UP^ Not so, at least not yet.
     (* Checks FsCondDoParse. *) 
 
     = PROCEDURE P4fsrIlftVisit ( ListTok : IntSets . ValidElemT ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LListCardTok : LbeStd . TokTyp 
             (* Tok for a list with cardinality ListCard and element ListTok. *)
@@ -1599,14 +1600,14 @@ CLEAN UP^ Not so, at least not yet.
       ; FixedChildTokSet : TokSetTyp 
       ; VAR (* IN OUT *) FragTokSet : TokSetTyp 
       ) 
-    RAISES { AssertionFailure }
+    RAISES { Backout }
     (* Include into FragTokSet, a token for each string formatted by FsNodeRef,
        with a member of FixedChildTokSet substituted for its one Ast child.
     *) 
     (* Checks FsCondDoParse. *) 
 
     = PROCEDURE P4fsrIfatVisit ( FixedTok : IntSets . ValidElemT ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LAltFrag : LRTable . TokArrayRefTyp 
             (* ^Insertion toks of the alternative, surrounding FixedTok. *) 
@@ -1647,7 +1648,7 @@ CLEAN UP^ Not so, at least not yet.
       ; VAR (* IN OUT *) AltTokSet : TokSetTyp 
       ; OptionIdSet : LRTable . OptionIdSetTyp 
       )
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsNodeRef has FsKind EstChildOf*, Subtree*, or CondFmt. *) 
     (* For every case that satisfies both FsAltCardSet and the FsAlt*TokSet
        fields, either fill P4fsrCondResultRef ^ with its alternative string, 
@@ -1791,7 +1792,7 @@ CLEAN UP^ Not so, at least not yet.
         (* An FsNode with exactly one Est child descendent. *) 
       ; VAR (* IN OUT *) AltTokSet : TokSetTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* For each alternative that FsPredNodeRef applies to, either fill 
        P4fsrCondResultRef ^ with its alternative string, or include into 
        AltTokSet, a token that will derive its alternative string. 
@@ -2037,7 +2038,7 @@ CLEAN UP^ Not so, at least not yet.
       ; VAR MaxFragLen : CARDINAL 
       ) 
     : FragSetRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Handle a complete conditional construct. *) 
 
 (* TODO ^This probably also works for a principal child not inside any 
@@ -2116,7 +2117,7 @@ CLEAN UP^ Not so, at least not yet.
       ; VAR MaxFragLen : CARDINAL 
       )
     : FragSetRefTyp  
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Used only for a principal child that is not inside a conditional
        construct.  It could optional though (a different kind of conditional) 
        and still have multiple fragments.
@@ -2217,7 +2218,7 @@ CLEAN UP^ Not so, at least not yet.
       ; VAR (* IN OUT *) NextOptionId : LRTable . OptionIdTyp 
       ) 
     : FragSetRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Called only when outside a conditional construct. *) 
 
     = VAR P4fsrUfsChildrensFragSets : FragSetSetRefTyp 
@@ -2366,7 +2367,7 @@ CLEAN UP^ Not so, at least not yet.
       ; VAR (* IN OUT *) NextOptionId : LRTable . OptionIdTyp 
       ) 
     : FragSetRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Called only when outside a conditional construct. *) 
     (* Mostly a dispatching procedure. *) 
 
@@ -2411,7 +2412,7 @@ CLEAN UP^ Not so, at least not yet.
       END P4fsrUncondFsChild 
 
   ; PROCEDURE P4fsrFixedRule ( FsFixedRuleNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LMaxFragLen : CARDINAL 
     ; VAR LFragSet : FragSetRefTyp  
@@ -2455,7 +2456,7 @@ CLEAN UP^ Not so, at least not yet.
       ; VAR Seps : LRTable . TokArrayRefTyp 
       ; VAR SepCt : INTEGER 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Make Seps point to a token string for the list separators, even if 
        empty, and set SepCt to the count of list separators. 
     *) 
@@ -2500,7 +2501,7 @@ CLEAN UP^ Not so, at least not yet.
 
   ; PROCEDURE P4fsrListRule 
       ( FsListRuleRef : LangUtil . FsNodeRefTyp ; Trailing : BOOLEAN ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LElemFragSet : FragSetRefTyp
     ; VAR LFragsetCt : CARDINAL 
@@ -2741,7 +2742,7 @@ CLEAN UP^ Not so, at least not yet.
     ( LangInfo : LangInfoRefTyp 
     ; Gram : GrammarSubTyp 
     ) 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
   (* Generate productions for all used classes in ClassTable. *)  
 
   = VAR LClassInfoRef : ClassInfo . ClassInfoRefTyp 
@@ -2814,7 +2815,7 @@ CLEAN UP^ Not so, at least not yet.
     ( LangInfo : LangInfoRefTyp 
     ; Factored : BOOLEAN := TRUE 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LGram : GrammarSubTyp  
   ; VAR LMessageCt : PortTypes . Card32Typ 

@@ -28,7 +28,8 @@ MODULE Check
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT CantHappen , AssertionFailure  
+; FROM Assertions IMPORT CantHappen 
+; FROM Failures IMPORT Backout   
 ; IMPORT Debug 
 ; FROM Debug 
   IMPORT tConflict , DebugHead , DebugState , DebugEnd 
@@ -57,7 +58,7 @@ MODULE Check
     ; ConflictingLookaheadSet : IntSets . T 
     ; VAR (* IN OUT *) IsOK : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR RisShiftRedSet : IntSets . T 
   ; VAR RisRedRedSet : IntSets . T 
@@ -126,7 +127,7 @@ MODULE Check
       END RisIsSublistNoSepProd 
 
   ; PROCEDURE RisToken ( LookaheadTok : IntSets . ValidElemT ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LRedItemCt , LShiftItemCt : CARDINAL 
     ; VAR LRedItemRetainedCt , LShiftItemRetainedCt : CARDINAL  
@@ -626,7 +627,7 @@ MODULE Check
 (* VISIBLE: *) 
 ; PROCEDURE CheckForConflicts 
     ( Gram : LRTable . GrammarTyp ; VAR IsOK : BOOLEAN ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Pruefe ob die Zustaende Konflikte beinhalten, 
      so weit moeglich werden Konflikte mit Hilfe von 
      Prioritaeten und Assoziativitaeten geloest, 

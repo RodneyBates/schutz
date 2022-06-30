@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -12,24 +12,24 @@ INTERFACE WriteTrv
 
 ; IMPORT Thread 
 
-; IMPORT Strings 
-; IMPORT SharedStrings 
+; FROM Failures IMPORT Backout 
 ; IMPORT PaintHs 
-; IMPORT Assertions 
+; IMPORT SharedStrings 
+; IMPORT Strings 
 
 ; TYPE DeliverLineProcTyp 
     = PROCEDURE 
         ( ImageRef : PaintHs . ImageTransientTyp 
         ; Line : Strings . StringTyp 
         ) 
-      RAISES { Assertions . AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
 ; TYPE DeliverTokProcTyp 
     = PROCEDURE 
         ( ImageRef : PaintHs . ImageTransientTyp 
         ; StringRef : SharedStrings . T 
         ) 
-      RAISES { Assertions . AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE WriteText 
     ( ImageRef : PaintHs . ImageTransientTyp 
@@ -37,14 +37,14 @@ INTERFACE WriteTrv
     ; DoGenerateText : BOOLEAN := TRUE 
     ; DoGenerateErrors : BOOLEAN := FALSE 
     ) 
-    RAISES { Assertions . AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE WriteToks 
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; DeliverTokProc : DeliverTokProcTyp 
     ; CmntsWanted : BOOLEAN 
     ) 
-    RAISES { Assertions . AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
 ; END WriteTrv 
 . 

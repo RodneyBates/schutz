@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -29,7 +29,8 @@ MODULE LRUtils
 ; IMPORT Word 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , AssertionFailure , CantHappen  
+; FROM Assertions IMPORT Assert , CantHappen  
+; FROM Failures IMPORT Backout   
 ; IMPORT IntSets 
 ; IMPORT LALRTypes 
 ; IMPORT LbeStd 
@@ -474,7 +475,7 @@ MODULE LRUtils
 
 ; PROCEDURE CheckSetOrderList 
     ( Gram : LRTable . GrammarTyp ; READONLY State : LALRTypes . StateTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LPrevItemSs , LItemSs : LALRTypes . ItemSsTyp 
   ; VAR LCompare : [ - 1 .. 1 ]
@@ -511,7 +512,7 @@ MODULE LRUtils
 
 ; PROCEDURE LazyComputeSetOrderList 
     ( Gram : LRTable . GrammarTyp ; VAR State : LALRTypes . StateTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LListRef : LALRTypes . ItemSsArrayRefTyp 
   ; VAR LListCt , LListSs , LListNextSs , LListEmptySs , LParentListSs 
@@ -630,7 +631,7 @@ MODULE LRUtils
     ; StateSs1 , StateSs2 : LALRTypes . StateSsTyp 
     ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LItemSs1 , LItemSs2 : LALRTypes . ItemSsTyp 
   ; VAR LCompare : [ - 1 .. 1 ] 
@@ -673,7 +674,7 @@ MODULE LRUtils
     ; AutomatonKind : LALRTypes . AutomatonKindTyp 
     ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LItemSs1 , LToItemSs1 , LItemSs2 , LToItemSs2 : LALRTypes . ItemSsTyp 
   ; VAR LCompare : [ - 1 .. 1 ] 
@@ -916,7 +917,7 @@ MODULE LRUtils
   = BEGIN 
       RETURN 
         AreEqualStates ( Self . Gram , LeftStateSs , RightStateSs , AkLR1List ) 
-(* FIXME: How can we get AssertionFailure from AreEqualStates to propagate
+(* FIXME: How can we get Backout from AreEqualStates to propagate
           through here?  We would have to change Table so that Equal
           RAISES ANY . *)  
           

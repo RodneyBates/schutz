@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -17,7 +17,7 @@ INTERFACE SharedStrings
 ; IMPORT Strings 
 ; IMPORT Assertions 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; TYPE StringNoTyp = BITS 15 FOR [ - 16_4000 .. 16_3FFF ] 
 ; CONST StringNoNull = 0 
@@ -44,21 +44,21 @@ INTERFACE SharedStrings
     ; Tok : LbeStd . TokTyp := LbeStd . Tok__Null 
     ) 
   : T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE FromArrayOfChar 
     ( READONLY String : ARRAY OF CHAR 
     ; Tok : LbeStd . TokTyp := LbeStd . Tok__Null 
     ) 
   : T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE FromText 
     ( String : TEXT 
     ; Tok : LbeStd . TokTyp := LbeStd . Tok__Null 
     ) 
   : T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; VAR (* CONST *) Null : T (* := FromText ( "" ) *)  
 

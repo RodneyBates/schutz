@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -12,7 +12,7 @@ INTERFACE Selection
 
 ; IMPORT PaintHs 
 ; IMPORT EditWindow 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; TYPE SelectionTyp 
   = OBJECT 
@@ -48,12 +48,12 @@ INTERFACE Selection
   *) 
 
 ; PROCEDURE ClearSelection  ( ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Does not clear preselection or SelText. *) 
 
 (* VISIBLE: *) 
 ; PROCEDURE Preselect ( Window : PaintHs . WindowRefTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } <* NOWARN *>
+  RAISES { Backout , Thread . Alerted } <* NOWARN *>
   (* Notes the current cursor location as preselection.  Leaves any 
      actual selection alone, in case there is no drag done. 
   *) 
@@ -62,10 +62,10 @@ INTERFACE Selection
     ( Window : PaintHs . WindowRefTyp 
     ; AbsPosition : EditWindow . CharPointTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE ManifestSelectionAsText ( ) : TEXT 
-  RAISES { AssertionFailure , Thread . Alerted } <* NOWARN *> 
+  RAISES { Backout , Thread . Alerted } <* NOWARN *> 
 
 ; END Selection 
 . 

@@ -26,7 +26,7 @@ MODULE Worker
 
 ; IMPORT AssertDevel 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT Display 
 ; IMPORT Errors
 ; IMPORT Failures 
@@ -146,7 +146,7 @@ MODULE Worker
         TRY 
           Closure . apply ( ) 
         EXCEPT 
-        | AssertionFailure 
+        | Backout 
         => IF Assertions . DoTerminate 
            THEN 
              Assertions . TerminatingNormally := TRUE 
@@ -221,7 +221,7 @@ MODULE Worker
          when the cancel was "refused" because it was too late.
 *) 
         ; RETURN WrtStopped  
-        | AssertionFailure 
+        | Backout 
         => IF Assertions . DoTerminate 
            THEN 
              Assertions . TerminatingNormally := TRUE 
@@ -474,7 +474,7 @@ MODULE Worker
   <* LL.sup < VBT.mu *>
   (* This is a callback, invoked from within Failures, when a runtime error
      occurs on the worker thread.  The runtime error could be secondary to
-     a blocked or unhandled exception, especially Assertions.AssertionFailure,
+     a blocked or unhandled exception, especially Assertions.Backout,
      which gets some special treatment.  It notifies the user, either on the
      command line in a dialog, and queries the user's desire what to do. 
   *)    
@@ -532,7 +532,7 @@ MODULE Worker
     ; DoWriteCheckpoint : BOOLEAN 
       (* ^Requests Failure to write a checkpoint. *) 
     ) 
-  : BOOLEAN (* Raise AssertionFailure. *) 
+  : BOOLEAN (* Raise Backout. *) 
   <* LL.sup < VBT.mu *>
   (* Worker thread calls this from inside an assertion failure.
      Failure does not return until it is known what to do, which could
@@ -574,17 +574,17 @@ MODULE Worker
         ; CASE StoredFailureAction 
           OF Failures . FailureActionTyp . FaCrash
           => Assertions . DoTerminate := TRUE 
-          ; LResult := TRUE (* Raise AssertionFailure. *) 
+          ; LResult := TRUE (* Raise Backout. *) 
           | Failures . FailureActionTyp . FaBackout 
-          => LResult := TRUE (* Raise AssertionFailure. *) 
+          => LResult := TRUE (* Raise Backout. *) 
           | Failures . FailureActionTyp . FaIgnore   
-          => LResult := FALSE (* Do not raise AssertionFailure. *) 
+          => LResult := FALSE (* Do not raise Backout. *) 
           END (* CASE *) 
         END (* LOCK *)  
       ; UiDevel . RemoveGuiAssertDialog ( ) 
       ELSE 
         Assertions . DoTerminate := TRUE 
-      ; LResult := TRUE (* Always raise AssertionFailure in batch. *) 
+      ; LResult := TRUE (* Always raise Backout in batch. *) 
       END (* IF *) 
     ; RETURN LResult 
     END Failure
@@ -627,7 +627,7 @@ MODULE Worker
          when the cancel was "refused" because it was too late?
 *) 
         ; BecomeIdle ( WrtStopped ) 
-        | AssertionFailure 
+        | Backout 
         => IF Assertions . DoTerminate OR NOT StoredClosure . IsInteractive 
            THEN 
              Assertions . TerminatingNormally := TRUE 

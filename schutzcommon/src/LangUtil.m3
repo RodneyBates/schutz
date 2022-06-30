@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -22,7 +22,8 @@ MODULE LangUtil
 ; FROM Wr IMPORT EOL 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , AssertionFailure 
+; FROM Assertions IMPORT Assert 
+; FROM Failures IMPORT Backout  
 ; IMPORT SchutzCoroutine
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
@@ -779,7 +780,7 @@ MODULE LangUtil
     ; READONLY LeafElem : EstHs . LeafElemTyp 
     ) 
   : FsNodeRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Gives the FsNodeRef of the root of the appropriate format tree for an Est 
      node that is a child corresponding to FsEstChildNode, taking into account
      the singleton-list optimization.  If LeafElem leads to a singleton-list
@@ -1468,7 +1469,7 @@ MODULE LangUtil
 (* VISIBLE: *)
 ; PROCEDURE IsLiteral ( Lang : LbeStd . LangTyp ; Tok : LbeStd . TokTyp )
   : BOOLEAN
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LString : SharedStrings . T
   ; VAR LChar : CHAR 
@@ -1487,7 +1488,7 @@ MODULE LangUtil
             ; RETURN LChar IN SET OF CHAR { '"' , '\'' , '0' .. '9' }
 (* TODO: Complete this.  Ldl needs to specify this property of a constterm. *)
             EXCEPT SharedStrings . SsOutOfBounds 
-            => RAISE AssertionFailure ( "SharedStrings.SsOutOfBounds" )  
+            => RAISE Backout ( "SharedStrings.SsOutOfBounds" )  
             END (* TRY EXCEPT *) 
           END (* IF *)
         END (* IF *)
@@ -1498,7 +1499,7 @@ MODULE LangUtil
 (* VISIBLE: *)
 ; PROCEDURE IsReserved ( Lang : LbeStd . LangTyp ; Tok : LbeStd . TokTyp )
   : BOOLEAN
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LString : SharedStrings . T
   ; VAR LChar : CHAR 
@@ -1517,7 +1518,7 @@ MODULE LangUtil
             ; RETURN LChar IN SET OF CHAR { 'a' .. 'z' , 'A' .. 'Z' }
 (* TODO: Complete this.  Ldl needs to specify this property of an instok. *)
             EXCEPT SharedStrings . SsOutOfBounds 
-            => RAISE AssertionFailure ( "IsReservedEmptyString" )  
+            => RAISE Backout ( "IsReservedEmptyString" )  
             END (* TRY EXCEPT *) 
           END (* IF *)
         END (* IF *)
@@ -1631,7 +1632,7 @@ MODULE LangUtil
 
 ; PROCEDURE StdStuffForEmpty ( Tok : LbeStd . TokTyp )
 
-  = <* FATAL AssertionFailure *> 
+  = <* FATAL Backout *> 
     BEGIN (* StdStuffForEmpty *)
       StdTokFsTreeMap [ Tok ]
         := NEW
@@ -1648,7 +1649,7 @@ MODULE LangUtil
 ; PROCEDURE StdStuffForVarTerminal
     ( Tok : LbeStd . TokTyp ; PlaceholderText : TEXT )
 
-  = <* FATAL AssertionFailure *> 
+  = <* FATAL Backout *> 
     BEGIN (* StdStuffForVarTerminal *)
       StdTokFsTreeMap [ Tok ]
         := NEW
@@ -1678,7 +1679,7 @@ MODULE LangUtil
 
 ; PROCEDURE StdStuffForLexErrModTok ( ) 
 
-  = <* FATAL AssertionFailure *> 
+  = <* FATAL Backout *> 
     VAR LFsChild : FsNodeRefTyp 
   ; VAR LFsRoot : FsNodeRefTyp 
   ; VAR LFmtNoMapRef : LangUtilRep . FsFmtNoMapRefTyp
@@ -1725,7 +1726,7 @@ MODULE LangUtil
 
 ; PROCEDURE StdStuffForAugment ( )
 
-  = <* FATAL AssertionFailure *> 
+  = <* FATAL Backout *> 
     BEGIN
       WITH WRoot = StdTokFsTreeMap [ LbeStd . Tok__Augment ]
       DO

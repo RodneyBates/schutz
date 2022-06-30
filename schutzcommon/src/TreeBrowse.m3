@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -18,7 +18,7 @@ MODULE TreeBrowse
 ; IMPORT Thread 
 ; IMPORT Wr 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT AstView 
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
@@ -125,7 +125,7 @@ MODULE TreeBrowse
     END ParseCommand 
 
 ; PROCEDURE Display ( Session : SessionTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -218,7 +218,7 @@ MODULE TreeBrowse
 
 ; PROCEDURE ToRoot 
     ( Session : SessionTyp ; <* UNUSED *> RemainingLine : TEXT ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* ToRoot *) 
       Session . CurrentRef := Session . RootRef 
@@ -228,7 +228,7 @@ MODULE TreeBrowse
 
 ; PROCEDURE ToAbsNodeNo 
     ( Session : SessionTyp ; NodeNo : LbeStd . EstNodeNoTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -269,7 +269,7 @@ MODULE TreeBrowse
     END ToAbsNodeNo 
 
 ; PROCEDURE ToAbsNode ( Session : SessionTyp ; RemainingLine : TEXT ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LNodeNo : LbeStd . EstNodeNoTyp 
 
@@ -279,7 +279,7 @@ MODULE TreeBrowse
     END ToAbsNode 
 
 ; PROCEDURE ToRelNode ( Session : SessionTyp ; RemainingLine : TEXT ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LRelNodeNo : LbeStd . EstNodeNoTyp 
 
@@ -290,7 +290,7 @@ MODULE TreeBrowse
 
 ; PROCEDURE ToParent 
     ( Session : SessionTyp ; <* UNUSED *> RemainingLine : TEXT ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -344,7 +344,7 @@ MODULE TreeBrowse
     ; Parent : AstView . AstRefTyp 
     ; ChildNo : LbeStd . EstChildNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -388,7 +388,7 @@ MODULE TreeBrowse
 
 ; PROCEDURE ToEldestChild 
     ( Session : SessionTyp ; <* UNUSED *> RemainingLine : TEXT ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* ToEldestChild *) 
       ToIthChild ( Session , Session . CurrentRef , 0 ) 
@@ -396,7 +396,7 @@ MODULE TreeBrowse
 
 ; PROCEDURE ToYoungestChild 
     ( Session : SessionTyp ; <* UNUSED *> RemainingLine : TEXT ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LChildCt : LbeStd . EstChildNoTyp 
 
@@ -407,7 +407,7 @@ MODULE TreeBrowse
 
 ; PROCEDURE ToChild 
     ( Session : SessionTyp ; RemainingLine : TEXT ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* ToChild *) 
       ToIthChild ( Session , Session . CurrentRef , GetInt ( RemainingLine ) ) 
@@ -415,7 +415,7 @@ MODULE TreeBrowse
 
 ; PROCEDURE ToElderSib 
     ( Session : SessionTyp ; <* UNUSED *> RemainingLine : TEXT ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -439,7 +439,7 @@ MODULE TreeBrowse
 
 ; PROCEDURE ToYoungerSib 
     ( Session : SessionTyp ; <* UNUSED *> RemainingLine : TEXT ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -512,7 +512,7 @@ MODULE TreeBrowse
     ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
     ; TreeId : TEXT := "" 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* A complete browse, using Stdio. *) 
 
 (* TODO: Calling this from m3gdb with EstRoot = NIL once segfaulted m3gdb. *) 
@@ -529,7 +529,7 @@ MODULE TreeBrowse
 
 (* VISIBLE: *) 
 ; PROCEDURE Interp ( Session : SessionTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 

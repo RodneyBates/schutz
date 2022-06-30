@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -22,7 +22,8 @@
 MODULE Automaton 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , AssertionFailure 
+; FROM Assertions IMPORT Assert 
+; FROM Failures IMPORT Backout  
 ; IMPORT IntSets 
 ; IMPORT LALRTypes 
 ; FROM LRTable IMPORT NontermKindTyp
@@ -219,7 +220,7 @@ MODULE Automaton
     ; OptionIdSet := LRTable . OptionIdSetEmpty
     ; BuildTok : LbeStd . TokTyp := LbeStd . Tok__Null 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Call this any time after InitAutomaton. *) 
 
   = VAR LProdCount , LNewProdCount : CARDINAL 
@@ -294,7 +295,7 @@ MODULE Automaton
     ; OptionIdSet := LRTable . OptionIdSetEmpty
     ; BuildTok : LbeStd . TokTyp := LbeStd . Tok__Null 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Call this any time after InitAutomaton and all calls on AddOperator. 
      Takes predecence and associativity from PrecedenceTok, if non-null, 
      otherwise by a default rule (from rightmost terminal in RHS). 
@@ -406,7 +407,7 @@ MODULE Automaton
 
 ; PROCEDURE CompareShortestDerivableAgainstNullable 
     ( Gram : LRTable . GrammarTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LN1 , LN2 : BOOLEAN 
 
@@ -428,7 +429,7 @@ MODULE Automaton
 
 ; PROCEDURE MakeAugmentProduction  
     ( Gram : LRTable . GrammarTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LRight : LRTable . TokArrayRefTyp 
 
@@ -448,7 +449,7 @@ MODULE Automaton
     END MakeAugmentProduction 
 
 ; PROCEDURE AfterProductions ( Gram : LRTable . GrammarTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Some processing done after all productions have been added, but before
      Build.  This once needed to be separated from Build.
   *) 
@@ -622,7 +623,7 @@ MODULE Automaton
 
 ; PROCEDURE CloseItem 
     ( Gram : LRTable . GrammarTyp ; ToCloseItemSs : LALRTypes . ItemSsTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Add closure items for the most recently added item, depth-first. *) 
 (* TODO: This procedure is confusing.  It uses the latest item (which changes
          during recursion) and the latest state (which does not). *) 
@@ -686,7 +687,7 @@ MODULE Automaton
 
 ; PROCEDURE MakeFirstState 
     ( Gram : LRTable . GrammarTyp ) : LALRTypes . StateSsTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LIsNew : BOOLEAN 
   ; VAR LResult : LALRTypes . StateSsTyp 
@@ -736,7 +737,7 @@ MODULE Automaton
 (* TODO ^This output parameter is dead everywhere.  Remove it. *) 
     ) 
   : LALRTypes . StateSsTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Either locate state GOTO(FromStateSs,Symbol), if it already exists, or
      if not, construct it.  Return its StateSs either way. 
   *) 
@@ -811,7 +812,7 @@ MODULE Automaton
 
 (* VISIBLE: *) 
 ; PROCEDURE Build ( Gram : LRTable . GrammarTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Build the LR(0) automaton, after precedence info and productions 
      have been inserted. *) 
 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -46,7 +46,8 @@ MODULE LineMarks
 
 ; IMPORT Assertions 
 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -66,7 +67,7 @@ MODULE LineMarks
     ; VAR TextAttrArrayRef : PaintHs . TextAttrArrayRefTyp 
     ; VAR LineErrArrayRef : PaintHs . LineErrArrayRefTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = CONST DefaultLineLen = 80 
 
@@ -121,7 +122,7 @@ MODULE LineMarks
           OF PaintHs . LineErrTyp 
 
 (* Not needed anymore: 
-  ; PROCEDURE GnlAccumChar ( Ch : CHAR ) RAISES { AssertionFailure } 
+  ; PROCEDURE GnlAccumChar ( Ch : CHAR ) RAISES { Backout } 
  
     = BEGIN (* GnlAccumChar *) 
         Assert 
@@ -135,7 +136,7 @@ MODULE LineMarks
 
   ; PROCEDURE GnlBlankFillTo 
       ( ToCharPos : LbeStd . LimitedCharNoSignedTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* GnlBlankFillTo *) 
         IF GnlCharPos # 4000 (* LbeStd . LimitedCharNoInfinity *)  
@@ -220,7 +221,7 @@ MODULE LineMarks
       ( StringRef : SharedStrings . T 
       ; TextAttr : PaintHs . TextAttrTyp := PaintHs . TextAttrDefault 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LStringLen : SharedStrings . LengthTyp 
 
@@ -249,7 +250,7 @@ MODULE LineMarks
               ; GnlCharPos := EstUtil . WidthSum ( GnlCharPos , 1 ) 
               END (* FOR *) 
             EXCEPT SharedStrings . SsOutOfBounds 
-            => RAISE AssertionFailure ( "SharedStrings.SsOutOfBounds" )  
+            => RAISE Backout ( "SharedStrings.SsOutOfBounds" )  
             END (* TRY EXCEPT *) 
           ELSE 
             CantHappen ( AFT . A_GnlAccumString_OverfullLine ) 
@@ -261,7 +262,7 @@ MODULE LineMarks
       ( TextValue : TEXT  
       ; TextAttr : PaintHs . TextAttrTyp := PaintHs . TextAttrDefault 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LStringLen : SharedStrings . LengthTyp 
 
@@ -307,7 +308,7 @@ MODULE LineMarks
       *) 
       ; IsModTok : BOOLEAN 
       ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = VAR GnlTeStartFmtNo : EstHs . FmtNoTyp 
     ; VAR GnlTeEstTravInfo : TravUtil . EstTravInfoTyp 
@@ -329,7 +330,7 @@ MODULE LineMarks
     ; VAR GnlTeDescendedInto : BOOLEAN 
 
     ; PROCEDURE GnlTeIncEstChild ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           GnlTeRMChildRelNodeNo := GnlTeEstTravInfo . EtiChildRelNodeNo 
@@ -357,7 +358,7 @@ MODULE LineMarks
 (* All calls on this were either trivially true or possibly false. *) 
     ; PROCEDURE GnlTeCheckIndentInfo 
         ( FsNodeRef : LangUtil . FsNodeRefTyp )  
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LIsFirstLine : BOOLEAN 
 
@@ -392,7 +393,7 @@ MODULE LineMarks
         ; FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FmtKind : LangUtil . FmtKindTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* GnlTeBlanksBeforeTok *) 
           IF TRUE OR GnlState = GnlStateTyp . GnlStateStartAtBeg 
@@ -421,7 +422,7 @@ MODULE LineMarks
         ( FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FmtKind : LangUtil . FmtKindTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LTok : LbeStd . TokTyp 
       ; VAR LTextAttr : PaintHs . TextAttrTyp 
@@ -471,7 +472,7 @@ MODULE LineMarks
         ; FmtKind : LangUtil . FmtKindTyp 
         ; InitialFsChildNo : LangUtil . FsChildNoTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = VAR LFsChildCt : LangUtil . FsChildNoTyp 
       ; VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -504,7 +505,7 @@ MODULE LineMarks
         ; FmtKind : LangUtil . FmtKindTyp 
         ; InitialFsChildNo : LangUtil . FsChildNoTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = VAR LFsChildCt : LangUtil . FsChildNoTyp 
       ; VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -541,11 +542,11 @@ MODULE LineMarks
         ( FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FsFmtKind : LangUtil . FmtKindTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted }
+      RAISES { Backout , Thread . Alerted }
       (* Does not handle Fs tree root nodes. *) 
 
       = PROCEDURE GnlTeTfsEstSubtree ( IsModTok : BOOLEAN ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
         (* Does NOT handle ModTok. *) 
 
         = VAR LChildFsNodeRef : LangUtil . FsNodeRefTyp 
@@ -623,7 +624,7 @@ MODULE LineMarks
 
       ; PROCEDURE GnlTeTfsModBlankLineInterior 
           ( ModBlankLine : ModHs . ModBlankLineTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* GnlTeTfsModBlankLineInterior *) 
             NewMark 
@@ -655,7 +656,7 @@ MODULE LineMarks
 
       ; PROCEDURE GnlTeTfsModBlankLine 
           ( ModBlankLine : ModHs . ModBlankLineTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* GnlTeTfsModBlankLine *) 
             CASE GnlState 
@@ -719,7 +720,7 @@ MODULE LineMarks
           END GnlTeTfsModBlankLine 
 
       ; PROCEDURE GnlTeTfsModCmntInterior ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* GnlTeTfsModCmntInterior *) 
             TYPECASE ModCmnt <* NOWARN *>  
@@ -780,7 +781,7 @@ MODULE LineMarks
           END GnlTeTfsModCmntInterior 
 
       ; PROCEDURE GnlTeTfsModCmnt ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR LNlBefore : BOOLEAN 
         ; VAR LIsImpliedNewLine : BOOLEAN 
@@ -868,7 +869,7 @@ MODULE LineMarks
 
       ; PROCEDURE GnlTeTfsModTextInterior 
           ( ModText : ModHs . ModTextTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* GnlTeTfsModTextInterior *) 
             Assert 
@@ -920,7 +921,7 @@ MODULE LineMarks
           END GnlTeTfsModTextInterior 
 
       ; PROCEDURE GnlTeTfsModText ( ModText : ModHs . ModTextTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* GnlTeTfsModText *) 
             IF GnlState = GnlStateTyp . GnlStateStartAtEnd 
@@ -992,7 +993,7 @@ MODULE LineMarks
           END GnlTeTfsModText 
 
       ; PROCEDURE GnlTeTfsModTok ( EstRef : EstHs . EstRefTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildFsNodeRef : LangUtil . FsNodeRefTyp 
 
@@ -1069,7 +1070,7 @@ MODULE LineMarks
             (* ^A tok delete mod applies to next tok. *) 
           ; VAR IsRepair : BOOLEAN 
           ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildRef : LbeStd . EstRootTyp 
         ; VAR LModDelIsFinished : BOOLEAN 
@@ -1178,7 +1179,7 @@ MODULE LineMarks
             END (* LOOP *) 
           END GnlTeTfsLeadingMods 
 
-      ; PROCEDURE GnlTeTfsTrailingMods ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE GnlTeTfsTrailingMods ( ) RAISES { Backout } 
 
         = BEGIN (* GnlTeTfsTrailingMods *) 
             LOOP 
@@ -1210,7 +1211,7 @@ MODULE LineMarks
       (* Format syntax trees *) 
 
       ; PROCEDURE GnlTeTfsInsTok ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LTextAttr : PaintHs . TextAttrTyp 
         ; VAR LDelete : BOOLEAN 
@@ -1268,7 +1269,7 @@ MODULE LineMarks
             END (* CASE *) 
           END GnlTeTfsInsTok 
 
-      ; PROCEDURE GnlTeTfsBuildFmtNoMark ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE GnlTeTfsBuildFmtNoMark ( ) RAISES { Backout } 
 
         = VAR LTok : LbeStd . TokTyp 
 
@@ -1337,7 +1338,7 @@ MODULE LineMarks
           END GnlTeTfsBuildFmtNoMark 
 
       ; PROCEDURE GnlTeTfsLineBreakInterior ( FsKind : FsKindTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* GnlTeTfsLineBreakInterior *) 
             IF FsKind = FsKindTyp . FsKindLineBreakReqd 
@@ -1367,7 +1368,7 @@ MODULE LineMarks
           END GnlTeTfsLineBreakInterior 
 
       ; PROCEDURE GnlTeTfsLineBreak ( FsKind : FsKindTyp )
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LDelete : BOOLEAN 
         ; VAR LIsRepair : BOOLEAN 
@@ -1419,7 +1420,7 @@ MODULE LineMarks
           END GnlTeTfsLineBreak 
 
       ; PROCEDURE GnlTeTfsEstChild ( IsEstList : BOOLEAN ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LDelete : BOOLEAN 
         ; VAR LIsRepair : BOOLEAN 
@@ -1520,7 +1521,7 @@ MODULE LineMarks
           END GnlTeTfsEstChild 
 
       ; PROCEDURE GnlTeTfsFsSubtree ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildFmtKind : LangUtil . FmtKindTyp 
         ; VAR LInitialChildNo : LangUtil . FsChildNoTyp 
@@ -1566,7 +1567,7 @@ MODULE LineMarks
           END GnlTeTfsFsSubtree
 
       ; PROCEDURE GnlTeTfsTraverseCondFmtChildren ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LFsChildNo : LangUtil . FsChildNoTyp 
         ; VAR LPredicate : BOOLEAN 
@@ -1907,7 +1908,7 @@ MODULE LineMarks
       (* ^TRUE if StartMark was at BOI, though not necessarily the 
          leftmost Nl of an adjacent group. *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = TYPE GplStateTyp 
       = { GplStateStartAtBeg 
@@ -1963,7 +1964,7 @@ MODULE LineMarks
       ; EstIndentPos1 : LbeStd . LimitedCharNoTyp 
       ; EstIndentPosN : LbeStd . LimitedCharNoTyp 
       ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = VAR GplTeStartFmtNo : EstHs . FmtNoTyp 
     ; VAR GplTeEstTravInfo : TravUtil . EstTravInfoTyp 
@@ -1978,7 +1979,7 @@ MODULE LineMarks
       *) 
 
     ; PROCEDURE GplTeDecEstChild ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           GplTeRightwardChildRelNodeNo 
@@ -1994,11 +1995,11 @@ MODULE LineMarks
         ( FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FsApproxFmtKind : LangUtil . FmtKindTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted }
+      RAISES { Backout , Thread . Alerted }
       (* DOES handle Fs root nodes. *)
 
       = PROCEDURE GplTeTfsEstSubtree ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
         (* Does NOT handle ModTok. *) 
 
         = VAR LChildFsNodeRef : LangUtil . FsNodeRefTyp 
@@ -2068,7 +2069,7 @@ MODULE LineMarks
  
       (* Leading mods. *)
  
-      ; PROCEDURE GplTeTfsModBlankLine ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE GplTeTfsModBlankLine ( ) RAISES { Backout } 
 
         = BEGIN (* GplTeTfsModBlankLine *) 
             CASE GplState 
@@ -2131,7 +2132,7 @@ MODULE LineMarks
 
       ; PROCEDURE GplTeTfsStringMod 
           ( Tok: LbeStd . TokTyp ; NlBefore : BOOLEAN ; NlAfter : BOOLEAN ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* GplTeTfsStringMod *) 
             CASE GplState <* NOWARN *> 
@@ -2219,7 +2220,7 @@ MODULE LineMarks
           END GplTeTfsStringMod 
 
       ; PROCEDURE GplTeTfsLeadingModsNoDel ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildIndentPos : LbeStd . LimitedCharNoTyp 
 
@@ -2333,7 +2334,7 @@ MODULE LineMarks
 
       ; PROCEDURE GplTeTfsCheckLeadingDel 
           ( VAR Delete : BOOLEAN ; VAR IsRepair : BOOLEAN ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         (* Caller must ensure only a deletable FsNode is current. *) 
 
@@ -2371,7 +2372,7 @@ MODULE LineMarks
           END GplTeTfsCheckLeadingDel 
 
       ; PROCEDURE GplTeTfsTrailingMods ( ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* GplTeTfsTrailingMods *) 
             LOOP 
@@ -2433,7 +2434,7 @@ MODULE LineMarks
             END (* CASE *) 
           END GplTeTfsIsAtEndingFmtNoMark 
 
-      ; PROCEDURE GplTeTfsBuildFmtNoMark ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE GplTeTfsBuildFmtNoMark ( ) RAISES { Backout } 
 
         = VAR LTok : LbeStd . TokTyp 
 
@@ -2498,7 +2499,7 @@ MODULE LineMarks
           END GplTeTfsBuildFmtNoMark 
 
       ; PROCEDURE GplTeTfsLineBreak ( FsKind : FsKindTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LDelete : BOOLEAN 
         ; VAR LIsRepair : BOOLEAN 
@@ -2551,7 +2552,7 @@ MODULE LineMarks
           END GplTeTfsLineBreak
 
       ; PROCEDURE GplTeTfsEstChild ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LDelete : BOOLEAN 
         ; VAR LIsRepair : BOOLEAN 
@@ -2640,7 +2641,7 @@ MODULE LineMarks
 
       ; PROCEDURE GplTeTfsTraverseFsFixedChildren 
           ( FmtKind : LangUtil . FmtKindTyp )  
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LFsChildNo : LangUtil . FsChildNoSignedTyp 
 
@@ -2679,7 +2680,7 @@ MODULE LineMarks
 
       ; PROCEDURE GplTeTfsTraverseFsListChildren 
           ( FmtKind : LangUtil . FmtKindTyp )  
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
  
         = VAR LFsChildCt : LangUtil . FsChildNoTyp 
         ; VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -2723,7 +2724,7 @@ MODULE LineMarks
           END GplTeTfsTraverseFsListChildren 
 
       ; PROCEDURE GplTeTfsTraverseCondFmtChildren ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LFsChildNo : LangUtil . FsChildNoTyp 
         ; VAR LFsChildNoSigned : LangUtil . FsChildNoSignedTyp 
@@ -3003,7 +3004,7 @@ MODULE LineMarks
     ; RootEstRef : LbeStd . EstRootTyp 
     ; VAR NewMark : Marks . TokMarkTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* This will always be the BOI FS item, which is not necessarily the
      normal rightmost of all marks that lead to the same Nl. *) 
 
@@ -3089,7 +3090,7 @@ MODULE LineMarks
     ; RootEstRef : LbeStd . EstRootTyp 
     ; VAR NewMark : Marks . TokMarkTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* The normal rightmost of all marks that lead to the BOI Nl. *) 
 
   = VAR LLMMark : Marks . TokMarkTyp 
@@ -3142,7 +3143,7 @@ MODULE LineMarks
     ; RootEstRef : LbeStd . EstRootTyp 
     ; VAR NewMark : Marks . TokMarkTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LFsNodeRef : LangUtil . FsNodeRefTyp 
   ; VAR LChildFsNodeRef : LangUtil . FsNodeRefTyp 

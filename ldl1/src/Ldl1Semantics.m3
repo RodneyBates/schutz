@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -16,7 +16,8 @@ MODULE Ldl1Semantics
 ; IMPORT Word 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT AstView 
 ; IMPORT Automaton 
 ; IMPORT EstHs 
@@ -83,7 +84,7 @@ MODULE Ldl1Semantics
     ; SemRef : LdlSemantics . SemTyp 
     ) 
   : LdlSemantics . SemDeclTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* FirstOcc *) 
       TYPECASE SemRef 
@@ -252,7 +253,7 @@ MODULE Ldl1Semantics
 ; PROCEDURE VersionNos 
       ( Lang : LbeStd . LangTyp ; EstRef : EstHs . EstRefTyp ) 
   : LdlSemantics . IntListRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR VnCt : PortTypes . Int32Typ 
   ; VAR VnResult : LdlSemantics . IntListRefTyp := NIL 
@@ -328,7 +329,7 @@ MODULE Ldl1Semantics
     END VersionNos 
 
 ; PROCEDURE Pass1 ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Pass 1: 
        - Find the start and precedence rules and check that there is 
          at most one occurrence of each. 
@@ -345,12 +346,12 @@ MODULE Ldl1Semantics
   *) 
 
   = PROCEDURE VisitRule ( RuleNode : AstView . AstRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR OptionalChildCt : CARDINAL 
 
     ; PROCEDURE VisitRhsNode ( Node : AstView . AstRefTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LWasFound : BOOLEAN 
       ; VAR LOldDeclNodeNo : INTEGER 
@@ -421,7 +422,7 @@ MODULE Ldl1Semantics
         END VisitRhsNode 
 
     ; PROCEDURE VarTermRule ( NameNode : AstView . AstRefTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LWasFound : BOOLEAN 
       ; VAR LOldDeclNodeNo : INTEGER 
@@ -458,10 +459,10 @@ MODULE Ldl1Semantics
         ; TokClass : TokClassTyp 
         ; Parents : AstView . AstRefTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = PROCEDURE VisitAsNodeDecl ( DeclNode : AstView . AstRefTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR LWasFound : BOOLEAN 
         ; VAR LOldDeclNodeNo : INTEGER 
@@ -912,7 +913,7 @@ MODULE Ldl1Semantics
     END BetweenPass1And2 
 
 ; PROCEDURE Pass2 ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Pass 2: 
        - Assign token numbers to varterms and abstract idents. 
        - Generate Sublist and Partial tokens for abstract list rules.  
@@ -928,10 +929,10 @@ MODULE Ldl1Semantics
   = VAR P2VarTermTokCt : CARDINAL 
 
   ; PROCEDURE VisitRule ( RuleNode : AstView . AstRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = PROCEDURE VisitMaybeString ( Node : AstView . AstRefTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* VisitMaybeString *) 
           IF NOT Node . IsOptSingletonList
@@ -958,7 +959,7 @@ MODULE Ldl1Semantics
         ; VAR (* IN OUT *) DeclCt : LbeStd . TokTyp 
         ; TokClass : TokClassTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Including VarTerm decls. *) 
 
       = VAR LVarTermModTok : LbeStd . TokTyp  
@@ -1079,10 +1080,10 @@ MODULE Ldl1Semantics
         ; VAR (* IN OUT *) DeclCt : LbeStd . TokTyp 
         ; TokClass : TokClassTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = PROCEDURE VisitAsDecl ( DeclNode : AstView . AstRefTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* VisitAsDecl *) 
             AsNodeDecl ( DeclNode , DeclCt , TokClass ) 
@@ -1098,7 +1099,7 @@ MODULE Ldl1Semantics
         ; VAR (* IN OUT *) DeclCt : LbeStd . TokTyp 
         ; TokClass : TokClassTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* AsClassRule *) 
           TYPECASE LangInfo . SemMapRef ^ [ ClassName . NodeNo ] . SemRef 
@@ -1286,7 +1287,7 @@ MODULE Ldl1Semantics
     END BetweenPass2And3 
 
 ; PROCEDURE Pass3 ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Pass 3: 
        - For member idents and strings of class rules, insert their 
          direct containment rules into ClassRelation. 
@@ -1294,18 +1295,18 @@ MODULE Ldl1Semantics
   *) 
 
   = PROCEDURE VisitRule ( RuleNode : AstView . AstRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = PROCEDURE AsClassRule 
         ( ClassName : AstView . AstRefTyp 
         ; ClassMembers : AstView . AstRefTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR ClassTok : LbeStd . TokTyp 
 
       ; PROCEDURE VisitMember ( MemberNode : AstView . AstRefTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR LWasFound : BOOLEAN 
         ; VAR LDeclNodeNo : INTEGER 
@@ -1450,7 +1451,7 @@ MODULE Ldl1Semantics
     END Pass3 
 
 ; PROCEDURE BetweenPass3And4 ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Between passes 3 and 4: 
      - Verify token counts assigned. 
      - Compute transitive closure of ClassRelation. 
@@ -1506,7 +1507,7 @@ MODULE Ldl1Semantics
     END ReportProductions 
 
 ; PROCEDURE Pass4 ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Pass 4: 
        - Use ClassRelation to compute token sets of As classes and 
          store them in the LdlSemantics . SemFirstOccClassTyp node.  If the 
@@ -1561,7 +1562,7 @@ MODULE Ldl1Semantics
 
   ; PROCEDURE Suffixes 
       ( SuffixesNode : AstView . AstRefTyp ; StartTok : LbeStd . TokTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR SfCt : PortTypes . Int32Typ 
     ; VAR SfResult : LdlSemantics . SuffixListRefTyp := NIL 
@@ -1573,7 +1574,7 @@ MODULE Ldl1Semantics
         END CountChild  
 
     ; PROCEDURE DoChild ( Node : AstView . AstRefTyp )  
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN 
           SfResult ^ [ SfCt ] 
@@ -1613,7 +1614,7 @@ MODULE Ldl1Semantics
       ( StartIdNode : AstView . AstRefTyp 
       ; SuffixesNode : AstView . AstRefTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LSemDecl : LdlSemantics . SemDeclTyp 
     ; VAR LDeclNodeNo : INTEGER 
@@ -1665,12 +1666,12 @@ MODULE Ldl1Semantics
       END StartRule 
 
   ; PROCEDURE VisitRule ( RuleNode : AstView . AstRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR EstChildNo : LbeStd . EstChildNoTyp 
 
     ; PROCEDURE AsChildClass ( ChildClassNode : AstView . AstRefTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = PROCEDURE VisitSetElement ( Tok : IntSets . ValidElemT ) 
 
@@ -1784,7 +1785,7 @@ MODULE Ldl1Semantics
         END AsChildClass 
 
     ; PROCEDURE AsChild ( ChildNode : AstView . AstRefTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LChildren : ARRAY [ 0 .. 1 ] OF AstView . AstRefTyp 
 
@@ -1801,7 +1802,7 @@ MODULE Ldl1Semantics
         END AsChild 
 
     ; PROCEDURE AsClassRule ( ClassName : AstView . AstRefTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LSet : IntSets . T 
 
@@ -1845,16 +1846,16 @@ MODULE Ldl1Semantics
         ; RhsNode : AstView . AstRefTyp := AstView . AstRefNull 
           (* Meaningful only if DeclKind = DeclKindTyp . CsFixedRule *) 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = PROCEDURE TraverseRhs 
           ( VAR OptionCt : LRTable . OptionIdTyp 
           ; VAR RhsCt : LbeStd . TokNoTyp 
           ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = PROCEDURE VisitCsFixedDescendent ( Node : AstView . AstRefTyp ) 
-          RAISES { AssertionFailure } 
+          RAISES { Backout } 
 
           = BEGIN (* VisitCsFixedDescendent *) 
               IF NOT Node . IsOptSingletonList
@@ -2391,12 +2392,12 @@ MODULE Ldl1Semantics
     ( VAR LangInfo : LdlSemantics . LangInfoRefTyp 
     ; Gram : GrammarSubTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR InsPrecedence : LRTable . PrecedenceTyp 
 
   ; PROCEDURE VisitLevel ( LevelNode : AstView . AstRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LevAssoc : LRTable . AssocTyp 
 
@@ -2508,7 +2509,7 @@ MODULE Ldl1Semantics
     END TokImage 
 
 ; PROCEDURE BetweenPass4And5 ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Between passes 4 and 5: 
      - Rebias counts of concrete nonterminal kinds to prepare for 
        assigning actual token values during pass 5. 
@@ -2631,7 +2632,7 @@ MODULE Ldl1Semantics
     END BetweenPass4And5 
 
 ; PROCEDURE Pass5 ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Pass 5: 
        - Assign Cs tokens. 
        - Warn if an As node has no building Cs rule. 
@@ -2641,10 +2642,10 @@ MODULE Ldl1Semantics
   *) 
 
   = PROCEDURE VisitRule ( RuleNode : AstView . AstRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = PROCEDURE VarTerm ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LIdentNode : AstView . AstRefTyp 
 
@@ -2670,10 +2671,10 @@ MODULE Ldl1Semantics
         END VarTerm 
 
     ; PROCEDURE MultiAsNodeRule ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = PROCEDURE VisitAsNodeRule ( DeclNode : AstView . AstRefTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* VisitAsNodeRule *) 
             TYPECASE LangInfo . SemMapRef ^ [ DeclNode . NodeNo ] . SemRef 
@@ -2730,7 +2731,7 @@ MODULE Ldl1Semantics
         ( VAR (* IN OUT *) DeclCt : LbeStd . TokTyp 
         ; TokClass : TokClassTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LIdNode : AstView . AstRefTyp 
 
@@ -2763,10 +2764,10 @@ MODULE Ldl1Semantics
         END CsRule 
 
     ; PROCEDURE MultiFsRule ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = PROCEDURE VisitFsIdent ( RefNode : AstView . AstRefTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR LIsStart : BOOLEAN 
 
@@ -2880,7 +2881,7 @@ MODULE Ldl1Semantics
 
 ; PROCEDURE BetweenPass5And6 
     ( LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
   (* - Do finish processing for Fs trees. 
      - Close the FormatsEmpty property.
   *) 
@@ -2901,16 +2902,16 @@ MODULE Ldl1Semantics
     END BetweenPass5And6 
 
 ; PROCEDURE Pass6 ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Pass 6: 
        - Insert productions into the LALR table builder. 
   *) 
 
   = PROCEDURE VisitRule ( RuleNode : AstView . AstRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = PROCEDURE AsCsClassRule ( )   
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* AsCsClassRule *) 
           TYPECASE 
@@ -2974,7 +2975,7 @@ MODULE Ldl1Semantics
         END BuildTok 
 
     ; PROCEDURE CsFixedRule ( ) 
-       RAISES { AssertionFailure } 
+       RAISES { Backout } 
 
       = VAR FixedAsChildList : AstView . AstRefTyp 
       ; VAR FixedAsChildNode : AstView . AstRefTyp 
@@ -2988,7 +2989,7 @@ MODULE Ldl1Semantics
           ; OptionCt : LRTable . OptionIdTyp 
           ; RhsCt : LbeStd . TokNoTyp 
           ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR Rhs_Right : LRTable . TokArrayRefTyp 
         ; VAR Rhs_NextRightSs : PortTypes . Int32Typ 
@@ -2997,7 +2998,7 @@ MODULE Ldl1Semantics
         ; VAR Rhs_NextFsEstChildSs : CARDINAL 
 
         ; PROCEDURE VisitChild ( CsChildNode : AstView . AstRefTyp ) 
-          RAISES { AssertionFailure } 
+          RAISES { Backout } 
 
           = VAR LCsSemDecl : LdlSemantics . SemDeclTyp 
 
@@ -3238,7 +3239,7 @@ MODULE Ldl1Semantics
         ( Kind : [ DeclKindTyp . CsStarRule .. DeclKindTyp . CsPluralRule ]
         ; Trailing : BOOLEAN 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR CsListSeps : LRTable . TokArrayRefTyp 
       ; VAR CsListSepCt : CARDINAL 
@@ -3477,13 +3478,13 @@ MODULE Ldl1Semantics
         END CsListRule 
 
     ; PROCEDURE CsAltRule ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR AltLhsTok : LbeStd . TokTyp 
       ; VAR AltBuildTok : LbeStd . TokTyp 
 
       ; PROCEDURE VisitAlternative ( AltNode : AstView . AstRefTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR LElemSemDecl : LdlSemantics . SemDeclTyp 
         ; VAR LRight : LRTable . TokArrayRefTyp 
@@ -3588,7 +3589,7 @@ MODULE Ldl1Semantics
     END Pass6 
 
 ; PROCEDURE AfterPass6 ( LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* AfterPass6 *) 
       Assert 
@@ -3666,7 +3667,7 @@ MODULE Ldl1Semantics
     ; LdlLang : LbeStd . LangTyp := LbeStd . LangNull 
     ) 
   : LdlSemantics . LangInfoRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Does not do LALR Generation. *) 
 
   = VAR LLangInfo : LdlSemantics . LangInfoRefTyp 
@@ -3743,7 +3744,7 @@ MODULE Ldl1Semantics
  
 ; PROCEDURE Check ( ) 
 
-  = <* FATAL AssertionFailure *> 
+  = <* FATAL Backout *> 
     BEGIN 
 (* HMM.  Is this all overly pedantic?  These equalities will be ensured by
          the .ldl1 definition's using, in the relevant AS rule,  the 

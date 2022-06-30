@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -17,7 +17,8 @@ MODULE TextEdit
 ; IMPORT Ascii 
 ; IMPORT AssertDevel 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT Display 
 ; IMPORT EditWindow 
 ; IMPORT Errors 
@@ -43,7 +44,7 @@ MODULE TextEdit
     ; LinesRef : PaintHs . LinesRefMeatTyp 
     ; TempEditRef : PaintHs . TempEditRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LWindowRef : PaintHs . WindowRefTyp 
 
@@ -82,7 +83,7 @@ MODULE TextEdit
     ( (* OUT *) TempEditRef : PaintHs . TempEditRefTyp 
     ; LinesRef : PaintHs . LinesRefMeatTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN 
       TempEditRef . TeEditedString 
@@ -126,7 +127,7 @@ MODULE TextEdit
     ; LinesRef : PaintHs . LinesRefMeatTyp 
     ; LineNo : LbeStd . LineNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* InitTempEditForText *) 
       TempEditRef . TeLinesRef := LinesRef 
@@ -146,7 +147,7 @@ MODULE TextEdit
     ; VAR RegeneratedLineErrArrayRef : PaintHs . LineErrArrayRefTyp 
     ; VAR EndBolTokMark : Marks . TokMarkTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 (* TODO: Maybe inline this.  It was just a quick coding expedient. *) 
 
   = VAR LLineCt : LbeStd . LineNoTyp 
@@ -182,10 +183,10 @@ MODULE TextEdit
     ; VAR EndBolTokMark : Marks . TokMarkTyp 
     ; VAR FailureOccurred : BOOLEAN
           (* ^Which would have been ignored, if VerifyEditedLine returns
-             without raising AssertionFailure.
+             without raising Backout.
           *)   
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LLineCt : LbeStd . LineNoTyp 
   ; VAR LAtEndOfImage : BOOLEAN 
@@ -276,7 +277,7 @@ MODULE TextEdit
     ; MinNodeNoToAdjust : LbeStd . EstNodeNoTyp 
     ; Bias : LbeStd . EstNodeNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LLinesHeader : PaintHs . LinesRefTyp 
   ; VAR LLinesRef : PaintHs . LinesRefMeatTyp 
@@ -476,7 +477,7 @@ MODULE TextEdit
 (* VISIBLE: *) 
 ; PROCEDURE BruteForceVerifyAllLinesRefs 
     ( ImageRef : PaintHs . ImageTransientTyp ; RepairIsOK : BOOLEAN ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Absent header is OK.
      Empty list is OK.
   *) 
@@ -621,7 +622,7 @@ MODULE TextEdit
     ; VAR LinesRefMeat : PaintHs . LinesRefMeatTyp 
     ; BlankLineCt : LbeStd . LineNoTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = BEGIN 
       LOOP 
@@ -654,7 +655,7 @@ MODULE TextEdit
     ; VAR LinesRefMeat : PaintHs . LinesRefMeatTyp 
     ; BlankLineCt : LbeStd . LineNoTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = BEGIN 
       LOOP 
@@ -755,7 +756,7 @@ MODULE TextEdit
           LbeStd . LimitedCharNoInfinity. 
       *) 
     )
-  RAISES { AssertionFailure , Thread . Alerted }  
+  RAISES { Backout , Thread . Alerted }  
   (* Call this only if it is known that a MergeTextEdit is needed. 
      This could happen if in state TeStateText, or if some line 
      splitting or merging is needed. *) 
@@ -828,7 +829,7 @@ MODULE TextEdit
     ( MinNodeNoToAdjust : LbeStd . EstNodeNoTyp 
     ; Bias : LbeStd . EstNodeNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LMark : PaintHs . LineMarkMeatTyp 
   ; VAR LNextOldLinesRef : PaintHs . LinesRefMeatTyp 
@@ -1004,7 +1005,7 @@ MODULE TextEdit
     END IfteAdjustLineMarks 
 
   ; PROCEDURE IfteMakeChanges ( ) 
-    RAISES { AssertionFailure }  
+    RAISES { Backout }  
     (* Make changes to non-functional data structures.  Hopefully, we
        won't crash during these.  If a crash occurs later, we can undo
        them, with the same hope, before writing a checkpoint and for
@@ -1119,7 +1120,7 @@ MODULE TextEdit
       END IfteUndoChanges 
 
   ; PROCEDURE IfteBuildNewLines ( ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = VAR LLineCt : LbeStd . LineNoTyp 
     ; VAR LStartBolTokMark : Marks . TokMarkTyp 
@@ -1305,7 +1306,7 @@ MODULE TextEdit
       END IfteBuildNewLines 
 
   ; PROCEDURE IfteVerifyNewLines ( ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = VAR LStartBolTokMark : Marks . TokMarkTyp 
     ; VAR LEndBolTokMark : Marks . TokMarkTyp 
@@ -1999,7 +2000,7 @@ MODULE TextEdit
           ; Display . NoteImageSavedState ( ImageRef , FALSE ) 
           ; Display . NoteImageParsedState ( ImageRef , FALSE ) 
           ; Display . NoteImageAnalyzedState ( ImageRef , FALSE ) 
-          EXCEPT AssertionFailure ( EMessage ) 
+          EXCEPT Backout ( EMessage ) 
           => (* Undo changes to the LinesRefs list and the Est root. *) 
             IfteUndoChanges ( ) 
           ; AssertDevel . WriteCheckpoint 
@@ -2013,7 +2014,7 @@ MODULE TextEdit
 (* TODO: This is pretty inefficient.  Find some not-too-inelegant way to 
          communicate to AssertDevel not to write a checkpoint. 
 *) 
-          ; RAISE AssertionFailure ( EMessage ) (* Pass it on up. *) 
+          ; RAISE Backout ( EMessage ) (* Pass it on up. *) 
           END (* TRY EXCEPT *) 
         ; EVAL LThruLineNo (* Place for a breakpoint. *) 
         END (* IF *) 
@@ -2022,7 +2023,7 @@ MODULE TextEdit
 
 (* VISIBLE: *) 
 ; PROCEDURE FlushEdit ( ImageRef : PaintHs . ImageTransientTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LImagePers : PaintHs . ImagePersistentTyp 
 
@@ -2421,7 +2422,7 @@ MODULE TextEdit
          TempEditRef, must be no farther left than this.  *) 
     ; VAR (* OUT *) TempEditRef : PaintHs . TempEditRefTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* GrapTempEditRef could cause the contents of some marks to change, as one
      effect of calling IfteFlushTempEdit.  This could change the LinesRef that
      callers want to initialize TempEditRef with.  So it just sets 
@@ -2534,7 +2535,7 @@ MODULE TextEdit
     ( TempEditRef : PaintHs . TempEditRefTyp 
     ; SuccLinesRef : PaintHs . LinesRefMeatTyp := NIL  
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Assert that length of TempEditRef is consistent. *) 
 
   = VAR LLinesRef : PaintHs . LinesRefMeatTyp 
@@ -2566,7 +2567,7 @@ MODULE TextEdit
     ; Mark : PaintHs . LineMarkMeatTyp 
     ; VAR (* IN OUT *) MustRepaintWindow : BOOLEAN 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LImagePers : PaintHs . ImagePersistentTyp 
   ; VAR LTempEditRef : PaintHs . TempEditRefTyp 
@@ -2659,7 +2660,7 @@ MODULE TextEdit
                 := PaintHs . TempEditStateTyp . TeStateIdle 
             ; DEC ( LImagePers . IpLineCtDisplay ) 
             EXCEPT 
-            AssertionFailure ( EMessage ) 
+            Backout ( EMessage ) 
             => (* Rollback changes to temp edit. *)
               LImagePers . IpTempEditRef := LSavedTempEditRef 
             ; LImagePers . IpTempEditState 
@@ -2671,7 +2672,7 @@ MODULE TextEdit
                 ) 
               (* ^This will rewrite the checkpoint already written from 
                   inside AssertDevel, but with the changes undone. *) 
-            ; RAISE AssertionFailure ( EMessage ) 
+            ; RAISE Backout ( EMessage ) 
             END (* TRY EXCEPT *) 
           END (* IF *) 
         END (* IF *) 
@@ -2738,7 +2739,7 @@ MODULE TextEdit
               ( ImageTrans , Mark . LmLinesRef , LTempEditRef ) 
           END (* IF *) 
         EXCEPT 
-        AssertionFailure ( EMessage ) 
+        Backout ( EMessage ) 
         => (* Rollback changes to temp edit. *)
           LImagePers . IpTempEditRef := LSavedTempEditRef 
         ; LImagePers . IpTempEditState := LSavedTempEditState  
@@ -2749,7 +2750,7 @@ MODULE TextEdit
             ) 
           (* ^This will rewrite the checkpoint already written from 
               inside AssertDevel, but with the changes undone. *) 
-        ; RAISE AssertionFailure ( EMessage ) 
+        ; RAISE Backout ( EMessage ) 
         END (* TRY EXCEPT *) 
       END (* IF *) 
     END SimpleDeleteChar 
@@ -2757,7 +2758,7 @@ MODULE TextEdit
 (* VISIBLE: *) 
 ; PROCEDURE DeleteChar 
     ( WindowRef : PaintHs . WindowRefTyp ; DeletingBwd : BOOLEAN ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 (* TODO: Update versions when no new tree is built.  
          (InnerFlushTempEdit does it when tree _is_ rebuilt.) 
@@ -2820,7 +2821,7 @@ MODULE TextEdit
                       , LMustRepaintWindow 
                       ) 
                   EXCEPT 
-                  AssertionFailure ( EMessage ) 
+                  Backout ( EMessage ) 
                   => (* Rollback cursor move. *)
                     Display . HorizMoveCursorWindowRef 
                       ( WindowRef 
@@ -2842,7 +2843,7 @@ MODULE TextEdit
                        checkpoint file could already have been written 
                        twice, this making three.  *)
                   ; LMustRepaintWindow := TRUE 
-                  ; RAISE AssertionFailure ( EMessage ) 
+                  ; RAISE Backout ( EMessage ) 
                   END (* TRY EXCEPT *) 
                 ELSE (* Can't join lines backward. *) 
                   Display . Beep ( Errors . ErrorTyp . EJoinLinesAtBOL ) 
@@ -2879,7 +2880,7 @@ MODULE TextEdit
                     , LMustRepaintWindow 
                     ) 
                 EXCEPT 
-                AssertionFailure ( EMessage ) 
+                Backout ( EMessage ) 
                 => (* Rollback cursor move. *)
                   Display . HorizMoveCursorWindowRef 
                     ( WindowRef , 1 , LMustRepaintWindow ) 
@@ -2892,7 +2893,7 @@ MODULE TextEdit
                      file could already have been written twice, this
                      making three.  *)
                 ; LMustRepaintWindow := TRUE 
-                ; RAISE AssertionFailure ( EMessage ) 
+                ; RAISE Backout ( EMessage ) 
                 END (* TRY EXCEPT *)               
               END (* IF *) 
             ELSE (* Deleting forward *) 
@@ -2939,7 +2940,7 @@ MODULE TextEdit
     ; NewChar : CHAR 
     ; IsInsert : BOOLEAN (* Otherwise Overlay *) 
     ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
 (* TODO: versions when no new tree is built.  (InnerFlushTempEdit does it when 
    tree _is_.) *) 
@@ -3122,7 +3123,7 @@ MODULE TextEdit
 *) 
                  ; INC ( LImagePers . IpLineCtDisplay ) 
                  EXCEPT 
-                 AssertionFailure ( EMessage ) 
+                 Backout ( EMessage ) 
                  => (* Rollback changes to temp edit. *)
                    LImagePers . IpTempEditRef := LSavedTempEditRef 
                  ; LImagePers . IpTempEditState 
@@ -3143,7 +3144,7 @@ MODULE TextEdit
                      ) 
                    (* ^This will rewrite the checkpoint already written from 
                        inside AssertDevel, but with the changes undone. *) 
-                 ; RAISE AssertionFailure ( EMessage ) 
+                 ; RAISE Backout ( EMessage ) 
                  END (* TRY EXCEPT *) 
                ELSE (* Not a new line inserted. *) 
                  GrabTempEditRef 
@@ -3280,7 +3281,7 @@ MODULE TextEdit
                    ; Display . HorizMoveCursorWindowRef 
                        ( WindowRef , 1 , LMustRepaintWindow ) 
                    EXCEPT 
-                   AssertionFailure ( EMessage ) 
+                   Backout ( EMessage ) 
                    => (* Rollback changes to temp edit. *)
                      LImagePers . IpTempEditRef := LSavedTempEditRef 
                    ; LImagePers . IpTempEditState 
@@ -3292,7 +3293,7 @@ MODULE TextEdit
                        ) 
                      (* ^This will rewrite the checkpoint already written from 
                          inside AssertDevel, but with the changes undone. *) 
-                   ; RAISE AssertionFailure ( EMessage ) 
+                   ; RAISE Backout ( EMessage ) 
                    END (* TRY EXCEPT *) 
                  END (* IF *) 
                END (* IF *) 
@@ -3326,7 +3327,7 @@ MODULE TextEdit
     ; String : TEXT 
     ; IsInsert : BOOLEAN (* Otherwise Overlay *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LLen : CARDINAL 
   ; VAR LMustRepaint : BOOLEAN 
@@ -3361,7 +3362,7 @@ MODULE TextEdit
 
 (* VISIBLE: *) 
 ; PROCEDURE TransposeChars ( WindowRef : PaintHs . WindowRefTyp ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
   = VAR LImageTrans : PaintHs . ImageTransientTyp 
   ; VAR LImagePers : PaintHs . ImagePersistentTyp 
@@ -3410,7 +3411,7 @@ MODULE TextEdit
               ; LLength := Strings . Length ( LTempEditRef . TeEditedString ) 
               ; LSavedTempEditRef := CopyOfTempEditRef ( LTempEditRef ) 
               ; LSavedTempEditState := LImagePers . IpTempEditState 
-              ; TRY (* For AssertionFailure *) 
+              ; TRY (* For Backout *) 
                   TRY (* For Strings . SsOutOfBounds *) 
                     IF LTempEditRef . TeDelFromPos 
                        = LbeStd . LimitedCharNoInfinity 
@@ -3510,12 +3511,12 @@ MODULE TextEdit
                   EXCEPT Strings . SsOutOfBounds  
                   => (* Translate this to an assertion failure. *) 
                      RAISE 
-                       AssertionFailure 
+                       Backout 
                          ( MessageCodes . Image 
                              ( AFT . A_TransposeChars_Strings_SsOutOfBounds ) 
                          )    
                   END (* TRY EXCEPT *) 
-                EXCEPT AssertionFailure ( EMessage ) 
+                EXCEPT Backout ( EMessage ) 
                 => (* Rollback changes to temp edit. *)
                   LImagePers . IpTempEditRef := LSavedTempEditRef 
                 ; LImagePers . IpTempEditState 
@@ -3527,7 +3528,7 @@ MODULE TextEdit
                     ) 
                   (* ^This will rewrite the checkpoint already written from 
                       inside AssertDevel, but with the changes undone. *) 
-                ; RAISE AssertionFailure ( EMessage ) 
+                ; RAISE Backout ( EMessage ) 
                 END (* TRY EXCEPT *) 
               END (* IF *) 
             END (* IF *) 
@@ -3538,7 +3539,7 @@ MODULE TextEdit
 
 (* VISIBLE: *) 
 ; PROCEDURE DeleteRestOfLine ( WindowRef : PaintHs . WindowRefTyp ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
   = VAR LImageTrans : PaintHs . ImageTransientTyp  
   ; VAR LImagePers : PaintHs . ImagePersistentTyp  
@@ -3654,7 +3655,7 @@ MODULE TextEdit
                     , WCursorMark . LmLinesRef 
                     , LTempEditRef 
                     ) 
-                EXCEPT AssertionFailure ( EMessage ) 
+                EXCEPT Backout ( EMessage ) 
                 => (* Rollback changes to temp edit. *)
                   LImagePers . IpTempEditRef := LSavedTempEditRef 
                 ; LImagePers . IpTempEditState := LSavedTempEditState  
@@ -3665,7 +3666,7 @@ MODULE TextEdit
                     ) 
                   (* ^This will rewrite the checkpoint already written from 
                       inside AssertDevel, but with the changes undone. *) 
-                ; RAISE AssertionFailure ( EMessage ) 
+                ; RAISE Backout ( EMessage ) 
                 END (* TRY EXCEPT *) 
               END (* IF *) 
             END (* IF *) 
@@ -3680,7 +3681,7 @@ MODULE TextEdit
     ; ToCharPos : LbeStd . CharNoTyp 
     (* FromCharPos and ToCharPos in the as-possibly-already-edited line. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: GrabTempEditRef has been done. *) 
 
   = VAR LImagePers : PaintHs . ImagePersistentTyp  
@@ -3747,7 +3748,7 @@ MODULE TextEdit
           ( ImageTrans , FALSE ) 
       ; Display . NoteImageAnalyzedState ( ImageTrans , FALSE ) 
       EXCEPT 
-      AssertionFailure ( EMessage ) 
+      Backout ( EMessage ) 
       => (* Rollback changes to temp edit. *)
         LImagePers . IpTempEditRef := LSavedTempEditRef 
       ; LImagePers . IpTempEditState := LSavedTempEditState  
@@ -3758,7 +3759,7 @@ MODULE TextEdit
           ) 
         (* ^This will rewrite the checkpoint already written from 
             inside AssertDevel, but with the changes undone. *) 
-      ; RAISE AssertionFailure ( EMessage ) 
+      ; RAISE Backout ( EMessage ) 
       END (* TRY EXCEPT *) 
     END DeleteTempEditedCharRange 
 
@@ -3768,7 +3769,7 @@ MODULE TextEdit
     ; FromMark : PaintHs . LineMarkMeatTyp 
     ; ThruMark : PaintHs . LineMarkMeatTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LTempEditRef : PaintHs . TempEditRefTyp   
   ; VAR LFromPos : LbeStd . CharNoTyp 
@@ -4002,7 +4003,7 @@ MODULE TextEdit
 
 (* VISIBLE *) 
 ; PROCEDURE AcceptRepairUnderCursor ( WindowRef : PaintHs . WindowRefTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR ArTempEditRef : PaintHs . TempEditRefTyp 
 
@@ -4010,7 +4011,7 @@ MODULE TextEdit
       ( TempEditRef : PaintHs . TempEditRefTyp 
       ; CharPos : LbeStd . CharNoTyp  
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LLength : LbeStd . CharNoTyp 
     ; VAR LSavedTempEditRef : PaintHs . TempEditRefTyp 
@@ -4051,7 +4052,7 @@ MODULE TextEdit
           END (* IF *) 
         ; AssertTempEdit ( TempEditRef ) 
         EXCEPT 
-        AssertionFailure ( EMessage ) 
+        Backout ( EMessage ) 
         => (* Rollback changes to temp edit. *)
           WindowRef . WrImageRef . ItPers . IpTempEditRef := LSavedTempEditRef 
         ; AssertDevel . WriteCheckpoint 
@@ -4061,7 +4062,7 @@ MODULE TextEdit
             ) 
           (* ^This will rewrite the checkpoint already written from 
               inside AssertDevel, but with the changes undone. *) 
-        ; RAISE AssertionFailure ( EMessage ) 
+        ; RAISE Backout ( EMessage ) 
         END (* TRY EXCEPT *) 
       END ArTouchTempEditedChar 
 
@@ -4069,7 +4070,7 @@ MODULE TextEdit
        ( RightDecoration : PaintHs . TextAttrComponentTyp 
        ; RightAttrSs : INTEGER 
        ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Do the right region without worrying about interference from left. *) 
 
     = VAR LToCharPos : LbeStd . CharNoTyp 

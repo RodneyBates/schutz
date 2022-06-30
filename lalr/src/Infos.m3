@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -28,7 +28,7 @@ MODULE Infos
 ; IMPORT Thread 
 ; IMPORT Wr 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT Gen 
 ; IMPORT IntSets 
 ; IMPORT LALRTypes 
@@ -921,7 +921,7 @@ MODULE Infos
     ; StateNo : LRTable . StateNoTyp 
     ; VAR Line : LRTable . StateNoArrayRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* ReconstructTableLine *) 
       FOR RTok := Gram . FirstTerminal TO Gram . LastNonterminal 
@@ -931,7 +931,7 @@ MODULE Infos
     END ReconstructTableLine 
 
 ; PROCEDURE CheckTable ( Gram : LRTable . GrammarTyp ; InfoWr : Wr . T ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Thread . Alerted *> 
     <* FATAL Wr . Failure *> 
@@ -1064,7 +1064,7 @@ MODULE Infos
     ( Gram : LRTable . GrammarTyp 
     ; WrT : Wr . T := NIL (* NIL means use Messages . MessageWr ( ) *) 
     )
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LWrT : Wr . T 
 

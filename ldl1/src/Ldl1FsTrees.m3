@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -14,7 +14,8 @@ MODULE Ldl1FsTrees
 ; IMPORT Fmt 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT AstView 
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
@@ -52,7 +53,7 @@ MODULE Ldl1FsTrees
 (* VISIBLE: *) 
 ; PROCEDURE BuildFixedTerm 
     ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ; Tok : LbeStd . TokTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LFsChild : LangUtil . FsNodeRefTyp 
   ; VAR LFsRoot : LangUtil . FsNodeRefTyp 
@@ -110,7 +111,7 @@ MODULE Ldl1FsTrees
     ; VarTermTok : LbeStd . TokTyp 
     ; VarTermModTok : LbeStd . TokTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LFsChild : LangUtil . FsNodeRefTyp 
   ; VAR LFsRoot : LangUtil . FsNodeRefTyp 
@@ -196,7 +197,7 @@ MODULE Ldl1FsTrees
     ; IsStart : BOOLEAN 
     ) 
   : LangUtil . FsNodeRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Build an FS tree for a single AS node. *) 
 
   = VAR BldFsIdentNode 
@@ -286,7 +287,7 @@ MODULE Ldl1FsTrees
         END (* IF *) 
       END IncOptionId 
 
-  ; PROCEDURE ConsumeAsChild ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE ConsumeAsChild ( ) RAISES { Backout } 
 
     = VAR LAsGrandChildren : ARRAY [ 0 .. 1 ] OF AstView . AstRefTyp 
 
@@ -311,7 +312,7 @@ MODULE Ldl1FsTrees
       END ConsumeAsChild 
 
   ; PROCEDURE FmtNoOfNextAsChild ( ) : EstHs . FmtNoTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LLeafElem : EstHs . LeafElemTyp 
 
@@ -364,7 +365,7 @@ MODULE Ldl1FsTrees
       ( LdlFsChild : AstView . AstRefTyp 
       ; FsEstChild : LangUtil . FsNodeRefTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LFmtNoOfNextAsChild := FmtNoOfNextAsChild ( ) 
     ; VAR LNextAsChildClass := BldNextAsChildClass 
@@ -391,7 +392,7 @@ MODULE Ldl1FsTrees
       ; IndentCode : LangUtil . IndentCodeTyp 
       ) 
     : LangUtil . IndentCodeTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LResult : INTEGER 
     ; VAR LIntNode : AstView . AstRefTyp 
@@ -514,7 +515,7 @@ MODULE Ldl1FsTrees
       ; FsKindForLineBreak : FsKindTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LAsChildNo : LbeStd . EstChildNoTyp 
     ; VAR LResult : LangUtil . FsNodeRefTyp  
@@ -688,7 +689,7 @@ MODULE Ldl1FsTrees
       ; FsKindForLineBreak : FsKindTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LAsDeclNodeNo : INTEGER 
     ; VAR LAsSemDecl : LdlSemantics . SemDeclTyp 
@@ -791,7 +792,7 @@ MODULE Ldl1FsTrees
 (* TODO: ^This is now always TRUE. *) 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LAsSemDecl: LdlSemantics . SemDeclTyp 
     ; VAR LChildIndentCode : LangUtil . IndentCodeTyp 
@@ -985,7 +986,7 @@ MODULE Ldl1FsTrees
       ; VAR EstChildFmtNo : EstHs . FmtNoTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Either a CASE or a conditional format construct. *) 
 
     = VAR LFsChildrenNode : AstView . AstRefTyp 
@@ -1405,7 +1406,7 @@ MODULE Ldl1FsTrees
       ; IsStart : BOOLEAN 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LLdlFsChild : AstView . AstRefTyp 
     ; VAR LLdlFsChildExists : BOOLEAN 
@@ -1581,7 +1582,7 @@ MODULE Ldl1FsTrees
       END FsTreeForFsSubtree 
 
   ; PROCEDURE ConsumeAlternative ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LWasFound : BOOLEAN 
 
@@ -1607,7 +1608,7 @@ MODULE Ldl1FsTrees
       ; FsKindForLineBreak : FsKindTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LResult : LangUtil . FsNodeRefTyp 
     ; VAR LEstChildFmtNo : EstHs . FmtNoTyp 
@@ -1667,7 +1668,7 @@ MODULE Ldl1FsTrees
       ; FsKindForLineBreak : FsKindTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LResult : LangUtil . FsNodeRefTyp 
     ; VAR LEstChildFmtNo : EstHs . FmtNoTyp 
@@ -1771,7 +1772,7 @@ MODULE Ldl1FsTrees
       ; FsKindForLineBreak : FsKindTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LResult : LangUtil . FsNodeRefTyp 
 
@@ -1936,7 +1937,7 @@ MODULE Ldl1FsTrees
       ; NextAltFsRef : LangUtil . FsNodeRefTyp 
       ; VAR (* IN OUT *) MaxFmtNo : EstHs . FmtNoTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Also fills in null FmtNos that are to the left of the Ast child
        in an FsList tree and fills in FsRightFmtNo and FsLeftFmtNo *) 
 
@@ -2160,7 +2161,7 @@ MODULE Ldl1FsTrees
       ; IsStart : BOOLEAN 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LResult : LangUtil . FsNodeRefTyp := NIL  
     ; VAR LMaxFmtNo : EstHs . FmtNoTyp 
@@ -2257,7 +2258,7 @@ MODULE Ldl1FsTrees
       ; IsStart : BOOLEAN 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = CONST IsFsStarRule = TRUE 
 
@@ -2620,7 +2621,7 @@ MODULE Ldl1FsTrees
      can't conveniently encode in the language type system.
   *) 
 
-  = <* FATAL AssertionFailure *> 
+  = <* FATAL Backout *> 
     BEGIN 
       Assert 
         ( Ldl1Child . AsReqdChild_ChildName = Ldl1Child . AsOptChild_ChildName 

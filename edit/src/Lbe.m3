@@ -27,7 +27,7 @@ EXPORTS Main
 
 ; IMPORT AssertDevel  
 ; IMPORT Assertions 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT Files
 ; IMPORT GrammarGen    (* Not "used", but types declared within 
                                        are needed by pickles. *)
@@ -88,7 +88,7 @@ EXPORTS Main
         Wr . PutText ( Stdio . stderr , "Browsing Est:" & TreeId & Wr . EOL ) 
       ; TreeBrowse . Interp ( LSession ) 
       EXCEPT
-        AssertionFailure 
+        Backout 
       => DL ( "Tree browse suffered an assertion failure." ) 
       | Thread . Alerted 
       , Wr . Failure 
@@ -404,7 +404,7 @@ EXPORTS Main
 
 ; PROCEDURE Work ( ) 
 
-  = <* FATAL Assertions . AssertionFailure *> 
+  = <* FATAL Backout *> 
     BEGIN (* Work *) 
       SetDefaults ( ) 
     ; IF GetArgs ( ) 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -16,7 +16,7 @@ INTERFACE TravUtil
 ; IMPORT SharedStrings 
 ; IMPORT Marks 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; PROCEDURE IndentPos 
     ( Lang : LbeStd . LangTyp 
@@ -70,7 +70,7 @@ INTERFACE TravUtil
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ; IsOptSingletonList : BOOLEAN := FALSE 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Sets EtiNodeRef , EtiParentRef , EtiStringRef , EtiChildCt.
      and EtiIsOptSingletonList. 
   *) 
@@ -82,7 +82,7 @@ INTERFACE TravUtil
     ; KindSet : EstHs . EstChildKindSetTyp 
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* For an element of an optimized singleton list, trump up a suitable
      EstTravInfo.  Otherwise, set it up for forward traversal of the
      children of EstNodeRef with AbsNodeNo.
@@ -94,7 +94,7 @@ INTERFACE TravUtil
     ; KindSet : EstHs . EstChildKindSetTyp 
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* For an element of an optimized singleton list, trump up a suitable
      EstTravInfo.  Otherwise, set it up for backward traversal of the
      children of EstNodeRef with AbsNodeNo.
@@ -108,11 +108,11 @@ INTERFACE TravUtil
     ; KindSet : EstHs . EstChildKindSetTyp := EstHs . EstChildKindSetEmpty  
     ; ParentAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
 
 ; PROCEDURE GetLMEstChild 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Set EtiChildCt from EtiParentRef and EtiIsOptSingletonList.  
      Set EtiChildNo to the leftmost child number (always zero).  
      If this child exists, set EtiChildLeafElem and EtiChildFmtNo accordingly. 
@@ -120,7 +120,7 @@ INTERFACE TravUtil
 
 ; PROCEDURE GetRMEstChild 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Set EtiChildCt from EtiParentRef and EtiIsOptSingletonList.  
      Set EtiChildNo to the rightmost child number.  
      If this child exists, set EtiChildLeafElem and EtiChildFmtNo accordingly. 
@@ -130,7 +130,7 @@ INTERFACE TravUtil
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
     ; I : LbeStd . EstChildNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: EstTravInfo is initialized. *) 
   (* Move to Ith child. Set ChildNo, ChildRelNodeNo, ChildLeafElem, 
      and ChildFmtNo. 
@@ -141,18 +141,18 @@ INTERFACE TravUtil
     ; EstRelNodeNo : LbeStd . EstNodeNoTyp 
       (* ^Node number relative to the parent of EstTravInfo. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE IncEstChild 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Increase ChildNo. If there is another child, set 
      ChildRelNodeNo, ChildLeafElem and ChildFmtNo accordingly. 
   *) 
 
 ; PROCEDURE DecEstChild 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Decrease ChildNo. If there is an earlier child, set 
      ChildRelNodeNo, ChildLeafElem and ChildFmtNo accordingly. 
   *) 
@@ -162,14 +162,14 @@ INTERFACE TravUtil
     ; StartChildNo : LbeStd . EstChildNoTyp 
     ; KindSet : EstHs . EstChildKindSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE SetToPrevInKindSet 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
     ; StartChildNo : LbeStd . EstChildNoTyp 
     ; KindSet : EstHs . EstChildKindSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 (* Utility: *) 
 
@@ -183,7 +183,7 @@ INTERFACE TravUtil
     ; VAR ChildIndentPosN : LbeStd . LimitedCharNoTyp 
     ; IsFirstLine : BOOLEAN := FALSE 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE IsInFirstLine  
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
@@ -191,7 +191,7 @@ INTERFACE TravUtil
     ; Bwd : BOOLEAN 
     )  
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* "First line" in the layout sense that does not consider New lines 
      inserted by modifiers. 
   *) 
@@ -202,7 +202,7 @@ INTERFACE TravUtil
     ; VAR (* OUT *) RelevantModRef : LbeStd . EstRootTyp 
     ; VAR (* OUT *) ModDelIsFinished : BOOLEAN 
     )
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
   (* For forward traversals. 
      RelevantModRef # NIL iff the next child is a mod for this fs item, 
      in which case it points to the relevant mod. 
@@ -217,7 +217,7 @@ INTERFACE TravUtil
     ; FsNodeRef : LangUtil . FsNodeRefTyp 
     ) 
   : BOOLEAN
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
   (* When traversing forwards and FsNodeRef is a CondFmtNode, 
      ascertain whether the conditional format insertions 
      are to be done. *) 
@@ -229,7 +229,7 @@ INTERFACE TravUtil
     ; FsNodeRef : LangUtil . FsNodeRefTyp 
     ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* When traversing backwards and FsNodeRef is a CondFmtNode, 
      ascertain whether the conditional format insertions 
      are to be done. *) 
@@ -242,7 +242,7 @@ INTERFACE TravUtil
     ; VAR KindSet : EstHs . EstChildKindSetTyp 
     ; VAR IsOptSingletonList : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* IsOptSingletonList means EstNodeNo is for an optimized-away singleton list,
      and EstRef and KindSet denote its one element, whose actual NodeNo is 
      EstNodeNo + 1.
@@ -254,7 +254,7 @@ INTERFACE TravUtil
       (* ^Node number relative to Root. *) 
     ) 
   : LbeStd . EstNodeNoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE DescendCondFmt 
     ( Lang : LbeStd . LangTyp 
@@ -265,7 +265,7 @@ INTERFACE TravUtil
     ; VAR FsChildNo : LangUtil . FsChildNoTyp 
     ; Bwd : BOOLEAN := FALSE
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* When descending through a CondFmt node, call this to check the predicate
      and find the appropriate immediate child number. *) 
 
@@ -277,7 +277,7 @@ INTERFACE TravUtil
     ; ChildKindSet : EstHs . EstChildKindSetTyp 
     )
   : LangUtil . FsNodeRefTyp
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Return the Fs leaf that has FmtNo.  Will evaluate predicates if
      necessary, to get to the correct alternative FsEstChild. 
   *)
@@ -289,7 +289,7 @@ INTERFACE TravUtil
     ; TokMark : Marks . TokMarkTyp 
     ) 
   : LbeStd . LimitedCharNoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: TokMark denotes a new line. *) 
   (* The actual indent position for the text beginning on a new line at the 
      point TokMark denotes, in the tree rooted at EstRoot.  
@@ -315,7 +315,7 @@ INTERFACE TravUtil
       (* ^FALSE merely means we don't know. *)
     ) 
   : LangUtil . FmtKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Use when descending into an Est, toward a line mark. *)
 
 ; PROCEDURE FmtKindForEstTraversing 
@@ -332,7 +332,7 @@ INTERFACE TravUtil
     ; EstRef : LbeStd . EstRootTyp 
     ) 
   : LangUtil . FmtKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Use when info about the current line is known. *) 
 
 ; PROCEDURE FmtKindForFsSubtreeDescending   
@@ -351,7 +351,7 @@ INTERFACE TravUtil
       (* ^FALSE merely means we don't know. *)
     ) 
   : LangUtil . FmtKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Use when descending into an FsSubtree, preferably toward a line mark. *)
 
 ; PROCEDURE FmtKindForFsSubtreeTraversing  
@@ -370,7 +370,7 @@ INTERFACE TravUtil
     ; VAR (* IN OUT *) EstListChildrenToPass : LbeStd . EstChildNoTyp 
     ) 
   : LangUtil . FmtKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Use when traversing into the Fs subtree from one end or the other,
      when info about the current line is known. *) 
 (* CHECK: Works Bwd?  Do we need it to? *) 
@@ -394,7 +394,7 @@ INTERFACE TravUtil
     ; VAR (* IN OUT *) EstListChildrenToPass : LbeStd . EstChildNoTyp 
     ) 
   : BOOLEAN 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
   (* The line break must be undeleted. 
      This function has a SIDE EFFECT.  If the line break is not to be taken,
      notes that it has been passed, which must happen exactly once, so that
@@ -404,19 +404,19 @@ INTERFACE TravUtil
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE AssertBwdNoLostFixedChild 
     ( FsNodeRef : LangUtil . FsNodeRefTyp 
     ; READONLY EstTravInfo : EstTravInfoTyp 
     ) 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
 
 ; PROCEDURE NodeNoOfNodeRef 
     ( RootNodeRef : LbeStd . EstRootTyp ; SoughtNodeRef : REFANY ) 
   : LbeStd . EstNodeNoTyp
   (* LbeStd.EstNodNoNull, if not found. *) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   
 ; END TravUtil 
 . 

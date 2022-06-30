@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -11,8 +11,8 @@ INTERFACE Ldl1FsTrees
    Build FsTrees for a language definition written in Ldl1.
 *) 
 
-; IMPORT Assertions 
 ; IMPORT AstView 
+; FROM Failures IMPORT Backout 
 ; IMPORT LangUtil 
 ; IMPORT LbeStd 
 ; IMPORT LdlSemantics 
@@ -21,7 +21,7 @@ INTERFACE Ldl1FsTrees
     ( <* UNUSED *> VAR LangInfo : LdlSemantics . LangInfoRefTyp 
     ; Tok : LbeStd . TokTyp 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE BuildVarTerm 
     ( <* UNUSED *> VAR LangInfo : LdlSemantics . LangInfoRefTyp 
@@ -29,7 +29,7 @@ INTERFACE Ldl1FsTrees
     ; VarTermTok : LbeStd . TokTyp 
     ; VarTermModTok : LbeStd . TokTyp 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE Build 
     ( VAR LangInfo : LdlSemantics . LangInfoRefTyp 
@@ -38,7 +38,7 @@ INTERFACE Ldl1FsTrees
     ; IsStart : BOOLEAN 
     ) 
   : LangUtil . FsNodeRefTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Build an FS tree for a single AS node. *) 
 
 ; END Ldl1FsTrees 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -29,7 +29,8 @@ MODULE MergeTxt
 ; IMPORT TravUtil 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , AssertionFailure , CantHappen 
+; FROM Assertions IMPORT Assert , CantHappen  
+; FROM Failures IMPORT Backout  
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -77,7 +78,7 @@ MODULE MergeTxt
     ; VAR TrailingBlankLinesIncluded : LbeStd . LineNoTyp  
       (* ^Similarly, for trailing mods. *) 
     ) 
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
   (* MergeTextEdit puts a single-location group of text 
      modifications into an Est. *) 
@@ -334,7 +335,7 @@ MODULE MergeTxt
         (* ^Position of leftmost nonblank of the subtree.  
            LimitedCharNoUnknown, if none exists. *) 
       ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
     (* New Est building. *) 
 
@@ -506,7 +507,7 @@ MODULE MergeTxt
     ; VAR MteTeParentIsTouched : BOOLEAN := FALSE 
 
     ; PROCEDURE MteTeIncEstChild ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* MteTeIncEstChild *) 
           MteTeRMChildRef := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
@@ -515,7 +516,7 @@ MODULE MergeTxt
         END MteTeIncEstChild 
 
     ; PROCEDURE MteTeDecEstChild ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* MteTeDecEstChild *) 
           MteTeRightChildRelNodeNo 
@@ -552,7 +553,7 @@ MODULE MergeTxt
 
     ; PROCEDURE MteTeFlushChild 
         ( NewFmtNo : EstHs . FmtNoTyp ; NewEdgeKind : EstHs . EdgeKindTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* MteTeFlushChild *) 
           IF MteTeChildIsWaiting 
@@ -600,7 +601,7 @@ MODULE MergeTxt
 
     ; PROCEDURE MteTeFlushSliceOrChild 
         ( NewFmtNo : EstHs . FmtNoTyp ; NewEdgeKind : EstHs . EdgeKindTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* MteTeFlushSliceOrChild *) 
           IF MteTeWaitingFromChildNo # LbeStd . EstChildNoNull  
@@ -676,7 +677,7 @@ MODULE MergeTxt
         ; VAR ChildLeafElem : EstHs . LeafElemTyp 
         ; VAR FmtNo : EstHs . FmtNoTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Find the left sib of the leftmost already waiting Est child. *) 
 
       = VAR LNodeNo : LbeStd . EstNodeNoTyp 
@@ -723,7 +724,7 @@ MODULE MergeTxt
           END (* IF *) 
         END MteTeFindLeftSib 
 
-    ; PROCEDURE MteTeFlushDels ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE MteTeFlushDels ( ) RAISES { Backout } 
 
       = VAR LExists : BOOLEAN 
       ; VAR LEstChildNo : LbeStd . EstChildNoTyp 
@@ -807,7 +808,7 @@ MODULE MergeTxt
           END (* IF *) 
         END MteTeFlushDels 
 
-    ; PROCEDURE MteTeFlushBlankLines ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE MteTeFlushBlankLines ( ) RAISES { Backout } 
 
       = VAR LExists : BOOLEAN 
       ; VAR LEstChildNo : LbeStd . EstChildNoTyp 
@@ -879,7 +880,7 @@ MODULE MergeTxt
 
     ; PROCEDURE MteTeWaitBlankLines 
         ( BlankLineCt : LbeStd . LineNoTyp ; FmtNo : EstHs . FmtNoTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* MteTeWaitBlankLines *) 
           IF BlankLineCt > 0 
@@ -902,7 +903,7 @@ MODULE MergeTxt
         ; IsNotRepair := FALSE 
         (* Neither IsRepair nor IsNotRepair means it doesn't matter *) 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Arrange for this item to be included in a delete mod. *) 
 
       = BEGIN (* MteTeIncludeInModDel *) 
@@ -933,7 +934,7 @@ MODULE MergeTxt
         ; FmtNo : EstHs . FmtNoTyp 
         ; EdgeKind : EstHs . EdgeKindTyp  
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Wait a new Est child. *) 
 
       = BEGIN (* MteTeWaitChild *) 
@@ -961,7 +962,7 @@ MODULE MergeTxt
 
     ; PROCEDURE MteTeFlushExceptSlice 
         ( NewFmtNo : EstHs . FmtNoTyp ; NewEdgeKind : EstHs . EdgeKindTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Flush anything that is waiting, except for a slice as the
          leftmost waiting thing. *) 
 
@@ -980,7 +981,7 @@ MODULE MergeTxt
         ( EdgeKind : EstHs . EdgeKindTyp 
         ; IsInteresting : BOOLEAN 
         )  
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Wait the current Est child. *) 
 
       = VAR LNewEdgeKind : EstHs . EdgeKindTyp 
@@ -1041,7 +1042,7 @@ MODULE MergeTxt
           END 
         END MteTeWaitExistingEstChild 
 
-    ; PROCEDURE MteTeWaitChildrenToLeft ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE MteTeWaitChildrenToLeft ( ) RAISES { Backout } 
       (* Wait the range of existing Est children of the current parent node, 
          from the leftmost child through the current child. *) 
 
@@ -1125,7 +1126,7 @@ MODULE MergeTxt
           END (* IF *) 
         END MteTeWaitChildrenToLeft 
 
-    ; PROCEDURE MteTeWaitChildrenToRight ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE MteTeWaitChildrenToRight ( ) RAISES { Backout } 
       (* Wait the range of existing Est children of the current parent node, 
          from the current child through the rightmost child. *) 
 
@@ -1175,7 +1176,7 @@ MODULE MergeTxt
         END MteTeWaitChildrenToRight 
 
     ; PROCEDURE MteTeWaitChildrenFartherToRight ( ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Wait the range of existing Est children of the current parent node, 
          from the child to the right of the current child through the 
          rightmost child. *) 
@@ -1245,7 +1246,7 @@ MODULE MergeTxt
         ; TextLen : LbeStd . LimitedCharNoTyp 
         ) 
       : ModHs . ModTextTyp (* NIL => was a blank line. *) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LNewModRef : ModHs . ModTextTyp 
       ; VAR LFromSs : PortTypes . Int32Typ 
@@ -1291,7 +1292,7 @@ MODULE MergeTxt
 
     ; PROCEDURE MteTeMaybeFinishBwdEdit 
         ( FmtNo : EstHs . FmtNoTyp ; MarkNodeNo : LbeStd . EstNodeNoTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* If now is the time to do it, go out of MteStateBwdEdit, build
          and wait whatever new Mods are required, count NewLinesCt for
          the built mods, set NewBolTokMark, set state to BwdNl or
@@ -1538,7 +1539,7 @@ MODULE MergeTxt
           END 
         END MteTeMaybeFinishBwdEdit 
 
-    ; PROCEDURE MteTeFinishMerge ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE MteTeFinishMerge ( ) RAISES { Backout } 
 
       = VAR LNewEstRef : EstHs . EstRefTyp 
       ; VAR LEstChildRef : LbeStd . EstRootTyp 
@@ -1669,7 +1670,7 @@ MODULE MergeTxt
         ( READONLY SourceString : Strings . StringTyp 
         ; ModTextStartSs : LbeStd . LimitedCharNoTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR MteTeMsStartSs : LbeStd . LimitedCharNoTyp 
 
@@ -1760,7 +1761,7 @@ MODULE MergeTxt
           END (* IF *) 
         END MteTeFlushCondFmt 
 
-    ; PROCEDURE MteTeReverse ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE MteTeReverse ( ) RAISES { Backout } 
 
       (* Make transition into MteStateBwdEdit. *) 
 
@@ -1809,7 +1810,7 @@ MODULE MergeTxt
     ; PROCEDURE MteTeReverseOrPassNlBefore ( ) 
       : BOOLEAN 
       (* ^True if did reverse. *) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Used for ordinary Fs tree line breaks too. *) 
       (* This FUNCTION has numerous SIDE EFFECTS. *) 
       (* PRE: MteState is not a backward state. *)
@@ -1847,7 +1848,7 @@ MODULE MergeTxt
     ; PROCEDURE MteTeReverseOrPassNlAfter ( ) 
       : BOOLEAN 
       (* ^True if did reverse. *) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* This FUNCTION has numerous SIDE EFFECTS. *) 
       (* PRE: MteState is not a backward state. *) 
       (* We are at the new line after of a BlankLine, ModCmnt, or ModText. 
@@ -1879,7 +1880,7 @@ MODULE MergeTxt
         ; StringRef : SharedStrings . T 
         ; IsTrailingCmnt : BOOLEAN 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* String of comment, text mod, or token. *) 
 
       = VAR LLength := SharedStrings . Length ( StringRef ) 
@@ -1955,7 +1956,7 @@ MODULE MergeTxt
             ; MteFwdPrevTok := Tok 
             END (* IF *) 
           EXCEPT Strings . SsOutOfBounds 
-          => RAISE AssertionFailure ( "Strings.SsOutOfBounds" )  
+          => RAISE Backout ( "Strings.SsOutOfBounds" )  
           END (* TRY EXCEPT *) 
         END MteTeFwdString 
 
@@ -1965,7 +1966,7 @@ MODULE MergeTxt
           (* If StringRef is NIL, instead use a string of blanks of 
              this length. (which can also be zero) *) 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* Copy characters that are part of the touched but not the replaced 
          region into the new character arrays being filled for mod text(s). *) 
 
@@ -2118,7 +2119,7 @@ MODULE MergeTxt
         ; INC ( MteBlankSs ) 
         END MteTeFwdBlanks 
 
-    ; PROCEDURE MteTeBwdBlanks ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE MteTeBwdBlanks ( ) RAISES { Backout } 
       (* Harmless, if we are already out of MteStateBwdEdit. *) 
 
       = VAR LBlanksLen : LbeStd . LimitedCharNoSignedTyp 
@@ -2154,7 +2155,7 @@ MODULE MergeTxt
           (* Tells caller to exclude this item from the new Est, 
              if in a backwards state. *) 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: MteState # MteStateTyp . MteStateRightNlFound. *) 
 
       = BEGIN (* MteTeTok *) 
@@ -2214,7 +2215,7 @@ MODULE MergeTxt
         ( FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FmtKind : LangUtil . FmtKindTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LDoExcludeIfBwd : BOOLEAN 
 
@@ -2270,7 +2271,7 @@ MODULE MergeTxt
         ; FsChildCt : LangUtil . FsChildNoTyp 
         ; InitialFsChildNo : LangUtil . FsChildNoSignedTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
 
@@ -2313,7 +2314,7 @@ MODULE MergeTxt
         ; FsChildCt : LangUtil . FsChildNoTyp 
         ; InitialFsChildNo : LangUtil . FsChildNoTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
 
@@ -2356,13 +2357,13 @@ MODULE MergeTxt
         ( FsNodeRef : LangUtil . FsNodeRefTyp 
         ; FsFmtKind : LangUtil . FmtKindTyp 
         ) 
-      RAISES { AssertionFailure , Thread . Alerted } 
+      RAISES { Backout , Thread . Alerted } 
 
       (* Leading mods. *) 
 
       = PROCEDURE MteTeTfsModBlankLine1stBwd 
           ( <* UNUSED *> ModBlankLine : ModHs . ModBlankLineTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* Backward processing inside a blank line that does not follow
            a deleted new line.  MteItemCt does not include the Nl after. 
         *) 
@@ -2437,7 +2438,7 @@ MODULE MergeTxt
 
       ; PROCEDURE MteTeTfsModBlankLine1stFwd 
           ( ModBlankLine : ModHs . ModBlankLineTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* Forward processing of a blank line that we are starting somewhere
            inside of. *) 
 
@@ -2515,7 +2516,7 @@ MODULE MergeTxt
 
       ; PROCEDURE MteTeTfsModBlankLine2nd 
           ( ModBlankLine : ModHs . ModBlankLineTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* A ModBlankLine that follows a deleted new line.  This implies
            it is adjacent to the touched region. *) 
 
@@ -2544,7 +2545,7 @@ MODULE MergeTxt
 
       ; PROCEDURE MteTeTfsModBlankLine 
           ( ModBlankLine : ModHs . ModBlankLineTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* MteTeTfsModBlankLine *) 
             CASE MteState 
@@ -2609,7 +2610,7 @@ MODULE MergeTxt
           END MteTeTfsModBlankLine 
 
       ; PROCEDURE MteTeTfsModCmntBwd ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         (* Does not handle Nl after, which is handled differently
            at different call sites.  MteItemCt does not include 
@@ -2756,7 +2757,7 @@ MODULE MergeTxt
           END MteTeTfsModCmntBwd 
 
       ; PROCEDURE MteTeTfsModCmntFwd ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR LFromPos : LbeStd . LimitedCharNoSignedTyp 
         ; VAR LIsTrailingCmnt : BOOLEAN 
@@ -2899,7 +2900,7 @@ MODULE MergeTxt
           END MteTeTfsModCmntFwd
 
       ; PROCEDURE MteTeTfsModCmnt ( ModCmnt : ModHs . ModCmntTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR LNlBefore : BOOLEAN 
         ; VAR LIsTrailingCmnt : BOOLEAN 
@@ -3019,7 +3020,7 @@ MODULE MergeTxt
           END MteTeTfsModCmnt 
 
       ; PROCEDURE MteTeTfsModTextBwd ( ModText : ModHs . ModTextTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* Does not handle Nl after, nor trailing blanks. These are
            handled at various call sites, in different ways. *) 
 
@@ -3142,7 +3143,7 @@ MODULE MergeTxt
           END MteTeTfsModTextBwd 
 
       ; PROCEDURE MteTeTfsModTextFwd ( ModText : ModHs . ModTextTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* This is a ModText in the old Est. *) 
 
         = BEGIN (* MteTeTfsModTextFwd *) 
@@ -3204,7 +3205,7 @@ MODULE MergeTxt
           END MteTeTfsModTextFwd 
 
       ; PROCEDURE MteTeTfsModText ( ModText : ModHs . ModTextTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* This is a ModText in the old Est. *) 
         = VAR LNlBefore : BOOLEAN 
 
@@ -3322,7 +3323,7 @@ MODULE MergeTxt
           END MteTeTfsModText 
 
       ; PROCEDURE MteTeTfsModTok ( EstRef : EstHs . EstRefTyp ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LLMCharPos : LbeStd . LimitedCharNoTyp 
 
@@ -3431,7 +3432,7 @@ MODULE MergeTxt
           END MteTeTfsModTok
 
       ; PROCEDURE MteTeTfsLexErrChars ( String : SharedStrings . T ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR LMarkNodeNo : LbeStd . EstNodeNoTyp  
         ; VAR LDoExcludeIfBwd : BOOLEAN 
@@ -3515,7 +3516,7 @@ MODULE MergeTxt
           END MteTeTfsLexErrChars  
 
       ; PROCEDURE MteTeTfsModErr ( <* UNUSED *> ModErr : ModHs . ModErrTyp ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = VAR LMarkNodeNo : LbeStd . EstNodeNoTyp  
 
@@ -3598,7 +3599,7 @@ MODULE MergeTxt
             (* ^Position of leftmost nonblank of the subtree.  
                LimitedCharNoUnknown, if none exists. *) 
           ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
         (* DOES handle ModTok. *) 
 
         = VAR LChildFsNodeRef : LangUtil . FsNodeRefTyp 
@@ -3830,7 +3831,7 @@ MODULE MergeTxt
           END MteTeTfsEstSubtree 
 
       ; PROCEDURE MteTeTfsLeadingModsNoDel ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
         (* Works in either direction. Does not handle a delete mod. *) 
 
         = BEGIN (* MteTeTfsLeadingModsNoDel *) 
@@ -3897,7 +3898,7 @@ MODULE MergeTxt
             END (* LOOP *) 
           END MteTeTfsLeadingModsNoDel 
 
-      ; PROCEDURE MteTeTfsTrailingMods ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE MteTeTfsTrailingMods ( ) RAISES { Backout } 
         (* Works in either direction. *) 
 
         = BEGIN (* MteTeTfsTrailingMods *) 
@@ -3928,7 +3929,7 @@ MODULE MergeTxt
 
       ; PROCEDURE MteTeTfsFwdLeadingDel 
           ( VAR Delete : BOOLEAN ; VAR IsRepair : BOOLEAN ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* MteTeTfsFwdLeadingDel *) 
             Delete := FALSE 
@@ -3971,7 +3972,7 @@ MODULE MergeTxt
 
       ; PROCEDURE MteTeTfsBwdLeadingDel 
           ( VAR Delete : BOOLEAN ; VAR IsRepair : BOOLEAN ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
 
         = BEGIN (* MteTeTfsBwdLeadingDel *) 
             Delete := FALSE 
@@ -4076,7 +4077,7 @@ MODULE MergeTxt
 
       (* Format Syntax Trees: *) 
 
-      ; PROCEDURE MteTeTfsBegOfImage ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE MteTeTfsBegOfImage ( ) RAISES { Backout } 
 
         = BEGIN (* MteTeTfsBegOfImage *) 
             IF MteState IN MteStateSetStart
@@ -4124,7 +4125,7 @@ MODULE MergeTxt
             END 
           END MteTeTfsBegOfImage 
 
-      ; PROCEDURE MteTeTfsEndOfImage ( ) RAISES { AssertionFailure } 
+      ; PROCEDURE MteTeTfsEndOfImage ( ) RAISES { Backout } 
         (* PRE: Leading mods already done and not deleted. *) 
         (* Text edits can lie beyond EOI. *) 
 
@@ -4197,7 +4198,7 @@ MODULE MergeTxt
           END MteTeTfsEndOfImage 
 
       ; PROCEDURE MteTeTfsInsTok ( IsRepair : BOOLEAN ) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* PRE: Leading mods already done;  The InsTok is not deleted. *) 
 
         = VAR LDoExcludeIfBwd : BOOLEAN 
@@ -4274,7 +4275,7 @@ MODULE MergeTxt
           END MteTeTfsInsTok 
 
       ; PROCEDURE MteTeTfsLineBreak ( FsKind : FsKindTyp) 
-        RAISES { AssertionFailure } 
+        RAISES { Backout } 
         (* PRE: Leading mods already done; Line break is not deleted. *) 
 
         = BEGIN (* MteTeTfsLineBreak *) 
@@ -4390,7 +4391,7 @@ MODULE MergeTxt
           END MteTeTfsLineBreak 
 
       ; PROCEDURE MteTeTfsEstChild ( IsEstList : BOOLEAN ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
         (* Only for an Fs-prescribed Est child. *) 
 
         = VAR LLMCharPos : LbeStd . LimitedCharNoTyp 
@@ -4520,7 +4521,7 @@ MODULE MergeTxt
           END MteTeTfsEstChild 
 
       ; PROCEDURE MteTeTfsFsSubtree ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LChildFmtKind : LangUtil . FmtKindTyp 
         ; VAR LFsChildCt : LangUtil . FsChildNoTyp 
@@ -4580,7 +4581,7 @@ MODULE MergeTxt
           END MteTeTfsFsSubtree 
 
       ; PROCEDURE MteTeTfsTraverseCondFmtChildren ( ) 
-        RAISES { AssertionFailure , Thread . Alerted } 
+        RAISES { Backout , Thread . Alerted } 
 
         = VAR LFsChildCt : LangUtil . FsChildNoTyp 
         ; VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -5119,7 +5120,7 @@ MODULE MergeTxt
         END (* Block *) 
       END MteTraverseEst 
 
-  ; PROCEDURE MteCheckTokMarks ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE MteCheckTokMarks ( ) RAISES { Backout } 
 
     = VAR LEstRef : LbeStd . EstRootTyp 
     ; VAR LEstRef2 : LbeStd . EstRootTyp

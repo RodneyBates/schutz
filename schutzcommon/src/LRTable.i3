@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -12,7 +12,7 @@ INTERFACE LRTable
 
 ; IMPORT Fmt 
 
-; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 ; IMPORT LbeStd 
 ; IMPORT PortTypes 
 
@@ -245,13 +245,13 @@ INTERFACE LRTable
     ; Tok : LbeStd . TokTyp 
     ) 
   : LbeStd . LRStateTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE AcceptProdNo ( Gram : GrammarTyp ) : ProdNoTyp 
 
 ; PROCEDURE Continuation 
     ( Gram : GrammarTyp ; State : LbeStd . LRStateTyp ) : LbeStd . TokTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE ShortParseCheckCost 
     ( Gram : GrammarTyp 

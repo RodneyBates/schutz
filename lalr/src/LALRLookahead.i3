@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -23,13 +23,13 @@
 
 INTERFACE LALRLookahead 
 
-; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 ; IMPORT LRTable 
 
 ; TYPE ConflictProc = PROCEDURE ( p0 : BOOLEAN ) 
 
 ; PROCEDURE ComputeLALR ( Gram : LRTable . GrammarTyp ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Berechnung der LALR(1) LookAheadSets *) 
 
 ; END LALRLookahead 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -27,7 +27,7 @@ MODULE UiRecPlay
 ; IMPORT VBT 
 ; IMPORT Wr 
 
-; FROM Assertions IMPORT AssertionFailure
+; FROM Failures IMPORT Backout
 ; IMPORT BuildLexMachine  
 ; IMPORT Display 
 ; IMPORT EditWindow 
@@ -1306,7 +1306,7 @@ Enabled := FALSE ;
               TRY 
                 LCommandInt  
                   := LexTable . ValueFromText ( CommandTable , LCommandString ) 
-              EXCEPT AssertionFailure 
+              EXCEPT Backout 
               => LCommandInt := LexTable . ValueNull 
 (* TODO: Pop a dialog or something here? *) 
               END (* TRY EXCEPT *) 

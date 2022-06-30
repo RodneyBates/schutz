@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -31,7 +31,7 @@ INTERFACE AstView
 
 (* WARNING: Currently not thread-safe. *) 
 
-; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 ; IMPORT LbeStd 
 ; IMPORT PortTypes 
 
@@ -63,7 +63,7 @@ INTERFACE AstView
     ; IsOptSingletonList : BOOLEAN := FALSE  
     ) 
   : AstRefTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Construct a new node handle having AstRefTyp. *) 
 
 ; TYPE AstRefArrayTyp = ARRAY OF AstRefTyp 
@@ -75,7 +75,7 @@ INTERFACE AstView
     ; VAR ChildRef : AstRefTyp 
     ; VAR WasFound : BOOLEAN 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Set ChildRef to denote the leftmost Ast child of Parent and record in 
      Parent that this is its current child.  NOT WasFound if there is no child.
   *) 
@@ -85,7 +85,7 @@ INTERFACE AstView
     ; VAR ChildRef : AstRefTyp 
     ; VAR WasFound : BOOLEAN 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Advance the current Ast child of Parent one to the right, set ChildRef 
      to denote this Ast child, Parent and record in Parent that this is its 
      current child.  NOT WasFound if there is no child to the right.
@@ -96,7 +96,7 @@ INTERFACE AstView
     ; VAR Children : AstRefArrayTyp 
     ; LdlLang : LbeStd . LangTyp := LbeStd . LangNull 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Fill Children with as many of the children of Parent as will fit,
      padding any extra elements with AstRefNull
   *) 
@@ -107,7 +107,7 @@ INTERFACE AstView
     ; LdlLang : LbeStd . LangTyp := LbeStd . LangNull 
     ) 
   : AstRefTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* The ChildNo-th child of Parent.  AstRefNull if it doesn't exist. *) 
 
 ; PROCEDURE IntValue ( READONLY Node : AstRefTyp ) : PortTypes . Int32Typ 
@@ -116,7 +116,7 @@ INTERFACE AstView
 ; PROCEDURE ChildCt 
     ( Parent : AstRefTyp ; Max : CARDINAL := LAST ( CARDINAL ) ) 
   : CARDINAL 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Count of Ast children of Parent, but not more than Max.  This is 
      O(ChildCt), and the Max limitation merely allows a caller to make it
      faster, if it is not interested whether the count exceeds Max.

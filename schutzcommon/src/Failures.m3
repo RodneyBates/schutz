@@ -450,7 +450,7 @@ UNSAFE MODULE Failures
       IF GBackoutRef = NIL
       THEN 
         TRY
-          RAISE Backout   
+          RAISE Backout ( "" )    
         EXCEPT
         | Backout 
         => GBackoutRef

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -10,7 +10,8 @@ MODULE M3Scanner
 
 ; IMPORT TextIntTbl 
 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT SchutzCoroutine 
 ; IMPORT LangUtil  
 ; IMPORT LbeStd 
@@ -63,7 +64,7 @@ MODULE M3Scanner
   (* It is possible to put back at most one character, and it must 
      be the one that was gotten there. *) 
   ; PROCEDURE PutBackChar ( Ch : CHAR ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* PutBackChar *) 
         TRY 
@@ -79,12 +80,12 @@ MODULE M3Scanner
               ) 
           END (* IF *) 
         EXCEPT Strings . SsOutOfBounds 
-        => RAISE AssertionFailure ( "Strings.SsOutOfBounds" ) 
+        => RAISE Backout ( "Strings.SsOutOfBounds" ) 
         END (* TRY EXCEPT *) 
       END PutBackChar 
 
   ; PROCEDURE EnsureOneChar ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* EnsureOneChar *) 
         TRY 
@@ -107,7 +108,7 @@ MODULE M3Scanner
           ; Ch := Strings . IthChar ( InString , Pos ) 
           END (* IF *) 
         EXCEPT Strings . SsOutOfBounds 
-        => RAISE AssertionFailure ( "Strings.SsOutOfBounds" ) 
+        => RAISE Backout ( "Strings.SsOutOfBounds" ) 
         END (* TRY EXCEPT *) 
       END EnsureOneChar 
 
@@ -121,7 +122,7 @@ MODULE M3Scanner
            without incrementing Pos. *) 
 
   ; PROCEDURE BegOfTok ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* BegOfTok *) 
         IF Pos > 0 
@@ -141,7 +142,7 @@ MODULE M3Scanner
 
   ; PROCEDURE DeliverTok 
       ( Tok : LbeStd . TokTyp ; MakeIdle : BOOLEAN := TRUE ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* DeliverTok *) 
         ScannerIf . AccumSlice ( Sif , TokString ) 
@@ -154,7 +155,7 @@ MODULE M3Scanner
       END DeliverTok 
 
   ; PROCEDURE AppendAndDeliverTok ( Tok : LbeStd . TokTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* AppendAndDeliverTok *) 
         Strings . AppendCharInPlace ( TokString , Ch ) 
@@ -163,7 +164,7 @@ MODULE M3Scanner
       END AppendAndDeliverTok 
 
   ; PROCEDURE NextChar ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* NextChar *) 
         Strings . AppendCharInPlace ( TokString , Ch ) 
@@ -173,7 +174,7 @@ MODULE M3Scanner
       END NextChar 
 
   ; PROCEDURE LexErrorChars ( Code : LbeStd . ErrCodeTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* LexErrorChars *) 
         State := LbeStd . SsInTok 
@@ -184,7 +185,7 @@ MODULE M3Scanner
       END LexErrorChars 
 
   ; PROCEDURE Ident ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LIntTok : INTEGER 
 
@@ -203,7 +204,7 @@ MODULE M3Scanner
       END Ident 
 
   ; PROCEDURE Placeholder ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LIntTok : INTEGER 
 
@@ -232,7 +233,7 @@ MODULE M3Scanner
       END Placeholder  
 
   ; PROCEDURE Number ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* Number *) 
         BegOfTok ( ) 
@@ -292,7 +293,7 @@ MODULE M3Scanner
       END Number 
 
   ; PROCEDURE String ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LCount : PortTypes . Int32Typ 
 
@@ -345,7 +346,7 @@ MODULE M3Scanner
       END String 
 
   ; PROCEDURE CharLit ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LCount : PortTypes . Int32Typ 
 
@@ -399,7 +400,7 @@ MODULE M3Scanner
       END CharLit 
 
   ; PROCEDURE CommentSuffix ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN 
         SaveState := State 
@@ -457,7 +458,7 @@ MODULE M3Scanner
       END CommentSuffix 
 
   ; PROCEDURE PragmaSuffix ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN 
         SaveState := State 
@@ -710,8 +711,8 @@ MODULE M3Scanner
             END (* CASE *) 
           END (* IF *) 
        END (* LOOP *) 
-       EXCEPT AssertionFailure 
-      => <* FATAL AssertionFailure *> 
+       EXCEPT Backout 
+      => <* FATAL Backout *> 
         BEGIN 
           BegOfTok ( ) 
         ; DeliverTok ( LbeStd . Tok__Unknown ) 

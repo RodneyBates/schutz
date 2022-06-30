@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -14,7 +14,7 @@ INTERFACE Images
 
 ; IMPORT PaintHs 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; EXCEPTION NoMoreWindows 
 
@@ -29,7 +29,7 @@ INTERFACE Images
     ; ForSave : BOOLEAN 
     ) 
   : PaintHs . ImagePersistentTyp  
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* If ForSave, has SIDE EFFECT of TextEdit . FlushEdit, because this must 
      be done to prevent the cleaning up from losing information. 
   *) 
@@ -38,11 +38,11 @@ INTERFACE Images
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; WindowRef : PaintHs . WindowRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE DisconnectImageFromAllWindows 
     ( ImageRef : PaintHs . ImageTransientTyp )
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE DiscardImage ( ImageRef : PaintHs . ImageTransientTyp )  
   (* ^No action if ImageRef is in any window. *) 
@@ -51,7 +51,7 @@ INTERFACE Images
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; InsertNilFixedChildren := FALSE 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Reparse a (possibly) modified tree. *) 
 
 ; VAR ImageTable : TextRefTbl . T 

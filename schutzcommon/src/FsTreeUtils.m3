@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -12,8 +12,8 @@ MODULE FsTreeUtils
 
 ; IMPORT Fmt 
 
-; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , AssertionFailure , CantHappen  
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout   
 ; IMPORT EstHs  
 ; IMPORT IntSets 
 ; IMPORT LdlSemantics 
@@ -88,14 +88,14 @@ MODULE FsTreeUtils
     ( <* UNUSED *> LangInfo : LangInfoRefTyp 
     ; FsAltNodeRef : LangUtil . FsNodeRefTyp 
     )
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* FsAltNodeRef is an alternative node.  Compute its 
      FsAbsentEstChildFormatsEmpty, i.e., does it format empty when its Est
      child is absent.  Do this even if the Est child is Required.  
   *) 
 
   = PROCEDURE CfsaRecurse ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { Done , AssertionFailure } 
+    RAISES { Done , Backout } 
     (* PRE: FsNodeRef is an alternative or any descendant thereof. *) 
 
     = BEGIN 
@@ -139,7 +139,7 @@ MODULE FsTreeUtils
     ; FsListChildRef : LangUtil. FsNodeRefTyp 
     ; ListTokSet : TokSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: FsListChildRef has FsKind EstChildOf*, Subtree*, or CondFmt. *) 
 
   (* Set FsSingletonOptMin and FsSingletonOptMapRef of FsListChildRef.  
@@ -153,7 +153,7 @@ MODULE FsTreeUtils
   ; VAR CsloSingletonOptMapRef : LRTable . TokArrayRefTyp 
 
   ; PROCEDURE CsloFwdOuter ( OuterListTok : IntSets . ValidElemT ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR CsloFoOuterElemTokSet : TokSetTyp 
 
@@ -305,7 +305,7 @@ MODULE FsTreeUtils
     ( LangInfo : LdlSemantics . LangInfoRefTyp 
     ; FsRuleNodeRef : LangUtil . FsNodeRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* 1) Note the need for list cardinality tokens for other list nodes, 
         due to their use as principal children of this Fs Tree, in the 
         semantic node attached to the Abstract list declaration of the other 
@@ -381,7 +381,7 @@ MODULE FsTreeUtils
       ; CardSet : CardSetTyp 
       )
     : BOOLEAN (* A case remained. *) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Handle every case that satisfies both TokSet and CardSet. 
        These are all for the same format alternative, denoted by
        FsNodeRef. *) 
@@ -483,7 +483,7 @@ MODULE FsTreeUtils
       END FfrRemainingCases  
 
   ; PROCEDURE FfrPredicate ( FsPredNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsPredNodeRef has FsKind EstChildOf*, Subtree*, or CondFmt. *) 
 
     = PROCEDURE FfrPredGetListSetInfo 
@@ -946,7 +946,7 @@ MODULE FsTreeUtils
       ( VAR (* IN OUT *) FsCondFmtNodeRef : LangUtil . FsNodeRefTyp 
         (* ^Possibly changed to eliminate unsatisfiable alternatives. *) 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsCondFmtNodeRef has FsKind EstChildOf*, Subtree*, or CondFmt. *) 
     (* NOT to be called recursively for subsequent predicates. *) 
 
@@ -1027,7 +1027,7 @@ MODULE FsTreeUtils
 
   ; PROCEDURE FfrUncondPrincipalChild 
       ( FsChildNodeRef : LangUtil . FsNodeRefTyp )
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsChildNodeRef is a principal child that is NOT inside a conditional
        construct.  It could still have multiple alternatives if it's optional 
        or contains list(s).
@@ -1090,7 +1090,7 @@ MODULE FsTreeUtils
       END FfrUncondPrincipalChild 
 
   ; PROCEDURE FfrUncondFsSubtree ( FsSubtreeNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsSubtreeNodeRef has FsKindEstFixed* or FsKindSubtree*. *) 
     (* PRE: We are NOT inside a conditional construct. *) 
 
@@ -1111,7 +1111,7 @@ MODULE FsTreeUtils
       ( VAR (* IN OUT *) FsChildNodeRef : LangUtil . FsNodeRefTyp 
         (* ^Possibly changed to eliminate unsatisfiable alternatives. *) 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Called only when outside a conditional construct. *) 
     (* Mostly a dispatching procedure. *) 
 
@@ -1142,7 +1142,7 @@ MODULE FsTreeUtils
 
   ; PROCEDURE FfrListRule 
       ( FsListRuleNodeRef : LangUtil . FsNodeRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: FsListRuleNodeRef has FsKindEstList*. *) 
 
     = PROCEDURE HasBookendsRecurse ( FsNodeRef : LangUtil . FsNodeRefTyp ) 
@@ -1340,7 +1340,7 @@ MODULE FsTreeUtils
     ; FsNodeRef : LangUtil . FsNodeRefTyp 
     ; VAR (* IN OUT *) ChangesOccurred : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LFsChildRef : LangUtil . FsNodeRefTyp 
   ; VAR LResultFormatsEmpty : UncertainBool . T   
@@ -1388,7 +1388,7 @@ MODULE FsTreeUtils
           (* ^For the entire conditional construct.  This is not stored in any
              FsNode, so must be returned separately. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR CccAltFormatsEmpty : UncertainBool . T 
 
@@ -1647,7 +1647,7 @@ MODULE FsTreeUtils
              not stored in any FsNode, so it needs to be returned separately
              in this parameter. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* FsNodeRef is anything other than a top-level FsRule node. *) 
 
   = VAR LDeclNodeNo : LbeStd . EstNodeNoTyp 
@@ -1735,7 +1735,7 @@ MODULE FsTreeUtils
     ; FsRuleTok : LbeStd . TokTyp 
     ; VAR (* IN OUT *) ChangesOccurred : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LFsNodeRef : LangUtil . FsNodeRefTyp
   ; VAR LFsEstChild : LangUtil . FsNodeRefTyp 
@@ -1786,7 +1786,7 @@ MODULE FsTreeUtils
 
 (* VISIBLE: *) 
 ; PROCEDURE CloseFormatsEmpty ( LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Compute the closure of the FormatsEmpty property. *) 
 
   = VAR LChangesOccurred : BOOLEAN := TRUE

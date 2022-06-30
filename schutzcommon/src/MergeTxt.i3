@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -17,7 +17,7 @@ INTERFACE MergeTxt
 ; IMPORT Marks 
 ; IMPORT Strings 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 (* There could be up to four new TokMarks, denoting new beginnings of
    lines, built by MergeTextEdit. If the old line is actually a blank
@@ -73,7 +73,7 @@ INTERFACE MergeTxt
     ; VAR TrailingBlankLinesIncluded : LbeStd . LineNoTyp  
       (* ^Similarly, for trailing mods. *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   (* MergeTextEdit puts a single location group of text modifications
      into an Est.  The string at ModTextStringRef will have no leading

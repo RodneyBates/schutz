@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -19,7 +19,7 @@ INTERFACE GenConstEst
 ; IMPORT LbeStd 
 ; IMPORT LdlSemantics 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; PROCEDURE WriteStream 
     ( Lang : LbeStd . LangTyp 
@@ -32,7 +32,7 @@ INTERFACE GenConstEst
     ; WrT : Wr . T 
       (* Must be open.  Not closed. *) 
     )
-  RAISES { AssertionFailure }
+  RAISES { Backout }
   (* Write the generated module to WrT. *) 
 
 ; PROCEDURE WriteName  

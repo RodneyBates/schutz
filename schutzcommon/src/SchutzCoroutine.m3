@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -15,7 +15,8 @@ MODULE SchutzCoroutine
 ; IMPORT Thread 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert 
+; FROM Assertions IMPORT Assert
+; FROM Failures IMPORT Backout 
 ; IMPORT MessageCodes 
 
 ; TYPE AFT = MessageCodes . T 
@@ -52,7 +53,7 @@ MODULE SchutzCoroutine
 
 ; PROCEDURE ApplyBody ( Self : ClosureTyp ) : REFANY 
 
-  = <* FATAL Assertions . AssertionFailure *> BEGIN (* ApplyBody *) 
+  = <* FATAL Backout *> BEGIN (* ApplyBody *) 
       LOCK Self . Cr 
       DO (* If necessary, wait for initial resume by creator *) 
          IF Self . Cr . Active = RoutineKindTyp . Creator 
@@ -112,7 +113,7 @@ MODULE SchutzCoroutine
     ; RETURN Cr 
     END Init 
 
-; PROCEDURE LockedResume ( Cr : T ) RAISES { Assertions . AssertionFailure } 
+; PROCEDURE LockedResume ( Cr : T ) RAISES { Backout } 
   (* Caller must hold lock on Cr *) 
 
   = VAR LSelf : RoutineKindTyp 
@@ -129,7 +130,7 @@ MODULE SchutzCoroutine
     END LockedResume 
 
 (* VISIBLE: *) 
-; PROCEDURE Resume ( Cr : T ) RAISES { Assertions . AssertionFailure } 
+; PROCEDURE Resume ( Cr : T ) RAISES { Backout } 
   (* Switch execution to the other coroutine of T. 
      A Noop if the caller is the creator of Cr and 
      ChildProc has returned. *) 

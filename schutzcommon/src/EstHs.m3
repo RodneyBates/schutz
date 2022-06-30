@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -25,7 +25,8 @@ MODULE EstHs
 ; IMPORT Thread
 ; IMPORT Wr 
 
-; FROM Assertions IMPORT Assert , AssertionFailure  
+; FROM Assertions IMPORT Assert 
+; FROM Failures IMPORT Backout   
 ; IMPORT LbeStd 
 ; IMPORT MessageCodes 
 ; IMPORT PortTypes 
@@ -382,7 +383,7 @@ MODULE EstHs
 
 (* EXPORTED: *) 
 ; PROCEDURE WidthInfoIsNull ( WidthInfo : WidthInfoTyp ) : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LResult : BOOLEAN 
 

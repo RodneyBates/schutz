@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -32,7 +32,8 @@ MODULE Files
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , AssertionFailure  
+; FROM Assertions IMPORT Assert 
+; FROM Failures IMPORT Backout   
 ; IMPORT EstHs 
 ; IMPORT EstUtil  
 ; IMPORT LangMap
@@ -258,7 +259,7 @@ MODULE Files
 (* VISIBLE: *) 
 ; PROCEDURE ReadNamedImageFile ( FileName : TEXT ) 
   : PaintHs . ImageTransientTyp 
-  RAISES { AssertionFailure , Error , Thread . Alerted } 
+  RAISES { Backout , Error , Thread . Alerted } 
   (* Reads an est, image, or checkpoint file.  Builds an ImageRef for an est 
      file.  Does not set IpImageName, ItAbsTextFileName, or ItAbsPickleFileName.
   *) 
@@ -351,7 +352,7 @@ MODULE Files
     ; VAR NewTreeRef : LbeStd . EstRootTyp 
     ; InsertNilFixedChildren := FALSE 
     )
-  RAISES { AssertionFailure , Thread . Alerted }  
+  RAISES { Backout , Thread . Alerted }  
 
   (* Parse from a file. *) 
 
@@ -391,7 +392,7 @@ MODULE Files
 (* VISIBLE: *) 
 ; PROCEDURE OpenEmptyFile ( ImageName : TEXT ) 
   : PaintHs . ImageTransientTyp 
-  RAISES { AssertionFailure , Error , Thread . Alerted }  
+  RAISES { Backout , Error , Thread . Alerted }  
   (* Does not set IpImageName, ItAbsTextFileName, or ItAbsPickleFileName. 
      Does not write a pickle file. 
   *) 
@@ -449,7 +450,7 @@ MODULE Files
 ; PROCEDURE OpenTextRdT 
      ( RdT : Rd . T ; Lang : LbeStd . LangTyp ; FileName : TEXT ) 
   : PaintHs . ImageTransientTyp 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Does not set IpImageName. 
      Does not write a pickle file. 
   *) 
@@ -513,7 +514,7 @@ MODULE Files
 (* VISIBLE: *) 
 ; PROCEDURE OpenNamedTextFile ( FileName : TEXT ) 
   : PaintHs . ImageTransientTyp 
-  RAISES { AssertionFailure , Error , Thread . Alerted } 
+  RAISES { Backout , Error , Thread . Alerted } 
   (* Does not set IpImageName, ItAbsTextFileName, or ItAbsPickleFileName. 
      Does not write a pickle file. 
   *) 
@@ -550,7 +551,7 @@ MODULE Files
       ; TRY 
           LResult := OpenTextRdT ( LRdT , LSuffixInfo . Lang , FileName ) 
         EXCEPT 
-        AssertionFailure ( E ) => RAISE AssertionFailure ( E )  
+        Backout ( E ) => RAISE Backout ( E )  
 
         | Thread . Alerted => RAISE Thread . Alerted 
 
@@ -748,7 +749,7 @@ MODULE Files
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; FileName : TEXT 
     ) 
-  RAISES { AssertionFailure , Error , Thread . Alerted } 
+  RAISES { Backout , Error , Thread . Alerted } 
 (* TODO: This is unused as of 2004-05-20.  See if it should go. *) 
 
   = VAR WrT : Wr . T 
@@ -757,7 +758,7 @@ MODULE Files
       ( <* UNUSED *> ImageRef : PaintHs . ImageTransientTyp 
       ; String : Strings . StringTyp 
       ) 
-   RAISES { AssertionFailure , Thread . Alerted } 
+   RAISES { Backout , Thread . Alerted } 
 
     = <* FATAL Wr . Failure *> 
       BEGIN (* WriteProc *) 
@@ -774,7 +775,7 @@ MODULE Files
       ; WriteTrv . WriteText ( ImageRef , WriteProc , DoGenerateText := TRUE ) 
       ; Wr . Close ( WrT ) 
       EXCEPT Thread . Alerted => RAISE Thread . Alerted 
-      | AssertionFailure ( EArg ) => RAISE AssertionFailure ( EArg ) 
+      | Backout ( EArg ) => RAISE Backout ( EArg ) 
       ELSE 
 (* FIX:  eliminate this case. *) 
         RAISE Error ( "Can't open output text file " & FileName ) 

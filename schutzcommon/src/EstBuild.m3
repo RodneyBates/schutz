@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -21,7 +21,8 @@ MODULE EstBuild
 
 ; IMPORT Assertions 
 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -151,7 +152,7 @@ MODULE EstBuild
 ; PROCEDURE LeftmostTokForLeafNode 
     ( Lang : LbeStd . LangTyp ; LeafRef : EstHs . KTreeRefTyp ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
 
@@ -223,7 +224,7 @@ MODULE EstBuild
 (* VISIBLE: *) 
 ; PROCEDURE PrependTokInfo 
     ( MergeState : MergeStateTyp ; Tok : LbeStd . TokTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Prepend token count and width for an insertion token. *) 
 
   = VAR LWidthInfo : EstHs . WidthInfoTyp 
@@ -300,7 +301,7 @@ MODULE EstBuild
     ; VAR (* IN OUT *) ExistingLeftTok : LbeStd . TokTyp 
     ; VAR (* IN OUT *) ExistingRightTok : LbeStd . TokTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* PrependSliceTokPair *) 
       Assert 
@@ -340,7 +341,7 @@ MODULE EstBuild
     ; RightGapOrigChildNo : LbeStd . EstChildNoTyp 
       (* ^Child No in original Est of the child to right of the gap. *)
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Include token count and width for insertion tokens that are separators
      and conditional insertions between successive Est children of an Est
      list.  This is only used to reinsert info where a list has been sliced
@@ -360,7 +361,7 @@ MODULE EstBuild
   (* These parent nodes are only filled when --FsNodeRef # MsFsNodeRef *) 
 
   ; PROCEDURE RlsLeftAstChild ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Lazily find and cache the left-of-gap Ast child. *) 
 
     = VAR LEstChildNo : LbeStd . EstChildNoTyp 
@@ -385,7 +386,7 @@ MODULE EstBuild
       END RlsLeftAstChild 
 
   ; PROCEDURE RlsRightAstChild ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Lazily find and cache the right-of-gap Ast child. *) 
 
     = VAR LEstChildNo : LbeStd . EstChildNoTyp 
@@ -491,7 +492,7 @@ MODULE EstBuild
       ; DoSkipLeftmost : BOOLEAN 
       ; DoSkipRightmost : BOOLEAN 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Traverse Leftward, from RightFmtNo to LeftFmtNo, inserting list
        separators' width and token counts.  DoSkipRightmost means skip 
        RightFmtNo and start with the next one to its left.
@@ -507,7 +508,7 @@ MODULE EstBuild
           (* Moves R to L while traversing. *)
 (* TODO:  ^Probably this should be a non-local variable instead of a formal. *)
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LFsChildNo : LangUtil . FsChildNoTyp 
       ; VAR LFsNodeRef : LangUtil . FsNodeRefTyp 
@@ -845,7 +846,7 @@ MODULE EstBuild
     END InitLeafRow 
 
 ; PROCEDURE FlushLeadingTokInfoToLeaf ( MergeState : MergeStateTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* FlushLeadingTokInfoToLeaf *) 
       Assert 
@@ -879,7 +880,7 @@ MODULE EstBuild
     ; FmtNo : EstHs . FmtNoTyp 
     ; IsLeftOfSeam : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: MergeState . MsLeafRow is unpacked and has space for at least one
           additional child. 
   *) 
@@ -988,7 +989,7 @@ MODULE EstBuild
     ; VAR ResultRef : EstHs . KTreeRefTyp 
     ; VAR ResultKindSet : EstHs . EstChildKindSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* FlushLeafRow *) 
       Assert 
@@ -1042,7 +1043,7 @@ MODULE EstBuild
 
 ; PROCEDURE FlushLeadingTokInfoToNonleaf 
     ( MergeState : MergeStateTyp ; VAR NonleafRow : MsNonleafRowTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* FlushLeadingTokInfoToNonleaf *) 
       Assert 
@@ -1075,7 +1076,7 @@ MODULE EstBuild
     ; KindSet : EstHs . EstChildKindSetTyp 
     ; IsLeftOfSeam : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: NonleafRow is unpacked and has space for at least one more child. *) 
 
   = VAR LCumNodeCt : LbeStd . EstNodeNoTyp 
@@ -1158,7 +1159,7 @@ MODULE EstBuild
     END PrependToNonleafRow 
 
 ; PROCEDURE ShortenUnpackedNonleafRow ( VAR NonleafRow : MsNonleafRowTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN 
       Assert 
@@ -1180,7 +1181,7 @@ MODULE EstBuild
     ; DoDeleteLeftmostElem : BOOLEAN 
     ; VAR ReplacedChildCt : LbeStd . EstChildNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LNewElemCt : EstHs . ElemNoTyp 
   ; VAR LOrigToChildNo : LbeStd . EstChildNoTyp 
@@ -1299,7 +1300,7 @@ MODULE EstBuild
     ; VAR ResultRef : EstHs . KTreeRefTyp 
     ; VAR ResultKindSet : EstHs . EstChildKindSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* FlushNonleafRow *) 
       Assert 
@@ -1337,7 +1338,7 @@ MODULE EstBuild
     ; InsertionRef : EstHs . KTreeRefTyp 
     ; InsertionKindSet : EstHs . EstChildKindSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LHeight : EstHs . KTreeHeightTyp 
   ; VAR LInsertionRef : EstHs . KTreeRefTyp 
@@ -1491,7 +1492,7 @@ MODULE EstBuild
     ; KindSet : EstHs . EstChildKindSetTyp 
     ; NewEstChildRef : LbeStd . EstRootTyp := NIL 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Alter the leftmost item in the being-constructed Est node, as follows:
      Include KindSet in its kind set. 
      IF NewEstChildRef is non-NIL, change the child to NewEstChildRef. 
@@ -1650,7 +1651,7 @@ MODULE EstBuild
     ; GroupFmtNo : EstHs . FmtNoTyp 
       (* ^GroupFmtNo is used only if IsFirstOfGroup *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 (* Merging proceeds right to left. *) 
 
   = VAR LInsertionRef : EstHs . KTreeRefTyp 
@@ -1753,7 +1754,7 @@ MODULE EstBuild
     ; VAR LeftmostNewChildRef : LbeStd . EstRootTyp 
     ; VAR LeftmostNewKindSet : EstHs . EstChildKindSetTyp 
     ) 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
 
   = TYPE AdjKindTyp 
       = { AdjKindSame (* Left and right arrays are really the same array. *) 
@@ -1796,7 +1797,7 @@ MODULE EstBuild
 
   ; PROCEDURE MslLeaf 
       ( DownInfo : DownInfoTyp ; VAR ResultInfo : ResultInfoTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR MslLSeamInsertionCt1 : PortTypes . Card16Typ 
     ; VAR MslLSeamInsertionCt2 : PortTypes . Card16Typ 
@@ -1807,7 +1808,7 @@ MODULE EstBuild
              shifted to --2 when we finish the right new node, 
              so --2 is always the current one to use when filling. *) 
 
-    ; PROCEDURE MslLFlush ( ) RAISES { AssertionFailure } 
+    ; PROCEDURE MslLFlush ( ) RAISES { Backout } 
 
       = VAR LInsertionRef : EstHs . KTreeRefTyp 
       ; VAR LKindSet : EstHs . EstChildKindSetTyp 
@@ -1839,7 +1840,7 @@ MODULE EstBuild
         ; FmtNo : EstHs . FmtNoTyp 
         ; IsLeftOfSeam : BOOLEAN 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* MslLPrepend *) 
           IF MergeState . MsLeafRow . MsLrElemCt >= MslLSeamInsertionCt2 
@@ -1855,7 +1856,7 @@ MODULE EstBuild
         ; RightGapEdgeInfo : EstHs . EdgeInfoTyp 
         ; RightGapOrigChildNo : LbeStd . EstChildNoTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* MslLReincludeListSepTokInfo *) 
           IF ResultInfo . RiSeamInsertionRef2 = NIL 
@@ -2463,7 +2464,7 @@ MODULE EstBuild
 
   ; PROCEDURE MslNonleaf 
       ( DownInfo : DownInfoTyp ; VAR ResultInfo : ResultInfoTyp ) 
-    RAISES { AssertionFailure }   
+    RAISES { Backout }   
 
     = VAR MslNlSeamInsertionCt1 : PortTypes . Card16Typ 
     ; VAR MslNlSeamInsertionCt2 : PortTypes . Card16Typ 
@@ -2475,7 +2476,7 @@ MODULE EstBuild
          so --2 is always the current one to use when filling. *) 
 
     ; PROCEDURE MslNlFlush ( VAR NonleafRow : MsNonleafRowTyp ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR LInsertionRef : EstHs . KTreeRefTyp 
       ; VAR LKindSet : EstHs . EstChildKindSetTyp 
@@ -2509,7 +2510,7 @@ MODULE EstBuild
         ; KindSet : EstHs . EstChildKindSetTyp 
         ; IsLeftOfSeam : BOOLEAN 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* MslNlPrepend *) 
           IF NonleafRow . MsNlrElemCt >= MslNlSeamInsertionCt2 
@@ -2532,7 +2533,7 @@ MODULE EstBuild
         ; RightGapOrigChildNo : LbeStd . EstChildNoTyp 
         ; VAR NonleafRow : MsNonleafRowTyp 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = BEGIN (* MslNlReincludeListSepTokInfo *) 
           IF ResultInfo . RiSeamInsertionRef2 = NIL 
@@ -3286,7 +3287,7 @@ MODULE EstBuild
     ; ResultEstNodeKind : EstHs . EstNodeKindTyp 
     ; VAR ResultEstRef : EstHs . EstRefTyp 
     ) 
-  RAISES { AssertionFailure }   
+  RAISES { Backout }   
 
   = VAR LHeight : EstHs . KTreeHeightTyp 
   ; VAR LInsertionRef : EstHs . KTreeRefTyp 

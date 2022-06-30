@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -15,7 +15,7 @@ INTERFACE EstBuild
 ; IMPORT LbeStd 
 ; IMPORT EstHs 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 (* Merging slices of Est nodes' children into a new Est node. *) 
 
@@ -55,7 +55,7 @@ INTERFACE EstBuild
 
 ; PROCEDURE PrependTokInfo 
     ( MergeState : MergeStateTyp ; Tok : LbeStd . TokTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Prepend token count and width for an insertion token. *) 
 
 ; PROCEDURE AlterLMChild 
@@ -63,7 +63,7 @@ INTERFACE EstBuild
     ; KindSet : EstHs . EstChildKindSetTyp 
     ; NewEstChildRef : LbeStd . EstRootTyp := NIL 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Alter the leftmost item in the being-constructed Est node, as follows:
      Include KindSet in its kind set. 
      IF NewEstChildRef is non-NIL, change the child to NewEstChildRef. 
@@ -71,7 +71,7 @@ INTERFACE EstBuild
 
 ; PROCEDURE InclNextRightmostChildKindSet 
     ( MergeState : MergeStateTyp ; KindSet : EstHs . EstChildKindSetTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Arrange to include KindSet in the child kind set of the rightmost 
      element of the next-to-be-merged child or slice of MergeState. 
      FinishMerge asserts something was merged since this was called with
@@ -95,7 +95,7 @@ INTERFACE EstBuild
     ; GroupFmtNo : EstHs . FmtNoTyp 
       (* ^GroupFmtNo is used only if IsFirstOfGroup *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE MergeSlice 
     ( MergeState : MergeStateTyp 
@@ -116,14 +116,14 @@ INTERFACE EstBuild
     ; VAR LeftmostNewChildRef : LbeStd . EstRootTyp 
     ; VAR LeftmostNewKindSet : EstHs . EstChildKindSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE FinishMerge 
     ( MergeState : MergeStateTyp 
     ; ResultEstNodeKind : EstHs . EstNodeKindTyp 
     ; VAR ResultTreeRef : EstHs . EstRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; END EstBuild 
 . 

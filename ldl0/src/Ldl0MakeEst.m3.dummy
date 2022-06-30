@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                         n                 *)
 (* -----------------------------------------------------------------------2- *)
@@ -11,12 +11,12 @@ MODULE Ldl0MakeEst
 (* A hand-written dummy for what is usually a machine-generated module. *) 
 
 ; IMPORT LbeStd 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 (* VISIBLE: *) 
 ; PROCEDURE Root ( Lang : LbeStd . LangTyp := LbeStd . LangNull ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN 
       RETURN NIL 

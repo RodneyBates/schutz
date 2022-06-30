@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -22,7 +22,7 @@ INTERFACE ParseTrv
 ; IMPORT Rd 
 ; IMPORT Thread 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 (* Interface to parser *) 
 
@@ -43,7 +43,7 @@ INTERFACE ParseTrv
     ; SuccKind : SuccKindTyp 
     ) 
   : ParseHs . ParseTravStateRefTyp 
-  RAISES { Thread . Alerted , AssertionFailure } 
+  RAISES { Thread . Alerted , Backout } 
   (* Get the next parse traversal state, after one in hand. 
      When the current state is a whole subtree, (which implies 
      it contains no syntactic modifications,) 
@@ -56,7 +56,7 @@ INTERFACE ParseTrv
 ; PROCEDURE InitParseEst 
     ( VAR ParseInfo : ParseHs . ParseInfoTyp ; EstRef : LbeStd . EstRootTyp ) 
   : ParseHs . ParseTravStateRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Get an initial parse traversal state for a tree. *) 
 
 ; PROCEDURE InitParseFile 

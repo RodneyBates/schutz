@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -12,7 +12,7 @@ INTERFACE SchutzCoroutine
    do it. 
 *) 
 
-; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 
 ; CONST Brand = "SchutzCoroutine.T.Brand" 
 
@@ -33,7 +33,7 @@ INTERFACE SchutzCoroutine
   (* Switch execution to the other coroutine of T. 
      A Noop if the caller is the creator of Cr and 
      ChildProc has returned. *) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE HasReturned ( Cr : T ) : BOOLEAN 
   (* TRUE if ChildProc of the child coroutine has returned. *) 

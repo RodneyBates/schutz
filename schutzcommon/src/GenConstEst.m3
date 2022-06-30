@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -21,7 +21,6 @@ MODULE GenConstEst
 ; IMPORT Time 
 ; IMPORT Stdio
 
-; IMPORT Assertions 
 ; IMPORT EstHs 
 ; IMPORT LangUtil 
 ; IMPORT LbeStd 
@@ -35,7 +34,8 @@ MODULE GenConstEst
 ; IMPORT TravUtil  
 ; IMPORT VersionedFiles 
 
-; FROM Assertions IMPORT CantHappen , AssertionFailure 
+; FROM Assertions IMPORT CantHappen 
+; FROM Failures IMPORT Backout  
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -47,7 +47,7 @@ MODULE GenConstEst
       RETURN "LangUtil.FmtKindTyp . " & LangUtil.FmtKindImage ( K ) 
     END FmtKindImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE WriteStream 
     ( Lang : LbeStd . LangTyp 
     ; EstRoot : LbeStd . EstRootTyp 
@@ -57,7 +57,7 @@ MODULE GenConstEst
     ; WrT : Wr . T 
       (* Must be open.  Not closed. *) 
     )
-  RAISES { AssertionFailure }
+  RAISES { Backout }
 
   = PROCEDURE W ( TextValue : TEXT ) 
     (* Easy to call: write to current output stream. *) 
@@ -226,7 +226,7 @@ MODULE GenConstEst
 
   ; PROCEDURE EstOtherChild 
       ( N : LbeStd . EstRootTyp ; Indent : IndentTyp := 0 ) 
-    RAISES { AssertionFailure }
+    RAISES { Backout }
 
     = BEGIN 
         TYPECASE N 
@@ -285,7 +285,7 @@ MODULE GenConstEst
       ; AbsNodeNo : LbeStd . EstNodeNoTyp 
       ; Indent : IndentTyp := 0 
       )  
-    RAISES { AssertionFailure }
+    RAISES { Backout }
     (* Generate a procedure that builds and returns the subtree rooted
        at NodeRef. *) 
 
@@ -322,7 +322,7 @@ MODULE GenConstEst
         END  
 
       (* Now generate the build procedure for this node. *) 
-      ; WL ( "; PROCEDURE " & LNodeName & " ( ) : EstHs . EstRefTyp RAISES { AssertionFailure } " ) 
+      ; WL ( "; PROCEDURE " & LNodeName & " ( ) : EstHs . EstRefTyp RAISES { Backout } " ) 
       ; W ( B ( Indent + 2 ) & "= VAR LResult : EstHs . EstRefTyp " ) 
       ; WL ( B ( Indent + 2 ) 
             & "; VAR LMergeState : EstBuild . MergeStateTyp " 
@@ -401,17 +401,17 @@ MODULE GenConstEst
       END GenEstNodeProc 
 
   ; PROCEDURE GenRoot ( N : LbeStd . EstRootTyp ; Indent : IndentTyp := 0 ) 
-    RAISES { AssertionFailure }
+    RAISES { Backout }
     (* Generate a parameterless procedure named "Root" that builds and returns
        a copy of the whole tree rooted at N. *)  
 
     = VAR LEstRef : EstHs . EstRefTyp 
 
     ; BEGIN 
-        WL ( "(* VISIBLE: *) " ) 
+        WL ( "(* EXPORTED: *) " ) 
       ; WL ( "; PROCEDURE Root ( Lang : LbeStd . LangTyp := LbeStd . LangNull ) " ) 
       ; WL ( "  : LbeStd . EstRootTyp " ) 
-      ; WL ( "  RAISES { AssertionFailure } " ) 
+      ; WL ( "  RAISES { Backout } " ) 
       ; WL ( B ( Indent + 2 ) & "= <* UNUSED *> CONST Dummy = 0 (* For ease of generation. *) " ) 
       ; TYPECASE N 
         OF NULL => LEstRef := NIL 
@@ -465,7 +465,7 @@ MODULE GenConstEst
         *)   
       ; WL ( "; IMPORT SharedStrings " ) 
       ; WL ( "; IMPORT Ldl0Tok AS LdlTok " ) 
-      ; WL ( "; FROM Assertions IMPORT AssertionFailure " ) 
+      ; WL ( "; FROM Failures IMPORT Backout " ) 
       ; WL ( "" ) 
       ; GenRoot  ( EstRoot , Indent := 0 ) 
       ; WL ( "" ) 
@@ -476,7 +476,7 @@ MODULE GenConstEst
       END (* Block *) 
     END WriteStream 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE WriteName  
     ( Lang : LbeStd . LangTyp 
     ; EstRoot : LbeStd . EstRootTyp 

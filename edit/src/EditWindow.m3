@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2021, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -32,7 +32,7 @@ MODULE EditWindow
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT CantHappen , AssertionFailure 
+; FROM Failures IMPORT Backout  
 ; IMPORT Display 
 ; IMPORT Errors 
 ; IMPORT LbeStd 
@@ -163,7 +163,7 @@ MODULE EditWindow
               ; VertGap : PixelCoordTyp := MinVertGap 
               ) 
             : T 
-            RAISES { AssertionFailure } 
+            RAISES { Backout } 
             := Init 
 
           OVERRIDES 
@@ -576,7 +576,7 @@ MODULE EditWindow
     END InitArrows 
 
 ; PROCEDURE ComputeDerivedWindowInfo ( Window : T ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   <* LL.sup = Window *> 
 
   = VAR LMetrics : ScrnFont . Metrics 
@@ -727,7 +727,7 @@ MODULE EditWindow
         ELSE
           Assertions . Message ( AFT . E_NoFixedFontFound )
         ; Assertions . DoTerminate := TRUE 
-        ; RAISE Assertions . AssertionFailure
+        ; RAISE Backout
                   ( MessageCodes . Image ( AFT . E_NoFixedFontFound ) ) 
         END (* CASE *) 
       ; Window . EwPaintOpBg 
@@ -803,7 +803,7 @@ MODULE EditWindow
     ; VertGap : PixelCoordTyp := MinVertGap 
     ) 
     : T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* Init *) 
     (* Apparently doesn't exist: VBT . Leaf . init ( Window ) *)
@@ -1636,7 +1636,7 @@ MODULE EditWindow
     = Worker . ClosureTyp OBJECT PointParam : Point . T END 
 
 ; PROCEDURE MouseClickWorkProc ( Closure : WorkerClosurePointTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. Closure . PointParam is char point. *) 
   (* On Worker thread. *) 
 
@@ -1766,7 +1766,7 @@ MODULE EditWindow
 
 ; PROCEDURE ClearSelectionWorkProc 
     ( <* UNUSED *> Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* On Worker thread. *) 
 
   = VAR LCommandString : TEXT 
@@ -1907,7 +1907,7 @@ MODULE EditWindow
     END Mouse 
 
 ; PROCEDURE SweepSelectionWorkProc ( Closure : WorkerClosurePointTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. Closure . PointParam is char point. *) 
   (* On Worker thread. *) 
 
@@ -1992,7 +1992,7 @@ MODULE EditWindow
   = Worker . ClosureTyp OBJECT BoolParam : BOOLEAN END 
 
 ; PROCEDURE PromptAndCloseWorkProc ( Closure : WorkerClosureBoolTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = BEGIN 
       Ui . PromptAndCloseAllImages 
@@ -2066,7 +2066,7 @@ MODULE EditWindow
     END Misc 
 
 ; PROCEDURE BeginKeyWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2096,7 +2096,7 @@ MODULE EditWindow
     END ReplayBeginKey 
 
 ; PROCEDURE EndKeyWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2125,7 +2125,7 @@ MODULE EditWindow
     END ReplayEndKey 
 
 ; PROCEDURE CharDelFwdWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2154,7 +2154,7 @@ MODULE EditWindow
     END ReplayCharDelFwd 
 
 ; PROCEDURE CharDelBwdWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2183,7 +2183,7 @@ MODULE EditWindow
     END ReplayCharDelBwd 
 
 ; PROCEDURE DeleteRestOfLineWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2213,7 +2213,7 @@ MODULE EditWindow
     END ReplayDeleteRestOfLine 
 
 ; PROCEDURE CharTransposeWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2242,7 +2242,7 @@ MODULE EditWindow
     END ReplayCharTranspose 
 
 ; PROCEDURE CursorLeftWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2272,7 +2272,7 @@ MODULE EditWindow
     END ReplayCursorLeft 
 
 ; PROCEDURE CursorRightWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2302,7 +2302,7 @@ MODULE EditWindow
     END ReplayCursorRight 
 
 ; PROCEDURE CursorUpWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2332,7 +2332,7 @@ MODULE EditWindow
     END ReplayCursorUp 
 
 ; PROCEDURE CursorDownWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2362,7 +2362,7 @@ MODULE EditWindow
     END ReplayCursorDown 
 
 ; PROCEDURE PriorKeyWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2396,7 +2396,7 @@ MODULE EditWindow
     END ReplayPriorKey 
 
 ; PROCEDURE NextKeyWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2430,7 +2430,7 @@ MODULE EditWindow
     END ReplayNextKey 
 
 ; PROCEDURE HomeKeyWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* On Worker thread. *) 
 
@@ -2530,7 +2530,7 @@ MODULE EditWindow
     = Worker . ClosureTyp OBJECT CharParam : CHAR END 
 
 ; PROCEDURE CharTypeWorkProc ( Closure : WorkerClosureCharTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set.  Closure . CharParam is char typed. *) 
   (* On Worker thread. *) 
 
@@ -2801,7 +2801,7 @@ MODULE EditWindow
     END Key 
 
 ; PROCEDURE RedoWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
   = VAR LDoRescreen : BOOLEAN 
   ; VAR LDoReshape : BOOLEAN 
@@ -2939,7 +2939,7 @@ MODULE EditWindow
 ; <* UNUSED *> 
 (* CHECK: Will we need it someday? *) 
   PROCEDURE ReshapeWorkProc ( Closure : WorkerClosureReshapeTyp )  
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   <* LL.sup = VBT.mu.Window *> 
   (* PRE: Closure . Window, ReshapeRec are set. *) 
   (* On worker thread. *) 
@@ -2995,7 +2995,7 @@ MODULE EditWindow
 ; <* UNUSED *> 
 (* CHECK: Will we need it someday? *) 
   PROCEDURE RepaintWorkProc ( Closure : Worker . ClosureTyp )   
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   <* LL.sup = VBT.mu.Window *> 
   (* PRE: Closure . Window is set. *) 
   (* On worker thread. *) 
@@ -3113,7 +3113,7 @@ MODULE EditWindow
           ; LText := LSel . SelText 
           EXCEPT 
           | Thread . Alerted => LText := "" 
-          | AssertionFailure => LText := "" 
+          | Backout => LText := "" 
           END (* TRY EXCEPT *) 
         END (* IF *) 
       END (* IF *) 

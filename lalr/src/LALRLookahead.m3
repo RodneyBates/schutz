@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -28,7 +28,8 @@
 MODULE LALRLookahead 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , AssertionFailure , CantHappen 
+; FROM Assertions IMPORT Assert , CantHappen
+; FROM Failures IMPORT Backout 
 ; IMPORT Check 
 ; IMPORT IntProdVarArray 
 ; IMPORT IntItemVarArray 
@@ -433,7 +434,7 @@ MODULE LALRLookahead
     END PushItem 
 
 ; PROCEDURE PopItem ( ) : LALRTypes . ItemSsTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* PopItem *) 
       Assert ( Stack . Used >= 1 , AFT . A_LookaheadPopItem_EmptyStack ) 
@@ -442,7 +443,7 @@ MODULE LALRLookahead
     END PopItem 
 
 ; PROCEDURE TopItem ( ) : LALRTypes . ItemSsTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* TopItem *) 
       Assert ( Stack . Used >= 1 , AFT . A_LookaheadTopItem_EmptyStack ) 
@@ -478,7 +479,7 @@ MODULE LALRLookahead
     ; ItemSs : LALRTypes . ItemSsTyp 
     ; TreatConflict : ConflictProc 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LItemStackDepth : LALRTypes . ItemMarkTyp 
   ; VAR LTransItemSs : LALRTypes . ItemSsTyp 
@@ -566,7 +567,7 @@ MODULE LALRLookahead
 
 ; PROCEDURE Digraph 
     ( Gram : LRTable . GrammarTyp ; TreatConflict : ConflictProc ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* Digraph *) 
     (* Let S be an initially empty stack OF elements of X *) 
@@ -796,7 +797,7 @@ MODULE LALRLookahead
 
 (* VISIBLE: *) 
 ; PROCEDURE ComputeLALR ( Gram : LRTable . GrammarTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Berechnung der LALR(1) LookAheadSets *) 
 
   = VAR LNullables : IntSets . T (* Nonterminals *) := NIL 

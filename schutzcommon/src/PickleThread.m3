@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -22,9 +22,7 @@ MODULE PickleThread
 ; IMPORT Wr 
 
 ; IMPORT LbeStd 
-; IMPORT Assertions 
-
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; TYPE StateTyp 
     = { Idle             (* Waiting for a client to request work. *)  
@@ -33,7 +31,7 @@ MODULE PickleThread
                             Waiting to notify client . *) 
       , Error            (* Worker thread has finished with exception Error. 
                             Waiting for client to find out. *)  
-      , AssertionFailure (* Worker thread has finished with AssertionFailure. 
+      , Backout (* Worker thread has finished with Backout. 
                             Waiting for client to find out. *) 
       , Alerted          (* Worker thread has finished with Alerted. 
                             Waiting for client to find out. *) 
@@ -61,7 +59,7 @@ MODULE PickleThread
     ( WrT : Wr . T 
     ; Ref : REFANY 
     ) 
-  RAISES { Error , AssertionFailure , Thread . Alerted } 
+  RAISES { Error , Backout , Thread . Alerted } 
   (* Do Pickle . Write with the same parameters, in a distinct thread
      whose stack will be set large for pickling.  Serialize requests.
      Forward Alerts to the pickling thread, "backward" the listed exceptions
@@ -97,10 +95,10 @@ MODULE PickleThread
            => StoredState := StateTyp . Idle  
             ; Thread . Signal ( WaitingForIdle ) 
             ; RAISE Error ( StoredExceptionArg )   
-          | StateTyp . AssertionFailure 
+          | StateTyp . Backout   
            => StoredState := StateTyp . Idle  
             ; Thread . Signal ( WaitingForIdle ) 
-            ; RAISE AssertionFailure ( StoredExceptionArg )   
+            ; RAISE Backout ( StoredExceptionArg ) 
           | StateTyp . Alerted 
            => StoredState := StateTyp . Idle  
             ; Thread . Signal ( WaitingForIdle ) 
@@ -151,16 +149,16 @@ MODULE PickleThread
       END (* LOCK *) 
     END FinishError 
 
-; PROCEDURE FinishAssertionFailure ( Arg : TEXT ) 
+; PROCEDURE FinishBackout ( Arg : TEXT ) 
 
   = BEGIN 
       LOCK Mu
       DO
-        StoredState := StateTyp . AssertionFailure  
+        StoredState := StateTyp . Backout  
       ; StoredExceptionArg := Arg  
       ; Thread . Signal ( WaitingForDone ) 
       END (* LOCK *) 
-    END FinishAssertionFailure  
+    END FinishBackout  
 
 ; PROCEDURE FinishAlert ( ) 
 
@@ -186,7 +184,7 @@ MODULE PickleThread
         ; FinishNormally ( ) 
         EXCEPT 
         | Error ( EArg ) => FinishError ( EArg )  
-        | AssertionFailure ( EArg ) => FinishAssertionFailure ( EArg )  
+        | Backout => FinishBackout ( "" )  
         | Thread . Alerted => FinishAlert ( )   
         ELSE FinishError ( NIL ) 
         END (* TRY EXCEPT *) 

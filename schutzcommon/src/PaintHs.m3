@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -24,7 +24,8 @@ MODULE PaintHs
 
 ; IMPORT Assertions 
 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -245,7 +246,7 @@ MODULE PaintHs
 (* VISIBLE: *) 
 ; PROCEDURE LinkLineMarkToRight 
     ( InsertToRightOfRef : LineMarkTyp ; RefToInsert : LineMarkMeatTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LRightRef : LineMarkTyp 
 
@@ -264,7 +265,7 @@ MODULE PaintHs
 (* VISIBLE: *) 
 ; PROCEDURE LinkLineMarkToLeft 
     ( InsertToLeftOfRef : LineMarkTyp ; RefToInsert : LineMarkMeatTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LLeftRef : LineMarkTyp 
 
@@ -321,7 +322,7 @@ MODULE PaintHs
     ; SuccMark : LineMarkTyp 
     ; Image : ImageTransientTyp := NIL 
     )
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Higher-level.  Links in and also takes care of IpMarkCt and LrHasMark. *) 
 
   = BEGIN 
@@ -344,7 +345,7 @@ MODULE PaintHs
     ; PredMark : LineMarkTyp 
     ; Image : ImageTransientTyp := NIL 
     )
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Higher-level.  Links in and also takes care of IpMarkCt and LrHasMark. *) 
 
   = BEGIN 
@@ -375,7 +376,7 @@ MODULE PaintHs
       *) 
     )
   : BOOLEAN (* Success. *) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Even higher-level yet.  Sorts into the right place. *) 
 
   = VAR IlmImagePers : ImagePersistentTyp 
@@ -383,7 +384,7 @@ MODULE PaintHs
 
   ; PROCEDURE IlmSearch ( Pred : LineMarkTyp ; Succ : LineMarkTyp ) 
     : BOOLEAN (* Success. *) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
   
     = VAR LPred : LineMarkTyp 
     ; VAR LSucc : LineMarkTyp 
@@ -566,7 +567,7 @@ MODULE PaintHs
 (* VISIBLE: *) 
 ; PROCEDURE CompareLineMarks ( Left , Right : LineMarkMeatTyp ) 
   : [ - 1 .. 1 ] 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Takes into account LmTokMark , LmLineNo, and LmCharPos *) 
 
   = VAR LResult : [ - 1 .. 1 ] 
@@ -596,7 +597,7 @@ MODULE PaintHs
     ; VAR Left : LineMarkMeatTyp
     ; VAR Right : LineMarkMeatTyp
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Put Mark1 and Mark2 into nondescending order. *) 
 
   = BEGIN
@@ -622,7 +623,7 @@ MODULE PaintHs
 (* VISIBLE: *) 
 ; PROCEDURE BruteForceVerifyLineMarks 
     ( ImageTrans : ImageTransientTyp ; DoCheckOrder : BOOLEAN := TRUE ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LImagePers : PaintHs . ImagePersistentTyp  
   ; VAR LHeader : LineMarkTyp 

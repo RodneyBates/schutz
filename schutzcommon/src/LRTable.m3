@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -17,7 +17,8 @@ MODULE LRTable
 ; IMPORT MessageCodes 
 ; IMPORT Assertions 
 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -153,7 +154,7 @@ MODULE LRTable
     ; Tok : LbeStd . TokTyp 
     ) 
   : LbeStd . LRStateTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LState : LbeStd . LRStateTyp 
   ; VAR LNBase : CARDINAL 
@@ -208,7 +209,7 @@ MODULE LRTable
 (* VISIBLE: *) 
 ; PROCEDURE Continuation 
     ( Gram : GrammarTyp ; State : LbeStd . LRStateTyp ) : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* Continuation *) 
       Assert 

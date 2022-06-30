@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -19,13 +19,14 @@ INTERFACE LangUtil
 ; IMPORT Thread 
 
 ; IMPORT Assertions 
-; IMPORT SchutzCoroutine 
 ; IMPORT EstHs 
+; FROM Failures IMPORT Backout 
 ; IMPORT IntSets 
 ; IMPORT LbeStd 
 ; IMPORT LRTable 
 ; IMPORT PortTypes 
 ; IMPORT ScannerIf 
+; IMPORT SchutzCoroutine 
 ; IMPORT SharedStrings 
 ; IMPORT SuffixInfo 
 ; IMPORT UncertainBool 
@@ -828,7 +829,7 @@ INTERFACE LangUtil
     ; READONLY LeafElem : EstHs . LeafElemTyp 
     ) 
   : FsNodeRefTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Gives the FsNodeRef of the root of the appropriate format tree for an Est 
      node that is a child corresponding to FsEstChildNode, taking into account
      the singleton-list optimization.  If LeafElem leads to a singleton-list
@@ -845,7 +846,7 @@ INTERFACE LangUtil
     ; VAR FsNode : FsNodeRefTyp 
     ; VAR IsSingletonList : BOOLEAN   
     ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
   (* Gives the FsNodeRef of the root of the appropriate format tree for an Est 
      node, that is a child corresponding to FsEstChildNode, taking into account
      the singleton-list optimization.  If EstNodeRef is a singleton-list
@@ -1008,11 +1009,11 @@ INTERFACE LangUtil
 
 ; PROCEDURE IsLiteral ( Lang : LbeStd . LangTyp ; Tok : LbeStd . TokTyp ) 
   : BOOLEAN  
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE IsReserved ( Lang : LbeStd . LangTyp ; Tok : LbeStd . TokTyp ) 
   : BOOLEAN  
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE Gram ( Lang : LbeStd . LangTyp ) : LRTable . GrammarTyp 
 

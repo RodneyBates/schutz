@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -25,13 +25,13 @@ INTERFACE TempMark
 ; IMPORT ParseHs 
 ; IMPORT PaintHs 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; PROCEDURE BuildTempMarkList 
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; VAR ParseInfo : ParseHs . ParseInfoTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Convert the marks in an Est into a temp mark list 
      and mark bits in the Est nodes.  
      TempMarks could be located on any of the following:
@@ -53,14 +53,14 @@ INTERFACE TempMark
     ; OldEstRef : LbeStd . EstRootTyp 
     ; NewEstRef : LbeStd . EstRootTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Rebuild marks from temporary marks after reparse. *) 
 
 ; PROCEDURE UnmarkEst 
     ( EstRef : LbeStd . EstRootTyp 
     ; RootAbsNodeNo : LbeStd . EstNodeNoTyp := 0 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Remove any leftover temp mark mark bits in the Est. 
      This is needed for the OLD Est, after reparsing. 
   *) 
@@ -73,7 +73,7 @@ INTERFACE TempMark
     ( ImageTrans : PaintHs . ImageTransientTyp 
     ; VAR SavedMarkListRef : ParseHs . TempMarkArrayRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE RestorePermanentMarks 
     ( ImageTrans : PaintHs . ImageTransientTyp 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -16,7 +16,8 @@ MODULE EstUtil
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT EstHs 
 ; IMPORT LangUtil 
 ; FROM LangUtil IMPORT PredicateKindTyp 
@@ -50,7 +51,7 @@ MODULE EstUtil
 (* EXPORTED *) 
 ; PROCEDURE EstTok ( NodeRef : LbeStd . EstRootTyp ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* If NodeRef is a string object, returns its token. 
      Otherwise, the EstTok stored in the node. *) 
 
@@ -101,7 +102,7 @@ MODULE EstUtil
 ; PROCEDURE FsRuleForEstNode 
     ( Lang : LbeStd . LangTyp ; NodeRef : LbeStd . EstRootTyp ) 
   : LangUtil . FsNodeRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* The FsNodeRef of the root of the format tree for an Est node,
      or an FsNode of FsKindAstString, for an AstString. 
   *)
@@ -143,7 +144,7 @@ MODULE EstUtil
 (* EXPORTED *) 
 ; PROCEDURE EstChildKindSet ( NodeRef : LbeStd . EstRootTyp ) 
   : EstHs . EstChildKindSetTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* WARNING: EstChildKindContainsInsertionRepair and 
               EstChildKindContainsSyntMod can't be ascertained from
               the node itself, for ModDel and AstString, nor can
@@ -214,7 +215,7 @@ MODULE EstUtil
 ; PROCEDURE EstIsPlaceholder 
     ( Lang : LbeStd . LangTyp ; NodeRef : LbeStd . EstRootTyp ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Either from a SharedString . T or an Est node. *) 
 
   = VAR LTok : LbeStd . TokTyp 
@@ -345,7 +346,7 @@ MODULE EstUtil
     ; Lang : LbeStd . LangTyp := LbeStd . LangNull 
     ) 
   : TEXT 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* ^Also works on NIL, giving "NIL" *) 
 
   = VAR LResult : TEXT
@@ -401,7 +402,7 @@ MODULE EstUtil
     ; <* UNUSED *> Mnemonic : BOOLEAN := FALSE 
     ) 
   : TEXT 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* ^Also works on NIL, giving "NIL" *) 
 
   = BEGIN (* EstNodeImage *) 
@@ -891,7 +892,7 @@ MODULE EstUtil
          the root node. If they do and NodeNo is 0, will return LM Element. *) 
     ) 
   : [ 0 .. EstHs . ElemCtMax - 1 ] 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LLoElemNo : EstHs . ElemNoTyp 
     (* LLoElemNo is for the element containing the low numbered 
@@ -927,7 +928,7 @@ MODULE EstUtil
          the root node. If they do and NodeNo is 0, will return LM Element. *) 
     ) 
   : [ 0 .. EstHs . ElemCtMax - 1 ] 
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
 
   = VAR LLoElemNo : EstHs . ElemNoTyp 
     (* LLoElemNo is for the element containing the low numbered 
@@ -968,7 +969,7 @@ MODULE EstUtil
          relative to the parent rooted at NodeRef. *) 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LNodeNo : LbeStd . EstNodeNoTyp 
   ; VAR LNodeCt : LbeStd . EstNodeNoTyp 
@@ -1046,7 +1047,7 @@ MODULE EstUtil
     ; ChildNo : LbeStd . EstChildNoTyp 
     ) 
   : EstHs . ElemNoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LLoElemNo : EstHs . ElemNoTyp 
     (* LLoElemNo is for the element containing the low numbered 
@@ -1098,7 +1099,7 @@ MODULE EstUtil
     ( VAR (* IN OUT *) LevelInfo : LevelInfoTyp 
     ; Visit : VisitNonleafLevelProcTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
  (* PRE: LevelInfo . LiNodeRef and LiHeight are set for a KTreeRefTyp, and
          LiChildNo is set for a child of it that the caller wants to get to. 
     Descend through any nonleaf levels toward this child.  Call Visit on
@@ -1176,7 +1177,7 @@ MODULE EstUtil
 ; PROCEDURE IthChildRef 
     ( EstRef : EstHs . EstRefTyp ; I : LbeStd . EstChildNoTyp ) 
   : LbeStd . EstRootTyp  
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
 
 (* TODO: Inline DescendThruNonleafLevels and its noop callback Visit. *) 
   = VAR LLevelInfo : LevelInfoTyp 
@@ -1207,7 +1208,7 @@ MODULE EstUtil
       *) 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     )
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
 
 (* TODO: Inline DescendThruNonleafLevels and its noop callback Visit. *) 
   = VAR LLevelInfo : LevelInfoTyp 
@@ -1240,7 +1241,7 @@ MODULE EstUtil
     ; VAR ResultNodeNo : LbeStd . EstNodeNoTyp 
     ; VAR ResultNodeRef : EstHs . EstRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* If NodeNo is either an optimized singleton list or its element, will 
      give the parent of the list. *)  
   (* Will not give any kind of pseudo-node for an optimized singleton list. *) 
@@ -1291,7 +1292,7 @@ MODULE EstUtil
     ; NodeNo : LbeStd . EstNodeNoTyp 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure }
+  RAISES { Backout }
   (* If NodeNo is an optimized singleton list, will give its element. *)  
 
   = VAR LNodeRef : EstHs . EstRefTyp 
@@ -1339,7 +1340,7 @@ MODULE EstUtil
     ; VAR WasAlreadyTRUE : BOOLEAN 
       (* ^The value there was already TRUE. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 (* TODO: Inline DescendThruNonleafLevels and its callback Visit. *) 
 
   = VAR StBitSet := EstHs . EstChildKindSetTyp { KindBit } 
@@ -1378,7 +1379,7 @@ MODULE EstUtil
     ; NodeNo : LbeStd . EstNodeNoTyp 
     ; KindBit : EstHs . EstChildKindTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Also copies KindBit up, if KindBit IN EstChildKindSetCopyUp *) 
 
   = VAR LParentRef : EstHs . EstRefTyp 
@@ -1462,7 +1463,7 @@ MODULE EstUtil
     ; ChildNo : LbeStd . EstChildNoTyp 
     ; NewChildRef : LbeStd . EstRootTyp  
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Violently change a child ref in place, without any changes to kind sets, 
      width info, etc.  Violates the usual immutability rule.  Use on your
      own recognizance.  
@@ -1492,7 +1493,7 @@ MODULE EstUtil
     ; VAR WasAlreadyFALSE : BOOLEAN 
       (* ^The value there was already FALSE. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR SfBitSet := EstHs . EstChildKindSetTyp { KindBit } 
 
@@ -1502,7 +1503,7 @@ MODULE EstUtil
       ; VAR DoNegateParentBit : BOOLEAN 
             (* ^KindBit no longer belongs in the set for KTreeRef *) 
       ) 
-    RAISES { SfBailout , AssertionFailure } 
+    RAISES { SfBailout , Backout } 
 
     = VAR LLeafArrayRef : EstHs . LeafArrayRefTyp 
     ; VAR LNonleafArrayRef : EstHs . NonleafArrayRefTyp 
@@ -1620,7 +1621,7 @@ MODULE EstUtil
     ; VAR ResultChildRelNodeNo : LbeStd . EstNodeNoTyp 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR SksDone : BOOLEAN 
   ; VAR SksElemNoDec : PortTypes . Int16Typ 
@@ -1630,7 +1631,7 @@ MODULE EstUtil
       ; ChildNo : LbeStd . EstChildNoTyp 
       ; Height : EstHs . KTreeHeightTyp 
       )
-    RAISES { AssertionFailure }  
+    RAISES { Backout }  
     (* Go down through the leaves of the levels of the K-tree, towards
        ChildNo as long as we have a bit match, then sideways when we
        don't.  Return when we either find the leaf element we want
@@ -1891,7 +1892,7 @@ MODULE EstUtil
     ; VAR ResultChildRelNodeNo : LbeStd . EstNodeNoTyp 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 (* Beginning with the StartChildNo-th element (inclusive), 
     search for and return the subscript, root node number, 
     and leaf elem of the next element whose kind set intersects 
@@ -1921,7 +1922,7 @@ MODULE EstUtil
     ; VAR ResultChildRelNodeNo : LbeStd . EstNodeNoTyp 
     ; VAR ResultLeafElem : EstHs . LeafElemTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 (* PrevInKindSet is like NextInKindSet, but search backwards. *) 
 
   = BEGIN (* PrevInKindSet *) 
@@ -1939,7 +1940,7 @@ MODULE EstUtil
 (* EXPORTED *) 
 ; PROCEDURE ApproxChildCt ( Root : LbeStd . EstRootTyp ) 
   : ModHs . EstApproxChildCtTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LChildNo : LbeStd . EstChildNoTyp 
   ; VAR LChildCt : LbeStd . EstChildNoTyp 
@@ -1989,7 +1990,7 @@ MODULE EstUtil
     ; KindSet : EstHs . EstChildKindSetTyp 
     ) 
   : BOOLEAN 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LChildNo : LbeStd . EstChildNoTyp 
   ; VAR LNodeNo : LbeStd . EstNodeNoTyp 
@@ -2148,7 +2149,7 @@ MODULE EstUtil
 ; PROCEDURE EstMiscInfo 
     ( <* UNUSED *> Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : EstHs . EstMiscInfoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LResult : EstHs . EstMiscInfoTyp 
 
@@ -2301,7 +2302,7 @@ MODULE EstUtil
 ; PROCEDURE EstEdgeKind  
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : EstHs . EdgeKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LEstMiscInfo  : EstHs . EstMiscInfoTyp 
 
@@ -2317,7 +2318,7 @@ MODULE EstUtil
     ; I : LbeStd . EstChildNoTyp 
     ) 
   : EstHs . EdgeKindTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LEstChildRef : EstHs . EstRefTyp 
   ; VAR LEstMiscInfo  : EstHs . EstMiscInfoTyp 
@@ -2332,7 +2333,7 @@ MODULE EstUtil
 ; PROCEDURE LeftTokForEst 
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
 
@@ -2350,7 +2351,7 @@ MODULE EstUtil
 ; PROCEDURE RightTokForEst 
     ( Lang : LbeStd . LangTyp ; ItemRef : LbeStd . EstRootTyp ) 
   : LbeStd . TokTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LEstMiscInfo : EstHs . EstMiscInfoTyp 
 
@@ -2369,7 +2370,7 @@ MODULE EstUtil
     ; LeafRef : EstHs . KTreeLeafRefTyp 
     ; VAR Result : EstHs . SliceEdgeInfoPairTyp 
     )
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
 
   = VAR LChildCtMinus1 : LbeStd . EstChildNoTyp 
   ; VAR LLeafArrayRef : EstHs . LeafArrayRefTyp 
@@ -2469,7 +2470,7 @@ MODULE EstUtil
     ; KTreeRef : EstHs . KTreeRefTyp 
     ; VAR SliceEdgeInfoPair : EstHs . SliceEdgeInfoPairTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* GetKTreeSliceEdgeInfoPair *) 
       TYPECASE KTreeRef 
@@ -2552,7 +2553,7 @@ MODULE EstUtil
 (* EXPORTED *) 
 ; PROCEDURE Statistics 
     ( Parent : EstHs . KTreeRefTyp ; VAR Result : StatisticsTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = PROCEDURE Init ( VAR Stats : StatisticsTyp ) 
 
@@ -2583,7 +2584,7 @@ MODULE EstUtil
       END Init 
 
   ; PROCEDURE TraverseLeaf ( LeafRef : EstHs . LeafArrayRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* TraverseLeaf *) 
         IF LeafRef # NIL 
@@ -2598,7 +2599,7 @@ MODULE EstUtil
       END TraverseLeaf 
 
   ; PROCEDURE TraverseNonleaf ( NonleafRef : EstHs . NonleafArrayRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* TraverseNonleaf *) 
         IF NonleafRef # NIL 
@@ -2613,7 +2614,7 @@ MODULE EstUtil
       END TraverseNonleaf 
 
   ; PROCEDURE Recurse ( Parent : LbeStd . EstRootTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* Recurse *) 
         TYPECASE Parent 

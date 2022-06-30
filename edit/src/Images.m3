@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -13,7 +13,7 @@ MODULE Images
 ; IMPORT Thread 
 ; IMPORT Wr 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT Display 
 ; IMPORT EstUtil 
 ; IMPORT Files 
@@ -98,7 +98,7 @@ MODULE Images
     ; NewImagePers : PaintHs . ImagePersistentTyp 
     ; RemoveLinesRefs : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Copy the mark list, but remove marks not to be saved in the
      pickle file.  At present, only the first cursor is saved. 
      Also NIL out mark fields that have no meaning in a pickle. *) 
@@ -155,7 +155,7 @@ MODULE Images
     ; ForSave : BOOLEAN 
     ) 
   : PaintHs . ImagePersistentTyp  
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* If ForSave, has SIDE EFFECT of TextEdit . FlushEdit, because this must 
      be done to prevent the cleaning up from losing information. 
   *) 
@@ -223,7 +223,7 @@ MODULE Images
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; WindowNoSet : PaintHs . WindowNoSetTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: ImageRef # NIL *) 
 
   = VAR LLinesRef : PaintHs . LinesRefMeatTyp  
@@ -323,7 +323,7 @@ MODULE Images
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; WindowRef : PaintHs . WindowRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LWindowNoSet : PaintHs . WindowNoSetTyp 
 
@@ -339,7 +339,7 @@ MODULE Images
 (* VISIBLE: *) 
 ; PROCEDURE DisconnectImageFromAllWindows 
     ( ImageRef : PaintHs . ImageTransientTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LWindowNoSet : PaintHs . WindowNoSetTyp 
   ; VAR LWindowRef : PaintHs . WindowRefTyp 
@@ -409,7 +409,7 @@ MODULE Images
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; InsertNilFixedChildren := FALSE 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 (* CHECK: Does this really belong here?  Maybe in Display? *) 
 
   (* Reparse a (possibly) modified tree. *) 

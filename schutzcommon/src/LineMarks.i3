@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -32,7 +32,7 @@ INTERFACE LineMarks
 ; IMPORT Strings 
 ; IMPORT PaintHs 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; PROCEDURE GetNextLine 
     ( Lang : LbeStd . LangTyp 
@@ -49,7 +49,7 @@ INTERFACE LineMarks
     ; VAR TextAttrArrayRef : PaintHs . TextAttrArrayRefTyp 
     ; VAR LineErrArrayRef : PaintHs . LineErrArrayRefTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE GetPrevLine 
     ( Lang : LbeStd . LangTyp 
@@ -61,14 +61,14 @@ INTERFACE LineMarks
       (* ^TRUE if StartMark was at BOI, though not necessarily the 
          leftmost Nl of an adjacent group. *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE GetLMBegOfImage 
     ( Lang : LbeStd . LangTyp 
     ; EstRef : LbeStd . EstRootTyp 
     ; VAR NewMark : Marks . TokMarkTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* This will always be the BOI FS item, which is not necessarily the
      normal rightmost of all marks that lead to the same Nl.
   *) 
@@ -78,7 +78,7 @@ INTERFACE LineMarks
     ; EstRef : LbeStd . EstRootTyp 
     ; VAR NewMark : Marks . TokMarkTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* The normal rightmost of all marks that lead to the BOI Nl. *) 
 
 ; PROCEDURE GetEndOfImage 
@@ -86,7 +86,7 @@ INTERFACE LineMarks
     ; EstRef : LbeStd . EstRootTyp 
     ; VAR NewMark : Marks . TokMarkTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; END LineMarks 
 . 

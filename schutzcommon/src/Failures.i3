@@ -49,7 +49,7 @@ INTERFACE Failures
 ; PROCEDURE ActivationImage ( READONLY Act : RT0 . RaiseActivation ) : TEXT 
 
 ; <*IMPLICIT*>
-  EXCEPTION Backout 
+  EXCEPTION Backout ( TEXT )  
   (* Backout and recover from an unhandled exception or runtime failure. *) 
 
 ; <*IMPLICIT*>

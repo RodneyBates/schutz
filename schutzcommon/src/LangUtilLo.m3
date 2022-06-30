@@ -10,11 +10,11 @@ MODULE LangUtilLo
 
 (* Used to break up potential import cycle for LangUtil. *) 
 
-; IMPORT Assertions 
+; FROM Assertions IMPORT CantHappen  
+; FROM Failures IMPORT Backout 
 ; IMPORT LbeStd 
-; FROM LbeStd IMPORT 
-    TokTyp , TokClassTyp 
-    , TokClassVarTermPred , TokClassAsPlusPred 
+; FROM LbeStd
+    IMPORT TokTyp , TokClassTyp , TokClassVarTermPred , TokClassAsPlusPred 
 ; IMPORT MessageCodes 
       
 ; FROM LdlSemantics IMPORT LangInfoRefTyp
@@ -109,7 +109,7 @@ MODULE LangUtilLo
 (* VISIBLE: *) 
 ; PROCEDURE TokClass 
     ( LangInfo : LangInfoRefTyp ; Tok : TokTyp ) : TokClassTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* The TokClass that contains token Tok.  Works on builtin tokens too. *) 
 
   = VAR LLo , LHi , LProbe , LPred : TokClassTyp 
@@ -160,7 +160,7 @@ MODULE LangUtilLo
       ; WITH WPart = LangInfo . TokPart ^ 
         DO LOOP 
             IF LLo > LHi 
-            THEN Assertions . CantHappen 
+            THEN CantHappen 
                    ( AFT . A_LangUtilLo_TokClass_NotFound ) 
             ELSE 
               LProbe 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -26,7 +26,7 @@ EXPORTS Main
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT Boot 
 ; IMPORT SchutzCoroutine 
 ; IMPORT EstUtil 
@@ -310,7 +310,7 @@ EXPORTS Main
     ; TreeId : TEXT := "" 
     ) 
 
-  = <* FATAL AssertionFailure *> 
+  = <* FATAL Backout *> 
     VAR LSession : TreeBrowse . T 
 
   ; BEGIN
@@ -338,7 +338,7 @@ EXPORTS Main
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
-    <* FATAL AssertionFailure *> 
+    <* FATAL Backout *> 
     BEGIN
       Wr . PutText ( LdlTextWr , Strings . ToTextNonNIL ( String ) ) 
     ; Wr . PutText ( LdlTextWr , Wr . EOL ) 
@@ -461,7 +461,7 @@ EXPORTS Main
 
 ; PROCEDURE BuildEst ( ) : LbeStd . EstRootTyp 
 
-  = <* FATAL AssertionFailure *> 
+  = <* FATAL Backout *> 
     BEGIN 
       IF UseGeneratedEst 
       THEN
@@ -486,7 +486,7 @@ EXPORTS Main
     END SetSuffixes 
 
 ; PROCEDURE Work ( ) 
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -791,7 +791,7 @@ EXPORTS Main
     ELSE 
       TRY  
         Work ( ) 
-      EXCEPT AssertionFailure => 
+      EXCEPT Backout => 
         Process . Exit ( 2 ) <* NORETURN *>
       END (* TRY EXCEPT *) 
     END (* IF *) 

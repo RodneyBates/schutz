@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -16,7 +16,7 @@ INTERFACE Display
 ; IMPORT PaintHs 
 ; IMPORT Errors 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 <* PRAGMA LL *> 
 
@@ -51,7 +51,7 @@ INTERFACE Display
 ; PROCEDURE LineCtOfBolTokMark 
     ( EstRoot : LbeStd . EstRootTyp ; TokMark : Marks . TokMarkTyp ) 
   : LbeStd . LineNoTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* For a TokMark identifying a regular LinesRef (not Blank Lines), will be 
      zero.  Also zero for a blank line, start at end. 
      otherwise the count of blank lines. *) 
@@ -75,7 +75,7 @@ INTERFACE Display
     ; DesiredLinesRef : PaintHs . LinesRefMeatTyp 
     ) 
   : LbeStd . LineNoSignedTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* DesiredLinesRef points to a line rec known to be visible in 
      the window described by WindowRef. Return the window-relative 
      line number of the first line represented by DesiredLinesRef. 
@@ -88,7 +88,7 @@ INTERFACE Display
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Ensure that the successor of LinesRef is really the 
      following line, i.e. NOT LinesRef.GapAfter. *) 
 
@@ -96,7 +96,7 @@ INTERFACE Display
     ( (* UNCHANGED *) ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Ensure that the predecessor of LinesRef is really the 
      previous line, i.e. NOT predecessor.GapAfter. *) 
 
@@ -110,14 +110,14 @@ INTERFACE Display
     ; READONLY BolTokMark : Marks . TokMarkTyp 
     ; LineNo : LbeStd . LineNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE PaintUneditedNonblankLine 
     ( (* UNCHANGED *) WindowRef : PaintHs . WindowRefTyp 
     ; LineNoInWindow : LbeStd . LineNoSignedTyp 
     ; LinesRef : PaintHs . LinesRefMeatTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE PaintLinesRangeOneWindow 
     ( Window : PaintHs . WindowRefTyp 
@@ -126,7 +126,7 @@ INTERFACE Display
     ; ThruLinesRef : PaintHs . LinesRefMeatTyp  
     ; ThruLineNo : LbeStd . LineNoTyp
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE PaintLinesRangeAllWindows 
     ( ImageTrans : PaintHs . ImageTransientTyp 
@@ -135,7 +135,7 @@ INTERFACE Display
     ; ThruLinesRef : PaintHs . LinesRefMeatTyp  
     ; ThruLineNo : LbeStd . LineNoTyp
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE PaintWindowFromLines 
     ( WindowRef : PaintHs . WindowRefTyp 
@@ -143,7 +143,7 @@ INTERFACE Display
     ; VAR ToLinesRef : PaintHs . LinesRefMeatTyp 
     ; VAR ToLineNo : LbeStd . LineNoSignedTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE HorizScrollWindowRefToContainCursor 
     ( (* IN OUT *) WindowRef : PaintHs . WindowRefTyp 
@@ -159,14 +159,14 @@ INTERFACE Display
     ; VAR (* IN OUT *) MustRepaint : BOOLEAN 
       (* Set true if anything requiring a repaint happens. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Will scroll WindowRef if necessary to keep cursor inside. *) 
 
 ; PROCEDURE HorizMoveCursorAndRepaintWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; CursorMovement : EditWindow . CharCoordTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Will scroll WindowRef if necessary to keep cursor inside. *) 
 
 ; PROCEDURE NonblankLengthOfCurrentLine ( WindowRef : PaintHs . WindowRefTyp ) 
@@ -174,7 +174,7 @@ INTERFACE Display
 
 ; PROCEDURE HorizMoveCursorToEndAndRepaint 
     ( WindowRef : PaintHs . WindowRefTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE HorizScrollWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
@@ -185,13 +185,13 @@ INTERFACE Display
           Even if NOT DoDragCursor, it will be dragged to 
           prevent its getting outside the window. *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE CreateEmptyLinesRefList 
     ( (* IN OUT *) ImageRef : PaintHs . ImageTransientTyp ) 
 
 ; PROCEDURE InitImageFirstWindow ( ImageTrans : PaintHs . ImageTransientTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Creates a mark list if there is none.  
      Creates a cursor at BOI if there is no cursor. 
      Leaves line list untouched. 
@@ -201,12 +201,12 @@ INTERFACE Display
     ( (* IN OUT *) WindowRef : PaintHs . WindowRefTyp 
     ; VAR BlankLinesAtEnd : LbeStd . LineNoTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* The cursor must point to a valid LinesRef. *) 
 
 ; PROCEDURE ReconstructLinesAndPaint 
     ( (* IN OUT *) ImageRef : PaintHs . ImageTransientTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Any temp edits have been flushed.  
      Depends only on the list of MarkRecs.  Completely rebuilds 
      LinesRefs for the image and all the pointers thereto from 
@@ -223,7 +223,7 @@ INTERFACE Display
          None of these pointers should be used or stored 
          by the caller. *) 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* FromLinesRef .. ThruLinesRef, belonging to ImageRec, have 
      become invisible altogether.  Unlink any LinesRefs which 
      should no longer be retained. *) 
@@ -237,7 +237,7 @@ INTERFACE Display
          pointers should be used or stored by the caller. *) 
     ; WindowNo : PaintHs . WindowNoTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* FromLinesRef .. ThruLinesRef are no longer visible in WindowNo. 
      Node this in the LinesRefs' LrVisibleIn fields. 
      If some of the LinesRefs become invisible altogether, 
@@ -249,25 +249,25 @@ INTERFACE Display
     ; VAR (* OUT *) ActualMovement : EditWindow . CharPointTyp 
     ; VAR (* IN OUT *) MustRepaint : BOOLEAN 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE MoveCursorAndRepaintWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; WantedMovement : EditWindow . CharPointTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE MoveCursorAbsoluteInsideWindow 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; AbsPosition : EditWindow . CharPointTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* AbsPosition must lie within the window. *) 
 
 ; PROCEDURE AbsoluteCursorPositionInWindow 
     ( WindowRef : PaintHs . WindowRefTyp ) 
   : EditWindow . CharPointTyp 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* AbsPosition must lie within the window. *) 
 
 ; PROCEDURE VertScrollAndRepaint 
@@ -279,14 +279,14 @@ INTERFACE Display
           Even if NOT DoDragCursor, it will be dragged to 
           prevent its getting outside the window. *) 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; PROCEDURE ReshapeWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; OldSize : EditWindow . CharPointTyp 
     ; NewSize : EditWindow . CharPointTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; VAR GMostRecentBeepCode : Errors . ErrorTyp 
 
@@ -302,7 +302,7 @@ INTERFACE Display
     ( ImageRef : PaintHs . ImageTransientTyp ; State : BOOLEAN ) 
 
 ; PROCEDURE Reparse ( (* IN OUT *) ImageRef : PaintHs . ImageTransientTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; END Display 
 . 

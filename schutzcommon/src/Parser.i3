@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -18,14 +18,14 @@ INTERFACE Parser
 ; IMPORT LbeStd 
 ; IMPORT ParseHs 
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; PROCEDURE Parse 
     ( VAR ParseInfo : ParseHs . ParseInfoTyp 
     ; ParseTravStateRef : ParseHs . ParseTravStateRefTyp
     ; VAR NewTreeRef : LbeStd . EstRootTyp 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
 
 ; END Parser 
 . 

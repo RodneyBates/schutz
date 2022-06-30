@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -11,8 +11,8 @@ MODULE Ldl0FsTrees
    Build FsTrees for a language definition written in Ldl0.
 *) 
 
-; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , AssertionFailure , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT AstView 
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
@@ -47,7 +47,7 @@ MODULE Ldl0FsTrees
 (* VISIBLE: *) 
 ; PROCEDURE BuildFixedTerm 
     ( VAR LangInfo : LdlSemantics . LangInfoRefTyp ; Tok : LbeStd . TokTyp ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { AssertionFailure } 
 
   = VAR LFsChild : LangUtil . FsNodeRefTyp 
   ; VAR LFsRoot : LangUtil . FsNodeRefTyp 
@@ -106,7 +106,7 @@ MODULE Ldl0FsTrees
     ; VarTermTok : LbeStd . TokTyp 
     ; VarTermModTok : LbeStd . TokTyp 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { AssertionFailure } 
 
   = VAR LFsChild : LangUtil . FsNodeRefTyp 
   ; VAR LFsRoot : LangUtil . FsNodeRefTyp 
@@ -192,7 +192,7 @@ MODULE Ldl0FsTrees
     ; IsStart : BOOLEAN 
     ) 
   : LangUtil . FsNodeRefTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { AssertionFailure } 
 
   = VAR BldFsIdentNode 
       := AstView . AstRef ( LangInfo . Root , FsIdentSemRef . NodeNo ) 
@@ -253,7 +253,7 @@ MODULE Ldl0FsTrees
       END IncOptionId 
 
   ; PROCEDURE ConsumeAsChild ( ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
 
     = VAR LAsGrandChildren : ARRAY [ 0 .. 1 ] OF AstView . AstRefTyp 
 
@@ -277,7 +277,7 @@ MODULE Ldl0FsTrees
       END ConsumeAsChild 
 
   ; PROCEDURE FmtNoOfNextAsChild ( ) : EstHs . FmtNoTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
 
     = VAR LLeafElem : EstHs . LeafElemTyp 
 
@@ -319,7 +319,7 @@ MODULE Ldl0FsTrees
       ( FsChild : AstView . AstRefTyp 
       ; FsEstChild : LangUtil . FsNodeRefTyp 
       ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
 
     = VAR LFmtNoOfNextAsChild := FmtNoOfNextAsChild ( ) 
     ; VAR LNextAsChildClass := NextAsChildClass 
@@ -347,7 +347,7 @@ MODULE Ldl0FsTrees
       ; IndentCode : LangUtil . IndentCodeTyp 
       ) 
       : LangUtil . FsNodeRefTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
 
     = VAR LFsChildren : ARRAY [ 0 .. 2 ] OF AstView . AstRefTyp 
     ; VAR LAsFirstOcc : LdlSemantics . SemDeclTyp 
@@ -496,7 +496,7 @@ MODULE Ldl0FsTrees
       ; IndentCode : LangUtil . IndentCodeTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
 
     = VAR LFsChild : AstView . AstRefTyp 
     ; VAR LFsChildExists : BOOLEAN 
@@ -752,7 +752,7 @@ MODULE Ldl0FsTrees
       ; VAR (* IN OUT *) CurrentIndentCode : LangUtil . IndentCodeTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
 
     = VAR LChildren : ARRAY [ 0 .. 2 ] OF AstView . AstRefTyp 
     ; VAR LResult : LangUtil . FsNodeRefTyp 
@@ -1009,7 +1009,7 @@ MODULE Ldl0FsTrees
       ; IndentCode : LangUtil . IndentCodeTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
 
     = VAR LFsChild : AstView . AstRefTyp 
     ; VAR LFsChildExists : BOOLEAN 
@@ -1165,7 +1165,7 @@ MODULE Ldl0FsTrees
       ( FsRef : LangUtil . FsNodeRefTyp 
       ; VAR (* IN OUT *) MaxFmtNo : EstHs . FmtNoTyp 
       ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
     (* Also fills in null FmtNos that are to the left of the Ast child
        in an FsList tree and fills in FsRightFmtNo and FsLeftFmtNo *) 
 
@@ -1298,7 +1298,7 @@ MODULE Ldl0FsTrees
       ; FsKindForLineBreak : FsKindTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
 
     = VAR LResult : LangUtil . FsNodeRefTyp 
     ; VAR LMaxFmtNo : EstHs . FmtNoTyp 
@@ -1384,7 +1384,7 @@ MODULE Ldl0FsTrees
       ; FsKindForLineBreak : FsKindTyp 
       ) 
     : LangUtil . FsNodeRefTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { AssertionFailure } 
 
     = CONST IsStar = TRUE 
 

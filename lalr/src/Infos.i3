@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -25,7 +25,7 @@ INTERFACE Infos
 
 ; IMPORT Wr 
 
-; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 ; IMPORT IntSets 
 ; IMPORT LALRTypes 
 ; IMPORT LRTable 
@@ -106,7 +106,7 @@ INTERFACE Infos
     ( Gram : LRTable . GrammarTyp 
     ; WrT : Wr . T := NIL (* NIL means use Messages . MessageWr ( ) *) 
     )
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
 
 ; END Infos 
 . 

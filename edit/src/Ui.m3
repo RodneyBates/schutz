@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -24,7 +24,8 @@ MODULE Ui
 
 (* Application: *) 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure  
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout   
 ; IMPORT Display 
 ; IMPORT EditWindow 
 ; IMPORT EstUtil  
@@ -57,7 +58,7 @@ MODULE Ui
 ; CONST DL = Messages . StdErrLine 
 
 ; PROCEDURE InitForm ( Form : FormsVBT . T ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LWindow : EditWindow . T  
   ; VAR LFont : Font . T 
@@ -150,7 +151,7 @@ MODULE Ui
 ; PROCEDURE OpenEmptyFile 
     ( ImageName : TEXT ; AbsTextFileName : TEXT ; AbsPickleFileName : TEXT ) 
   : PaintHs . ImageTransientTyp 
-  RAISES { AssertionFailure , Files . Error , Thread . Alerted } 
+  RAISES { Backout , Files . Error , Thread . Alerted } 
   (* Runs on worker thread. *) 
 
   = VAR LImageRef : PaintHs . ImageTransientTyp 
@@ -177,7 +178,7 @@ MODULE Ui
     END OpenEmptyFile 
 
 ; PROCEDURE OpenWorkProc ( Self : WorkerClosureTextTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Self . Window is set. Self . TextParam is file name. *) 
   (* Runs on worker thread. *) 
 
@@ -374,10 +375,10 @@ MODULE Ui
         ELSE  
           Assertions . MessageText ( EMessage ) 
         ; Options . OpeningImageRef := NIL 
-        ; RAISE AssertionFailure ( EMessage ) 
+        ; RAISE Backout ( EMessage ) 
         END (* IF *) 
 
-      | AssertionFailure ( EMessage )  
+      | Backout ( EMessage )  
       => IF Worker . DoGuiActions ( ) 
         THEN 
           IF NOT Thread . TestAlert ( )    
@@ -394,7 +395,7 @@ MODULE Ui
         ELSE 
 (* CHECK: Presumably, the EMessage was already displayed in this case. *) 
           Options . OpeningImageRef := NIL 
-        ; RAISE AssertionFailure ( EMessage ) 
+        ; RAISE Backout ( EMessage ) 
         END (* IF *) 
 
       | Thread . Alerted 
@@ -497,7 +498,7 @@ MODULE Ui
     END AltOpenYesCallback 
 
 ; PROCEDURE AltOpenNoWorkProc ( Self : WorkerClosureTextTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Self . Window is set. Self . TextParam is file name. *) 
   (* Runs on worker thread. *) 
 
@@ -734,7 +735,7 @@ MODULE Ui
     ; TRY 
         EVAL InnerExportOK ( Closure ) 
       EXCEPT Thread . Alerted => (* Ignore. *) 
-      | AssertionFailure => (* Already handled. *) 
+      | Backout => (* Already handled. *) 
       END (* TRY EXCEPT *) 
     END SaveAndExportWorkProc 
 
@@ -788,7 +789,7 @@ MODULE Ui
   *) 
 
 ; PROCEDURE SaveDialogDisconnect ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Disconnect an image that is to be closed, but first had a save prompt
      done for it. 
   *) 
@@ -834,7 +835,7 @@ MODULE Ui
 (* VISIBLE: *) 
 ; PROCEDURE PromptAndCloseAllImages 
     ( Closure : Worker . ClosureTyp ; QuitAfter : BOOLEAN ) 
-  RAISES { AssertionFailure , Thread . Alerted }
+  RAISES { Backout , Thread . Alerted }
   (* PRE: Closure . Window only is set. Image is chosen inside. *)  
   (* Runs on worker thread. *) 
 
@@ -868,7 +869,7 @@ MODULE Ui
     ; DoCloseAllImages : BOOLEAN  
     ; DoCloseAllWindows : BOOLEAN  
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: Closure . Window, ImageTrans, ImagePers are set. *) 
   (* Runs on worker thread. *) 
 
@@ -953,7 +954,7 @@ MODULE Ui
 
 ; PROCEDURE SaveDialogWorkProc 
     ( Closure : WorkerClosureTextTyp (* TextParam is button name. *) ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: Closure . Window is set.  Closure . Textparm is button name. *) 
   (* Runs on worker thread. *) 
 
@@ -1268,14 +1269,14 @@ MODULE Ui
 ; PROCEDURE WriteText 
     ( Closure : WorkerClosureTextTyp (* TextParam is file name. *) ) 
   : BOOLEAN (* True if successful *) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Do the actual writing. *) 
 
   = PROCEDURE WriteProc  
       ( <* UNUSED *> ImageRef : PaintHs . ImageTransientTyp 
       ; String : Strings . StringTyp 
       )  
-    RAISES { AssertionFailure , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted } 
 
     = BEGIN
         TRY 
@@ -1318,7 +1319,7 @@ MODULE Ui
           END (* IF *) 
         ; LSuccess := FALSE  
         | Thread . Alerted => RAISE Thread . Alerted 
-        | AssertionFailure ( EArg ) => RAISE AssertionFailure ( EArg ) 
+        | Backout ( EArg ) => RAISE Backout ( EArg ) 
         ELSE 
           IF Closure . IsInteractive
            THEN 
@@ -1363,7 +1364,7 @@ MODULE Ui
 ; PROCEDURE InnerExportOK 
     ( Closure : WorkerClosureTextTyp ) 
   : BOOLEAN (* Success *) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window, ImageTrans, and ImagePers are set. *) 
   (* PRE: TextParam is file name. *) 
   (* Runs on worker thread. *) 
@@ -1401,7 +1402,7 @@ MODULE Ui
 
 ; PROCEDURE ReplayExportWorkProc 
     ( Closure : WorkerClosureTextTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. Closure . TextParam is file name. *) 
   (* Runs on worker thread. *) 
 
@@ -1440,7 +1441,7 @@ MODULE Ui
     END ReplayFileExport 
 
 ; PROCEDURE ExportOKWorkProc ( Closure : WorkerClosureTextTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. Closure . TextParam is file name.*) 
   (* Runs on worker thread. *) 
 
@@ -1482,7 +1483,7 @@ MODULE Ui
 
 ; <* UNUSED *> PROCEDURE ExportButtonWorkProc 
      ( Closure : WorkerClosureTextTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Does unconditional export, using IpAbsTextFileName *) 
   (* PRE: Closure . Window is set. Closure . TextParam is file name.*) 
   (* Runs on worker thread. *) 
@@ -1495,7 +1496,7 @@ MODULE Ui
 (*********************************Close***********************************) 
 
 ; PROCEDURE ReplayCloseImageWorkProc ( Closure : WorkerClosureTextTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: Closure . Window is set. Closure . TextParam is image name.*) 
   (* Runs on worker thread. *) 
 
@@ -1543,7 +1544,7 @@ MODULE Ui
     END ReplayFileCloseImage 
 
 ; PROCEDURE CloseImageWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *) 
 
@@ -1578,7 +1579,7 @@ MODULE Ui
 
 ; PROCEDURE ReplayCloseWindowWorkProc 
     ( Closure : WorkerClosureTextIntTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* PRE: Closure . Window is set.  
           Closure . TextParam is image name from the command. 
           Closure . IntParam is window number from the command. 
@@ -1697,7 +1698,7 @@ MODULE Ui
             END (* IF *) 
           END (* IF *) 
         END (* IF *) 
-      EXCEPT AssertionFailure => 
+      EXCEPT Backout => 
       END (* TRY EXCEPT *) 
     END CloseWindowWorkProc 
 
@@ -1721,7 +1722,7 @@ MODULE Ui
     END CloseWindowCallback   
 
 ; PROCEDURE CloseAllWorkProc ( Closure : Worker . ClosureTyp )  
-  RAISES { AssertionFailure }  
+  RAISES { Backout }  
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -1762,7 +1763,7 @@ MODULE Ui
     END ReplayFileQuit 
 
 ; PROCEDURE QuitWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -1827,7 +1828,7 @@ MODULE Ui
 (******************************** Edit menu ******************************)
 
 ; PROCEDURE EditCutWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -1917,7 +1918,7 @@ MODULE Ui
     END EditCutCallback 
 
 ; PROCEDURE EditCopyWorkProc ( <* UNUSED *> Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -2041,7 +2042,7 @@ MODULE Ui
     END ReadSelections 
 
 ; PROCEDURE EditPasteWorkProc ( Closure : WorkerClosureTextTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set.  Closure . CharParam is char typed. *) 
   (* On Worker thread. *) 
 
@@ -2191,7 +2192,7 @@ ReadSelections (* q.v. *) ( Window , Time )
 (****************************** Accept repair ****************************) 
 
 ; PROCEDURE AcceptRepairWorkProc ( Closure : Worker . ClosureTyp )  
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -2244,7 +2245,7 @@ ReadSelections (* q.v. *) ( Window , Time )
 (*********************************** Parse *******************************) 
 
 ; PROCEDURE ParseWorkProc ( Self : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted }   
+  RAISES { Backout , Thread . Alerted }   
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -2319,7 +2320,7 @@ ReadSelections (* q.v. *) ( Window , Time )
 (********************************** Analyze ******************************) 
 
 ; PROCEDURE AnalyzeWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -2469,7 +2470,7 @@ ReadSelections (* q.v. *) ( Window , Time )
 (**************************** Scrolling **********************************)
 
 ; PROCEDURE VertScrollWorkProc ( Closure : Worker . ClosureTyp ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -2576,7 +2577,7 @@ ReadSelections (* q.v. *) ( Window , Time )
     END VertScrollCallback 
 
 ; PROCEDURE HorizScrollWorkProc ( Closure : Worker . ClosureTyp )  
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
@@ -2762,7 +2763,7 @@ ReadSelections (* q.v. *) ( Window , Time )
     ; DelayTime : INTEGER 
     )
   : BOOLEAN (* => Success. *) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   = <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 

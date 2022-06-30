@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -18,7 +18,7 @@ INTERFACE Files
 ; IMPORT PaintHs
 ; IMPORT ScannerIf  
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 
 ; EXCEPTION Error ( TEXT ) 
 
@@ -33,7 +33,7 @@ INTERFACE Files
 
 ; PROCEDURE ReadNamedImageFile ( FileName : TEXT ) 
   : PaintHs . ImageTransientTyp 
-  RAISES { AssertionFailure , Error , Thread . Alerted } 
+  RAISES { Backout , Error , Thread . Alerted } 
   (* Reads an est, image, or checkpoint file.  Builds an ImageRef for an est 
      file. Does not set IpImageName, ItAbsTextFileName, or 
      ItAbsPickleFileName. 
@@ -48,19 +48,19 @@ INTERFACE Files
     ; VAR NewTreeRef : LbeStd . EstRootTyp 
     ; InsertNilFixedChildren := FALSE 
     ) 
-  RAISES { AssertionFailure , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted } 
   (* Parse from a file. *) 
 
 ; PROCEDURE OpenEmptyFile ( ImageName : TEXT ) 
   : PaintHs . ImageTransientTyp 
-  RAISES { AssertionFailure , Error , Thread . Alerted }  
+  RAISES { Backout , Error , Thread . Alerted }  
   (* Does not set IpImageName, ItAbsTextFileName, or ItAbsPickleFileName. 
      Does not write a pickle file. 
   *) 
 
 ; PROCEDURE OpenNamedTextFile ( FileName : TEXT ) 
   : PaintHs . ImageTransientTyp 
-  RAISES { AssertionFailure , Error , Thread . Alerted } 
+  RAISES { Backout , Error , Thread . Alerted } 
   (* Does not set IpImageName, ItAbsTextFileName, or ItAbsPickleFileName. 
      Does not write a pickle file. 
   *) 
@@ -76,7 +76,7 @@ INTERFACE Files
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; FileName : TEXT 
     ) 
-  RAISES { AssertionFailure , Error , Thread . Alerted } 
+  RAISES { Backout , Error , Thread . Alerted } 
 (* TODO: ^This is unused as of 2004-05-20.  See if it should go. *) 
 
 ; END Files 

@@ -10,7 +10,7 @@ INTERFACE LangUtilLo
 
 (* Used to break up potential import cycle for LangUtil. *) 
 
-; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 ; FROM LbeStd IMPORT TokTyp , TokClassTyp 
 ; FROM LdlSemantics IMPORT LangInfoRefTyp 
 
@@ -41,7 +41,7 @@ INTERFACE LangUtilLo
 
 ; PROCEDURE TokClass 
     ( LangInfo : LangInfoRefTyp ; Tok : TokTyp ) : TokClassTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* The TokClass that contains token Tok.  Works on builtin tokens too. *) 
 
 ; PROCEDURE ListTokOfPartialTok 

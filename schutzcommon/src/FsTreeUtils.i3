@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -10,7 +10,7 @@ INTERFACE FsTreeUtils
 
 (* Common code that works on FsTrees.  Common to both Ldl0 and Ldl1. *)  
 
-; FROM Assertions IMPORT AssertionFailure 
+; FROM Failures IMPORT Backout 
 ; IMPORT LangUtil 
 ; IMPORT LdlSemantics 
 
@@ -18,10 +18,10 @@ INTERFACE FsTreeUtils
     ( LangInfo : LdlSemantics . LangInfoRefTyp 
     ; FsRuleNodeRef : LangUtil . FsNodeRefTyp 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
 ; PROCEDURE CloseFormatsEmpty ( LangInfo : LdlSemantics . LangInfoRefTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Compute the closure of the FormatsEmpty property. *) 
 
 ; END FsTreeUtils 

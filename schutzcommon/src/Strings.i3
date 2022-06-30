@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -29,8 +29,8 @@ INTERFACE Strings
 
 ; IMPORT Text 
 
+; FROM Failures IMPORT Backout 
 ; IMPORT PortTypes 
-; IMPORT Assertions 
 
 (* Treat TYPE SpaceType and StringTyp ( = T ) as opaque. 
    Use Copy instead of := and AreEqual instead of = *) 
@@ -59,11 +59,11 @@ INTERFACE Strings
 
 ; PROCEDURE ToText 
     ( String : T ; From : StringSsTyp := 0 ) : TEXT 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE ToTextNonNIL 
     ( String : T ; From : StringSsTyp := 0 ) : TEXT 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE FromChar 
     ( Ch : CHAR ; EventualLengthHint : StringSsTyp := 0 ) : T 
@@ -76,7 +76,7 @@ INTERFACE Strings
 
 ; PROCEDURE FetchChars 
     ( VAR Chars : ARRAY OF CHAR ; String : T ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
    (* Truncate or leave suffix of Chars unchanged if lengths are # *) 
 
 ; PROCEDURE IthChar 
@@ -88,28 +88,28 @@ INTERFACE Strings
     ; Ch : CHAR 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { SsOutOfBounds , Assertions . AssertionFailure } 
+    RAISES { SsOutOfBounds , Backout } 
 
 ; PROCEDURE AppendInPlace 
     ( VAR (*IN OUT *) Left : T 
     ; Right : T 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE AppendTextInPlace 
     ( VAR (*IN OUT *) Left : T 
     ; Right : TEXT (* Can be NIL *) 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE AppendCharInPlace 
     ( VAR (*IN OUT *) Left : T 
     ; Ch : CHAR 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE MakeEmpty ( VAR String : T ) 
 
@@ -122,16 +122,16 @@ INTERFACE Strings
     ; From : StringSsTyp := 0 
     ; For : StringSsTyp := LAST ( StringSsTyp ) 
     ) : T 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE TruncateInPlace 
     ( VAR (* IN OUT *) String : T ; ToLength : StringSsTyp ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
   (* Noop if ToLength > Length ( String ) *) 
 
 ; PROCEDURE LeftTruncateInPlace 
     ( VAR (* IN OUT *) String : T ; ToLength : StringSsTyp ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
   (* Remove characters from the left, shortening the string 
      to ToLength. *) 
   (* Noop if ToLength > Length ( String ) *) 
@@ -141,7 +141,7 @@ INTERFACE Strings
     ; PrefixLength : StringSsTyp 
     ; DeleteCount : INTEGER 
     ) 
-    RAISES { SsOutOfBounds , Assertions . AssertionFailure } 
+    RAISES { SsOutOfBounds , Backout } 
   (* After the prefix, delete DeleteCount characters, 
      shifting the suffix left and shortening the string 
      by DeleteCount. Attempting to delete beyond the 
@@ -153,7 +153,7 @@ INTERFACE Strings
     ; BlankCount : INTEGER 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { SsOutOfBounds , Assertions . AssertionFailure } 
+    RAISES { SsOutOfBounds , Backout } 
   (* After the prefix, insert BlankCount blanks, shifting 
      the suffix right and extending the string by BlankCount *) 
 
@@ -161,7 +161,7 @@ INTERFACE Strings
 
 ; PROCEDURE InvokeWithArrayOfChar 
     ( String : T ; Proc : ProcArrayOfChar ) 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE AreEqual ( Left , Right : T ) : BOOLEAN 
 
@@ -173,14 +173,14 @@ INTERFACE Strings
 
 ; PROCEDURE PosOf1stNonblank 
     ( READONLY String : T ) : StringSsTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE PosOfLastNonblank 
     ( READONLY String : T ) : StringSsSignedTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
 
 ; PROCEDURE AtLeastBlanks ( MinLength : StringSsTyp ) : T 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Return a string that is all blanks and of at least MinLength *) 
   (* Depends on clients' not mutating the result. *) 
 

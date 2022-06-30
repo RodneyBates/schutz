@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -21,7 +21,7 @@
 
 INTERFACE Automaton 
 
-; IMPORT Assertions 
+; FROM Failures IMPORT Backout 
 ; IMPORT LbeStd 
 ; IMPORT LRTable 
 
@@ -88,7 +88,7 @@ INTERFACE Automaton
     ; OptionIdSet := LRTable . OptionIdSetEmpty
     ; BuildTok : LbeStd . TokTyp := LbeStd . Tok__Null 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Call this any time after InitAutomaton and all calls on AddOperator. 
      Takes predecence and associativity from PrecedenceTok, if non-null, 
      otherwise by a default rule (from rightmost terminal in RHS). 
@@ -105,7 +105,7 @@ INTERFACE Automaton
     ; OptionIdSet := LRTable . OptionIdSetEmpty
     ; BuildTok : LbeStd . TokTyp := LbeStd . Tok__Null 
     ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Call this any time after InitAutomaton. *) 
 
 ; PROCEDURE ActualProdCt 
@@ -113,13 +113,13 @@ INTERFACE Automaton
   (* Call this any time after InitAutomaton. *) 
 
 ; PROCEDURE AfterProductions ( Gram : LRTable . GrammarTyp ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Some processing done after all productions have been added, but before
      Build.  This once needed to be separated from Build.
   *) 
 
 ; PROCEDURE Build ( Gram : LRTable . GrammarTyp ) 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Build the LR(0) automaton, after precedence info and productions 
      have been inserted. *) 
 

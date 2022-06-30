@@ -28,7 +28,7 @@ EXPORTS Main
 ; IMPORT Thread 
 ; IMPORT Wr 
 
-; FROM Assertions IMPORT AssertionFailure
+; FROM Failures IMPORT Backout
 ; IMPORT AstView 
 ; IMPORT Boot 
 ; IMPORT EstHs 
@@ -386,7 +386,7 @@ EXPORTS Main
     ( EstRoot : LbeStd . EstRootTyp 
     ; Lang : LbeStd . LangTyp := LbeStd . LangNull  
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LSession : TreeBrowse . T 
 
@@ -411,7 +411,7 @@ EXPORTS Main
     ( <* UNUSED *> ImageRef : PaintHs . ImageTransientTyp 
     ; String : Strings . StringTyp 
     )  
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
@@ -538,7 +538,7 @@ EXPORTS Main
 
 ; PROCEDURE ReadFile 
     ( FileName : TEXT ) : PaintHs . ImageTransientTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LSimpleName : TEXT 
   ; VAR LImageName : TEXT 
@@ -558,7 +558,7 @@ EXPORTS Main
         TRY 
           LImageRef := Files . ReadNamedImageFile ( FileName ) 
         EXCEPT 
-        AssertionFailure ( E ) => RAISE AssertionFailure ( E )  
+        Backout ( E ) => RAISE Backout ( E )  
         | Thread . Alerted => 
         | Files . Error ( EMessage ) 
         => DL ( EMessage ) 
@@ -579,7 +579,7 @@ EXPORTS Main
         TRY 
           LImageRef := Files . OpenNamedTextFile ( FileName ) 
         EXCEPT 
-        AssertionFailure ( E ) => RAISE AssertionFailure ( E )  
+        Backout ( E ) => RAISE Backout ( E )  
         | Thread . Alerted => 
         | Files . Error ( EMessage ) 
         => DL ( EMessage ) 
@@ -596,7 +596,7 @@ EXPORTS Main
     END ReadFile 
 
 ; PROCEDURE Open ( FileName : TEXT ) : BOOLEAN (* Success *) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LResult : BOOLEAN := FALSE 
 
@@ -639,7 +639,7 @@ EXPORTS Main
 
 ; PROCEDURE Analyze
     ( ImageRef : PaintHs . ImageTransientTyp ) : BOOLEAN (* Success *) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = <* FATAL Thread . Alerted *> 
     BEGIN 
@@ -695,7 +695,7 @@ EXPORTS Main
     END Init 
 
 ; PROCEDURE Work ( ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LStats1 : EstUtil . StatisticsTyp 
   ; VAR LFileName : TEXT 
@@ -983,7 +983,7 @@ EXPORTS Main
       TRY 
         Init ( ) 
       ; Work ( ) 
-      EXCEPT AssertionFailure => 
+      EXCEPT Backout => 
         Process . Exit ( 2 ) <* NORETURN *>
       END (* TRY EXCEPT *) 
     END (* IF *) 

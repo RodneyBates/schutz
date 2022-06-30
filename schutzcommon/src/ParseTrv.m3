@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -26,7 +26,8 @@ EXPORTS ParseTrv , ScannerIf
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout 
 ; IMPORT SchutzCoroutine 
 ; IMPORT EstHs 
 ; IMPORT EstUtil
@@ -86,7 +87,7 @@ EXPORTS ParseTrv , ScannerIf
     ; VAR DeliverString : Strings . StringTyp 
     ; VAR AreAllBlanks : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Retrieve Initial information delivered to scanner. *) 
 
   = BEGIN (* GetInitialChars *) 
@@ -102,7 +103,7 @@ EXPORTS ParseTrv , ScannerIf
 
 (* VISIBLE in ScannerIf *) 
 ; PROCEDURE AccumSlice ( ScanIf : ScanIfTyp ; Slice : Strings . StringTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   (* Accumulate Slice as part of the token being scanned. *) 
   (* (Concatenate Slice onto end of SifAccumString...) *) 
@@ -139,7 +140,7 @@ EXPORTS ParseTrv , ScannerIf
       (* ^NextSlice delivered to scanner. *) 
     ; VAR AreAllBlanks : BOOLEAN 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   (* Consume the first ConsumedCt of the substring last delivered to 
      the scanner. *) 
@@ -170,7 +171,7 @@ EXPORTS ParseTrv , ScannerIf
     ; VAR AreAllBlanks : BOOLEAN 
     ; IsPlaceholder : BOOLEAN := FALSE 
     ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Do what ConsumeChars does, plus deliver a token in Tok. *) 
   (* DeliverTok runs on the scanner's coroutine, 
      but resumes parse traverser *) 
@@ -191,7 +192,7 @@ EXPORTS ParseTrv , ScannerIf
 (* VISIBLE in ScannerIf *) 
 ; PROCEDURE NoteBeg 
     ( ScanIf : ScanIfTyp ; ScanState : LbeStd . ScanStateTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   (* Note that the current character is the first of a token *) 
   (* NoteBeg runs on the scanner's coroutine, 
@@ -209,7 +210,7 @@ EXPORTS ParseTrv , ScannerIf
 (* VISIBLE in ScannerIf *) 
 ; PROCEDURE NoteBegPrevChar 
     ( ScanIf : ScanIfTyp ; ScanState : LbeStd . ScanStateTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   (* Note that the previous character is the first of a token *) 
   (* NoteBegPrevChar runs on the scanner's coroutine, 
@@ -226,7 +227,7 @@ EXPORTS ParseTrv , ScannerIf
 
 (* VISIBLE in ScannerIf *) 
 ; PROCEDURE LexErr ( ScanIf : ScanIfTyp ; ErrCode : LbeStd . ErrCodeTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   (* Attach a lexical error message to the current token *) 
   (* LexErr runs on the scanner's coroutine, 
@@ -466,17 +467,17 @@ EXPORTS ParseTrv , ScannerIf
            ; StateRef : ParseHs . ParseTravStateRefTyp
            ; Depth : INTEGER 
            )
-         RAISES { AssertionFailure }
+         RAISES { Backout }
          
 ; PROCEDURE TraverseStates
     ( READONLY ParseInfo : ParseHs . ParseInfoTyp ; Visitor : StateVisitorTyp ) 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = PROCEDURE TsRecurse
       ( FromStateRef , ToStateRef : ParseHs . ParseTravStateEstRefTyp
       ; Depth : INTEGER
       )
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
   
     = VAR LStateRef , LAdvanceStateRef : ParseHs . ParseTravStateEstRefTyp 
     ; BEGIN
@@ -568,7 +569,7 @@ EXPORTS ParseTrv , ScannerIf
 (* This is here for debugging. *) 
 ; <* UNUSED *> PROCEDURE DumpStateGraph
     ( FileName : TEXT ; READONLY ParseInfo : ParseHs . ParseInfoTyp )
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR DsgWrT : Wr . T
   ; VAR DsgLayoutWrT : Layout . T
@@ -578,7 +579,7 @@ EXPORTS ParseTrv , ScannerIf
       ; StateRef : ParseHs . ParseTravStateRefTyp
       ; Depth : INTEGER 
       )
-    RAISES { AssertionFailure }
+    RAISES { Backout }
     
     = CONST IndentAmt = 2
     ; CONST DepthPad = 2
@@ -776,7 +777,7 @@ EXPORTS ParseTrv , ScannerIf
               , Fmt . Pad ( Misc . RefanyImage ( LEstParentRef ) , RefanyPad ) 
               )
           END (* IF *) 
-        EXCEPT Assertions . AssertionFailure ( Msg )  
+        EXCEPT Backout ( Msg )  
           => Wr . PutText ( DsWrT , Wr . EOL ) 
           ; Wr . PutText ( DsWrT , "Assertion Failure in DsDisplayEst, " )  
           ; Wr . PutText ( DsWrT , Msg )  
@@ -882,7 +883,7 @@ EXPORTS ParseTrv , ScannerIf
     ; SuccKind : SuccKindTyp 
     ) 
     : ParseHs . ParseTravStateRefTyp 
-    RAISES { Thread . Alerted , AssertionFailure } 
+    RAISES { Thread . Alerted , Backout } 
   (* Get the next parse traversal state, after one in hand. 
      When the current state is a whole subtree, (which implies 
      it contains no syntactic modifications,) 
@@ -997,7 +998,7 @@ END
       ; EstChildKindSet : EstHs . EstChildKindSetTyp 
       ; SyntTokCt : LbeStd . LimitedTokCtTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* NpsAccumNode *)
         IF NodeRef # NIL 
@@ -1014,7 +1015,7 @@ END
       END NpsAccumNode 
 
   ; PROCEDURE NpsInnerFlushNonNILSlice ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     (* This is an optimized, inner procedure.  It is a bit 
        dangerous because it neither checks that NpsSliceParentRef 
@@ -1054,7 +1055,7 @@ END
       END NpsInnerFlushNonNILSlice 
 
   ; PROCEDURE NpsFlushSlice ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN 
         IF NpsSliceParentRef # NIL 
@@ -1070,7 +1071,7 @@ END
       ; ToEstChildNo : LbeStd . EstChildNoTyp 
       ; SyntTokCt : LbeStd . LimitedTokCtTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* NpsAccumSlice *) 
         IF NpsSliceParentRef = NIL 
@@ -1108,7 +1109,7 @@ END
       END NpsCheckNextTempMarkForEstLeaf 
 
   ; PROCEDURE NpsCheckNextTempMarkForInsTok ( FmtNo : EstHs . FmtNoTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
   (* Sets NpsNextTempMarkIsRelevant. *) 
 
     = VAR LLeafElem : EstHs . LeafElemTyp 
@@ -1172,7 +1173,7 @@ END
         END (* IF *) 
       END NpsCheckNextTempMarkForInsTok 
 
-  ; PROCEDURE NpsIncludeTempMark ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsIncludeTempMark ( ) RAISES { Backout } 
     (* Include the next temp mark into NpsWaitingTempMarkRange and advance to the
        next temp mark. *)  
 
@@ -1238,7 +1239,7 @@ END
 
   ; PROCEDURE NpsAppendTempMarkRange 
       ( VAR ToRange : ParseHs . TempMarkRangeTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Append NpsWaitingTempMarkRange to ToRange. *) 
 
     = BEGIN 
@@ -1261,7 +1262,7 @@ END
       ; FromChildNo : LbeStd . EstChildNoTyp 
       ; ToChildNo : LbeStd . EstChildNoTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Skip temp marks on/in the subtrees rooted at the range of children
        [FromChildNo,ToChildNo) of EstRef.  Do so by calling NpsIncludeTempMark,
        which increments NpsNextTempMarkSs.  Do not skip RightSib marks on the 
@@ -1281,7 +1282,7 @@ END
         ; TraverseToChildNo : LbeStd . EstChildNoTyp 
         ; Depth : INTEGER 
         ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
 
       = VAR NpsStmTLeafElem : EstHs . LeafElemTyp 
       ; VAR NpsStmTChildNo : LbeStd . EstChildNoTyp 
@@ -1460,7 +1461,7 @@ END
       END NpsPassNewLine 
 
   ; PROCEDURE NpsAccumRescannedLexErrChars ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LString : SharedStrings . T 
     ; VAR LChildKindSet : EstHs . EstChildKindSetTyp 
@@ -1508,7 +1509,7 @@ END
       END NpsAccumRescannedLexErrChars  
 
   ; PROCEDURE NpsAccumScannedBlankLine ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LChildKindSet : EstHs . EstChildKindSetTyp 
     ; VAR LExistingModRef : ModHs . ModBlankLineTyp 
@@ -1602,7 +1603,7 @@ END
 
   ; PROCEDURE NpsAccumRescannedCmnt 
       ( StartPosRelTo : LbeStd . LimitedCharNoTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LChildKindSet : EstHs . EstChildKindSetTyp 
     ; VAR LModCmntRef : ModHs . ModCmntTyp 
@@ -1745,7 +1746,7 @@ END
         END (* IF *) 
       END NpsAccumRescannedCmnt 
 
-  ; PROCEDURE NpsDeliverRescannedTok ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsDeliverRescannedTok ( ) RAISES { Backout } 
 
     = VAR LStringRef : SharedStrings . T 
     ; VAR LChildKindSet : EstHs . EstChildKindSetTyp 
@@ -1910,7 +1911,7 @@ END
       ; AreAllBlanks : BOOLEAN 
       ; VAR ConsumedCt : Strings . StringSsTyp   
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     (* Takes care of updating: 
@@ -1926,7 +1927,7 @@ END
     = PROCEDURE NpsDssIncludeTempMarks 
         ( ToPos : LbeStd . LimitedCharNoTyp ) 
       (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
-      RAISES { AssertionFailure }
+      RAISES { Backout }
       (* Include any temp marks that are in the string delivered to the
          scanner, up to ToPos, and bias them line-relative, during reparsing.
          They will be rebiased after rescanning. *)
@@ -2005,7 +2006,7 @@ END
             } 
 
     ; PROCEDURE NpsDssConsumeChars ( TokDelivered : BOOLEAN ) 
-      RAISES { AssertionFailure } 
+      RAISES { Backout } 
       (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
       = BEGIN (* NpsDssConsumeChars *) 
@@ -2140,12 +2141,12 @@ END
             END (* IF *) 
           ; INC ( ConsumedCt , ParseInfo . PiScanIf . SifConsumedCt ) 
           EXCEPT Strings . SsOutOfBounds 
-          => RAISE AssertionFailure ( "SharedStrings.SsOutOfBounds" )  
+          => RAISE Backout ( "SharedStrings.SsOutOfBounds" )  
           END (* TRY EXCEPT *) 
         END NpsDssConsumeChars 
 
     ; PROCEDURE NpsDssLexErr ( ) 
-      RAISES { AssertionFailure }
+      RAISES { Backout }
 
       (* Just leave any leftover temp marks alone, to be put on a later 
          item that can have them. *)
@@ -2271,7 +2272,7 @@ END
 
   ; PROCEDURE NpsModCmntAbsStartPos ( ModCmntRef : ModHs . ModCmntTyp ) 
     : LbeStd . LimitedCharNoTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: We are scanning. *) 
 
     = VAR LPos : LbeStd . LimitedCharNoSignedTyp 
@@ -2314,7 +2315,7 @@ END
       END NpsModCmntAbsStartPos 
 
   ; PROCEDURE NpsRescanModCmntTrailers ( ModCmntRef : ModHs . ModCmntTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = VAR LConsumedCt : Strings . StringSsTyp    
@@ -2357,7 +2358,7 @@ END
       END NpsRescanModCmntTrailers 
 
   ; PROCEDURE NpsModTextTrailers ( ModTextRef : ModHs . ModTextTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = VAR LConsumedCt : Strings . StringSsTyp    
@@ -2424,7 +2425,7 @@ END
       ; TravUtil . IncEstChild ( NpsSeEstRef . SeEstTravInfo ) 
       END NpsModTextTrailers 
 
-  ; PROCEDURE NpsRescanString ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsRescanString ( ) RAISES { Backout } 
     (* PRE NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = VAR LConsumedCt : Strings . StringSsTyp   
@@ -2515,7 +2516,7 @@ END
         END (* LOOP *) 
       END NpsRescanString 
 
-  ; PROCEDURE NpsRescanModCmnt ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsRescanModCmnt ( ) RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = BEGIN (* NpsRescanModCmnt *) 
@@ -2540,7 +2541,7 @@ END
       END NpsRescanModCmnt 
 
   ; PROCEDURE NpsRescanModText ( ModTextRef : ModHs . ModTextTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = BEGIN (* NpsRescanModText *) 
@@ -2583,7 +2584,7 @@ END
         END (* IF *) 
       END NpsRescanModText 
 
-  ; PROCEDURE NpsRescanInsTok ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsRescanInsTok ( ) RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = BEGIN (* NpsRescanInsTok *) 
@@ -2595,7 +2596,7 @@ END
       ; NpsRescanString ( ) 
       END NpsRescanInsTok 
 
-  ; PROCEDURE NpsRescanLexErrChars ( ) RAISES { AssertionFailure }
+  ; PROCEDURE NpsRescanLexErrChars ( ) RAISES { Backout }
     (* PRE: Not scanning the chars yet. *)
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
@@ -2608,7 +2609,7 @@ END
       ; NpsRescanString ( ) 
       END NpsRescanLexErrChars 
 
-  ; PROCEDURE NpsRescanAstString ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsRescanAstString ( ) RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = BEGIN (* NpsRescanAstString *) 
@@ -2620,7 +2621,7 @@ END
       ; NpsRescanString ( ) 
       END NpsRescanAstString 
 
-  ; PROCEDURE NpsRescanBlanks ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsRescanBlanks ( ) RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = VAR LConsumedCt : Strings . StringSsTyp    
@@ -2731,7 +2732,7 @@ END
       ; StateKindForBlanks : ParseHs . ParseTravStateKindTyp 
       ; StateKindAfterBlanks : ParseHs . ParseTravStateKindTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = BEGIN (* NpsRescanTok *) 
@@ -2759,7 +2760,7 @@ END
         END (* IF *) 
       END NpsRescanTok 
 
-  ; PROCEDURE NpsInsTok ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsInsTok ( ) RAISES { Backout } 
 
     = VAR LDeferredInfo : ParseHs . DeferredInfoRefTyp
     
@@ -2835,7 +2836,7 @@ END
       END NpsInsTok 
 
   ; PROCEDURE NpsLineBreak ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LConsumedCt : Strings . StringSsTyp    
 
@@ -2894,7 +2895,7 @@ END
           := ParseHs . ParseTravStateKindTyp . PtsKindDoneWithFsNode 
       END NpsLineBreak 
 
-  ; PROCEDURE NpsFsNodeAfterLeadingMods ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsFsNodeAfterLeadingMods ( ) RAISES { Backout } 
 
     = VAR LConsumedCt : Strings . StringSsTyp   
 
@@ -2998,7 +2999,7 @@ END
         END (* CASE *) 
       END NpsFsNodeAfterLeadingMods 
 
-  ; PROCEDURE NpsRescanModBlankLine ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsRescanModBlankLine ( ) RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = VAR LConsumedCt : Strings . StringSsTyp   
@@ -3027,7 +3028,7 @@ END
       END NpsRescanModBlankLine 
 
   ; PROCEDURE NpsRescanModCmntLeaders ( ModCmntRef : ModHs . ModCmntTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
     = VAR LConsumedCt : Strings . StringSsTyp    
@@ -3120,7 +3121,7 @@ END
       END NpsRescanModCmntLeaders 
 
   ; PROCEDURE NpsModTextLeaders ( ModTextRef : ModHs . ModTextTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* We always rescan these, even if we weren't scanning before. *) 
     (* PRE: NpsNextTempMarkIsRelevant is meaningful. *) 
 
@@ -3192,7 +3193,7 @@ END
       ; IncludeContainsTempMark : BOOLEAN 
       ; OnlyOneChild : BOOLEAN := TRUE 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Slice out as many leading or trailing mods in a group as possible. *) 
 
     = VAR LEstChildNo1 : LbeStd . EstChildNoTyp 
@@ -3412,7 +3413,7 @@ END
         END (* IF MustComputeDisplay etc. *) 
       END NpsSliceMods 
 
-  ; PROCEDURE NpsAttachedMods ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsAttachedMods ( ) RAISES { Backout } 
 
     = VAR LChildRef : LbeStd . EstRootTyp 
     ; VAR LModDelIsFinished : BOOLEAN 
@@ -3794,7 +3795,7 @@ END
       ( FsNodeRef : LangUtil . FsNodeRefTyp 
       ; SelfFsChildNo : LangUtil . FsChildNoTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LStackElemFsNodeRef : ParseHs . StackElemFsTyp 
 
@@ -3839,7 +3840,7 @@ END
       ; FsChildNo : LangUtil . FsChildNoTyp 
       ; FsKindSet : LangUtil . FsKindSetTyp 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LChildFsNodeRef : LangUtil . FsNodeRefTyp 
 
@@ -3882,7 +3883,7 @@ END
       END NpsChildContainsInsertionRepair 
 
   ; PROCEDURE NpsBeginLexErrChars ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LString : SharedStrings . T
     ; VAR LDeferredInfo : ParseHs . DeferredInfoRefTyp
@@ -3974,7 +3975,7 @@ END
         END (* IF *)
       END NpsBeginLexErrChars 
 
-  ; PROCEDURE NpsBeginAstString ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsBeginAstString ( ) RAISES { Backout } 
 
     = VAR LStringRef : SharedStrings . T
     ; VAR LDeferredInfo : ParseHs . DeferredInfoRefTyp 
@@ -4120,7 +4121,7 @@ END
       END NpsBeginAstString 
 
   ; PROCEDURE NpsCheckEstSuccessor ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Check whether we have previously advanced beyond the end of this Est 
        (Possibly a list slice). This can happen when the Est/slice has no 
        syntactic mods and an advance is done after the whole 
@@ -4164,7 +4165,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
       END NpsCheckEstSuccessor 
 
   ; PROCEDURE NpsFindEndOfListSlice ( SliceThruFmtNo : EstHs . FmtNoTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* Set NpsSeEstRef . SeEstWholeSliceToChildNo 
        and NpsSeEstRef . SeEstWholeSliceRMEstChildNo, for a list slice
        starting at the current Est child.  
@@ -4315,7 +4316,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
       ; NpsInEstPopPhase := FALSE 
       END NpsPushEstSublist
 
-  ; PROCEDURE NpsMaybeListSlice ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsMaybeListSlice ( ) RAISES { Backout } 
     (* See whether there is a plural list slice we can return as a whole, 
        with a sublist token.  If so, set variables up for it. 
        If currently scanning, make the slice empty.  
@@ -4432,7 +4433,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
         END (* IF *) 
       END NpsMaybeListSlice 
 
-  ; PROCEDURE NpsNewFsNode ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsNewFsNode ( ) RAISES { Backout } 
 
     = VAR LFsDescendantRef : LangUtil . FsNodeRefTyp 
 
@@ -4672,7 +4673,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
 
       END NpsAfterFsChildOfFsList 
 
-  ; PROCEDURE NpsDoneWithFsNode ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsDoneWithFsNode ( ) RAISES { Backout } 
 
     = VAR LOldSeFsRef : ParseHs . StackElemFsTyp  
     ; VAR LFsChildNo : LangUtil . FsChildNoTyp 
@@ -4810,7 +4811,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
 
   ; PROCEDURE NpsPushEstPlain 
       ( IsModTok : BOOLEAN ; VAR FsNodeRef : LangUtil . FsNodeRefTyp) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LNewSeEstRef : ParseHs . StackElemEstTyp 
     ; VAR LChildRef : LbeStd . EstRootTyp 
@@ -4875,7 +4876,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
       ; Tok : LbeStd . TokTyp 
       ; RangeToSearch : ParseHs . TempMarkRangeTyp 
       ) 
-    RAISES { AssertionFailure }
+    RAISES { Backout }
     (* If Tok is not a constant terminal, set TiPatchTempMarkRange to empty.
        Otherwise, skip any temp marks in RangeToSearch that are not ChildFmtNo
        marks, then set TiPatchTempMarkRange to the contiguous group of temp
@@ -4949,7 +4950,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
       ; IsOptSingletonList : BOOLEAN 
       ) 
     : LbeStd . TokTyp 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     (* If appropriate, return the list cardinality token for the actual 
        complement of Est children.  Otherwise, just use the token from
        FsNodeRef 
@@ -5021,7 +5022,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
       ; RETURN LResult 
       END NpsListCardTok 
 
-  ; PROCEDURE NpsNewEst ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsNewEst ( ) RAISES { Backout } 
     (* The new Est is EtiChildLeafElem . LeChildRef, or a slice beginning
        there. *)  
 
@@ -5168,7 +5169,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
         END (* WITH WParentTravInfo *) 
       END NpsNewEst 
 
-  ; PROCEDURE NpsComputeStateAfterListSlice ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsComputeStateAfterListSlice ( ) RAISES { Backout } 
 
     = VAR LLeafElem : EstHs . LeafElemTyp 
     ; VAR LNodeNo : LbeStd . EstNodeNoTyp 
@@ -5215,7 +5216,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
           ) 
       END NpsComputeStateAfterListSlice  
 
-  ; PROCEDURE NpsComputeStateAfterEst ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsComputeStateAfterEst ( ) RAISES { Backout } 
 
     = BEGIN (* NpsComputeStateAfterEst *) 
         IF NpsResultStateKind ( ) 
@@ -5292,7 +5293,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
       END NpsComputeStateAfterEst 
 
   ; PROCEDURE NpsDeliverEndOfImage ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* NpsDeliverEndOfImage *) 
         NpsResultStateRef . PtsTokInfo . TiTok := LbeStd . Tok__EndOfImage 
@@ -5340,7 +5341,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
         END (* IF *)
       END NpsNewStateInform
       
-  ; PROCEDURE NpsStateMachine ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsStateMachine ( ) RAISES { Backout } 
 
     (* NpsStateMachine only returns when it is time to deliver 
        a state *) 
@@ -5443,7 +5444,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
 
   ; PROCEDURE NpsAccumPreviouslyDeferredItem 
       ( DeferredInfo : ParseHs . DeferredInfoRefTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
     = VAR LTokIsMeaningful : BOOLEAN
 
     ; BEGIN (* NpsAccumPreviouslyDeferredItem *) 
@@ -5507,7 +5508,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
 
 ; VAR SeqNoToStop : INTEGER := 9
 
-  ; PROCEDURE NpsParseFromEst ( ) RAISES { AssertionFailure } 
+  ; PROCEDURE NpsParseFromEst ( ) RAISES { Backout } 
 
     = VAR LFromStateEstRef 
         := NARROW ( FromStateRef , ParseHs . ParseTravStateEstRefTyp ) 
@@ -5711,7 +5712,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
       END NpsParseFromEst 
 
   ; PROCEDURE NpsParseFromFile ( ) 
-    RAISES { Thread . Alerted , AssertionFailure } 
+    RAISES { Thread . Alerted , Backout } 
 
     = <* FATAL Rd . Failure *> 
       VAR LConsumedCt : Strings . StringSsTyp   
@@ -5863,7 +5864,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
 
 ; PROCEDURE InitialStackElemEst ( EstRef : LbeStd . EstRootTyp ) 
   : ParseHs . StackElemEstTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
   (* Return a dummy StackElemEstTyp node to go on the bottom of the Est
      stack.  It has no parent EstNode, but its current child node is
      the parameter EstRef.
@@ -5901,7 +5902,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
 ; PROCEDURE InitParseEst 
     ( VAR ParseInfo : ParseHs . ParseInfoTyp ; EstRef : LbeStd . EstRootTyp ) 
     : ParseHs . ParseTravStateRefTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   (* Get an initial parse traversal state for a tree. *) 
 

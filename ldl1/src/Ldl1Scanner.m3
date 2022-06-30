@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -10,7 +10,8 @@ MODULE Ldl1Scanner
 
 ; IMPORT TextIntTbl 
 
-; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure 
+; FROM Assertions IMPORT Assert , CantHappen 
+; FROM Failures IMPORT Backout  
 ; IMPORT SchutzCoroutine 
 ; IMPORT LangUtil  
 ; IMPORT LbeStd 
@@ -82,7 +83,7 @@ MODULE Ldl1Scanner
   (* It is possible to put back at most one character, and it must 
      be the one that was gotten there. *) 
   ; <* UNUSED *> PROCEDURE PutBackChar ( Ch : CHAR ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* PutBackChar *) 
         TRY 
@@ -98,12 +99,12 @@ MODULE Ldl1Scanner
               ) 
           END (* IF *) 
         EXCEPT Strings . SsOutOfBounds 
-        => RAISE AssertionFailure ( "Strings.SsOutOfBounds" ) 
+        => RAISE Backout ( "Strings.SsOutOfBounds" ) 
         END (* TRY EXCEPT *) 
       END PutBackChar 
 
   ; PROCEDURE EnsureOneChar ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* EnsureOneChar *) 
         TRY 
@@ -121,7 +122,7 @@ MODULE Ldl1Scanner
           ; Ch := Strings . IthChar ( InString , Pos ) 
           END (* IF *) 
         EXCEPT Strings . SsOutOfBounds 
-        => RAISE AssertionFailure ( "Strings.SsOutOfBounds" ) 
+        => RAISE Backout ( "Strings.SsOutOfBounds" ) 
         END (* TRY EXCEPT *) 
       END EnsureOneChar 
 
@@ -135,7 +136,7 @@ MODULE Ldl1Scanner
            without incrementing Pos. *) 
 
   ; PROCEDURE BegOfTok ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* BegOfTok *) 
         IF Pos > 0 
@@ -150,7 +151,7 @@ MODULE Ldl1Scanner
 
   ; PROCEDURE DeliverTok 
       ( Tok : LbeStd . TokTyp ; MakeIdle : BOOLEAN := TRUE ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* DeliverTok *) 
         ScannerIf . AccumSlice ( Sif , TokString ) 
@@ -163,7 +164,7 @@ MODULE Ldl1Scanner
       END DeliverTok 
 
   ; PROCEDURE AppendAndDeliverTok ( Tok : LbeStd . TokTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* AppendAndDeliverTok *) 
         Strings . AppendCharInPlace ( TokString , Ch ) 
@@ -172,7 +173,7 @@ MODULE Ldl1Scanner
       END AppendAndDeliverTok 
 
   ; PROCEDURE NextChar ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* NextChar *) 
         Strings . AppendCharInPlace ( TokString , Ch ) 
@@ -182,7 +183,7 @@ MODULE Ldl1Scanner
       END NextChar 
 
   ; PROCEDURE LexErrorChars ( Code : LbeStd . ErrCodeTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* LexErrorChars *) 
         State := LbeStd . SsInTok 
@@ -193,7 +194,7 @@ MODULE Ldl1Scanner
       END LexErrorChars 
 
   ; PROCEDURE Ident ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LIntTok : INTEGER 
 
@@ -212,7 +213,7 @@ MODULE Ldl1Scanner
       END Ident 
 
   ; PROCEDURE Integer ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* Integer *) 
         BegOfTok ( ) 
@@ -223,7 +224,7 @@ MODULE Ldl1Scanner
       END Integer 
 
   ; PROCEDURE String ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = VAR LCount : PortTypes . Int32Typ 
 
@@ -277,7 +278,7 @@ MODULE Ldl1Scanner
       END String 
 
   ; PROCEDURE CommentSuffix ( ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN 
         SaveState := State 
@@ -523,8 +524,8 @@ MODULE Ldl1Scanner
             END (* CASE *) 
           END (* IF *) 
         END (* LOOP *) 
-      EXCEPT AssertionFailure 
-      => <* FATAL AssertionFailure *> 
+      EXCEPT Backout 
+      => <* FATAL Backout *> 
         BEGIN 
           BegOfTok ( ) 
         ; DeliverTok ( LbeStd . Tok__Unknown ) 

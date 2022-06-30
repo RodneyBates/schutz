@@ -1,16 +1,16 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
 INTERFACE Ldl1Semantics 
 
+; FROM Failures IMPORT Backout 
 ; IMPORT LbeStd 
 ; IMPORT LdlSemantics 
-; IMPORT Assertions 
 
 ; PROCEDURE CheckContainment 
     ( LangInfo : LdlSemantics . LangInfoRefTyp 
@@ -24,7 +24,7 @@ INTERFACE Ldl1Semantics
     ; SemRef : LdlSemantics . SemTyp 
     ) 
   : LdlSemantics . SemDeclTyp 
-    RAISES { Assertions . AssertionFailure } 
+    RAISES { Backout } 
   (* Follow a SemAddlDef to its first occurence.  Otherwise, identity. *) 
 
 ; PROCEDURE Analyze 
@@ -32,7 +32,7 @@ INTERFACE Ldl1Semantics
     ; LdlLang : LbeStd . LangTyp := LbeStd . LangNull 
     ) 
   : LdlSemantics . LangInfoRefTyp 
-  RAISES { Assertions . AssertionFailure } 
+  RAISES { Backout } 
   (* Does not do LALR Generation. *) 
 
 ; VAR Bootstrapping : BOOLEAN := FALSE 

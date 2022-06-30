@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2017, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -13,7 +13,8 @@ MODULE ManualAsTrees
 
 ; IMPORT Text 
 
-; FROM Assertions IMPORT Assert , AssertionFailure 
+; FROM Assertions IMPORT Assert 
+; FROM Failures IMPORT Backout  
 ; IMPORT EstBuild 
 ; IMPORT EstHs 
 ; IMPORT LbeStd 
@@ -71,7 +72,7 @@ MODULE ManualAsTrees
     ; FmtNo8 : EstHs . FmtNoTyp := EstHs . FmtNoNull 
     ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR Node_MergeState : EstBuild . MergeStateTyp 
 
@@ -79,7 +80,7 @@ MODULE ManualAsTrees
       ( Child : LbeStd . EstRootTyp := NIL 
       ; FmtNo : EstHs . FmtNoTyp := EstHs . FmtNoNull 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* MergeChild *) 
         IF FmtNo = EstHs . FmtNoNull 
@@ -121,7 +122,7 @@ MODULE ManualAsTrees
     END MkNode 
 
 ; PROCEDURE MkString ( String : TEXT ) : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* MkString *) 
       RETURN 
@@ -129,7 +130,7 @@ MODULE ManualAsTrees
     END MkString 
 
 ; PROCEDURE MkStringOrFormatter ( Param : TEXT ) : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* MkStringOrFormatter *) 
       IF Text . Equal ( Param , "BANG" ) 
@@ -150,7 +151,7 @@ MODULE ManualAsTrees
     END MkStringOrFormatter 
 
 ; PROCEDURE MkId ( Tok : LbeStd . TokTyp ) : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* MkId *) 
       RETURN 
@@ -161,7 +162,7 @@ MODULE ManualAsTrees
     END MkId 
 
 ; PROCEDURE MkChildId ( Tok : LbeStd . TokTyp ) : SharedStrings . T 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
     
   = BEGIN (* MkChildId *) 
       RETURN 
@@ -172,7 +173,7 @@ MODULE ManualAsTrees
     END MkChildId 
 
 ; PROCEDURE GrandChildRef ( Param : REFANY ) : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* GrandChildRef *) 
       TYPECASE Param <* NOWARN *>
@@ -198,7 +199,7 @@ MODULE ManualAsTrees
 
 ; PROCEDURE MkAsTokNameRule 
     ( Lhs : LbeStd . TokTyp ; Rhs : TEXT ) : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* MkAsTokNameRule *) 
       RETURN 
@@ -218,7 +219,7 @@ MODULE ManualAsTrees
     ; Sep1 : TEXT := NIL 
     ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LSeparators : EstHs . EstRefTyp 
 
@@ -259,7 +260,7 @@ MODULE ManualAsTrees
     ; Child9 : REFANY := NIL 
     ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LRhs : LbeStd . EstRootTyp 
 
@@ -291,7 +292,7 @@ MODULE ManualAsTrees
 
 ; PROCEDURE MkCsOptChild 
     ( Child1 : REFANY := NIL ; Child2 : REFANY := NIL ) : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* MkCsOptChild *) 
       RETURN 
@@ -312,7 +313,7 @@ MODULE ManualAsTrees
     ; Sep2 : TEXT := NIL 
     ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LNodeTok : LbeStd . TokTyp 
   ; VAR LFormatters : EstHs . EstRefTyp 
@@ -368,7 +369,7 @@ MODULE ManualAsTrees
     ; Child8 : REFANY := NIL 
     ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LNodeTok : LbeStd . TokTyp 
   ; VAR LChildren : LbeStd . EstRootTyp 
@@ -427,7 +428,7 @@ MODULE ManualAsTrees
     ; Child8 : REFANY := NIL 
     ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LChildren : LbeStd . EstRootTyp 
 
@@ -466,7 +467,7 @@ MODULE ManualAsTrees
     ; Child8 : REFANY := NIL 
     ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LChildren : LbeStd . EstRootTyp 
 
@@ -505,7 +506,7 @@ MODULE ManualAsTrees
     ; Child8 : REFANY := NIL 
     ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LChildren : LbeStd . EstRootTyp 
 
@@ -545,7 +546,7 @@ MODULE ManualAsTrees
     ; Child8 : REFANY := NIL 
     ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR LChildren : LbeStd . EstRootTyp 
 
@@ -577,7 +578,7 @@ MODULE ManualAsTrees
 ; PROCEDURE MkFsChildPlain 
     ( ChildName : LbeStd . TokTyp ; ChildClass : LbeStd . TokTyp ) 
   : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* MkFsChildPlain *) 
       RETURN 
@@ -592,7 +593,7 @@ MODULE ManualAsTrees
 
 ; PROCEDURE MkFsChildPlain0 
     ( ChildClass : LbeStd . TokTyp ) : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* MkFsChildPlain0 *) 
       RETURN 
@@ -607,14 +608,14 @@ MODULE ManualAsTrees
 ; CONST FILL = FmtKindTyp . FILL 
 
 ; PROCEDURE RuleList ( ) : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = VAR RuleList_MergeState : EstBuild . MergeStateTyp 
 
   (* Utility procedures for adding rules to the list. *) 
 
   ; PROCEDURE Child ( ChildTree : LbeStd . EstRootTyp ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* Child *) 
         EstBuild . MergeChild 
@@ -627,7 +628,7 @@ MODULE ManualAsTrees
       END Child 
 
   ; PROCEDURE AddAsTokNameRule ( Lhs : LbeStd . TokTyp ; Rhs : TEXT ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* AddAsTokNameRule *) 
         Child ( MkAsTokNameRule ( Lhs , Rhs ) ) 
@@ -638,7 +639,7 @@ MODULE ManualAsTrees
       ; ListChildTok : LbeStd . TokTyp 
       ; Sep1 : TEXT := NIL 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* AddCsStarRule *) 
         Child ( MkCsListRule ( LT . CsStarRule , Lhs , ListChildTok , Sep1 ) ) 
@@ -649,7 +650,7 @@ MODULE ManualAsTrees
       ; ListChildTok : LbeStd . TokTyp 
       ; Sep1 : TEXT := NIL 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* AddCsPlusRule *) 
         Child ( MkCsListRule ( LT . CsPlusRule , Lhs , ListChildTok , Sep1 ) ) 
@@ -667,7 +668,7 @@ MODULE ManualAsTrees
       ; Child8 : REFANY := NIL 
       ; Child9 : REFANY := NIL 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* AddCsFixedRule *) 
         Child 
@@ -693,7 +694,7 @@ MODULE ManualAsTrees
       ; Sep1 : TEXT := NIL 
       ; Sep2 : TEXT := NIL 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* AddFsListRuleTok *) 
         Child 
@@ -720,7 +721,7 @@ MODULE ManualAsTrees
       ; Sep1 : TEXT := NIL 
       ; Sep2 : TEXT := NIL 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* AddFsListRule *) 
         Child ( MkFsListRule ( Lhs , FmtKind , ListChild , Sep1 , Sep2 ) ) 
@@ -738,7 +739,7 @@ MODULE ManualAsTrees
       ; Child7 : REFANY := NIL 
       ; Child8 : REFANY := NIL 
       ) 
-    RAISES { AssertionFailure } 
+    RAISES { Backout } 
 
     = BEGIN (* AddFsFixedRule *) 
         Child 
@@ -2884,7 +2885,7 @@ MODULE ManualAsTrees
 (* VISIBLE: *) 
 ; PROCEDURE LanguageDefinition 
     ( Lang : LbeStd . LangTyp := LbeStd . LangNull ) : LbeStd . EstRootTyp 
-  RAISES { AssertionFailure } 
+  RAISES { Backout } 
 
   = BEGIN (* LanguageDefinition *) 
       GLang := Lang 
