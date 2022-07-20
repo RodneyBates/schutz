@@ -10,7 +10,8 @@ MODULE UiDevel
 
 ; IMPORT RuntimeError 
 
-; IMPORT AnyEvent 
+; IMPORT AnyEvent
+; IMPORT Compiler 
 ; IMPORT FormsVBT 
 ; IMPORT Pathname 
 (* Except for swapping the strings "Pickle" and "Pickle2 AS Pickle", make no
@@ -19,7 +20,8 @@ MODULE UiDevel
 *) 
 ; IMPORT Pickle2 AS Pickle (* The Pickle2 mess. *)
 ; IMPORT Rd 
-; IMPORT Rsrc 
+; IMPORT Rsrc
+; IMPORT RT0
 ; IMPORT Stdio 
 ; IMPORT Text 
 ; IMPORT Thread 
@@ -30,12 +32,13 @@ MODULE UiDevel
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Failures IMPORT Backout 
+; FROM Assertions IMPORT AssertionFailure  
 ; IMPORT Boot 
 ; IMPORT Display 
 ; IMPORT EditWindow 
 ; IMPORT EstUtil
 ; IMPORT Failures 
+; FROM Failures IMPORT Backout 
 ; IMPORT Files 
 ; IMPORT GenConstEst 
 ; IMPORT Images 
@@ -51,6 +54,7 @@ MODULE UiDevel
 ; IMPORT TreeBrowse 
 ; IMPORT Ui 
 ; IMPORT UiRecPlay 
+; IMPORT UnsafeUtils 
 ; IMPORT VersionedFiles 
 ; IMPORT Worker 
 
@@ -363,7 +367,7 @@ MODULE UiDevel
       END (* IF *) 
     END WriteStatsWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayWriteStats ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -448,7 +452,7 @@ MODULE UiDevel
       END (* IF *) 
     END WriteEstPickleWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayWriteEstPickle ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -538,7 +542,7 @@ MODULE UiDevel
       END (* IF *) 
     END GenEstModuleWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayGenEstModule ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -624,7 +628,7 @@ MODULE UiDevel
       END (* IF *) 
     END WriteParseInfoWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayWriteParseInfo ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -709,7 +713,7 @@ MODULE UiDevel
       END (* IF *) 
     END WriteFsTreesWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayWriteFsTrees ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -792,7 +796,7 @@ MODULE UiDevel
       END (* IF *) 
     END WriteSemPickleWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayWriteSemPickle ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -900,7 +904,7 @@ MODULE UiDevel
       END (* IF *) 
     END GenTokInterfaceWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayGenTokInterface ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1011,7 +1015,7 @@ MODULE UiDevel
       END (* IF *) 
     END GenChildInterfaceWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayGenChildInterface ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1160,7 +1164,7 @@ MODULE UiDevel
       END (* IF *) 
     END WriteCheckpointWorkProc   
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayWriteCheckpoint ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1199,7 +1203,7 @@ MODULE UiDevel
 
 (* Take focus.  No need to do this on worker thread. *) 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayTakeFocus ( ) 
 
   = VAR LWindow : EditWindow . T 
@@ -1256,7 +1260,7 @@ MODULE UiDevel
     ; UiRecPlay . RecordString ( LCommandString ) 
     END RepaintWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayRepaint ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1311,7 +1315,7 @@ MODULE UiDevel
     ; UiRecPlay . RecordString ( LCommandString ) 
     END ReconstructLinesWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayReconstructLines ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1367,7 +1371,7 @@ MODULE UiDevel
     ; UiRecPlay . RecordString ( LCommandString ) 
     END VerifyLinesRefsWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayVerifyLinesRefs ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1404,11 +1408,12 @@ MODULE UiDevel
              ) 
     END VerifyLinesRefsCallback
 
-(* Force assertion failure. *) 
+(* Force assertion failure. *)
 
-; PROCEDURE ForceAssertWorkProc ( <* UNUSED *> Self : Worker . ClosureTyp ) 
-
-  = VAR LSavedCallback : Assertions . QueryProcTyp 
+; PROCEDURE ForceAssertWorkProc ( <* UNUSED *> Self : Worker . ClosureTyp )
+  (* AssertionFailure is blocked, to exercise further handling. *)
+  = VAR LSavedCallback : Assertions . QueryProcTyp
+  ; VAR LException : RT0 . ActivationPtr 
 
   ; BEGIN 
       UiRecPlay . Record ( UiRecPlay . CommandTyp . ForceAssert ) 
@@ -1418,14 +1423,28 @@ MODULE UiDevel
       EXCEPT Thread . Alerted 
       => RETURN 
       END 
-    ; TRY 
-        Assertions . CantHappenText ( "User forced assertion" )  
-      EXCEPT
-        Failures . Backout => (* Necessary? Would be caught outer? *)
-      END (* TRY EXCEPT *) 
+    ; Assertions . CantHappenText ( "User forced assertion failure" )
+      (* CantHappenText will catch Ignore before it gets back here.
+         We want to let AssertionFailure and RuntimeError.E get
+         through uncaught or blocked, to test their conversion into
+         Ignore (when requested by the user).  RuntimeError.E is
+         <*IMPLICIT*>, so will be unhandled if we don't catch it here.
+         AssertionFailure is blocked by this proceedure, so can be
+         used to test that.  We would like to catch any other exception
+         here and report it, for testing, but there is no way in Modula-3
+         to catch everything-but... *)   
+      (* Wish we could do the following: 
+          LException
+            := UnsafeUtils . AdrToRT0_ActivationPtr
+                 ( Compiler . ThisException ( ) )
+                 (* BEWARE! ^It's NOT an ExceptionPtr, it's an ActivationPtr! *)
+        ; UnsafeUtils . DisplayActivation
+            ( "User-forced AssertionFailure raised: ", LException )  
+      *) 
+      
     END ForceAssertWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayForceAssert ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1518,7 +1537,7 @@ MODULE UiDevel
     ; UiRecPlay . RecordString ( LCommandString ) 
     END MergeTextWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayMergeText ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1591,7 +1610,7 @@ MODULE UiDevel
           apply := BrowseThread 
         END (* OBJECT *)
 
-(* VISIBLE: *)
+(* EXPORTED: *)
 ; PROCEDURE ReplayBrowseEst ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1655,7 +1674,7 @@ MODULE UiDevel
 
 (* Set debug level. No worker thread needed. *) 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ShowDebugOptions ( ) 
 
   = <* FATAL FormsVBT . Error *> 
@@ -1664,9 +1683,9 @@ MODULE UiDevel
       THEN 
         IF Options . AllowProceedAfterAssert 
         THEN
-          FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Proceed" ) 
+          FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Ignore" ) 
         ELSE 
-          FormsVBT . MakeDormant ( Options . MainForm , "Fv_Assert_Proceed" ) 
+          FormsVBT . MakeDormant ( Options . MainForm , "Fv_Assert_Ignore" ) 
         END (* IF *) 
       ; IF Options . AllowTerminateAfterAssert 
         THEN
@@ -1677,7 +1696,7 @@ MODULE UiDevel
       END (* IF *) 
     END ShowDebugOptions 
 
-(* VISIBLE: *)
+(* EXPORTED: *)
 ; PROCEDURE ReplaySetDebugLevel ( Level : INTEGER ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1737,17 +1756,21 @@ MODULE UiDevel
 
 (* Failure dialogs: *) 
 
-(* VISIBLE: *) 
-; PROCEDURE ShowGuiAssertDialog ( Location , Message : TEXT ) 
+(* EXPORTED: *) 
+; PROCEDURE ShowGuiAssertDialog ( Failure , Location , Checkpoint : TEXT )
+  RAISES { FormsVBT . Error } 
 
   = <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN
       FormsVBT . PutText 
-        ( Options . MainForm , "Fv_Assert_Location" , Location  ) 
+        ( Options . MainForm , "Fv_Assert_Failure" , Failure ) 
     ; FormsVBT . PutText 
-        ( Options . MainForm , "Fv_Assert_Message" , Message )
-    ; FormsVBT . PopUp ( Options . MainForm , "Fv_AssertDialog" ) 
+        ( Options . MainForm , "Fv_Assert_Location" , Location )
+    ; FormsVBT . PutText 
+        ( Options . MainForm , "Fv_Assert_Checkpoint" , Checkpoint )
+    ; FormsVBT . PopUp
+        ( Options . MainForm , "Fv_AssertDialog" , forcePlace := TRUE ) 
     ; FormsVBT . MakeDormant ( Options . MainForm , "Fv_Background" ) 
     END ShowGuiAssertDialog  
 
@@ -1759,11 +1782,11 @@ MODULE UiDevel
     ) 
 
   = BEGIN 
-      Worker . ReportAssertDialog 
+      Worker . AnswerGuiAssertDialog 
         ( Failures . FailureActionTyp . FaBackout ) 
     END AssertBackoutProc 
 
-; PROCEDURE AssertProceedProc 
+; PROCEDURE AssertIgnoreProc 
     ( <* UNUSED *> Form : FormsVBT . T 
     ; <* UNUSED *> Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
@@ -1771,9 +1794,9 @@ MODULE UiDevel
     ) 
 
   = BEGIN 
-      Worker . ReportAssertDialog 
+      Worker . AnswerGuiAssertDialog 
         ( Failures . FailureActionTyp . FaIgnore ) 
-    END AssertProceedProc 
+    END AssertIgnoreProc 
 
 ; PROCEDURE AssertTerminateProc 
     ( <* UNUSED *> Form : FormsVBT . T 
@@ -1783,11 +1806,11 @@ MODULE UiDevel
     ) 
 
   = BEGIN 
-      Worker . ReportAssertDialog 
+      Worker . AnswerGuiAssertDialog 
         ( Failures . FailureActionTyp . FaCrash ) 
     END AssertTerminateProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE RemoveGuiAssertDialog ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1796,7 +1819,7 @@ MODULE UiDevel
     ; FormsVBT . PopDown ( Options . MainForm , "Fv_AssertDialog" ) 
     END RemoveGuiAssertDialog  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ShowCheckpointNotice ( Message: TEXT (* May be multiline. *) ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1815,9 +1838,9 @@ MODULE UiDevel
       FormsVBT . AttachProc 
         ( Form , "Fv_Assert_Backout" , AssertBackoutProc )
     ; FormsVBT . AttachProc 
-        ( Form , "Fv_Assert_Proceed" , AssertProceedProc )
-    ; FormsVBT . AttachProc 
         ( Form , "Fv_Assert_Terminate" , AssertTerminateProc )
+    ; FormsVBT . AttachProc 
+        ( Form , "Fv_Assert_Ignore" , AssertIgnoreProc )
     END AttachButtonHandlers 
 
 ; PROCEDURE AttachMenuHandlers ( Form : FormsVBT . T ) 
@@ -1908,7 +1931,7 @@ MODULE UiDevel
         ( Form , "Fv_Devel_GenAll" , GenAllCallback ) 
     END AttachMenuHandlers 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE AttachHandlers ( Form : FormsVBT . T ) 
 
   = BEGIN 

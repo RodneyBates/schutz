@@ -382,7 +382,7 @@ EXPORTS Main
   = BEGIN
      IF NOT Options . Crash
      THEN
-       AssertDevel . RuntimeFailureDialog ( ) 
+    (* AssertDevel . RuntimeFailureDialog ( ) *)  
      END (* IF *) 
     END Exitor 
 

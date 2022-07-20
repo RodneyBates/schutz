@@ -37,7 +37,7 @@ INTERFACE Assertions
     = Failures . FailureActionSetTyp
         { Failures . FailureActionTyp . FaCrash
         , Failures . FailureActionTyp . FaBackout
-        , Failures . FailureActionTyp . FaBackout
+        , Failures . FailureActionTyp . FaIgnore 
         } 
 
 (* Use this Thread.T subtype to create a thread with options about how

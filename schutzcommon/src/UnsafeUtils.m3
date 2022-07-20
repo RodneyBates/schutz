@@ -1,7 +1,7 @@
   
 (* -----------------------------------------------------------------------1- *)
 (* File UnsafeUtils.m3  Modula-3 source code.                                *)
-(* Copyright 2010 .. 2020, Rodney M. Bates.                                  *)
+(* Copyright 2010 .. 2022, Rodney M. Bates.                                  *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *) 
 (* -----------------------------------------------------------------------2- *)
@@ -57,6 +57,8 @@ UNSAFE MODULE UnsafeUtils
    do this properly.  That is a runtime system change, not to be undertaken
    lightly.  This is a temporary expedient to keep moving forward on
    schutz. *)
+(* WARNING: it is misnamed; should be PutActivation!! *) 
+
 (* Later note: The version in RTExStack looks to be identical. *)
 
 (* OR, maybe keep here and write to a TEXT or Wr.T, for more flexibility? *)
@@ -84,17 +86,19 @@ UNSAFE MODULE UnsafeUtils
     END;
     RTIO.PutText ("\n");
     RTIO.Flush ();
-  END PutExcept
+  END PutExcept 
 
 (* EXPORTED: *) 
-; PROCEDURE DisplayException ( Tag : TEXT ; Addr : ADDRESS )
+; PROCEDURE DisplayActivation
+    ( Tag : TEXT ; Addr : ADDRESS (* RT0.ActivationPtr *) )
   (* Display, on command line, an interpretation of a value gotten from
-     Compiler.ThisException. *)
+     'Compiler.ThisException', which, contrary to the name 'ThisException',
+     is a RT0.ActivationPtr, NOT an ExceptionPtr!! *)
 
   = BEGIN
       (* RTException . *) PutExcept
         ( Tag , AdrToRT0_ActivationPtr ( Addr ) ^ ) 
-    END DisplayException 
+    END DisplayActivation 
 
 (* EXPORTED *) 
 ; PROCEDURE ObjectSize ( TC : TypeCodeTyp ) : INTEGER 

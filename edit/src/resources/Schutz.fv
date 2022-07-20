@@ -1,14 +1,14 @@
 
 ;; -----------------------------------------------------------------------1- ;;
 ;; This file is part of the Schutz semantic editor.                          ;;
-;; Copyright 1988..2020, Rodney M. Bates.                                    ;;
+;; Copyright 1988..2022, Rodney M. Bates.                                    ;;
 ;; rodney.m.bates@acm.org                                                    ;;
 ;; Licensed under the MIT License.                                           ;;
 ;; -----------------------------------------------------------------------2- ;;
 
 ;; File edit/src/resources/Schutz.fv
 
-(Shape %Fv_Window (Height 700 - 400 + Inf ) (Width 450 - 200 + Inf )
+(Shape %Fv_Window (Height 700  + Inf ) (Width 500 + Inf )
   ( Macro BG_COLOR ( ) '( 0.754 0.832 0.664 ) )
   (LabelFont (Family "new century schoolbook" ) ) 
   (Font "fixed" ) 
@@ -120,7 +120,8 @@
            (MButton %Fv_Devel_WriteCheckpoint (TLA "Write checkpoint") ) 
            (MButton %Fv_Devel_TakeFocus (TLA "Take keyboard focus") )
            (MButton %Fv_Devel_Repaint (TLA "Repaint") )
-           (MButton %Fv_Devel_ForceAssert (TLA "Force assertion failure") )
+           (MButton %Fv_Devel_ForceAssert
+             (TLA "Force assertion failure (after 5 sec.)") )
            (MButton %Fv_Devel_ReplayLast (TLA "Replay failing command") )
            (MButton %Fv_Devel_MergeText (TLA "Merge text") )
            (MButton %Fv_Devel_ReconstructLines (TLA "Reconstruct lines") )
@@ -542,7 +543,7 @@
             (Glue 6)
             "Schutz semantic editor, version 0.1"
             "Written by Rodney M. Bates"
-            "Copyright \251 2021, Rodney M. Bates"
+            "Copyright \251 2022, Rodney M. Bates"
             "Send comments to rodney.m.bates@acm.org"
             (Glue 6)
             Ridge
@@ -580,13 +581,17 @@
         (TextEdit %Fv_CheckpointPopup_Message ReadOnly)
       )
     )
+
+; Dialog for assertion and runtime failues: 
+
     (ZChassis %Fv_AssertDialog
               (At .95 .1 NE)
               (BgColor "VeryPaleSlateBlue")
-              (Title "Assertion Failure")
+              (Title "Runtime Failure")
               (LightShadow "White")
               (DarkShadow "SlateBlue")
-      (Shape (Width 400 + Inf - 200) (Height 100 + Inf - 50)
+              (Open FALSE) ; Set this true to see this in formsedit
+      (Shape (Width 450 ) (Height 200 )
         (VBox 
            (Text Center (LabelFont (PointSize 240) ) "O H   N O !" )
            (Glue 2)
@@ -594,38 +599,56 @@
               "The usually marvelous Schutz editor has suffered a humiliating" 
            ) 
            (Glue 2)
-           (Text Center (LabelFont (PointSize 240) ) "RUNTIME ERROR!" ) 
-           Ridge 
+           (Text Center (LabelFont (PointSize 240) ) "RUNTIME ERROR!" )
+           
+           Ridge
+
            (HBox
-             (Shape (Width 30) (Text LeftAlign "Failure:" ) )
-             (TypeIn %Fv_Assert_Failure ReadOnly )
-           ) 
-           (HBox
-             (Shape (Width 30) (Text LeftAlign "Problem:") )
-             (TypeIn %Fv_Assert_Location ReadOnly )
+             (Shape (Width 50 + 0)
+               (Text LeftAlign "Failure:" )
+             )
+             (TypeIn %Fv_Assert_Failure ReadOnly ExpandOnDemand )
            )
+
+           (HBox
+             (Shape (Width 50 + 0)
+               (Text LeftAlign "Location:")
+             ) 
+             (TypeIn %Fv_Assert_Location ReadOnly ExpandOnDemand )
+           )
+
+           (TypeIn %Fv_Assert_Checkpoint ReadOnly ExpandOnDemand )
+
            (Glue 5)
            (HBox
               (Fill)
-              (Shape (Width 0 + 1000)
-                 (Rim(Pen 1) 
-                   (Button %Fv_Assert_Backout "Back out")
-              )  )
-              (Fill)
-              (Shape (Width 0 + 1000)
-                 (Rim(Pen 1) 
-                    ( Filter (Dormant TRUE) 
-                      ( Button %Fv_Assert_Terminate "Terminate")
-                    )
-                 )
+              (Filter %Fv_Failure_Backout (Active TRUE)
+                (TEXTBUBBLE
+                  (Rim(Pen 1) 
+                    (Button %Fv_Assert_Backout "Back out")
+                  )
+                  "Undo any effects of the failing action."
+                )
               )
               (Fill)
-              (Shape (Width 0 + 1000)
-                 (Rim(Pen 1) 
-                    ( Filter (Dormant TRUE) 
-                      ( Button %Fv_Assert_Proceed "Ignore and Proceed")
-                    ) 
-              )  )
+              (Filter %Fv_Failure_Terminate (Active TRUE)
+                (TEXTBUBBLE 
+                  (Rim(Pen 1) 
+                    ( Button %Fv_Assert_Terminate "Terminate")
+                  )
+                  "Terminate Schutz."
+                )
+              )
+
+              (Fill)
+              (Filter %Fv_Failure_Ignore (Vanish TRUE)
+                (TEXTBUBBLE 
+                  (Rim(Pen 1) 
+                    ( Button %Fv_Assert_Ignore "Ignore and Proceed")
+                  )
+                  "Ignore the failure (dangerous!)"
+                ) 
+              )
               (Fill)
            ) 
         )

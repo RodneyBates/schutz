@@ -15,14 +15,15 @@ INTERFACE Failures
    via its registering of a backstop callback with the runtime system. *)
 
 ; IMPORT RT0
+; IMPORT Thread 
 
 ; TYPE FailureActionTyp = { FaCrash , FaBackout , FaIgnore }
 ; TYPE FailureActionSetTyp = SET OF FailureActionTyp 
 
-; TYPE QueryProcTyp
+; TYPE QueryProcTyp 
   = PROCEDURE
       ( READONLY Act : RT0 . RaiseActivation
-      ; String1 , String2 : TEXT 
+      ; StoppedReason : TEXT 
       ; AllowedActions : FailureActionSetTyp
       )
     : FailureActionTyp
@@ -38,23 +39,40 @@ INTERFACE Failures
      by lack of a covering RAISES clause, or, (if NOT raises,) 'a'
      is not handled. *) 
 
-
-; PROCEDURE RegisterQueryProc ( QueryProc : QueryProcTyp )
+; PROCEDURE RegisterQueryProc ( QueryProc : QueryProcTyp ; FDoGui := FALSE )
   (* Register a query procedure for Thread.Self. *) 
+  RAISES { Thread . Alerted } 
 
 ; TYPE ThreadInfoRefTyp <: REFANY 
 
-; PROCEDURE ExcName ( READONLY Act : RT0 . RaiseActivation ) : TEXT
+; PROCEDURE ExcName
+    ( READONLY Act : RT0 . RaiseActivation ; Secondary := FALSE ) : TEXT
+  (* Name of exception raised by Act. 
+     Secondary means the uncaught or blocked RT error, after an 
+     original exception, if such exists.
+  *) 
 
-; PROCEDURE ActivationImage ( READONLY Act : RT0 . RaiseActivation ) : TEXT 
+; PROCEDURE ActivationLocation ( READONLY Act : RT0 . RaiseActivation ) : TEXT
+    (* Code location where the raise denoted by Apt. *) 
 
 ; <*IMPLICIT*>
   EXCEPTION Backout ( TEXT )  
-  (* Backout and recover from an unhandled exception or runtime failure. *) 
+  (* Backout and recover from an unhandled exception or runtime failure.
+     If this goes uncaught, a crash will result.  It's implicit, so no
+     danger of its being blocked.
+     
+     Don't raise this, only catch it.  It will be raised inside
+     module Failures. 
+  *) 
 
 ; <*IMPLICIT*>
   EXCEPTION Ignore
-  (* Ignore an unhandled exception or runtime failure. *) 
+  (* Ignore an unhandled exception or runtime failure, and proceed.
+  
+     Don't raise this. It will be raised inside module Failures.
+     Catch it only IFF at a place where an exception or runtime
+     error can be ignored. 
+  *) 
 
 ; END Failures
 .

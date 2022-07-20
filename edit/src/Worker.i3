@@ -142,7 +142,7 @@ INTERFACE Worker
   *)
 *)
 
-; PROCEDURE ReportAssertDialog  
+; PROCEDURE AnswerGuiAssertDialog  
     ( FailureAction : Failures . FailureActionTyp ) 
   <* LL.sup <= VBT.mu *> 
   (* Gui threads call this to report user response to an assertion dialog. *) 

@@ -1,4 +1,4 @@
-
+ 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
 (* Copyright 1988..2022, Rodney M. Bates.                                    *)
@@ -9,13 +9,17 @@
 MODULE AssertDevel 
 
 ; IMPORT Process 
-; IMPORT Rd  
+; IMPORT Rd
+; IMPORT RT0   
+; IMPORT RTIO  
 ; IMPORT Stdio 
 ; IMPORT Text 
+; IMPORT TextWr  
 ; IMPORT Thread 
 ; IMPORT Wr 
 
 ; IMPORT Assertions
+; IMPORT Failures 
 ; IMPORT Files 
 ; IMPORT Images 
 ; IMPORT LbeStd 
@@ -33,44 +37,44 @@ MODULE AssertDevel
     ; Message : TEXT 
     ; DoCreateVersion : BOOLEAN 
     ) 
-  (* Writes messages to stderr and shows them in a dialog box, if
-     interactive. *)
+  (* Writes messages to stderr and, if GUI, shows them in a dialog box. *)
   = VAR LResultMessage : TEXT
-  ; VAR LGui : BOOLEAN 
 
   ; BEGIN
-      LGui := Worker . DoGuiActions ( ) 
-    ; LResultMessage 
-        := WriteCheckpointNoGui ( ImageRef , Message , DoCreateVersion )
-    ; IF LGui
-         AND LResultMessage # NIL AND NOT Text . Equal ( LResultMessage , "" )
-      THEN
-        UiDevel . ShowCheckpointNotice ( LResultMessage ) 
+      LResultMessage 
+        := WriteCheckpointQuiet ( ImageRef , DoCreateVersion )
+    ; RTIO . PutText ( LResultMessage )
+    ; RTIO . Flush ( ) 
+    ; IF Worker . DoGuiActions ( ) 
+         AND LResultMessage # NIL
+         AND NOT Text . Equal ( LResultMessage , "" )
+      THEN UiDevel . ShowCheckpointNotice ( LResultMessage ) 
       END (*IF *)
+(* TODO: Something with LResultMessage. *) 
     END WriteCheckpoint 
 
-; PROCEDURE WriteCheckpointNoGui  
+(*EXPORTED*) 
+; PROCEDURE WriteCheckpointQuiet 
     ( ImageRef : PaintHs . ImageTransientTyp (* Noop if NIL. *) 
-    ; Message : TEXT 
     ; DoCreateVersion : BOOLEAN 
     ) 
   : TEXT (* For display in a dialog box. *) (* May be NIL. *)
-  (* Returns messages, in case caller already has things locked
-     which would try to reaxquire the same mutex on same thread.
+  (* Constructs and returns a message, for caller to decide what to do with.
+     The message is EOL-terminated and may have internal EOLs too.
   *)
 
 (* TODO: Is this really the right place for this procedure? *) 
 
   = VAR LCheckpointName : TEXT 
-  ; VAR LMessage : TEXT 
-  ; VAR LGui : BOOLEAN 
+  ; VAR LMessage : TEXT
+  ; VAR LMsgWrT : TextWr .T 
 
   ; CONST DefaultFileName = "IncompletelyOpened" 
 
   ; <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
     BEGIN
-      LMessage := NIL  
+      LMsgWrT := TextWr . New ( ) 
     ; IF ImageRef # NIL 
       THEN 
         LCheckpointName 
@@ -79,105 +83,67 @@ MODULE AssertDevel
         THEN
           LCheckpointName 
             := Misc . AbsFileName ( Misc . CheckpointName ( DefaultFileName ) )
-        END (* IF *) 
+        END (* IF *)
       ; ImageRef . ItPers . IpCrashCommand := UiRecPlay . CurrentCommand ( ) 
+(* TODO: ^Whoa, this is definitely not the right place to do this! *) 
       ; TRY 
-          Files .WriteImagePickle 
+          Files . WriteImagePickle 
             ( Images . PersistentImageToSave ( ImageRef , ForSave := FALSE )  
             , LCheckpointName  
             , DoCreateVersion := DoCreateVersion  
             )  
         (* Checkpoint write was successful. *) 
         ; Wr . PutText 
-            ( Stdio . stderr 
-            , "A checkpoint has been written to file:"
-               & Wr . EOL  
-               & "\"" 
-               & LCheckpointName 
-               & "\"" 
-               & Wr . EOL  
+            ( LMsgWrT 
+            , "A checkpoint has been written to file: " & Wr . EOL & "\""
             ) 
+        ; Wr . PutText ( LMsgWrT , LCheckpointName ) 
+        ; Wr . PutText ( LMsgWrT , "\"" & Wr . EOL ) 
         ; IF DoCreateVersion 
-          THEN
-            Wr . PutText 
-              ( Stdio . stderr , "It is a new version." & Wr . EOL )
-          ELSE 
-            Wr . PutText 
-              ( Stdio . stderr , "It is NOT a new version." & Wr . EOL ) 
-          END (* IF *) 
-        ; IF LGui 
-          THEN
-            LMessage 
-              := "A checkpoint has been written to file:" 
-                 & Wr . EOL 
-                 & "\"" & LCheckpointName & "\""  
-          ; IF DoCreateVersion 
-            THEN LMessage := LMessage & Wr . EOL & "It is a new version." 
-            ELSE LMessage := LMessage & Wr . EOL & "It is NOT a new version." 
-            END (* IF *) 
-       (* ; UiDevel . ShowCheckpointNotice ( LMessage ) *) 
+          THEN Wr . PutText ( LMsgWrT , "It is a new version." & Wr . EOL )
+          ELSE Wr . PutText ( LMsgWrT , "It is NOT a new version." & Wr . EOL ) 
           END (* IF *) 
 
         EXCEPT (* Checkpoint write failed. *) 
           Files . Error ( EMessage ) 
-        => Wr . PutText 
-             ( Stdio . stderr 
-             , "And furthermore, it can't write a checkpoint file because: " 
-               & EMessage 
-               & "." 
-               & Wr . EOL  
-             ) 
-        ; Wr . Flush ( Stdio . stderr ) 
-        ; IF LGui
-          THEN
-            LMessage 
-              := "Unable to write a checkpoint to file:" 
-                 & Wr . EOL 
-                 & "\"" & LCheckpointName & "\""  
-                 & Wr . EOL 
-                 & EMessage 
-       (* ; UiDevel . ShowCheckpointNotice ( LMessage ) *) 
-          END (* IF *) 
+        => Wr . PutText
+             ( LMsgWrT , "Unable to write a checkpoint file because " ) 
+        ; Wr . PutText ( LMsgWrT , EMessage ) 
+        ; Wr . PutText ( LMsgWrT , "." & Wr . EOL )
         ELSE 
-          Wr . PutText 
-            ( Stdio . stderr 
-            , "And furthermore, it can't write a checkpoint file." 
-              & Wr . EOL  
-            ) 
-        ; Wr . Flush ( Stdio . stderr ) 
-        ; IF LGui
-          THEN
-            LMessage 
-              := "Unable to write a checkpoint to file:" 
-                 & Wr . EOL 
-                 & "\"" & LCheckpointName & "\"" 
-       (* ; UiDevel . ShowCheckpointNotice ( LMessage ) *) 
-          END (* IF *) 
+          Wr . PutText
+            ( LMsgWrT , "Unable to write a checkpoint file. " & Wr . EOL ) 
         END (* TRY EXCEPT *) 
       ELSE 
-        Wr . PutText ( Stdio . stderr , "No Image to checkpoint." & Wr . EOL ) 
-      END (* IF *) 
-    ; Wr . Flush ( Stdio . stderr )
+        Wr . PutText ( LMsgWrT , "No Image to checkpoint." & Wr . EOL ) 
+      END (* IF *)
+    ; LMessage := TextWr . ToText ( LMsgWrT ) 
     ; RETURN LMessage 
-    END WriteCheckpointNoGui  
+    END WriteCheckpointQuiet  
 
 (*EXPORTED*) 
-; PROCEDURE CheckpointForFailure
-    ( CrashCode : MessageCodes . T ; DisplayGui := TRUE )
-  : TEXT (* Message to user. *)  
+; PROCEDURE xxxCheckpointForFailure ( CrashCode : MessageCodes . T )
+  : TEXT (* Message about checkpoint. *) 
 
   = VAR LWindow : PaintHs . WindowRefTyp 
   ; VAR LImageRef : PaintHs . ImageTransientTyp 
-  ; VAR LMessage , LReason: TEXT 
+  ; VAR LReason : TEXT 
+  ; VAR LMessage : TEXT 
+  ; VAR LMsgWrT : TextWr . T 
 
   ; <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
     BEGIN (* CheckpointForFailure *)  
-      LWindow := Options . MainWindow  
+
+      LMsgWrT := TextWr . New ( ) 
+    ; LWindow := Options . MainWindow  
    (* LWindow := FormsVBT . GetGeneric ( Options . MainForm , "Fv_LbeWindow" ) 
       Can attempt to reacquire a mutex already held. *) 
-    ; IF LWindow # NIL 
-      THEN 
+    ; IF LWindow = NIL 
+      THEN
+        Wr . PutText
+          ( LMsgWrT , "No image identified, no checkpoint written." ) 
+      ELSE 
         LImageRef := LWindow . WrImageRef 
       ; IF LImageRef = NIL 
         THEN 
@@ -185,175 +151,141 @@ MODULE AssertDevel
         ; IF LImageRef # NIL 
           THEN 
             Wr . PutText 
-              ( Stdio . stderr 
+              ( LMsgWrT 
               , "Using Options.OpeningImageRef for checkpoint." & Wr . EOL 
               ) 
           END (* IF *) 
         END (* IF *) 
       ; IF LImageRef # NIL 
         THEN 
-          LImageRef . ItPers . IpCrashCode := ORD ( CrashCode )  
-        ; LReason := MessageCodes . Image ( CrashCode ) 
-        ; IF DisplayGui
-          THEN
-            WriteCheckpoint ( LImageRef , LReason , DoCreateVersion := TRUE )
-          ; LMessage := "" 
-          ELSE 
-            LMessage
-              := WriteCheckpointNoGui
-                   ( LImageRef , LReason , DoCreateVersion := TRUE )
-(* TODO: Something with LMessage. *) 
-          END (* IF *) 
+          LImageRef . ItPers . IpCrashCode := ORD ( CrashCode ) 
+        ; LReason := MessageCodes . Image ( CrashCode )  
+        ; LMessage
+            := WriteCheckpointQuiet ( LImageRef , DoCreateVersion := TRUE )
         END (* IF *) 
-      END (* IF *) 
-    END CheckpointForFailure 
+      END (* IF *)
+    ; RETURN LMessage 
+    END xxxCheckpointForFailure
+    
+; CONST AnsCrash = "c" 
+; CONST AnsBackout = "b" 
+; CONST AnsIgnore = "i" 
 
 (*EXPORTED*) 
-; PROCEDURE AssertDialogCommandLine 
-    ( <*UNUSED*> String1 : TEXT 
-    ; <*UNUSED*> String2 : TEXT 
-    ; Code : MessageCodes . T 
-    ; <*UNUSED*> DoWriteCheckpoint : BOOLEAN 
-    ) 
-  : BOOLEAN 
-  (* Conduct a command line dialog about an assertion failure. *) 
+; PROCEDURE yyyFailureMessageCommandLine 
+    ( READONLY Act : RT0 . RaiseActivation
+    ; StoppedReason : TEXT 
+    ; CheckpointMsg : TEXT 
+    )
+  (* Write a command line notification of a failure. *) 
 
   = VAR LResponse : TEXT 
-  ; VAR LResult : BOOLEAN 
+  ; VAR LResult : Failures . FailureActionTyp 
 
   ; <* FATAL Wr . Failure *> 
     <* FATAL Thread . Alerted *> 
-    BEGIN 
-      Wr . PutText 
-        ( Stdio . stderr 
-        , "###############################################################"
-          & Wr . EOL  
-          & "OH NO!" 
-          & Wr . EOL  
-          & "The usually marvelous " 
-          & LbeStd . AppName 
-          & " editor has suffered a humiliating"
-          & Wr . EOL  
-          & "ASSERTION FAILURE!" 
-          & Wr . EOL  
-        ) 
-    ; EVAL CheckpointForFailure ( Code ) 
-    ; IF DoStop 
-      THEN 
-        Wr . PutText 
-          ( Stdio . stderr , "-- Type \"t\" to terminate. " & Wr . EOL ) 
-      ; Wr . PutText 
-          ( Stdio . stderr 
-          , "-- Type \"c\" to force execution to continue."  
-            & Wr . EOL 
-            & "   WARNING: there is no telling what might happen if you try this." 
-            & Wr . EOL 
-          ) 
-      ; Wr . PutText 
-          ( Stdio . stderr  
-          , "-- Otherwise, " 
-             & LbeStd . AppName 
-             & " will attempt to reset itself to the state" 
-             & Wr . EOL  
-             & "   prior to the last command, which is not guaranteed to work." 
-             & Wr . EOL  
-          )  
-      ; Wr . PutText ( Stdio . stderr , LbeStd . AppName & "> " ) 
-      ; Wr . Flush ( Stdio . stderr )
+    BEGIN
+      RTIO . PutText ( Wr . EOL )
+    ; RTIO . PutText 
+        ( "###############################################################" ) 
+    ; RTIO . PutText ( "OH NO!" )
+    ; RTIO . PutText ( Wr . EOL ) 
+    ; RTIO . PutText ( "The usually marvelous " )
+    ; RTIO . PutText ( LbeStd . AppName )
+    ; RTIO . PutText ( " editor has suffered a humiliating" ) 
+    ; RTIO . PutText ( Wr . EOL )
+    ; RTIO . PutText ( StoppedReason ) 
+    ; RTIO . PutText ( " " )
+    ; RTIO . PutText ( Failures . ExcName ( Act ) ) 
+    ; RTIO . PutText ( Wr . EOL ) 
+    ; RTIO . PutText ( "at: " ) 
+    ; RTIO . PutText ( Failures . ActivationLocation ( Act ) ) 
+    ; RTIO . PutText ( Wr . EOL ) 
+    ; RTIO . PutText ( CheckpointMsg ) 
+    ; RTIO . PutText ( Wr . EOL ) 
+    END yyyFailureMessageCommandLine 
+
+(*EXPORTED*) 
+; PROCEDURE zzzFailureDialogCommandLine 
+    ( AllowedActions : Failures . FailureActionSetTyp )
+  : Failures . FailureActionTyp
+  (* Conduct a command line dialog about a blocked or uncaught exception. *) 
+
+  = VAR LResponse : TEXT 
+  ; VAR LResult : Failures . FailureActionTyp 
+
+  ; <* FATAL Wr . Failure *> 
+    <* FATAL Thread . Alerted *> 
+    BEGIN
+      AllowedActions
+        := AllowedActions
+           + Failures . FailureActionSetTyp
+               { Failures . FailureActionTyp . FaCrash }
+      (* ^ Always allow crashing. *) 
+    ; LOOP 
+        IF Failures . FailureActionTyp . FaCrash IN AllowedActions 
+        THEN 
+          RTIO . PutText ( "-- Type \"" )
+        ; RTIO . PutText ( AnsCrash )
+        ; RTIO . PutText ( "\" to terminate. " )
+        ; RTIO . PutText ( Wr . EOL )
+        END (* IF *)
+
+      ; IF Failures . FailureActionTyp . FaBackout IN AllowedActions 
+        THEN 
+          RTIO . PutText ( "-- Type \"" )
+        ; RTIO . PutText ( AnsIgnore )
+        ; RTIO . PutText 
+           ( "\" to attempt to reset to the state prior to the last command." ) 
+        ; RTIO . PutText ( Wr . EOL )
+        ; RTIO . PutText ( "This has a decent chance of working." ) 
+        ; RTIO . PutText ( Wr . EOL )
+        END (* IF *)
+
+      ; IF Failures . FailureActionTyp . FaIgnore IN AllowedActions 
+        THEN 
+          RTIO . PutText ( "-- Type \"" )
+        ; RTIO . PutText ( AnsIgnore )
+        ; RTIO . PutText 
+           ( "\" to ignore the failure and force execution to continue." ) 
+        ; RTIO . PutText ( Wr . EOL )
+        ; RTIO . PutText 
+            ( "   WARNING: no telling what will happen if you try this." ) 
+        ; RTIO . PutText ( Wr . EOL )
+        END (* IF *) 
+
+      ; RTIO . PutText ( LbeStd . AppName & "> " ) 
+      ; RTIO . Flush ( )
       ; TRY 
-          LResponse := Rd . GetLine ( Stdio . stdin )  
+          LResponse := Rd . GetLine ( Stdio . stdin )   
         EXCEPT ELSE 
           LResponse := "" 
         END (* TRY EXCEPT *)
-      ELSE 
-        LResponse := "t" 
-      END (* IF *) 
-    ; IF Text . Equal ( LResponse , "c" ) 
-      THEN 
-        Wr . PutText 
-          ( Stdio . stderr 
-          , "Forging Quixotically ahead, in spite of the failure." 
-            & Wr . EOL  
-            & "###############################################################"
-            & Wr . EOL  
-          ) 
-      ; Wr . Flush ( Stdio . stderr )
-      ; LResult := FALSE 
-      ELSIF Text . Equal ( LResponse , "t" ) 
-      THEN 
-        Wr . PutText 
-          ( Stdio . stderr 
-          , "Terminating " & LbeStd . AppName & "." 
-            & Wr . EOL  
-            & "###############################################################"
-            & Wr . EOL  
-          ) 
-      ; Wr . Flush ( Stdio . stderr )
-      ; Assertions . TerminatingNormally := TRUE 
-      ; Process . Exit ( 1 ) 
-      ; LResult := TRUE (* Dead *)  
-      ELSE 
-        Wr . PutText 
-          ( Stdio . stderr 
-          , "Attempting to back up to before the last command." 
-            & Wr . EOL  
-            & "###############################################################"
-            & Wr . EOL  
-          ) 
-      ; Wr . Flush ( Stdio . stderr )
-      ; LResult := TRUE 
-      END (* IF *)  
+
+      ; IF Failures . FailureActionTyp . FaCrash IN AllowedActions 
+           AND Text . Equal ( LResponse , AnsCrash ) 
+        THEN 
+          LResult := Failures . FailureActionTyp . FaCrash 
+        ; EXIT 
+        ELSIF Failures . FailureActionTyp . FaBackout IN AllowedActions 
+              AND Text . Equal ( LResponse , AnsBackout )
+        THEN 
+          LResult := Failures . FailureActionTyp . FaBackout 
+        ; EXIT 
+        ELSIF Failures . FailureActionTyp . FaIgnore IN AllowedActions 
+              AND Text . Equal ( LResponse , AnsIgnore ) 
+        THEN 
+          LResult := Failures . FailureActionTyp . FaIgnore 
+        ; EXIT 
+        ELSE 
+          RTIO . PutText ( "Unrecognized answer: \"" ) 
+        ; RTIO . PutText ( LResponse ) 
+        ; RTIO . PutText ( "\"" ) 
+        ; RTIO . PutText ( Wr . EOL )
+        END (* IF *)  
+      END (* LOOP *)
     ; RETURN LResult 
-    END AssertDialogCommandLine 
-
-; PROCEDURE InnerRuntimeFailureDialog ( ) 
-
-  = VAR LResponse : TEXT 
-
-  ; <* FATAL Wr . Failure *> 
-    <* FATAL Thread . Alerted *> 
-    BEGIN 
-      Wr . PutText 
-        ( Stdio . stderr 
-        , "###############################################################"
-          & Wr . EOL  
-          & "OH NO!" 
-          & Wr . EOL  
-          & "The usually marvelous " 
-          & LbeStd . AppName 
-          & " editor has suffered a humiliating"
-          & Wr . EOL  
-          & "RUNTIME ERROR!" 
-          & Wr . EOL  
-        ) 
-    ; EVAL CheckpointForFailure ( MessageCodes . T . RuntimeError ) 
-    ; IF DoStop 
-      THEN 
-        Wr . PutText 
-          ( Stdio . stderr , "-- <Type Return> to terminate. " & Wr . EOL ) 
-      ; Wr . PutText ( Stdio . stderr , LbeStd . AppName & "> " ) 
-      ; Wr . Flush ( Stdio . stderr )
-      ; TRY 
-          LResponse := Rd . GetLine ( Stdio . stdin )  
-        EXCEPT ELSE 
-          LResponse := "" 
-        END (* TRY EXCEPT *)
-      ELSE 
-      END (* IF *) 
-    END InnerRuntimeFailureDialog 
-
-(*EXPORTED*) 
-; PROCEDURE RuntimeFailureDialog ( ) 
-  (* Conduct a command line dialog about a runtime error. *) 
-
-  = BEGIN 
-      IF
-TRUE OR
-         NOT Assertions . TerminatingNormally
-      THEN 
-        InnerRuntimeFailureDialog ( ) 
-      END (* IF *) 
-    END RuntimeFailureDialog 
+    END zzzFailureDialogCommandLine 
 
 ; BEGIN 
   END AssertDevel 

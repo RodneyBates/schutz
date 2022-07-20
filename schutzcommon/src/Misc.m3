@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -881,7 +881,22 @@ MODULE Misc
       ; LLength := Text . Length ( LName ) 
       ; RETURN LLength >= 1 AND Text . GetChar ( LName , LLength - 1 ) = '_' 
       END (* IF *) 
-    END IsPickleOrCheckpointName 
+    END IsPickleOrCheckpointName
+
+(* EXPORTED: *) 
+; PROCEDURE PutHex ( WrT : Wr . T ; Value : INTEGER )
+
+  = BEGIN 
+      Wr.PutText
+        ( WrT
+        , Fmt . Pad
+            ( Fmt . Unsigned ( Value , base := 16 )
+            , length := 2 * BYTESIZE ( INTEGER )
+            , padChar := '0'
+            , align := Fmt . Align . Right 
+            )
+        )
+    END PutHex 
 
 ; BEGIN (* Misc *) 
     FixedText := Text . FromChars ( FixedBlanks ) 

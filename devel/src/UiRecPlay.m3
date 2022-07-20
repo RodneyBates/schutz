@@ -17,7 +17,6 @@ MODULE UiRecPlay
 ; IMPORT OSError 
 ; IMPORT Rd 
 ; IMPORT Rsrc 
-; IMPORT Stdio 
 ; IMPORT Text 
 ; IMPORT Thread 
 ; IMPORT Trestle 
@@ -27,7 +26,7 @@ MODULE UiRecPlay
 ; IMPORT VBT 
 ; IMPORT Wr 
 
-; FROM Failures IMPORT Backout
+; FROM Assertions IMPORT AssertionFailure  
 ; IMPORT BuildLexMachine  
 ; IMPORT Display 
 ; IMPORT EditWindow 
@@ -1306,7 +1305,7 @@ Enabled := FALSE ;
               TRY 
                 LCommandInt  
                   := LexTable . ValueFromText ( CommandTable , LCommandString ) 
-              EXCEPT Backout 
+              EXCEPT AssertionFailure  
               => LCommandInt := LexTable . ValueNull 
 (* TODO: Pop a dialog or something here? *) 
               END (* TRY EXCEPT *) 

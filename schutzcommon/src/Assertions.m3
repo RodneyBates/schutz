@@ -17,6 +17,7 @@ MODULE Assertions
 ; IMPORT Stdio 
 ; IMPORT Thread 
 
+; IMPORT Failures 
 ; IMPORT MessageCodes 
 
 ; PROCEDURE AF ( ) 
@@ -32,13 +33,19 @@ MODULE Assertions
 
   = <* FATAL Thread . Alerted *> 
     <* FATAL Wr . Failure *> 
-    BEGIN (* FailText *) 
+    BEGIN (* FailText *)
+(* Let Backstop, etc. produce this message:  
       Wr . PutText ( Stdio . stderr , "Assertion Failure: " ) 
     ; Wr . PutText ( Stdio . stderr , Message ) 
     ; Wr . PutText ( Stdio . stderr , Wr . EOL ) 
     ; Wr . Flush ( Stdio . stderr ) 
-    ; AF ( ) 
-    ; RAISE AssertionFailure ( Message ) 
+*)
+      AF ( ) 
+    ; TRY
+        RAISE AssertionFailure ( Message )
+      EXCEPT
+        Failures . Ignore =>
+      END (* EXCEPT *) 
     END FailText 
 
 (* EXPORTED: *) 
@@ -68,6 +75,7 @@ MODULE Assertions
 
   ; BEGIN (* Fail *) 
       LMessage := MessageCodes . Image ( Code ) 
+(* Let Backstop, etc. produce this message:  
     ; Wr . PutText 
         ( Stdio . stderr 
         , "Assertion Failure (" & Fmt . Int ( ORD ( Code ) ) & "): " 
@@ -75,8 +83,13 @@ MODULE Assertions
     ; Wr . PutText ( Stdio . stderr , LMessage ) 
     ; Wr . PutText ( Stdio . stderr , Wr . EOL ) 
     ; Wr . Flush ( Stdio . stderr ) 
-    ; AF ( ) 
-    ; RAISE AssertionFailure ( LMessage ) 
+*) 
+    ; AF ( )
+    ; TRY
+        RAISE AssertionFailure ( LMessage ) 
+      EXCEPT
+        Failures . Ignore =>
+      END (* EXCEPT *) 
     END Fail 
 
 (* EXPORTED: *) 

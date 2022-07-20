@@ -524,7 +524,7 @@ MODULE Files
   ; VAR LSuffixInfo : SuffixInfo . T 
   ; VAR LSuffix : TEXT 
   ; VAR LMsg : TEXT
-  ; VAR LException : ADDRESS 
+  ; VAR LActivation : ADDRESS (* RT0.ActivationPtr *)
 
   ; BEGIN (* OpenNamedTextFile *) 
       LSuffix := LangUtil . LangSuffixOfFileName ( FileName )  
@@ -545,7 +545,7 @@ MODULE Files
         EXCEPT Thread . Alerted => RAISE Thread . Alerted 
         ELSE 
           LMsg := "Can't open input file " & FileName 
-        ; LException := Compiler . ThisException ( ) 
+        ; LActivation := Compiler . ThisException ( ) 
         ; RAISE Error ( LMsg ) 
         END (* EXCEPT *) 
       ; TRY 
@@ -557,8 +557,8 @@ MODULE Files
 
         ELSE
           LMsg := "Can't parse input text file " & FileName
-        ; LException := Compiler . ThisException ( )
-        ; UnsafeUtils . DisplayException ( "OpenNamedTextFile" , LException ) 
+        ; LActivation := Compiler . ThisException ( )
+        ; UnsafeUtils . DisplayActivation ( "OpenNamedTextFile" , LActivation ) 
         ; RAISE Error ( LMsg ) 
         END (* EXCEPT *) 
 (* 
@@ -599,9 +599,7 @@ MODULE Files
           LWr := FileWr . Open ( AbsFileName ) 
         EXCEPT Thread . Alerted => RAISE Thread . Alerted 
         ELSE 
-          RAISE 
-            Error 
-              ( "Unable to open for write: " & AbsFileName )
+          RAISE Error ( "Unable to open for write: " & AbsFileName )
         END (* TRY EXCEPT *) 
       END (* IF *) 
     ; TRY 

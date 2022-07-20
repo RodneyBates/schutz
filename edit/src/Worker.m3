@@ -20,8 +20,14 @@ MODULE Worker
 
 ; IMPORT FormsVBT 
 ; IMPORT Process
+; IMPORT Rd 
 ; IMPORT RT0 
-; IMPORT Thread 
+; IMPORT RTIO
+; IMPORT Stdio 
+; IMPORT Text 
+; IMPORT TextWr 
+; IMPORT Thread
+; IMPORT Wr 
 (* ; IMPORT VBT (* Used in LL pragmas. *) *) 
 
 ; IMPORT AssertDevel 
@@ -29,9 +35,11 @@ MODULE Worker
 ; FROM Failures IMPORT Backout 
 ; IMPORT Display 
 ; IMPORT Errors
-; IMPORT Failures 
+; IMPORT Failures
+; IMPORT LbeStd 
 ; IMPORT MessageCodes 
 ; IMPORT Options
+; IMPORT PaintHs 
 ; IMPORT UiDevel 
 
 <* PRAGMA LL *> 
@@ -91,13 +99,13 @@ MODULE Worker
 
 (* Synchronization between worker thread and GUI thread(s): *) 
 
-; VAR Mu : MUTEX := NIL  
-  (* In the locking order, Mu > v, FORALL v : VBT . T  *) 
-(* Mu protects these variables: *) 
+; VAR WorkerMu : MUTEX := NIL  
+  (* In the locking order, WorkerMu > v, FORALL v : VBT . T  *) 
+(* WorkerMu protects these variables: *) 
 ; VAR WaitingForWork : Thread . Condition := NIL   
 ; VAR WaitingForBusy : Thread . Condition := NIL   
 ; VAR WaitingForIdle : Thread . Condition := NIL  
-; VAR WaitingForAssertDialog : Thread . Condition := NIL  
+; VAR WaitingForGuiAssertDialog : Thread . Condition := NIL  
 ; VAR StoredState : WorkResultNotRefusedTyp := WrtDone 
 ; VAR QueryingAssert : BOOLEAN := FALSE
 ; VAR StoredClosure : ClosureTyp := NIL 
@@ -113,10 +121,10 @@ MODULE Worker
       *)   
       (* There will have to be one of these for every window open, when we go 
          to multiple windows.  Nevertheless,  all will be protected by the 
-         single, global Mu, because operations with Image or Global 
+         single, global WorkerMu, because operations with Image or Global 
          granularity will need to examine all the queued closures. 
       *) 
-(* End of Mu-protected variables. *)
+(* End of WorkerMu-protected variables. *)
 
 (*EXPORTED*) 
 ; PROCEDURE RequestWork 
@@ -156,12 +164,12 @@ MODULE Worker
         END (* TRY EXCEPT *) 
       ; RETURN WrtDone 
       ELSE 
-        LOCK Mu 
+        LOCK WorkerMu 
         DO 
           IF WaitToStart  
           THEN 
             WHILE StoredClosure # NIL OR QueuedClosure # NIL  
-            DO Thread . AlertWait ( Mu , WaitingForIdle ) 
+            DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
             END (* WHILE *) 
           ELSIF StoredClosure # NIL 
           THEN 
@@ -175,7 +183,7 @@ MODULE Worker
         ; IF WaitToFinish 
           THEN
             WHILE StoredClosure # NIL 
-            DO Thread . AlertWait ( Mu , WaitingForIdle ) 
+            DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
             END (* WHILE *) 
           ; LResult := StoredState 
           ELSE 
@@ -231,7 +239,7 @@ MODULE Worker
         END (* TRY EXCEPT *) 
       ; RETURN WrtDone 
       ELSE 
-        LOCK Mu 
+        LOCK WorkerMu 
         DO
           IF StoredClosure # NIL   
           THEN 
@@ -271,7 +279,7 @@ MODULE Worker
   (* GUI threads call this to stop any active work. *)   
 
   = BEGIN 
-      LOCK Mu 
+      LOCK WorkerMu 
       DO 
         StoredClosure := NIL 
       ; IF StoredState = WrtBusyImmed 
@@ -281,7 +289,7 @@ MODULE Worker
       ; IF WaitToFinish 
         THEN
           WHILE StoredState = WrtBusyImmed 
-          DO Thread . AlertWait ( Mu , WaitingForIdle ) 
+          DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
           END (* WHILE *) 
         END (* IF*) 
       ; RETURN StoredState 
@@ -300,7 +308,7 @@ MODULE Worker
 
   ; BEGIN
       Closure . Granularity := Granularity 
-    ; LOCK Mu 
+    ; LOCK WorkerMu 
       DO 
         LResult := QueuedClosure (* The one cancelled, if any. *)  
       ; QueuedClosure := Closure 
@@ -328,7 +336,7 @@ MODULE Worker
   = VAR LResult : ClosureTyp 
 
   ; BEGIN
-      LOCK Mu 
+      LOCK WorkerMu 
       DO 
         LResult := QueuedClosure (* The one cancelled, if any. *) 
       ; QueuedClosure := NIL 
@@ -339,7 +347,7 @@ MODULE Worker
       ; IF WaitToFinish 
         THEN
           WHILE StoredState = WrtBusyQueued  
-          DO Thread . AlertWait ( Mu , WaitingForIdle ) 
+          DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
           END (* WHILE *) 
         END (* IF*) 
       END (* LOCK *) 
@@ -354,7 +362,7 @@ MODULE Worker
   = VAR LResult : ClosureTyp 
 
   ; BEGIN
-      LOCK Mu 
+      LOCK WorkerMu 
       DO 
         LResult := QueuedClosure 
       END (* LOCK *) 
@@ -367,7 +375,7 @@ MODULE Worker
   = VAR LResult : BOOLEAN 
 
   ; BEGIN 
-      LOCK Mu 
+      LOCK WorkerMu 
       DO
         LResult := StoredClosure = NIL AND QueuedClosure = NIL 
       END (* LOCK *) 
@@ -385,10 +393,10 @@ MODULE Worker
   = VAR LResult : WorkResultTyp  
 
   ; BEGIN
-      LOCK Mu 
+      LOCK WorkerMu 
       DO
         WHILE StoredClosure # NIL OR QueuedClosure # NIL 
-        DO Thread . AlertWait ( Mu , WaitingForIdle ) 
+        DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
         END (* WHILE *) 
       ; LResult := StoredState 
       END (* LOCK *) 
@@ -404,10 +412,10 @@ MODULE Worker
   *) 
 
   = BEGIN 
-      LOCK Mu 
+      LOCK WorkerMu 
       DO
         WHILE StoredClosure = NIL AND QueuedClosure = NIL 
-        DO Thread . Wait ( Mu , WaitingForWork ) 
+        DO Thread . Wait ( WorkerMu , WaitingForWork ) 
         END (* WHILE *) 
       ; IF QueuedClosure # NIL 
         THEN 
@@ -439,7 +447,7 @@ MODULE Worker
 
   = BEGIN 
       MakeLookIdle ( ) 
-    ; LOCK Mu 
+    ; LOCK WorkerMu 
       DO
         IF Thread . TestAlert ( ) 
         THEN NewState := WrtStopped 
@@ -462,11 +470,188 @@ MODULE Worker
       END (* LOCK *)  
     END BecomeIdle  
 
+; PROCEDURE CheckpointForFailure ( CrashCode : MessageCodes . T )
+  : TEXT (* Message about checkpoint, to be emitted a bit later. *) 
+
+  = VAR LWindow : PaintHs . WindowRefTyp 
+  ; VAR LImageRef : PaintHs . ImageTransientTyp 
+  ; VAR LReason : TEXT
+  ; VAR LMessage : TEXT
+  ; VAR LMsgWrT : TextWr . T 
+
+  ; <* FATAL Wr . Failure *> 
+    <* FATAL Thread . Alerted *> 
+    BEGIN (* CheckpointForFailure *)  
+
+      LMsgWrT := TextWr . New ( ) 
+    (* ; Wr . PutText ( LMsgWrT , "" ) *) 
+    ; LWindow := Options . MainWindow  
+   (* LWindow := FormsVBT . GetGeneric ( Options . MainForm , "Fv_LbeWindow" ) 
+      Can attempt to reacquire a mutex already held. *) 
+    ; IF LWindow = NIL 
+      THEN
+        Wr . PutText
+          ( LMsgWrT , "No image identified, no checkpoint written." ) 
+      ELSE 
+        LImageRef := LWindow . WrImageRef 
+      ; IF LImageRef = NIL 
+        THEN 
+          LImageRef := Options . OpeningImageRef 
+        ; IF LImageRef # NIL 
+          THEN 
+            Wr . PutText 
+              ( LMsgWrT 
+              , "Using Options.OpeningImageRef for checkpoint." & Wr . EOL 
+              ) 
+          END (* IF *) 
+        END (* IF *) 
+      ; IF LImageRef # NIL 
+        THEN 
+          LImageRef . ItPers . IpCrashCode := ORD ( CrashCode ) 
+        ; LReason := MessageCodes . Image ( CrashCode )  
+        ; Wr . PutText 
+              ( LMsgWrT 
+              , AssertDevel . WriteCheckpointQuiet
+                  ( LImageRef , DoCreateVersion := TRUE )
+              ) 
+        END (* IF *) 
+      END (* IF *)
+    ; LMessage := TextWr . ToText ( LMsgWrT ) 
+    ; RETURN LMessage 
+    END CheckpointForFailure
+    
+; CONST AnsCrash = "t" 
+; CONST AnsBackout = "b" 
+; CONST AnsIgnore = "i" 
+
+; PROCEDURE FailureMessageCommandLine 
+    ( READONLY Act : RT0 . RaiseActivation
+    ; StoppedReason : TEXT 
+    ; CheckpointMsg : TEXT 
+    )
+  (* Write a command line notification of a failure. *) 
+
+  = VAR LResponse : TEXT 
+  ; VAR LResult : Failures . FailureActionTyp 
+
+  ; <* FATAL Wr . Failure *> 
+    <* FATAL Thread . Alerted *> 
+    BEGIN
+      RTIO . PutText ( Wr . EOL )
+    ; RTIO . PutText 
+        ( "###############################################################" ) 
+    ; RTIO . PutText ( Wr . EOL ) 
+    ; RTIO . PutText ( "OH NO!" )
+    ; RTIO . PutText ( Wr . EOL ) 
+    ; RTIO . PutText ( "The usually marvelous " )
+    ; RTIO . PutText ( LbeStd . AppName )
+    ; RTIO . PutText ( " editor has suffered a humiliating" ) 
+    ; RTIO . PutText ( Wr . EOL )
+    ; RTIO . PutText ( StoppedReason ) 
+    ; RTIO . PutText ( " " )
+    ; RTIO . PutText ( Failures . ExcName ( Act ) ) 
+    ; RTIO . PutText ( Wr . EOL ) 
+    ; RTIO . PutText ( "at source code " ) 
+    ; RTIO . PutText ( Failures . ActivationLocation ( Act ) ) 
+    ; RTIO . PutText ( Wr . EOL ) 
+    ; RTIO . PutText ( CheckpointMsg ) 
+    ; RTIO . PutText ( Wr . EOL ) 
+    ; RTIO . Flush ( )
+    END FailureMessageCommandLine 
+
+; PROCEDURE FailureDialogCommandLine 
+    ( AllowedActions : Failures . FailureActionSetTyp )
+  : Failures . FailureActionTyp
+  (* Conduct a command line dialog about a blocked or uncaught exception. *) 
+
+  = VAR LResponse : TEXT 
+  ; VAR LResult : Failures . FailureActionTyp 
+
+  ; <* FATAL Wr . Failure *> 
+    <* FATAL Thread . Alerted *> 
+    BEGIN
+      AllowedActions
+        := AllowedActions
+           + Failures . FailureActionSetTyp
+               { Failures . FailureActionTyp . FaCrash }
+      (* ^ Always allow crashing. *) 
+    ; LOOP 
+        IF Failures . FailureActionTyp . FaCrash IN AllowedActions 
+        THEN 
+          RTIO . PutText ( "-- Type \"" )
+        ; RTIO . PutText ( AnsCrash )
+        ; RTIO . PutText ( "\" + RETURN to terminate " )
+        ; RTIO . PutText ( LbeStd . AppName & "." ) 
+        ; RTIO . PutText ( Wr . EOL )
+        END (* IF *)
+
+      ; IF Failures . FailureActionTyp . FaBackout IN AllowedActions 
+        THEN 
+          RTIO . PutText ( "-- Type \"" )
+        ; RTIO . PutText ( AnsBackout )
+        ; RTIO . PutText 
+           ( "\" + RETURN to backout and attempt to reset to the state prior" ) 
+        ; RTIO . PutText ( " to the last command." ) 
+        ; RTIO . PutText ( Wr . EOL )
+        ; RTIO . PutText ( "     This has a decent chance of working." ) 
+        ; RTIO . PutText ( Wr . EOL )
+        END (* IF *)
+
+      ; IF Failures . FailureActionTyp . FaIgnore IN AllowedActions 
+        THEN 
+          RTIO . PutText ( "-- Type \"" )
+        ; RTIO . PutText ( AnsIgnore )
+        ; RTIO . PutText 
+           ( "\" + RETURN to ignore the failure and force execution to continue." ) 
+        ; RTIO . PutText ( Wr . EOL )
+        ; RTIO . PutText 
+            ( "     WARNING: no telling what will happen if you try this." ) 
+        ; RTIO . PutText ( Wr . EOL )
+        END (* IF *) 
+
+      ; RTIO . PutText ( LbeStd . AppName & "> " ) 
+      ; RTIO . Flush ( )
+      ; TRY 
+          LResponse := Rd . GetLine ( Stdio . stdin )   
+        EXCEPT ELSE 
+          LResponse := "" 
+        END (* TRY EXCEPT *)
+
+      ; IF Failures . FailureActionTyp . FaCrash IN AllowedActions 
+           AND Text . Equal ( LResponse , AnsCrash ) 
+        THEN 
+          LResult := Failures . FailureActionTyp . FaCrash 
+        ; EXIT 
+        ELSIF Failures . FailureActionTyp . FaBackout IN AllowedActions 
+              AND Text . Equal ( LResponse , AnsBackout )
+        THEN 
+          LResult := Failures . FailureActionTyp . FaBackout 
+        ; EXIT 
+        ELSIF Failures . FailureActionTyp . FaIgnore IN AllowedActions 
+              AND Text . Equal ( LResponse , AnsIgnore ) 
+        THEN 
+          LResult := Failures . FailureActionTyp . FaIgnore 
+        ; EXIT 
+        ELSE 
+          RTIO . PutText ( "Unrecognized answer: \"" ) 
+        ; RTIO . PutText ( LResponse ) 
+        ; RTIO . PutText ( "\"" ) 
+        ; RTIO . PutText ( Wr . EOL )
+        END (* IF *)  
+      END (* LOOP *)
+    ; RETURN LResult 
+    END FailureDialogCommandLine 
+
+
+
+
+
+
 (*EXPORTED*)
 (* Registered as a callback. *)
 ; PROCEDURE FailureQuery
     ( READONLY Act : RT0 . RaiseActivation
-    ; ExceptionText , ActivationText : TEXT 
+    ; StoppedReason : TEXT 
     ; AllowedActions : Failures . FailureActionSetTyp
     )
   : Failures . FailureActionTyp 
@@ -480,14 +665,11 @@ MODULE Worker
   *)    
 
   = VAR LInteractive : BOOLEAN
-  ; VAR LMessage : TEXT 
+  ; VAR LCheckpointMsg : TEXT 
   ; VAR LResult : Failures . FailureActionTyp 
 
   ; BEGIN 
-      LMessage
-        := AssertDevel . CheckpointForFailure 
-             ( MessageCodes . T . NullCode , DisplayGui := FALSE ) 
-    ; LOCK Mu 
+      LOCK WorkerMu 
       DO IF StoredClosure # NIL
         THEN LInteractive := StoredClosure . IsInteractive 
         ELSIF QueuedClosure # NIL
@@ -495,116 +677,98 @@ MODULE Worker
         ELSE LInteractive := FALSE
         END (* IF *) 
       END (* LOCK *)
-    ; IF LInteractive 
+    ; LCheckpointMsg := CheckpointForFailure ( MessageCodes . T . NullCode ) 
+    ; FailureMessageCommandLine
+        ( Act , StoppedReason , LCheckpointMsg ) 
+
+    ; IF DoGuiActions ( )
       THEN
-(* TODO: put message into the dialog. *)
-        UiDevel . ShowGuiAssertDialog ( ExceptionText , ActivationText ) 
+        IF Failures . FailureActionTyp . FaBackout IN AllowedActions
+        THEN FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Backout" )
+        ELSE FormsVBT . MakeVanish ( Options . MainForm , "Fv_Assert_Backout" )
+        END (* IF *) 
+      ; IF Failures . FailureActionTyp . FaCrash IN AllowedActions
+        THEN FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Terminate" )
+        ELSE FormsVBT . MakeVanish ( Options . MainForm , "Fv_Assert_Terminate" )
+        END (* IF *) 
+      ; IF Failures . FailureActionTyp . FaIgnore IN AllowedActions
+        THEN FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Ignore" )
+        ELSE FormsVBT . MakeVanish ( Options . MainForm , "Fv_Assert_Ignore" )
+        END (* IF *) 
+      ; UiDevel . ShowGuiAssertDialog
+          ( StoppedReason & ": " & Failures . ExcName ( Act )
+          , Failures . ActivationLocation ( Act )
+          , LCheckpointMsg 
+          ) 
         (* It would be more obviously right to show and remove this dialog  
-           while holding Mu, but I can't figure out a way that satisfies a 
-           consistent lock order.  In any case, unlocking Mu is OK, because
-           we will only get here when StoredState = WrtBusyImmed or
+           while holding WorkerMu, but I can't figure out a way that satisfies a 
+           consistent lock order.  In any case, unlocking WorkerMu is OK,
+           because we will only get here when StoredState = WrtBusyImmed or
            WrtBusyQueued, which means the only thing any other thread
            can do is wait on WaitingForIdle. 
         *) 
-      ; LOCK Mu 
-        DO
-          QueryingAssert := TRUE 
-        ; WHILE QueryingAssert 
-          DO Thread . Wait ( Mu , WaitingForAssertDialog ) 
-          END (* WHILE *)
-        ; LResult := StoredFailureAction 
-        END (* LOCK *)  
+      ; IF LInteractive 
+        THEN 
+          LOCK WorkerMu 
+          DO
+            QueryingAssert := TRUE 
+          ; WHILE QueryingAssert 
+            DO Thread . Wait ( WorkerMu , WaitingForGuiAssertDialog ) 
+            END (* WHILE *)
+          ; LResult := StoredFailureAction 
+          END (* LOCK *)
+        ELSE LResult := Failures . FailureActionTyp . FaCrash
+        END (* IF *) 
       ; UiDevel . RemoveGuiAssertDialog ( ) 
-      ELSE
-(* TODO: Query command line, depending on option. *) 
-        Assertions . DoTerminate := TRUE 
-      ; LResult := Failures . FailureActionTyp . FaCrash 
-      END (* IF *) 
+      ELSE (* Command line for query. *) 
+        IF LInteractive
+        THEN LResult := FailureDialogCommandLine ( AllowedActions )
+        ELSE LResult := Failures . FailureActionTyp . FaCrash
+        END (* IF *) 
+      END (* IF *)
+    ; CASE LResult
+      OF Failures . FailureActionTyp . FaCrash
+      => RTIO . PutText 
+           ( "Terminating " & LbeStd . AppName & "." 
+             & Wr . EOL  
+             & "###############################################################"
+             & Wr . EOL  
+           ) 
+    ; RTIO . Flush ( )
+      | Failures . FailureActionTyp . FaBackout  
+      => RTIO . PutText
+           ( "Backing up to before the last command." 
+             & Wr . EOL  
+             & "###############################################################"
+             & Wr . EOL  
+           ) 
+      | Failures . FailureActionTyp . FaIgnore 
+      => RTIO . PutText
+           ( "Forging Quixotically ahead, in spite of the failure." 
+             & Wr . EOL  
+             & "###############################################################"
+             & Wr . EOL  
+           ) 
+      END (* CASE *)  
+    ; RTIO . Flush ( )
     ; RETURN LResult 
     END FailureQuery
     
-(*Old version: remove someday. 
 (*EXPORTED*) 
-; PROCEDURE xFailure 
-    ( String1 : TEXT 
-    ; String2 : TEXT 
-    ; CrashCode : MessageCodes . T 
-    ; DoWriteCheckpoint : BOOLEAN 
-      (* ^Requests Failure to write a checkpoint. *) 
-    ) 
-  : BOOLEAN (* Raise Backout. *) 
-  <* LL.sup < VBT.mu *>
-  (* Worker thread calls this from inside an assertion failure.
-     Failure does not return until it is known what to do, which could
-     involve querying the user, if appropriate. 
-  *)    
-
-  = VAR LInteractive : BOOLEAN 
-  ; VAR LResult : BOOLEAN 
-
-  ; BEGIN 
-      IF DoWriteCheckpoint 
-      THEN 
-        AssertDevel . CheckpointForFailure ( CrashCode ) 
-      END (* IF *) 
-    ; LOCK Mu 
-      DO IF StoredClosure # NIL
-        THEN LInteractive := StoredClosure . IsInteractive 
-        ELSIF QueuedClosure # NIL
-        THEN LInteractive := QueuedClosure . IsInteractive 
-        ELSE LInteractive := FALSE
-        END (* IF *) 
-      END (* LOCK *)
-    ; IF LInteractive 
-      THEN  
-        UiDevel . ShowGuiAssertDialog ( String1 , String2 ) 
-        (* It would be more obviously right to show and remove this dialog  
-           while holding Mu, but I can't figure out a way that satisfies a 
-           consistent lock order.  In any case, unlocking Mu is OK, because
-           we will only get here when StoredState = WrtBusyImmed or
-           WrtBusyQueued, which means the only thing any other thread
-           can do is wait on WaitingForIdle. 
-        *) 
-      ; LOCK Mu 
-        DO
-          QueryingAssert := TRUE 
-        ; WHILE QueryingAssert 
-          DO Thread . Wait ( Mu , WaitingForAssertDialog ) 
-          END (* WHILE *) 
-        ; CASE StoredFailureAction 
-          OF Failures . FailureActionTyp . FaCrash
-          => Assertions . DoTerminate := TRUE 
-          ; LResult := TRUE (* Raise Backout. *) 
-          | Failures . FailureActionTyp . FaBackout 
-          => LResult := TRUE (* Raise Backout. *) 
-          | Failures . FailureActionTyp . FaIgnore   
-          => LResult := FALSE (* Do not raise Backout. *) 
-          END (* CASE *) 
-        END (* LOCK *)  
-      ; UiDevel . RemoveGuiAssertDialog ( ) 
-      ELSE 
-        Assertions . DoTerminate := TRUE 
-      ; LResult := TRUE (* Always raise Backout in batch. *) 
-      END (* IF *) 
-    ; RETURN LResult 
-    END Failure
-*)
-
-(*EXPORTED*) 
-; PROCEDURE ReportAssertDialog  
+; PROCEDURE AnswerGuiAssertDialog 
     ( FailureAction : Failures . FailureActionTyp ) 
   <* LL.sup <= VBT.mu *> 
   (* Gui threads call this to report to us, the user's response to
      a failure dialog. *) 
 
   = BEGIN 
-      LOCK Mu 
+      LOCK WorkerMu 
       DO
-        StoredFailureAction := FailureAction 
+        StoredFailureAction := FailureAction
       ; QueryingAssert := FALSE  
-      ; Thread . Signal ( WaitingForAssertDialog )  
+      ; Thread . Signal ( WaitingForGuiAssertDialog )  
       END (* LOCK *)  
-    END ReportAssertDialog 
+    END AnswerGuiAssertDialog 
 
 (* The worker thread itself: *) 
 
@@ -658,8 +822,8 @@ MODULE Worker
 ; PROCEDURE DoGuiActions ( ) : BOOLEAN  
 
   = BEGIN 
-      LOCK Mu 
-      DO 
+      LOCK WorkerMu 
+      DO
         RETURN IAmWorkerThread ( ) AND StoredClosure . IsInteractive 
       END (* LOCK *) 
     END DoGuiActions 
@@ -677,11 +841,11 @@ MODULE Worker
 ; VAR WantedThreadStackSize := 64000 (* Word.T's *) (* = 256 K Bytes. *)  
 
 ; BEGIN (* Worker *) 
-    Mu := NEW ( MUTEX ) 
+    WorkerMu := NEW ( MUTEX ) 
   ; WaitingForWork := NEW ( Thread . Condition ) 
   ; WaitingForBusy := NEW ( Thread . Condition ) 
   ; WaitingForIdle := NEW ( Thread . Condition ) 
-  ; WaitingForAssertDialog := NEW ( Thread . Condition ) 
+  ; WaitingForGuiAssertDialog := NEW ( Thread . Condition ) 
   ; StoredState := WorkResultTyp . WrtDone 
   ; QueryingAssert := FALSE
   ; WorkerThreadClosure := NEW ( WorkerThreadClosureTyp ) 

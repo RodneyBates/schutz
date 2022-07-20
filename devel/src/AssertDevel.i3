@@ -6,8 +6,11 @@
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
-INTERFACE AssertDevel 
+INTERFACE AssertDevel
 
+; IMPORT RT0 
+
+; IMPORT Failures 
 ; IMPORT MessageCodes 
 ; IMPORT PaintHs 
 
@@ -24,31 +27,31 @@ INTERFACE AssertDevel
   (* Writes messages to stderr and shows them in a dialog box, if
      interactive. *) 
 
-; PROCEDURE WriteCheckpointNoGui  
+; PROCEDURE WriteCheckpointQuiet 
     ( ImageRef : PaintHs . ImageTransientTyp (* Noop if NIL. *) 
-    ; Message : TEXT 
     ; DoCreateVersion : BOOLEAN 
     ) 
   : TEXT (* For display in a dialog box. *) (* May be NIL. *)
-  (* Returns messages, in case caller already has things locked
-     which would try to reacquire the same mutex on same thread.
+  (* Constructs and returns a message, for caller to decide what to do with.
+     The message is EOL-terminated and may have internal EOLs too.
   *)
 
-; PROCEDURE CheckpointForFailure
-    ( CrashCode : MessageCodes . T ; DisplayGui := TRUE )
-  : TEXT (* Message to user. *) 
+(* TODO: Is this really the right place for this procedure? *) 
 
-; PROCEDURE AssertDialogCommandLine 
-    ( String1 : TEXT 
-    ; String2 : TEXT 
-    ; Code : MessageCodes . T 
-    ; DoWriteCheckpoint : BOOLEAN 
-    ) 
-  : BOOLEAN 
-  (* Conduct a command line dialog about an assertion failure. *) 
+; PROCEDURE xxxCheckpointForFailure ( CrashCode : MessageCodes . T )
+  : TEXT (* Message about checkpoint. *) 
 
-; PROCEDURE RuntimeFailureDialog ( ) 
-  (* Conduct a command line dialog about a runtime error. *) 
+; PROCEDURE yyyFailureMessageCommandLine 
+    ( READONLY Act : RT0 . RaiseActivation
+    ; StoppedReason : TEXT 
+    ; CheckpointMsg : TEXT 
+    )
+  (* Write a command line notification of a failure. *) 
+
+; PROCEDURE zzzFailureDialogCommandLine 
+    ( AllowedActions : Failures . FailureActionSetTyp )
+  : Failures . FailureActionTyp
+  (* Conduct a command line dialog about a blocked or uncaught exception. *) 
 
 ; END AssertDevel 
 .
