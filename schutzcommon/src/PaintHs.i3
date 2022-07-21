@@ -268,13 +268,13 @@ INTERFACE PaintHs
 ; PROCEDURE ResetAllLrHasMarkFields ( ImageTrans : ImageTransientTyp ) 
 
 (* Marks *) 
-(* Each image has a doubly linked list of LineMarks. The 
+(* Each image has a doubly linked list of LineMarks. The header 
    of this list is non-information-bearing, of type 
    LineMarkHeaderTyp.  The ImageTransientTyp object has a ref 
    to the header, and it also points back to the image. 
  
-   Each window has three LineMarks of LineMarkMeatTyp, one for 
-   the cursor, and the beginning and end of selected text. 
+   Each window can have five LineMarks of LineMarkMeatTyp, one 
+   of each kind in [MarkSsStartSel .. MarkSsEndMatch].
    The WindowRef has an array of pointers to these, and each 
    points back to the window and also notes which kind of mark 
    it is. 

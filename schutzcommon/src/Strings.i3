@@ -57,26 +57,22 @@ INTERFACE Strings
 ; PROCEDURE FromText 
     ( Txt : TEXT ; EventualLengthHint : StringSsTyp := 0 ) : T 
 
-; PROCEDURE ToText 
-    ( String : T ; From : StringSsTyp := 0 ) : TEXT 
+; PROCEDURE ToText ( String : T ; From : StringSsTyp := 0 ) : TEXT 
     RAISES { Backout } 
 
-; PROCEDURE ToTextNonNIL 
-    ( String : T ; From : StringSsTyp := 0 ) : TEXT 
+; PROCEDURE ToTextNonNIL ( String : T ; From : StringSsTyp := 0 ) : TEXT 
     RAISES { Backout } 
 
 ; PROCEDURE FromChar 
     ( Ch : CHAR ; EventualLengthHint : StringSsTyp := 0 ) : T 
 
 ; PROCEDURE FromChars 
-    ( READONLY Chars : ARRAY OF CHAR 
-    ; EventualLengthHint : StringSsTyp := 0 
-    ) 
-    : T 
+    ( READONLY Chars : ARRAY OF CHAR ; EventualLengthHint : StringSsTyp := 0 ) 
+  : T 
 
 ; PROCEDURE FetchChars 
     ( VAR Chars : ARRAY OF CHAR ; String : T ) 
-    RAISES { Backout } 
+  RAISES { Backout } 
    (* Truncate or leave suffix of Chars unchanged if lengths are # *) 
 
 ; PROCEDURE IthChar 
@@ -88,28 +84,28 @@ INTERFACE Strings
     ; Ch : CHAR 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { SsOutOfBounds , Backout } 
+  RAISES { SsOutOfBounds , Backout } 
 
 ; PROCEDURE AppendInPlace 
     ( VAR (*IN OUT *) Left : T 
     ; Right : T 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { Backout } 
+  RAISES { Backout } 
 
 ; PROCEDURE AppendTextInPlace 
     ( VAR (*IN OUT *) Left : T 
     ; Right : TEXT (* Can be NIL *) 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { Backout } 
+  RAISES { Backout } 
 
 ; PROCEDURE AppendCharInPlace 
     ( VAR (*IN OUT *) Left : T 
     ; Ch : CHAR 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { Backout } 
+  RAISES { Backout } 
 
 ; PROCEDURE MakeEmpty ( VAR String : T ) 
 
@@ -122,11 +118,11 @@ INTERFACE Strings
     ; From : StringSsTyp := 0 
     ; For : StringSsTyp := LAST ( StringSsTyp ) 
     ) : T 
-    RAISES { Backout } 
+  RAISES { Backout } 
 
 ; PROCEDURE TruncateInPlace 
     ( VAR (* IN OUT *) String : T ; ToLength : StringSsTyp ) 
-    RAISES { Backout } 
+  RAISES { Backout } 
   (* Noop if ToLength > Length ( String ) *) 
 
 ; PROCEDURE LeftTruncateInPlace 
@@ -141,7 +137,7 @@ INTERFACE Strings
     ; PrefixLength : StringSsTyp 
     ; DeleteCount : INTEGER 
     ) 
-    RAISES { SsOutOfBounds , Backout } 
+  RAISES { SsOutOfBounds , Backout } 
   (* After the prefix, delete DeleteCount characters, 
      shifting the suffix left and shortening the string 
      by DeleteCount. Attempting to delete beyond the 
@@ -153,15 +149,14 @@ INTERFACE Strings
     ; BlankCount : INTEGER 
     ; EventualLengthHint : StringSsTyp := 0 
     ) 
-    RAISES { SsOutOfBounds , Backout } 
+  RAISES { SsOutOfBounds , Backout } 
   (* After the prefix, insert BlankCount blanks, shifting 
      the suffix right and extending the string by BlankCount *) 
 
 ; TYPE ProcArrayOfChar = PROCEDURE ( READONLY Chars : ARRAY OF CHAR ) 
 
-; PROCEDURE InvokeWithArrayOfChar 
-    ( String : T ; Proc : ProcArrayOfChar ) 
-    RAISES { Backout } 
+; PROCEDURE InvokeWithArrayOfChar ( String : T ; Proc : ProcArrayOfChar ) 
+  RAISES { Backout } 
 
 ; PROCEDURE AreEqual ( Left , Right : T ) : BOOLEAN 
 
@@ -171,13 +166,11 @@ INTERFACE Strings
 
 ; PROCEDURE VerbatimCopy ( Old : T ; VAR New : T ) 
 
-; PROCEDURE PosOf1stNonblank 
-    ( READONLY String : T ) : StringSsTyp 
-    RAISES { Backout } 
+; PROCEDURE PosOf1stNonblank ( READONLY String : T ) : StringSsTyp 
+  RAISES { Backout } 
 
-; PROCEDURE PosOfLastNonblank 
-    ( READONLY String : T ) : StringSsSignedTyp 
-    RAISES { Backout } 
+; PROCEDURE PosOfLastNonblank ( READONLY String : T ) : StringSsSignedTyp 
+  RAISES { Backout } 
 
 ; PROCEDURE AtLeastBlanks ( MinLength : StringSsTyp ) : T 
   RAISES { Backout } 

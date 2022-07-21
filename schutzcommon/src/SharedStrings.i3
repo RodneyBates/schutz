@@ -8,7 +8,11 @@
 
 INTERFACE SharedStrings 
 
-(* Strings of CHAR, taken from several representations, turned into atoms. *) 
+(* Strings of CHAR, taken from several representations, turned into atoms.
+   I.e., if two strings have equal content, then they have equal string
+   numbers.  Each also has a token, inferred from the spelling.
+(* TODO: token codes need to be language-specific. *) 
+*) 
 
 ; IMPORT Word 
 
@@ -40,9 +44,7 @@ INTERFACE SharedStrings
 ; PROCEDURE Hash ( k : T ) : Word . T 
 
 ; PROCEDURE FromString 
-    ( String : Strings . T 
-    ; Tok : LbeStd . TokTyp := LbeStd . Tok__Null 
-    ) 
+    ( String : Strings . T ; Tok : LbeStd . TokTyp := LbeStd . Tok__Null ) 
   : T 
   RAISES { Backout } 
 
@@ -54,9 +56,7 @@ INTERFACE SharedStrings
   RAISES { Backout } 
 
 ; PROCEDURE FromText 
-    ( String : TEXT 
-    ; Tok : LbeStd . TokTyp := LbeStd . Tok__Null 
-    ) 
+    ( String : TEXT ; Tok : LbeStd . TokTyp := LbeStd . Tok__Null ) 
   : T 
   RAISES { Backout } 
 
