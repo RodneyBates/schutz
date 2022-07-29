@@ -610,7 +610,7 @@ UNSAFE MODULE Failures
     InitBackoutRef ( ) 
   ; InitIgnoreRef ( ) 
   ; InitAssertionFailureRef ( )
-  ; GRuntimeErrorRef := RuntimeError . Self ( ) 
+  ; GRuntimeErrorRef := RuntimeError . Self ( )
   ; GOldBackstop := RTException . SetBackstop ( Backstop )
   ; GFailureSync := NEW ( FailureSyncTyp )
   ; GFailureSync . Depth := 0 

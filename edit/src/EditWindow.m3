@@ -18,11 +18,13 @@ MODULE EditWindow
 ; IMPORT PaintOp 
 ; IMPORT Palette 
 ; IMPORT Path 
-; IMPORT Pixmap 
+; IMPORT Pixmap
+; IMPORT PlttFrnds 
 ; IMPORT Point 
 ; IMPORT Rect 
 ; IMPORT Region 
 ; IMPORT ScrnFont 
+; IMPORT ScrnPaintOp  
 ; IMPORT ScrnPixmap 
 ; IMPORT Stdio  
 ; IMPORT Text 
@@ -32,9 +34,9 @@ MODULE EditWindow
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
-; FROM Failures IMPORT Backout  
 ; IMPORT Display 
 ; IMPORT Errors 
+; FROM Failures IMPORT Backout  
 ; IMPORT LbeStd 
 ; IMPORT MessageCodes 
 ; IMPORT Options 
@@ -298,7 +300,19 @@ MODULE EditWindow
 
 ; PROCEDURE PrimaryToReal ( Primary : Options . PrimaryTyp ) : REAL 
 
-  = BEGIN  
+  =
+
+  VAR R1 , R2 , R3 , R4 : REAL
+;
+
+  BEGIN
+
+  R1 := FLOAT ( Primary ) 
+; R2 := FLOAT ( Options . PrimaryMax ) 
+; R3 := R1 / R2  
+
+; R4 := FLOAT ( Primary ) / FLOAT ( Options . PrimaryMax )
+; 
       RETURN FLOAT ( Primary ) / FLOAT ( Options . PrimaryMax ) 
     END PrimaryToReal 
 
@@ -346,7 +360,7 @@ MODULE EditWindow
     END SetBgOps 
 
 ; PROCEDURE SetDecOps ( VAR Ops : PaintOpsTyp ) 
-  (* Initialized Ops with transparent/Fg PaintOps for decorations. *) 
+  (* Initialize Ops with transparent/Fg PaintOps for decorations. *) 
 
   = BEGIN 
       Ops [ PaintHs . TaDecPlain ] 
@@ -375,7 +389,7 @@ MODULE EditWindow
     END SetDecOps 
 
 ; PROCEDURE SetCharOps ( VAR Ops : PaintOpsTyp ) 
-  (* Initialized Ops with transparent/Fg PaintOps for characters. *) 
+  (* Initialize Ops with transparent/Fg PaintOps for characters. *) 
 
   = BEGIN 
       Ops [ PaintHs . TaFgColorPlain ] 
@@ -588,13 +602,13 @@ MODULE EditWindow
       THEN 
         Window . EwFonts [ PaintHs . TaFontPlain ]  
           := Font . FromName
-               ( ARRAY OF TEXT { Options . FontNamePlain } , useXft := FALSE ) 
+               ( ARRAY OF TEXT { Options . FontNamePlain } , useXft := TRUE ) 
       ; Window . EwFonts [ PaintHs . TaFontBold ]  
           := Font . FromName
-               ( ARRAY OF TEXT { Options . FontNameBold } , useXft := FALSE ) 
+               ( ARRAY OF TEXT { Options . FontNameBold } , useXft := TRUE ) 
       ; Window . EwFonts [ PaintHs . TaFontItalic ]  
           := Font . FromName
-               ( ARRAY OF TEXT { Options . FontNameItalic } , useXft := FALSE ) 
+               ( ARRAY OF TEXT { Options . FontNameItalic } , useXft := TRUE ) 
       ; Window . EwFonts [ PaintHs . TaFontBoldItalic ]  
           := Window . EwFonts [ PaintHs . TaFontItalic ]  
 
@@ -609,7 +623,7 @@ MODULE EditWindow
         OF ScrnFont . Spacing . Monospaced
         , ScrnFont . Spacing . CharCell 
      (* , ScrnFont . Spacing . Any *)  
-        => LFontBoundingBox := LMetrics . maxBounds . boundingBox 
+        => LnFontBoundingBox := LMetrics . maxBounds . boundingBox 
         ; Window . EwCharSize 
             := Point . Sub 
                  ( Rect . SouthEast ( LFontBoundingBox ) 
@@ -809,7 +823,7 @@ MODULE EditWindow
     (* Apparently doesn't exist: VBT . Leaf . init ( Window ) *)
       Window . EwForm := Form 
     ; EVAL PaintHs . WindowRefTyp . init ( Window )  
-    ; Window . EwFonts [ PaintHs . TaFontPlain ]  := font 
+    ; Window . EwFonts [ PaintHs . TaFontPlain ] := font 
     ; Window . EwMargin := Point . Max ( Margin , MinMargin ) 
     ; Window . EwVertGap := MAX ( VertGap , MinVertGap ) 
     ; Window . EwDomain := Rect . Empty 
@@ -999,7 +1013,9 @@ MODULE EditWindow
       END PtDecorationLine 
 
   ; BEGIN (* PaintLine *) 
-      VAR LCharPoint : CharPointTyp 
+      VAR LCharPoint : CharPointTyp
+    ; VAR LOp : PaintOp . T
+    ; VAR LScrnOp : ScrnPaintOp . T 
 
     ; BEGIN (* Block for Paint *) 
         IF PaintText = NIL 
@@ -1079,15 +1095,27 @@ MODULE EditWindow
             ELSE (* No decoration to add. *) 
             END (* CASE *) 
 
-          (* Paint the characters.*) 
+          (* Paint the characters.*)
+
+          
+       (* ; LOp := Window . EwPaintOpsChar [ PaintHs . TaFgColorPlain ] experimental *)
+          ; LOp := Window . EwPaintOpsChar [ Attr . TaFgColor ] 
+
+; LScrnOp := Palette . ResolveOp ( Window . st , LOp )
+; Assertions . AssertText
+    ( LScrnOp # NIL , "NIL screen op for " & Fmt . Int ( LOp . op ) ) 
+; Assertions . AssertText
+    ( LScrnOp # PlttFrnds . noOp , "screen noOp for " & Fmt . Int ( LOp . op ) )
+
           ; VBT . PaintText 
-              ( v := Window 
+              ( v := Window  
               , clip := PtBoundingBox    
               , pt := CharToPixel ( Window , LCharPoint ) 
-              , fnt := Window . EwFonts [ Attr . TaFont ]   
+           (* , fnt := Window . EwFonts [ PaintHs . TaFontBold ] experimental. *) 
+              , fnt := Window . EwFonts [ Attr . TaFont ] 
               , t := Text . Sub 
                        ( PaintText , FromSsInString , PtSubstringLength )
-              , op := Window . EwPaintOpsChar [ Attr . TaFgColor ]
+              , op := LOp 
               ) 
           ; PaintInCursor ( Window ) 
           END (* IF *) 

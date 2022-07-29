@@ -139,7 +139,7 @@ INTERFACE Options
 ; VAR FgColorCmnt := RoyalBlue 
 ; VAR FgColorPlaceholder := EPurple  
 
-; VAR DecColorErr := ErrorRed 
+; VAR DecColorErr := EBlue  
 ; VAR DecColorTyped := Butterscotch 
 ; VAR DecColorTouched := GrayBrown  
 
