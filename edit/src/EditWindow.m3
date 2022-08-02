@@ -74,14 +74,6 @@ MODULE EditWindow
           := CharPointTyp { FIRST ( INTEGER ) , FIRST ( INTEGER ) } 
       END (* RECORD *) 
 
-; TYPE PaintOps2DTyp  
-    = ARRAY PaintHs . TextAttrComponentTyp , PaintHs . TextAttrComponentTyp
-      OF PaintOp . T 
-
-; TYPE PaintOpsTyp  
-    = ARRAY PaintHs . TextAttrComponentTyp 
-      OF PaintOp . T 
-
 ; TYPE FontsTyp = ARRAY PaintHs . TextAttrComponentTyp OF Font . T 
 
 ; TYPE RedoStateTyp 
@@ -116,16 +108,6 @@ MODULE EditWindow
                character coordinate origin. *) 
           ; EwOriginCellBoundingBox : Rect . T 
             (* ^Expanded with pixels around the font's cell. *)
-(*REMOVE:             
-          ; EwPaintOpBg : PaintOp . T 
-          ; EwPaintOpBorder : PaintOp . T 
-          ; EwPaintOpFg : PaintOp . T 
-          ; EwPaintOpBgFg : PaintOp . T 
-          ; EwPaintOps2D : PaintOps2DTyp 
-          ; EwPaintOpsBg : PaintOpsTyp 
-          ; EwPaintOpsDec : PaintOpsTyp 
-          ; EwPaintOpsChar : PaintOpsTyp
-*)
           
           ; EwCharsRect 
             : Rect . T (* Where actual characters are displayed. *) 
@@ -351,82 +333,6 @@ MODULE EditWindow
     ; LBlue := PrimaryToReal ( Color . Blue )  
     ; RETURN PaintOp . FromRGB ( LRed , LGreen , LBlue )  
     END PaintOpFromColor 
-
-; PROCEDURE SetBgOps ( VAR Ops : PaintOpsTyp ) 
-  (* Initializes Ops with tint PaintOps for background colors. *) 
-
-  = BEGIN 
-      Ops [ PaintHs . TaBgColorPlain ] 
-        := PaintOpFromColor ( Options . BgColorPlain ) 
-    ; Ops [ PaintHs . TaBgColorCmnt ] 
-        := PaintOpFromColor ( Options . BgColorCmnt ) 
-    ; Ops [ PaintHs . TaBgColorLiteral ] 
-        := PaintOpFromColor ( Options . BgColorLiteral ) 
-    ; Ops [ PaintHs . TaBgColorSelected ] 
-        := PaintOpFromColor ( Options . BgColorSelected ) 
-    ; Ops [ PaintHs . TaBgColorMatched ] 
-        := PaintOpFromColor ( Options . BgColorMatched ) 
-    END SetBgOps 
-
-; PROCEDURE SetDecOps ( VAR Ops : PaintOpsTyp ) 
-  (* Initialize Ops with transparent/Fg PaintOps for decorations. *) 
-
-  = BEGIN 
-      Ops [ PaintHs . TaDecPlain ] 
-        := PaintOp . Pair ( PaintOp . Transparent , PaintOp . Transparent ) 
-      (* ^Defensive.  Probably won't be used. *) 
-    ; Ops [ PaintHs . TaDecStrikeout ] 
-        := PaintOp . Pair 
-             ( PaintOp . Transparent 
-             , PaintOpFromColor ( Options . DecColorErr ) 
-             ) 
-    ; Ops [ PaintHs . TaDecCaret ] 
-        := PaintOp . Pair 
-             ( PaintOp . Transparent 
-             , PaintOpFromColor ( Options . DecColorErr ) 
-             ) 
-    ; Ops [ PaintHs . TaDecUnderline1 ] 
-        := PaintOp . Pair 
-             ( PaintOp . Transparent 
-             , PaintOpFromColor ( Options . DecColorTyped ) 
-             ) 
-    ; Ops [ PaintHs . TaDecUnderline2 ] 
-        := PaintOp . Pair 
-             ( PaintOp . Transparent 
-             , PaintOpFromColor ( Options . DecColorTouched ) 
-             ) 
-    END SetDecOps 
-
-; PROCEDURE SetCharOps ( VAR Ops : PaintOpsTyp ) 
-  (* Initialize Ops with transparent/Fg PaintOps for characters. *) 
-
-  = BEGIN 
-      Ops [ PaintHs . TaFgColorPlain ] 
-        := PaintOp . Pair 
-             ( PaintOp . Transparent 
-             , PaintOpFromColor ( Options . FgColorPlain ) 
-             ) 
-    ; Ops [ PaintHs . TaFgColorIdent ] 
-        := PaintOp . Pair 
-             ( PaintOp . Transparent 
-             , PaintOpFromColor ( Options . FgColorIdent ) 
-             ) 
-    ; Ops [ PaintHs . TaFgColorLiteral ] 
-        := PaintOp . Pair 
-             ( PaintOp . Transparent 
-             , PaintOpFromColor ( Options . FgColorLiteral ) 
-             ) 
-    ; Ops [ PaintHs . TaFgColorCmnt ] 
-        := PaintOp . Pair 
-             ( PaintOp . Transparent 
-             , PaintOpFromColor ( Options . FgColorCmnt ) 
-             ) 
-    ; Ops [ PaintHs . TaFgColorPlaceholder ] 
-        := PaintOp . Pair 
-             ( PaintOp . Transparent 
-             , PaintOpFromColor ( Options . FgColorPlaceholder ) 
-             ) 
-    END SetCharOps 
 
 (*
 ; PROCEDURE TextPaintOp ( Bg , Fg  : PaintHs . TextAttrComponentTyp ) 
@@ -752,65 +658,6 @@ MODULE EditWindow
         ; RAISE Backout
                   ( MessageCodes . Image ( AFT . E_NoFixedFontFound ) ) 
         END (* CASE *)
-(*
-      ; Window . EwPaintOpBg 
-          := PaintOp . FromRGB
-               ( PrimaryToReal ( Options . BgColorPlain . Red )  
-               , PrimaryToReal ( Options . BgColorPlain . Green )  
-               , PrimaryToReal ( Options . BgColorPlain . Blue )  
-               ) 
-     ; Window . EwPaintOpFg 
-          := PaintOp . FromRGB
-               ( PrimaryToReal ( Options . FgColorPlain . Red )  
-               , PrimaryToReal ( Options . FgColorPlain . Green )  
-               , PrimaryToReal ( Options . FgColorPlain . Blue )  
-               ) 
-      ; Window . EwPaintOpBgFg 
-          := PaintOp . Pair 
-               ( Window . EwPaintOpBg , Window . EwPaintOpFg ) 
-      ; Window . EwPaintOpBorder  
-          := PaintOp . FromRGB
-               ( PrimaryToReal ( Options . BgColorBorder . Red )  
-               , PrimaryToReal ( Options . BgColorBorder . Green )  
-               , PrimaryToReal ( Options . BgColorBorder . Blue )  
-               ) 
-      ; SetBgOps ( Window . EwPaintOpsBg ) 
-      ; SetDecOps ( Window . EwPaintOpsDec ) 
-      ; SetCharOps ( Window . EwPaintOpsChar ) 
-(* 
-      ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
-            TO LAST ( PaintHs . TextAttrComponentTyp ) 
-        DO 
-          Window . EwBgDecOpsError 
-            := BgDecPaintOp ( RBg , Options . FgColorError ) 
-        END (* FOR *)   
-      ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
-            TO LAST ( PaintHs . TextAttrComponentTyp ) 
-        DO 
-          Window . EwBgDecOpsTyped 
-            := BgDecPaintOp ( RBg , Options . FgColorTyped ) 
-        END (* FOR *)   
-      ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
-            TO LAST ( PaintHs . TextAttrComponentTyp ) 
-        DO 
-          Window . EwBgDecOpsTouched
-            := BgDecPaintOp ( RBg , Options . FgColorTouched 
-        END (* FOR *)   
-*) 
-(* 
-      ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
-            TO LAST ( PaintHs . TextAttrComponentTyp ) 
-        DO
-          FOR RFg := FIRST ( PaintHs . TextAttrComponentTyp ) 
-              TO LAST ( PaintHs . TextAttrComponentTyp ) 
-          DO
-            Window . EwPaintOps2D [ RBg , RFg ] 
-              := TextPaintOp ( RBg , RFg ) 
-          END 
-        END 
-*)
-
-*)
       ; InitArrows ( Window ) 
       END (* IF *) 
     END ComputeDerivedWindowInfo 
@@ -903,13 +750,22 @@ MODULE EditWindow
         | CursorStateTyp . CsBlinkingOn 
         , CursorStateTyp . CsSolid 
         => VBT . PolyTint 
-            ( Window , WCursor . TranslatedSerifRects , Ui . GDerivedInfoRef ^ . DiPaintOpFg ) 
+            ( Window
+            , WCursor . TranslatedSerifRects
+            , Ui . GDerivedInfoRef ^ . DiPaintOpFg
+            ) 
         ; VBT . PaintTint 
-            ( Window , WCursor . TranslatedVertRect , Ui . GDerivedInfoRef ^ . DiPaintOpFg ) 
+            ( Window
+            , WCursor . TranslatedVertRect
+            , Ui . GDerivedInfoRef ^ . DiPaintOpFg
+            ) 
 
         | CursorStateTyp . CsGrayed 
         => VBT . PolyTint 
-            ( Window , WCursor . TranslatedSerifRects , Ui . GDerivedInfoRef ^ . DiPaintOpFg ) 
+            ( Window
+            , WCursor . TranslatedSerifRects
+            , Ui . GDerivedInfoRef ^ . DiPaintOpFg
+            ) 
         ; VBT . PaintTexture 
             ( Window 
             , WCursor . TranslatedVertRect 
@@ -1041,7 +897,6 @@ MODULE EditWindow
   ; BEGIN (* PaintLine *) 
       VAR LCharPoint : CharPointTyp
     ; VAR LOp : PaintOp . T
-    ; VAR LScrnOp : ScrnPaintOp . T 
 
     ; BEGIN (* Block for PaintLine *) 
         IF PaintText = NIL 
@@ -1103,7 +958,8 @@ MODULE EditWindow
                  , Width := 2 
                  ) 
             | PaintHs . TaDecCaret   
-            => WITH WPaintOp = Ui . GDerivedInfoRef ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
+            => WITH WPaintOp
+                 = Ui . GDerivedInfoRef ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
                DO 
                  PtDecorationLine 
                    ( Window . EwCaretFrom 
@@ -1124,20 +980,11 @@ MODULE EditWindow
           (* Paint the characters.*)
 
           
-       (* ; LOp := Ui . GDerivedInfoRef ^ . DiPaintOpsChar [ PaintHs . TaFgColorPlain ] experimental *)
           ; LOp := Ui . GDerivedInfoRef ^ . DiPaintOpsChar [ Attr . TaFgColor ] 
-
-; LScrnOp := Palette . ResolveOp ( Window . st , LOp )
-; Assertions . AssertText
-    ( LScrnOp # NIL , "NIL screen op for " & Fmt . Int ( LOp . op ) ) 
-; Assertions . AssertText
-    ( LScrnOp # PlttFrnds . noOp , "screen noOp for " & Fmt . Int ( LOp . op ) )
-
           ; VBT . PaintText 
               ( v := Window  
               , clip := PtBoundingBox    
               , pt := CharToPixel ( Window , LCharPoint ) 
-           (* , fnt := Window . EwFonts [ PaintHs . TaFontBold ] experimental. *) 
               , fnt := Window . EwFonts [ Attr . TaFont ] 
               , t := Text . Sub 
                        ( PaintText , FromSsInString , PtSubstringLength )

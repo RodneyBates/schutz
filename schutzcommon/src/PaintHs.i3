@@ -25,6 +25,8 @@ INTERFACE PaintHs
 ; IMPORT ScannerIf 
 ; IMPORT Strings 
 
+<* PRAGMA LL *> 
+
 (* Window sets (of windows into a single image) *) 
 
 ; CONST WindowNoMin = 0 
