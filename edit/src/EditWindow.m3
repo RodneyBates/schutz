@@ -22,7 +22,8 @@ MODULE EditWindow
 ; IMPORT PlttFrnds 
 ; IMPORT Point 
 ; IMPORT Rect 
-; IMPORT Region 
+; IMPORT Region
+; IMPORT RTIO 
 ; IMPORT ScrnFont 
 ; IMPORT ScrnPaintOp  
 ; IMPORT ScrnPixmap 
@@ -186,8 +187,10 @@ MODULE EditWindow
 ; PROCEDURE Form ( Window : T ) : FormsVBT . T 
   (* The FormsVBT.T that this window is inside of. *)    
 
-  = BEGIN 
-      RETURN Window . EwForm 
+  = BEGIN
+      LOCK Window
+      DO RETURN Window . EwForm
+      END (* LOCK *) 
     END Form 
 
 ; VAR DefaultFont := Font . BuiltIn 
@@ -213,14 +216,16 @@ MODULE EditWindow
 ; PROCEDURE CharToPixel 
     ( Window : T ; CharPoint : CharPointTyp ) : Point . T 
 
-  = BEGIN (* CharToPixel *) 
-      RETURN 
-        Point . T 
-          { Window . EwCharOrigin . h 
-            + CharPoint . h * Window . EwCharSeparation . h 
-          , Window . EwCharOrigin . v 
-            + CharPoint . v * Window . EwCharSeparation . v 
-          } 
+  = BEGIN (* CharToPixel *)
+      LOCK Window DO 
+        RETURN 
+          Point . T 
+            { Window . EwCharOrigin . h 
+              + CharPoint . h * Window . EwCharSeparation . h 
+            , Window . EwCharOrigin . v 
+              + CharPoint . v * Window . EwCharSeparation . v 
+            } 
+      END (* LOCK *) 
     END CharToPixel 
 
 ; PROCEDURE PixelOffset 
@@ -228,11 +233,13 @@ MODULE EditWindow
   (* Convert a character point to a pixel point by simple scaling. *) 
 
   = BEGIN (* PixelOffset *) 
-      RETURN 
-        Point . T 
-          { CharPoint . h * Window . EwCharSeparation . h 
-          , CharPoint . v * Window . EwCharSeparation . v 
-          } 
+      LOCK Window DO 
+        RETURN 
+          Point . T 
+            { CharPoint . h * Window . EwCharSeparation . h 
+            , CharPoint . v * Window . EwCharSeparation . v 
+            } 
+      END (* LOCK *) 
     END PixelOffset 
 
 ; <* UNUSED *> 
@@ -622,8 +629,9 @@ MODULE EditWindow
       ; CASE LMetrics . spacing 
         OF ScrnFont . Spacing . Monospaced
         , ScrnFont . Spacing . CharCell 
-     (* , ScrnFont . Spacing . Any *)  
-        => LnFontBoundingBox := LMetrics . maxBounds . boundingBox 
+        , ScrnFont . Spacing . Any   
+        , ScrnFont . Spacing . Proportional    
+        => LFontBoundingBox := LMetrics . maxBounds . boundingBox 
         ; Window . EwCharSize 
             := Point . Sub 
                  ( Rect . SouthEast ( LFontBoundingBox ) 
@@ -807,7 +815,7 @@ MODULE EditWindow
 
 ; VAR MinMargin := Point . T { 6 , 3 } 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE Init 
     ( Window : T  
     ; Form : FormsVBT . T 
@@ -818,37 +826,46 @@ MODULE EditWindow
     ) 
     : T 
   RAISES { Backout } 
+  <* LL.sup < Window *> 
 
-  = BEGIN (* Init *) 
-    (* Apparently doesn't exist: VBT . Leaf . init ( Window ) *)
-      Window . EwForm := Form 
-    ; EVAL PaintHs . WindowRefTyp . init ( Window )  
-    ; Window . EwFonts [ PaintHs . TaFontPlain ] := font 
-    ; Window . EwMargin := Point . Max ( Margin , MinMargin ) 
-    ; Window . EwVertGap := MAX ( VertGap , MinVertGap ) 
-    ; Window . EwDomain := Rect . Empty 
-    ; ComputeDerivedWindowInfo ( Window ) 
-    ; Window . EwOwnsFocus := FALSE 
-    ; Window . EwRedoState := RedoStateTyp . Done 
-    ; Window . EwHasRescreenPending := FALSE  
-    ; Window . EwHasReshapePending := FALSE  
-    ; Window . EwHasRedisplayPending := FALSE  
-    ; Window . EwHasRepaintPending := FALSE  
-    ; Window . EwRedoClosure (* We only need one of these per window. *)  
-        := NEW ( Worker . ClosureTyp 
-               , Window := Window 
-               , apply := RedoWorkProc 
-               ) 
-    ; Display . ClearWindow ( Window ) 
+  = BEGIN (* Init *)
+      IF Window # NIL
+      THEN
+        LOCK Window
+        DO 
+          EVAL PaintHs . WindowRefTyp . init ( Window )  
+          (* Apparently doesn't exist: VBT . Leaf . init ( Window ) *)
+        ; Window . EwForm := Form 
+        ; Window . EwFonts [ PaintHs . TaFontPlain ] := font 
+        ; Window . EwMargin := Point . Max ( Margin , MinMargin ) 
+        ; Window . EwVertGap := MAX ( VertGap , MinVertGap ) 
+        ; Window . EwDomain := Rect . Empty 
+        ; ComputeDerivedWindowInfo ( Window ) 
+        ; Window . EwOwnsFocus := FALSE 
+        ; Window . EwRedoState := RedoStateTyp . Done 
+        ; Window . EwHasRescreenPending := FALSE  
+        ; Window . EwHasReshapePending := FALSE  
+        ; Window . EwHasRedisplayPending := FALSE  
+        ; Window . EwHasRepaintPending := FALSE  
+        ; Window . EwRedoClosure (* We only need one of these per window. *)  
+            := NEW ( Worker . ClosureTyp 
+                   , Window := Window 
+                   , apply := RedoWorkProc 
+                   )
+        END (* LOCK *) 
+      ; Display . ClearWindow ( Window ) 
+      END (* IF *) 
     ; RETURN Window 
     END Init 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SouthEastToCorner ( Window : WindowTyp ) : CharPointTyp 
   (* Follows the usual _to_ invariant, i.e. the first char _not_ included. *) 
 
   = BEGIN (* SouthEastToCorner *) 
-      RETURN Window . EwSouthEastChar 
+      LOCK Window DO 
+        RETURN Window . EwSouthEastChar 
+      END (* LOCK *) 
     END SouthEastToCorner 
 
 ; PROCEDURE PaintCursor ( Window : WindowTyp ; State : CursorStoredStateTyp ) 
@@ -946,7 +963,7 @@ MODULE EditWindow
       END (* CASE *) 
     END PaintInCursor 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE MakeCursorVisible ( Window : WindowTyp ) 
   <* LL . sup < BlinkerLock *> 
 
@@ -961,18 +978,25 @@ MODULE EditWindow
       END (* LOCK *) 
     END MakeCursorVisible 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintWindowBlank ( Window : WindowTyp ) 
   <* LL . sup < Window . mu *> 
 
-  = BEGIN (* PaintWindowBlank *) 
-      VBT . PaintTint 
-        ( Window , Rect . Full , Window . EwPaintOpBorder ) 
-    ; VBT . PaintTint 
-        ( Window , Window . EwCharsRect , Window . EwPaintOpBg ) 
+  = VAR LOpBorder : PaintOp . T 
+  ; VAR LOpBg : PaintOp . T 
+  ; VAR LCharsRect : Rect . T 
+
+  ; BEGIN (* PaintWindowBlank *)
+      LOCK Window
+      DO LOpBorder := Window . EwPaintOpBorder
+      ; LCharsRect := Window . EwCharsRect
+      ; LOpBg := Window . EwPaintOpBg
+      END (* LOCK *) 
+    ; VBT . PaintTint ( Window , Rect . Full , LOpBorder ) 
+    ; VBT . PaintTint ( Window , LCharsRect , LOpBg ) 
     END PaintWindowBlank 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintLine  
     ( Window : WindowTyp 
     ; FromPosInWindow : CharCoordTyp 
@@ -1017,7 +1041,7 @@ MODULE EditWindow
     ; VAR LOp : PaintOp . T
     ; VAR LScrnOp : ScrnPaintOp . T 
 
-    ; BEGIN (* Block for Paint *) 
+    ; BEGIN (* Block for PaintLine *) 
         IF PaintText = NIL 
         THEN PaintText := ""
         END (* IF *) 
@@ -1123,7 +1147,7 @@ MODULE EditWindow
       END (* Block *) 
     END PaintLine  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ClearLine 
     ( Window : WindowTyp 
     ; FromPosInWindow : CharCoordTyp 
@@ -1193,7 +1217,7 @@ MODULE EditWindow
       END (* IF *) 
     END PaintArrow 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintLeftArrow
     ( Window : WindowTyp 
     ; LineNoInWindow : CharCoordTyp 
@@ -1212,7 +1236,7 @@ MODULE EditWindow
         ) 
     END PaintLeftArrow
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintRightArrow 
     ( Window : WindowTyp 
     ; LineNoInWindow : CharCoordTyp 
@@ -1231,7 +1255,7 @@ MODULE EditWindow
         ) 
     END PaintRightArrow 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintBackground 
     ( Window : WindowTyp 
     ; LineNoInWindow : CharCoordTyp 
@@ -1262,7 +1286,7 @@ MODULE EditWindow
     ; PaintInCursor ( Window ) 
     END PaintBackground  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SetCursorPosition 
     ( Window : WindowTyp 
     ; CharPosInWindow : CharCoordTyp 
@@ -1314,7 +1338,7 @@ MODULE EditWindow
       END (* IF *) 
     END SetCursorPosition 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintCursorCoordinates ( Window : WindowTyp ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1344,7 +1368,7 @@ MODULE EditWindow
         )
     END PaintCursorCoordinates 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintInsertMode ( Window : WindowTyp ) 
 
   = VAR LValue : TEXT 
@@ -1372,7 +1396,7 @@ MODULE EditWindow
       END (* IF *) 
     END RedGreenBoolean
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE UpdateVertScroller ( Window : WindowTyp ) 
   <* LL.sup < Window *> 
 
@@ -1432,7 +1456,7 @@ MODULE EditWindow
       END (* IF *) 
     END UpdateVertScroller 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE UpdateHorizScroller ( Window : WindowTyp ) 
   <* LL.sup < Window *> 
 
@@ -1554,7 +1578,7 @@ MODULE EditWindow
       END (* IF *) 
     END SetCursorState 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintText 
     ( <*UNUSED*> Window : WindowTyp ; VbtName : TEXT ; Value : TEXT ) 
 
@@ -1564,7 +1588,7 @@ MODULE EditWindow
       FormsVBT . PutText ( Options . MainForm , VbtName , Value ) 
     END PaintText  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintWindowState 
     ( Window : WindowTyp ; VbtName : TEXT ; State : INTEGER ) 
 
@@ -1575,7 +1599,7 @@ MODULE EditWindow
         ( Form ( Window )  , VbtName , ORD ( State ) ) 
     END PaintWindowState 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintWindowSavedState ( Window : WindowTyp ; State : BOOLEAN ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1585,7 +1609,7 @@ MODULE EditWindow
         ( Form ( Window ) , "Fv_Modified" , ORD ( NOT State ) ) 
     END PaintWindowSavedState 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE Beep ( ) 
 
   = BEGIN (* Beep *) 
@@ -1622,7 +1646,7 @@ MODULE EditWindow
       END (* IF *) 
     END TakeKBFocusLocked 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE TakeKBFocus 
    ( Window : WindowTyp ; TimeStamp : VBT . TimeStamp ) 
   <* LL . sup < Window . mu *> 
@@ -1633,7 +1657,7 @@ MODULE EditWindow
       END (* LOCK *) 
     END TakeKBFocus 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ScreenSelection ( ) : VBT . Selection 
 
   = BEGIN 
@@ -1690,7 +1714,7 @@ MODULE EditWindow
       END (* IF *) 
     END MouseClickWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ReplayMouseClickPixel 
     ( Window : WindowTyp ; H : INTEGER ; V : INTEGER ) 
 
@@ -1712,7 +1736,7 @@ MODULE EditWindow
       END (* TRY EXCEPT *) 
     END ReplayMouseClickPixel  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ReplayMouseClickChar 
     ( Window : WindowTyp ; H : INTEGER ; V : INTEGER ) 
 
@@ -1810,7 +1834,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END ClearSelectionWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ReplayClearSelection ( ) 
 
   = BEGIN 
@@ -1869,7 +1893,7 @@ MODULE EditWindow
     ; GSweeping := FALSE 
     END EndSweepSelection 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ReplayEndSweepSelection ( Window : WindowTyp ) 
   <* LL . sup < Window . mu *> 
 
@@ -1950,7 +1974,7 @@ MODULE EditWindow
       END (* IF *) 
     END SweepSelectionWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ReplaySweepSelection 
     ( Window : WindowTyp ; H : INTEGER ; V : INTEGER ) 
 
@@ -2513,7 +2537,7 @@ MODULE EditWindow
     ; RecordInsertMode ( Closure . BoolParam ) 
     END SetInsertModeWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ReplaySetInsertMode ( Window : WindowTyp ; Value : BOOLEAN ) 
 
   = BEGIN 
@@ -2542,7 +2566,7 @@ MODULE EditWindow
     ; RecordInsertMode ( LIsInsert ) 
     END ToggleInsertModeWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ToggleInsertMode ( Window : WindowTyp ) 
 
   = BEGIN
@@ -2828,6 +2852,10 @@ MODULE EditWindow
       END (* IF *) 
     END Key 
 
+(* =================== Rescreen, reshape, repaint, etc.================= *)
+
+; VAR GLogEvents : BOOLEAN := TRUE 
+
 ; PROCEDURE RedoWorkProc ( Closure : Worker . ClosureTyp ) 
   RAISES { Backout , Thread . Alerted } 
 
@@ -2835,89 +2863,94 @@ MODULE EditWindow
   ; VAR LDoReshape : BOOLEAN 
   ; VAR LDoRepaint : BOOLEAN 
   ; VAR LOldSize : Point . T 
+  ; VAR LNewSize : Point . T 
   ; VAR LRegion : Region . T 
   ; VAR LTrailingBlankLines : LbeStd . LineNoTyp 
   ; VAR LLinesRef : PaintHs . LinesRefMeatTyp 
   ; VAR LLineNo : LbeStd . LineNoSignedTyp 
 
   ; BEGIN
-      LOCK Closure . Window 
-      DO 
-        LDoRescreen := Closure . Window . EwHasRescreenPending 
-      ; IF LDoRescreen 
-        THEN (* Really rescreen, all while holding the window lock. *) 
-          Closure . Window . EwScreenType 
-            := Closure . Window . EwPendingRescreenRec . st 
+      IF GLogEvents THEN RTIO . PutText ( "In RedoWorkProc: " ) END (* IF *) 
+    ; LOCK Closure . Window 
+      DO LDoRescreen := Closure . Window . EwHasRescreenPending
+      ; IF LDoRescreen
+        THEN 
+          IF GLogEvents THEN RTIO . PutText ( " rescreening" ) END (* IF *) 
+        ; Closure . Window . EwRedoState := RedoStateTyp . Rescreening  
+        ; Closure . Window . EwScreenType 
+            := Closure . Window . EwPendingRescreenRec . st
+        (* Let's assume Trestle won't rescreen unless st actually changes. *)
         ; Closure . Window . EwDomain := Rect . Empty 
         ; Closure . Window . EwHasRescreenPending := FALSE 
         END (* IF *) 
-      ; Closure . Window . EwRedoState := RedoStateTyp . Rescreening  
       END (* LOCK *) 
     ; IF LDoRescreen 
       THEN 
 (* CHECK: Do we want to record and replay rescreen? *) 
-      END (* IF *) 
+      END (* IF *)
+      
     ; LOCK Closure . Window 
-      DO 
-        LDoReshape := Closure . Window . EwHasReshapePending 
-      ; IF LDoReshape 
+      DO IF Closure . Window . EwHasReshapePending 
         THEN 
-          Closure . Window . EwDomain 
+          IF GLogEvents THEN RTIO . PutText ( " reshaping" ) END (* IF *) 
+        ; Closure . Window . EwRedoState := RedoStateTyp . Reshaping  
+        ; Closure . Window . EwDomain 
             := Closure . Window . EwPendingReshapeRec . new 
+        ; LOldSize := Closure . Window . EwSouthEastChar 
+        ; ComputeDerivedWindowInfo ( Closure . Window ) 
+        ; LNewSize := Closure . Window . EwSouthEastChar
+        ; LDoReshape := LNewSize # LOldSize
         ; Closure . Window . EwHasReshapePending := FALSE 
         END (* IF *) 
-      ; Closure . Window . EwRedoState := RedoStateTyp . Reshaping  
       END (* LOCK *) 
     ; IF LDoReshape 
-      THEN (* Finally, we really reshape. *) 
-        LOldSize := Closure . Window . EwSouthEastChar 
-      ; ComputeDerivedWindowInfo ( Closure . Window ) 
-      ; IF Closure . Window . EwSouthEastChar # LOldSize 
-        THEN 
-          Display . ReshapeWindowRef 
-            ( Closure . Window 
-            , LOldSize 
-            , Closure . Window . EwSouthEastChar 
-            ) 
-        END (* IF *) 
+      THEN (* Do the reshape on the worker thread, without the lock. *) 
+        IF GLogEvents THEN RTIO . PutText ( "(changed)" ) END (* IF *) 
+      ; Display . ReshapeWindowRef ( Closure . Window , LOldSize , LNewSize ) 
 (* CHECK: Do we want to record and replay reshape? *) 
-      END (* IF *) 
+      END (* IF *)
+      
     ; LOCK Closure . Window 
-      DO 
-        LDoRepaint := Closure . Window . EwHasRepaintPending 
-      ; IF LDoRepaint 
+      DO IF Closure . Window . EwHasRepaintPending 
         THEN 
-          LRegion := Closure . Window . EwPendingRepaintRegion 
+          IF GLogEvents THEN RTIO . PutText ( " repainting" ) END (* IF *) 
+        ; Closure . Window . EwRedoState := RedoStateTyp . Repainting  
+        ; LRegion := Closure . Window . EwPendingRepaintRegion 
           (* Maybe someday repaint will want this. *) 
-        ; Closure . Window . EwHasRepaintPending := FALSE 
+        ; LDoRepaint
+            := Closure . Window . EwScreenType # NIL 
+               AND NOT Rect . IsEmpty ( Closure . Window . EwDomain ) 
+        ; Closure . Window . EwHasRepaintPending := FALSE
         END (* IF *) 
-      ; Closure . Window . EwRedoState := RedoStateTyp . Repainting  
       END (* LOCK *) 
     ; IF LDoRepaint 
-      THEN (* Finally, we really repaint. *) 
-        IF Closure . Window . EwScreenType # NIL 
-           AND NOT Rect . IsEmpty ( Closure . Window . EwDomain ) 
-        THEN 
-          Display . PaintWindowFromLines 
-            ( Closure . Window 
-            , (* VAR *) LTrailingBlankLines (* Dead. *) 
-            , (* VAR *) LLinesRef (* Dead. *) 
-            , (* VAR *) LLineNo  (* Dead. *) 
-            )
-        END (* IF *) 
+      THEN (* Do the repaint on the worker thread, without the lock. *)
+        IF GLogEvents THEN RTIO . PutText ( "(nonempty)" ) END (* IF *) 
+      ; Display . PaintWindowFromLines 
+          ( Closure . Window 
+          , (* VAR *) LTrailingBlankLines (* Dead. *) 
+          , (* VAR *) LLinesRef (* Dead. *) 
+          , (* VAR *) LLineNo  (* Dead. *) 
+          )
 (* CHECK: Do we want to record and replay repaint? *) 
-      END (* IF *) 
+      END (* IF *)
+     
     ; LOCK Closure . Window 
-      DO 
-        Closure . Window . EwRedoState := RedoStateTyp . Done   
+      DO Closure . Window . EwRedoState := RedoStateTyp . Done   
       END (* LOCK *) 
+    ; IF GLogEvents
+      THEN
+        RTIO . PutText ( " end." )
+      ; RTIO . PutText ( Wr . EOL ) 
+      ; RTIO . Flush ( )
+      END (* IF *)
     END RedoWorkProc 
 
 ; TYPE WorkerClosureRescreenTyp
     = Worker . ClosureTyp OBJECT Rescreen : VBT . RescreenRec END 
 
 ; <* UNUSED *> 
-(* CHECK: Wil we need it someday? *) 
+(* CHECK: Will we need it someday? *) 
   PROCEDURE RescreenWorkProc ( Closure : WorkerClosureRescreenTyp )  
   <* LL.sup = VBT.mu.Window *> 
   (* PRE: Closure . Window, RescreenRec are set. *) 
@@ -2935,7 +2968,13 @@ MODULE EditWindow
   <* LL.sup = VBT.mu.Window *> 
 
   = BEGIN (* Rescreen *) 
-      LOCK Window 
+      IF GLogEvents
+      THEN
+        RTIO . PutText ( "Rescreen Callback. " )
+      ; RTIO . PutText ( Wr . EOL ) 
+      ; RTIO . Flush ( ) 
+      END (* IF *) 
+    ; LOCK Window 
       DO
         Window . EwHasRescreenPending := TRUE  
       ; Window . EwPendingRescreenRec := RescreenRec 
@@ -2943,7 +2982,7 @@ MODULE EditWindow
       ; Window . EwHasRepaintPending := FALSE (* Cancel *) 
       ; CASE Window . EwRedoState 
         OF RedoStateTyp . Starting 
-        => (* Let it proceed. It will get to the Rescreen. *) 
+        => (* Let RedoWorkProc proceed. It will get to the Rescreen. *) 
         | RedoStateTyp . Rescreening  
         , RedoStateTyp . Reshaping 
         , RedoStateTyp . Repainting 
@@ -2973,18 +3012,19 @@ MODULE EditWindow
   (* On worker thread. *) 
 
   = VAR LOldSize : Point . T 
+  ; VAR LNewSize : Point . T 
 
-  ; BEGIN (* ReshapeWorkProc *) 
-      LOldSize := Closure . Window . EwSouthEastChar 
-    ; Closure . Window . EwDomain := Closure . Reshape . new 
-    ; ComputeDerivedWindowInfo ( Closure . Window ) 
-    ; IF Closure . Window . EwSouthEastChar # LOldSize 
+  ; BEGIN (* ReshapeWorkProc *)
+      LOCK Closure . Window
+      DO 
+        LOldSize := Closure . Window . EwSouthEastChar 
+      ; Closure . Window . EwDomain := Closure . Reshape . new 
+      ; ComputeDerivedWindowInfo ( Closure . Window ) 
+      ; LNewSize := Closure . Window . EwSouthEastChar
+      END (* LOCK *) 
+    ; IF LNewSize # LOldSize 
       THEN 
-        Display . ReshapeWindowRef 
-          ( Closure . Window 
-          , LOldSize 
-          , Closure . Window . EwSouthEastChar 
-          ) 
+        Display . ReshapeWindowRef ( Closure . Window , LOldSize , LNewSize ) 
       END (* IF *) 
 (* CHECK: Do we want to record and replay reshape? *) 
     END ReshapeWorkProc 
@@ -2995,7 +3035,13 @@ MODULE EditWindow
   <* LL.sup = VBT.mu.Window *> 
 
   = BEGIN (* Reshape   *) 
-      LOCK Window 
+      IF GLogEvents
+      THEN
+        RTIO . PutText ( "Reshape Callback. " )
+      ; RTIO . PutText ( Wr . EOL ) 
+      ; RTIO . Flush ( ) 
+      END (* IF *) 
+    ; LOCK Window 
       DO
         Window . EwHasReshapePending := TRUE 
       ; Window . EwPendingReshapeRec := ReshapeRec 
@@ -3003,7 +3049,7 @@ MODULE EditWindow
       ; CASE Window . EwRedoState 
         OF RedoStateTyp . Starting 
         , RedoStateTyp . Rescreening  
-        => (* Let it proceed. It will get to the Reshape. *) 
+        => (* Let RedoWorkProc proceed. It will get to the Reshape. *) 
         | RedoStateTyp . Reshaping 
         , RedoStateTyp . Repainting 
         , RedoStateTyp . Done 
@@ -3030,11 +3076,16 @@ MODULE EditWindow
 
   = VAR LTrailingBlankLines : LbeStd . LineNoTyp 
   ; VAR LLinesRef : PaintHs . LinesRefMeatTyp 
-  ; VAR LLineNo : LbeStd . LineNoSignedTyp 
+  ; VAR LLineNo : LbeStd . LineNoSignedTyp
+  ; VAR LDoRepaint : BOOLEAN 
 
   ; BEGIN (* RepaintWorkProc *) 
-      IF Closure . Window . EwScreenType # NIL 
-         AND NOT Rect . IsEmpty ( Closure . Window . EwDomain ) 
+      LOCK Closure . Window
+      DO LDoRepaint
+           := Closure . Window . EwScreenType # NIL 
+              AND NOT Rect . IsEmpty ( Closure . Window . EwDomain )
+      END (* LOCK *)
+    ; IF LDoRepaint 
       THEN 
         Display . PaintWindowFromLines 
           ( Closure . Window 
@@ -3052,7 +3103,13 @@ MODULE EditWindow
   <* LL.sup = VBT.mu.Window *> 
 
   = BEGIN (* Repaint   *) 
-      LOCK Window 
+      IF GLogEvents
+      THEN
+        RTIO . PutText ( "Repaint Callback. " )
+      ; RTIO . PutText ( Wr . EOL ) 
+      ; RTIO . Flush ( ) 
+      END (* IF *) 
+    ; LOCK Window 
       DO
         Window . EwHasRepaintPending := TRUE 
       ; Window . EwPendingRepaintRegion := Region 
@@ -3060,7 +3117,7 @@ MODULE EditWindow
         OF RedoStateTyp . Starting 
         , RedoStateTyp . Rescreening  
         , RedoStateTyp . Reshaping 
-        => (* Let it proceed. It will get to the Repaint. *) 
+        => (* Let RedoWorkProc proceed. It will get to the Repaint. *) 
         | RedoStateTyp . Repainting 
         , RedoStateTyp . Done 
         => (* Start it over.  This will cancel it if already running. *)  
@@ -3182,7 +3239,7 @@ MODULE EditWindow
       END (* TRY EXCEPT *) 
     END Discard 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE BeginPaintGroup ( Window : WindowTyp ) 
   <* LL . sup < Window . mu *> 
 
@@ -3190,7 +3247,7 @@ MODULE EditWindow
       VBT . BeginGroup ( Window ) 
     END BeginPaintGroup 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE EndPaintGroup ( Window : WindowTyp ) 
   <* LL . sup < Window . mu *> 
 

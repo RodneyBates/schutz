@@ -44,7 +44,8 @@ INTERFACE EditWindow
     ; VertGap : PixelCoordTyp := MinVertGap 
     ) 
   : T 
-  RAISES { Backout } 
+  RAISES { Backout }
+  <* LL.sup < Window *> 
 
 ; TYPE CursorStateTyp 
     = { CsBlinkingOff   (* Used only in stored state *) 

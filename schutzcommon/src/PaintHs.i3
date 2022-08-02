@@ -598,7 +598,7 @@ INTERFACE PaintHs
         ; WrSearchForm : FormsVBT . T := NIL (* For separate search window. *) 
         METHODS
           init ( ) : WindowRefTyp 
-(* CHECK: ^Maybe this should not be a method? *) 
+          <* LL.sup = SELF *> 
         END (* OBJECT WindowPublic *) 
 
 ; TYPE WindowRefTyp <: WindowPublic 

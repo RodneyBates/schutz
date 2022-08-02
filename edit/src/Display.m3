@@ -1026,7 +1026,7 @@ MODULE Display
           ) 
       END (* IF *) 
     ; EditWindow . EndPaintGroup ( WindowRef ) 
-    END InnerPaintLine
+    END InnerPaintLine 
  
 (* VISIBLE: *) 
 ; PROCEDURE PaintTempEditedLine 

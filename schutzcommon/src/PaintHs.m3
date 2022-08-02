@@ -36,6 +36,7 @@ MODULE PaintHs
       END (* OBJECT *) 
 
 ; PROCEDURE InitWindowRef ( Self : WindowRefTyp ) : WindowRefTyp 
+  <* LL.sup = Self *> 
 
   = BEGIN      
       Self . WrImageLink := NIL 
@@ -59,7 +60,7 @@ MODULE PaintHs
     END InitWindowRef 
 
 (* VISIBLE: *) 
-; PROCEDURE TextAttrIsEqual ( Left , Right : TextAttrTyp ) : BOOLEAN 
+; PROCEDURE TextAttrIsEqual ( VALUE Left , Right : TextAttrTyp ) : BOOLEAN 
   (* Equal, except for the TaCharPos field. *) 
 
   = BEGIN 
