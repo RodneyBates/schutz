@@ -8,6 +8,8 @@
 
 INTERFACE Ui 
 
+; IMPORT Font 
+; IMPORT PaintOp 
 ; IMPORT Thread 
 ; IMPORT VBT 
 
@@ -19,6 +21,36 @@ INTERFACE Ui
 ; IMPORT Worker 
 
 <* PRAGMA LL *>
+
+(* User interface appearance things of single-instance. *)
+
+; TYPE PaintOpsTyp  
+    = ARRAY PaintHs . TextAttrComponentTyp 
+      OF PaintOp . T 
+
+; TYPE PaintOps2DTyp  
+    = ARRAY PaintHs . TextAttrComponentTyp , PaintHs . TextAttrComponentTyp
+      OF PaintOp . T 
+
+; TYPE FontsTyp = ARRAY PaintHs . TextAttrComponentTyp OF Font . T 
+
+; TYPE DerivedInfoRefTyp = REF DerivedInfoTyp 
+
+; TYPE DerivedInfoTyp 
+    = RECORD
+        DiPaintOpBg : PaintOp . T 
+      ; DiPaintOpBorder : PaintOp . T 
+      ; DiPaintOpFg : PaintOp . T 
+      ; DiPaintOpBgFg : PaintOp . T 
+      ; DiPaintOps2D : PaintOps2DTyp 
+      ; DiPaintOpsBg : PaintOpsTyp 
+      ; DiPaintOpsDec : PaintOpsTyp 
+      ; DiPaintOpsChar : PaintOpsTyp 
+      END (* DerivedInfoTyp *)
+
+; VAR GDerivedInfoRef : DerivedInfoRefTyp
+
+; PROCEDURE ComputeDerivedInfo ( Info : DerivedInfoRefTyp )
 
 ; PROCEDURE ReplayFileOpen ( FileName : TEXT ) 
 

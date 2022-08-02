@@ -72,7 +72,6 @@ MODULE EditWindow
       ; SavedPixmap : ScrnPixmap . T := NIL 
       ; CharPoint : CharPointTyp 
           := CharPointTyp { FIRST ( INTEGER ) , FIRST ( INTEGER ) } 
-      ; PaintOpBg : PaintOp . T 
       END (* RECORD *) 
 
 ; TYPE PaintOps2DTyp  
@@ -116,7 +115,8 @@ MODULE EditWindow
             (* ^Bounding box in pixel coordinates of the character at the 
                character coordinate origin. *) 
           ; EwOriginCellBoundingBox : Rect . T 
-            (* ^Expanded with pixels around the font's cell. *) 
+            (* ^Expanded with pixels around the font's cell. *)
+(*REMOVE:             
           ; EwPaintOpBg : PaintOp . T 
           ; EwPaintOpBorder : PaintOp . T 
           ; EwPaintOpFg : PaintOp . T 
@@ -124,7 +124,9 @@ MODULE EditWindow
           ; EwPaintOps2D : PaintOps2DTyp 
           ; EwPaintOpsBg : PaintOpsTyp 
           ; EwPaintOpsDec : PaintOpsTyp 
-          ; EwPaintOpsChar : PaintOpsTyp 
+          ; EwPaintOpsChar : PaintOpsTyp
+*)
+          
           ; EwCharsRect 
             : Rect . T (* Where actual characters are displayed. *) 
           ; EwSouthEastChar : CharPointTyp 
@@ -709,8 +711,7 @@ MODULE EditWindow
                    { Rect . FromPoint 
                        ( Point . T 
                            { h := Window . EwOriginCharBoundingBox . west - 2 
-                           , v := Window . EwOriginCharBoundingBox . north 
-                                  - 2 
+                           , v := Window . EwOriginCharBoundingBox . north - 2 
                            } 
                        ) 
                    , Rect . FromPoint 
@@ -723,8 +724,7 @@ MODULE EditWindow
                    , Rect . FromPoint 
                        ( Point . T 
                            { h := Window . EwOriginCharBoundingBox . west - 2 
-                           , v := Window . EwOriginCharBoundingBox . south 
-                                  + 1 
+                           , v := Window . EwOriginCharBoundingBox . south + 1 
                            } 
                        ) 
                    , Rect . FromPoint 
@@ -751,7 +751,8 @@ MODULE EditWindow
         ; Assertions . DoTerminate := TRUE 
         ; RAISE Backout
                   ( MessageCodes . Image ( AFT . E_NoFixedFontFound ) ) 
-        END (* CASE *) 
+        END (* CASE *)
+(*
       ; Window . EwPaintOpBg 
           := PaintOp . FromRGB
                ( PrimaryToReal ( Options . BgColorPlain . Red )  
@@ -773,7 +774,6 @@ MODULE EditWindow
                , PrimaryToReal ( Options . BgColorBorder . Green )  
                , PrimaryToReal ( Options . BgColorBorder . Blue )  
                ) 
-      ; Window . EwCursor . PaintOpBg := Window . EwPaintOpBg  
       ; SetBgOps ( Window . EwPaintOpsBg ) 
       ; SetDecOps ( Window . EwPaintOpsDec ) 
       ; SetCharOps ( Window . EwPaintOpsChar ) 
@@ -808,7 +808,9 @@ MODULE EditWindow
               := TextPaintOp ( RBg , RFg ) 
           END 
         END 
-*) 
+*)
+
+*)
       ; InitArrows ( Window ) 
       END (* IF *) 
     END ComputeDerivedWindowInfo 
@@ -881,13 +883,13 @@ MODULE EditWindow
           THEN 
             VBT . PolyTint 
               ( Window 
-              , WCursor . TranslatedSerifRects 
-              , Window . EwCursor . PaintOpBg 
+              , WCursor . TranslatedSerifRects
+              , Ui . GDerivedInfoRef ^ . DiPaintOpBg 
               ) 
           ; VBT . PaintTint 
               ( Window 
               , WCursor . TranslatedVertRect 
-              , Window . EwCursor . PaintOpBg 
+              , Ui . GDerivedInfoRef ^ . DiPaintOpBg 
               ) 
           ELSE 
             VBT . PaintScrnPixmap 
@@ -901,17 +903,17 @@ MODULE EditWindow
         | CursorStateTyp . CsBlinkingOn 
         , CursorStateTyp . CsSolid 
         => VBT . PolyTint 
-            ( Window , WCursor . TranslatedSerifRects , Window . EwPaintOpFg ) 
+            ( Window , WCursor . TranslatedSerifRects , Ui . GDerivedInfoRef ^ . DiPaintOpFg ) 
         ; VBT . PaintTint 
-            ( Window , WCursor . TranslatedVertRect , Window . EwPaintOpFg ) 
+            ( Window , WCursor . TranslatedVertRect , Ui . GDerivedInfoRef ^ . DiPaintOpFg ) 
 
         | CursorStateTyp . CsGrayed 
         => VBT . PolyTint 
-            ( Window , WCursor . TranslatedSerifRects , Window . EwPaintOpFg ) 
+            ( Window , WCursor . TranslatedSerifRects , Ui . GDerivedInfoRef ^ . DiPaintOpFg ) 
         ; VBT . PaintTexture 
             ( Window 
             , WCursor . TranslatedVertRect 
-            , Window . EwPaintOpBgFg 
+            , Ui . GDerivedInfoRef ^ . DiPaintOpBgFg 
             , Pixmap . Gray 
             ) 
         END (* CASE *) 
@@ -988,9 +990,9 @@ MODULE EditWindow
 
   ; BEGIN (* PaintWindowBlank *)
       LOCK Window
-      DO LOpBorder := Window . EwPaintOpBorder
+      DO LOpBorder := Ui . GDerivedInfoRef ^ . DiPaintOpBorder
       ; LCharsRect := Window . EwCharsRect
-      ; LOpBg := Window . EwPaintOpBg
+      ; LOpBg := Ui . GDerivedInfoRef ^ . DiPaintOpBg
       END (* LOCK *) 
     ; VBT . PaintTint ( Window , Rect . Full , LOpBorder ) 
     ; VBT . PaintTint ( Window , LCharsRect , LOpBg ) 
@@ -1078,7 +1080,7 @@ MODULE EditWindow
           ; VBT . PaintTint 
               ( v := Window 
               , clip := PtBoundingBox 
-              , op := Window . EwPaintOpsBg [ Attr . TaBgColor ] 
+              , op := Ui . GDerivedInfoRef ^ . DiPaintOpsBg [ Attr . TaBgColor ] 
               ) 
 
           (* Paint decoration, under the characters. *) 
@@ -1089,7 +1091,7 @@ MODULE EditWindow
             => PtDecorationLine 
                  ( Window . EwStrikeoutFrom 
                  , Window . EwStrikeoutThru 
-                 , Window . EwPaintOpsDec [ Attr . TaDecoration ] 
+                 , Ui . GDerivedInfoRef ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
                  , Width := 2 
                  ) 
             | PaintHs . TaDecUnderline1   
@@ -1097,11 +1099,11 @@ MODULE EditWindow
             => PtDecorationLine 
                  ( Window . EwUnderlineFrom 
                  , Window . EwUnderlineThru 
-                 , Window . EwPaintOpsDec [ Attr . TaDecoration ] 
+                 , Ui . GDerivedInfoRef ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
                  , Width := 2 
                  ) 
             | PaintHs . TaDecCaret   
-            => WITH WPaintOp = Window . EwPaintOpsDec [ Attr . TaDecoration ] 
+            => WITH WPaintOp = Ui . GDerivedInfoRef ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
                DO 
                  PtDecorationLine 
                    ( Window . EwCaretFrom 
@@ -1122,8 +1124,8 @@ MODULE EditWindow
           (* Paint the characters.*)
 
           
-       (* ; LOp := Window . EwPaintOpsChar [ PaintHs . TaFgColorPlain ] experimental *)
-          ; LOp := Window . EwPaintOpsChar [ Attr . TaFgColor ] 
+       (* ; LOp := Ui . GDerivedInfoRef ^ . DiPaintOpsChar [ PaintHs . TaFgColorPlain ] experimental *)
+          ; LOp := Ui . GDerivedInfoRef ^ . DiPaintOpsChar [ Attr . TaFgColor ] 
 
 ; LScrnOp := Palette . ResolveOp ( Window . st , LOp )
 ; Assertions . AssertText
@@ -1172,7 +1174,7 @@ MODULE EditWindow
     ; VBT . PaintTint 
         ( v := Window 
         , clip := LBoundingBox 
-        , op := Window . EwPaintOpBg 
+        , op := Ui . GDerivedInfoRef ^ . DiPaintOpBg 
         ) 
     ; PaintInCursor ( Window ) 
     END ClearLine 
@@ -1212,7 +1214,7 @@ MODULE EditWindow
       ; VBT . PaintTint 
           ( v := Window 
           , clip := LBoundingBox 
-          , op := Window . EwPaintOpBorder
+          , op := Ui . GDerivedInfoRef ^ . DiPaintOpBorder
           ) 
       END (* IF *) 
     END PaintArrow 
@@ -1281,7 +1283,7 @@ MODULE EditWindow
     ; VBT . PaintTint 
         ( v := Window 
         , clip := LBoundingBox 
-        , op := Window . EwPaintOpsBg [ BgColor ] 
+        , op := Ui . GDerivedInfoRef ^ . DiPaintOpsBg [ BgColor ] 
         ) 
     ; PaintInCursor ( Window ) 
     END PaintBackground  

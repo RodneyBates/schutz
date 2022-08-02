@@ -10,7 +10,8 @@ MODULE Ui
 
 (* Library: *) 
 ; IMPORT Font 
-; IMPORT FormsVBT 
+; IMPORT FormsVBT
+; IMPORT PaintOp 
 ; IMPORT Pathname 
 ; IMPORT Rd  
 ; IMPORT Rsrc 
@@ -53,6 +54,183 @@ MODULE Ui
 
 <* PRAGMA LL *> 
 
+(* ======================= Painting operators. ======================== *)
+
+; PROCEDURE PrimaryToReal ( Primary : Options . PrimaryTyp ) : REAL 
+
+  = VAR R1 , R2 , R3 , R4 : REAL
+  ; BEGIN
+      R1 := FLOAT ( Primary ) 
+    ; R2 := FLOAT ( Options . PrimaryMax ) 
+    ; R3 := R1 / R2  
+    ; R4 := FLOAT ( Primary ) / FLOAT ( Options . PrimaryMax )
+    ; RETURN FLOAT ( Primary ) / FLOAT ( Options . PrimaryMax ) 
+    END PrimaryToReal 
+
+; <* UNUSED *> (* But maybe needed someday. *) 
+  PROCEDURE RealColor 
+    ( Color : Options . ColorTyp 
+    ; VAR Red : REAL 
+    ; VAR Green : REAL 
+    ; VAR Blue : REAL 
+    ) 
+
+  = BEGIN 
+      Red := PrimaryToReal ( Color . Red ) 
+    ; Green := PrimaryToReal ( Color . Green ) 
+    ; Blue := PrimaryToReal ( Color . Blue )  
+    END RealColor 
+
+; PROCEDURE PaintOpFromColor ( Color : Options . ColorTyp ) : PaintOp . T 
+
+  = VAR LRed : REAL 
+  ; VAR LGreen : REAL 
+  ; VAR LBlue : REAL 
+
+  ; BEGIN 
+      LRed := PrimaryToReal ( Color . Red ) 
+    ; LGreen := PrimaryToReal ( Color . Green ) 
+    ; LBlue := PrimaryToReal ( Color . Blue )  
+    ; RETURN PaintOp . FromRGB ( LRed , LGreen , LBlue )  
+    END PaintOpFromColor 
+
+; PROCEDURE SetBgOps ( VAR Ops : PaintOpsTyp ) 
+  (* Initialize Ops with tint PaintOps for background colors. *) 
+
+  = BEGIN 
+      Ops [ PaintHs . TaBgColorPlain ] 
+        := PaintOpFromColor ( Options . BgColorPlain ) 
+    ; Ops [ PaintHs . TaBgColorCmnt ] 
+        := PaintOpFromColor ( Options . BgColorCmnt ) 
+    ; Ops [ PaintHs . TaBgColorLiteral ] 
+        := PaintOpFromColor ( Options . BgColorLiteral ) 
+    ; Ops [ PaintHs . TaBgColorSelected ] 
+        := PaintOpFromColor ( Options . BgColorSelected ) 
+    ; Ops [ PaintHs . TaBgColorMatched ] 
+        := PaintOpFromColor ( Options . BgColorMatched ) 
+    END SetBgOps 
+
+; PROCEDURE SetDecOps ( VAR Ops : PaintOpsTyp ) 
+  (* Initialize Ops with transparent/Fg PaintOps for decorations. *) 
+
+  = BEGIN 
+      Ops [ PaintHs . TaDecPlain ] 
+        := PaintOp . Pair ( PaintOp . Transparent , PaintOp . Transparent ) 
+      (* ^Defensive.  Probably won't be used. *) 
+    ; Ops [ PaintHs . TaDecStrikeout ] 
+        := PaintOp . Pair 
+             ( PaintOp . Transparent 
+             , PaintOpFromColor ( Options . DecColorErr ) 
+             ) 
+    ; Ops [ PaintHs . TaDecCaret ] 
+        := PaintOp . Pair 
+             ( PaintOp . Transparent 
+             , PaintOpFromColor ( Options . DecColorErr ) 
+             ) 
+    ; Ops [ PaintHs . TaDecUnderline1 ] 
+        := PaintOp . Pair 
+             ( PaintOp . Transparent 
+             , PaintOpFromColor ( Options . DecColorTyped ) 
+             ) 
+    ; Ops [ PaintHs . TaDecUnderline2 ] 
+        := PaintOp . Pair 
+             ( PaintOp . Transparent 
+             , PaintOpFromColor ( Options . DecColorTouched ) 
+             ) 
+    END SetDecOps 
+
+; PROCEDURE SetCharOps ( VAR Ops : PaintOpsTyp ) 
+  (* Initialize Ops with transparent/Fg PaintOps for characters. *) 
+
+  = BEGIN 
+      Ops [ PaintHs . TaFgColorPlain ] 
+        := PaintOp . Pair 
+             ( PaintOp . Transparent 
+             , PaintOpFromColor ( Options . FgColorPlain ) 
+             ) 
+    ; Ops [ PaintHs . TaFgColorIdent ] 
+        := PaintOp . Pair 
+             ( PaintOp . Transparent 
+             , PaintOpFromColor ( Options . FgColorIdent ) 
+             ) 
+    ; Ops [ PaintHs . TaFgColorLiteral ] 
+        := PaintOp . Pair 
+             ( PaintOp . Transparent 
+             , PaintOpFromColor ( Options . FgColorLiteral ) 
+             ) 
+    ; Ops [ PaintHs . TaFgColorCmnt ] 
+        := PaintOp . Pair 
+             ( PaintOp . Transparent 
+             , PaintOpFromColor ( Options . FgColorCmnt ) 
+             ) 
+    ; Ops [ PaintHs . TaFgColorPlaceholder ] 
+        := PaintOp . Pair 
+             ( PaintOp . Transparent 
+             , PaintOpFromColor ( Options . FgColorPlaceholder ) 
+             ) 
+    END SetCharOps 
+
+; PROCEDURE ComputeDerivedInfo ( Info : DerivedInfoRefTyp )
+
+  = BEGIN
+     Info ^ . DiPaintOpBg 
+          := PaintOp . FromRGB
+               ( PrimaryToReal ( Options . BgColorPlain . Red )  
+               , PrimaryToReal ( Options . BgColorPlain . Green )  
+               , PrimaryToReal ( Options . BgColorPlain . Blue )  
+               ) 
+   ; Info ^ . DiPaintOpFg 
+          := PaintOp . FromRGB
+               ( PrimaryToReal ( Options . FgColorPlain . Red )  
+               , PrimaryToReal ( Options . FgColorPlain . Green )  
+               , PrimaryToReal ( Options . FgColorPlain . Blue )  
+               ) 
+    ; Info ^ . DiPaintOpBgFg 
+          := PaintOp . Pair 
+               ( Info ^ . DiPaintOpBg , Info ^ . DiPaintOpFg ) 
+    ; Info ^ . DiPaintOpBorder  
+          := PaintOp . FromRGB
+               ( PrimaryToReal ( Options . BgColorBorder . Red )  
+               , PrimaryToReal ( Options . BgColorBorder . Green )  
+               , PrimaryToReal ( Options . BgColorBorder . Blue )  
+               ) 
+    ; SetBgOps ( Info ^ . DiPaintOpsBg ) 
+    ; SetDecOps ( Info ^ . DiPaintOpsDec ) 
+    ; SetCharOps ( Info ^ . DiPaintOpsChar ) 
+(* 
+    ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
+          TO LAST ( PaintHs . TextAttrComponentTyp ) 
+      DO 
+      Info ^ . DiBgDecOpsError 
+          := BgDecPaintOp ( RBg , Options . FgColorError ) 
+      END (* FOR *)   
+    ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
+          TO LAST ( PaintHs . TextAttrComponentTyp ) 
+      DO 
+      Info ^ . DiBgDecOpsTyped 
+          := BgDecPaintOp ( RBg , Options . FgColorTyped ) 
+      END (* FOR *)   
+    ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
+          TO LAST ( PaintHs . TextAttrComponentTyp ) 
+      DO 
+      Info ^ . DiBgDecOpsTouched
+          := BgDecPaintOp ( RBg , Options . FgColorTouched 
+      END (* FOR *)   
+*) 
+(* 
+    ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
+          TO LAST ( PaintHs . TextAttrComponentTyp ) 
+      DO
+        FOR RFg := FIRST ( PaintHs . TextAttrComponentTyp ) 
+            TO LAST ( PaintHs . TextAttrComponentTyp ) 
+        DO
+        Info ^ . DiPaintOps2D [ RBg , RFg ] 
+            := TextPaintOp ( RBg , RFg ) 
+        END 
+      END 
+*) 
+    END ComputeDerivedInfo 
+
 ; TYPE AFT = MessageCodes . T 
 
 ; CONST DL = Messages . StdErrLine 
@@ -69,18 +247,24 @@ MODULE Ui
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LFont := Font . FromName 
+      LWindow := NEW ( EditWindow . T ) 
+    ; LFont := Font . FromName 
                  ( ARRAY OF TEXT 
                     { (* "-*-courier-medium-r-*-*-*-140-*-*-*-*-*-*" *)
                       LFvFontName 
                     }
                  , useXft := FALSE
                  ) 
-    ; LWindow := EditWindow . Init 
-        ( NEW ( EditWindow . T ) 
-        , Form := Form 
-        , Font := LFont 
-        ) 
+
+    ; EVAL EditWindow . Init ( LWindow , Form := Form , Font := LFont )
+
+
+(*  ; LOCK LWindow
+      DO EVAL EditWindow . Init ( LWindow , Form := Form , Font := LFont )
+      END (* LOCK *)
+*)
+
+
     ; FormsVBT . PutGeneric ( Form , "Fv_LbeWindow" , LWindow ) 
     ; FormsVBT . PutInteger ( Form , "Fv_Modified" , 0 ) 
     ; FormsVBT . PutInteger ( Form , "Fv_Unparsed" , 0 ) 
@@ -2878,5 +3062,7 @@ ReadSelections (* q.v. *) ( Window , Time )
     END DefaultWindow 
 
 ; BEGIN 
+    GDerivedInfoRef := NEW ( DerivedInfoRefTyp )
+  ; ComputeDerivedInfo ( GDerivedInfoRef )  
   END Ui 
 . 
