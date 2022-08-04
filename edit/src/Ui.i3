@@ -38,7 +38,8 @@ INTERFACE Ui
 
 ; TYPE DerivedInfoTyp 
     = RECORD
-        DiPaintOpBg : PaintOp . T 
+        DiFonts : FontsTyp 
+      ; DiPaintOpBg : PaintOp . T 
       ; DiPaintOpBorder : PaintOp . T 
       ; DiPaintOpFg : PaintOp . T 
       ; DiPaintOpBgFg : PaintOp . T 
@@ -49,8 +50,6 @@ INTERFACE Ui
       END (* DerivedInfoTyp *)
 
 ; VAR GDerivedInfoRef : DerivedInfoRefTyp
-
-; PROCEDURE ComputeDerivedInfo ( Info : DerivedInfoRefTyp )
 
 ; PROCEDURE ReplayFileOpen ( FileName : TEXT ) 
 

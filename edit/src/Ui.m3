@@ -52,7 +52,25 @@ MODULE Ui
 ; IMPORT Worker 
 ; IMPORT WriteTrv 
 
-<* PRAGMA LL *> 
+<* PRAGMA LL *>
+
+(* ===================== Screen-independent fonts ===================== *)
+
+; PROCEDURE GetIndependentFonts ( Info : DerivedInfoRefTyp )
+
+  = BEGIN 
+      Info ^ . DiFonts [ PaintHs . TaFontPlain ]  
+        := Font . FromName
+             ( ARRAY OF TEXT { Options . FontNamePlain } , useXft := FALSE ) 
+    ; Info ^ . DiFonts [ PaintHs . TaFontBold ]  
+        := Font . FromName
+             ( ARRAY OF TEXT { Options . FontNameBold } , useXft := FALSE ) 
+    ; Info ^ . DiFonts [ PaintHs . TaFontItalic ]  
+        := Font . FromName
+             ( ARRAY OF TEXT { Options . FontNameItalic } , useXft := FALSE ) 
+    ; Info ^ . DiFonts [ PaintHs . TaFontBoldItalic ]  
+        := Info ^ . DiFonts [ PaintHs . TaFontItalic ]
+    END GetIndependentFonts 
 
 (* ======================= Painting operators. ======================== *)
 
@@ -99,13 +117,13 @@ MODULE Ui
 
   = BEGIN 
       Ops [ PaintHs . TaBgColorPlain ] 
-        := PaintOpFromColor ( Options . BgColorPlain ) 
+        := PaintOpFromColor ( Options . White (*BgColorPlain*) ) 
     ; Ops [ PaintHs . TaBgColorCmnt ] 
-        := PaintOpFromColor ( Options . BgColorCmnt ) 
+        := PaintOpFromColor ( Options . Pink (*BgColorCmnt*) ) 
     ; Ops [ PaintHs . TaBgColorLiteral ] 
-        := PaintOpFromColor ( Options . BgColorLiteral ) 
+        := PaintOpFromColor ( Options . Red (*BgColorLiteral*) ) 
     ; Ops [ PaintHs . TaBgColorSelected ] 
-        := PaintOpFromColor ( Options . BgColorSelected ) 
+        := PaintOpFromColor ( Options . Periwinkle (*BgColorSelected*) ) 
     ; Ops [ PaintHs . TaBgColorMatched ] 
         := PaintOpFromColor ( Options . BgColorMatched ) 
     END SetBgOps 
@@ -145,32 +163,38 @@ MODULE Ui
   = BEGIN 
       Ops [ PaintHs . TaFgColorPlain ] 
         := PaintOp . Pair 
-             ( PaintOp . Transparent 
+             ( PaintOp . Transparent
+               (* PaintOpFromColor(Options.EBrown) *)
+(* CLEANUP ^ These colors are for debug experiments. *) 
              , PaintOpFromColor ( Options . FgColorPlain ) 
              ) 
     ; Ops [ PaintHs . TaFgColorIdent ] 
         := PaintOp . Pair 
-             ( PaintOp . Transparent 
+             ( PaintOp . Transparent
+               (* PaintOpFromColor(Options.EGreen) *)
              , PaintOpFromColor ( Options . FgColorIdent ) 
              ) 
     ; Ops [ PaintHs . TaFgColorLiteral ] 
         := PaintOp . Pair 
-             ( PaintOp . Transparent 
+             ( PaintOp . Transparent
+               (* PaintOpFromColor(Options.ERed) *)
              , PaintOpFromColor ( Options . FgColorLiteral ) 
              ) 
     ; Ops [ PaintHs . TaFgColorCmnt ] 
         := PaintOp . Pair 
-             ( PaintOp . Transparent 
+             ( PaintOp . Transparent
+               (* PaintOpFromColor(Options.EBlue) *)
              , PaintOpFromColor ( Options . FgColorCmnt ) 
              ) 
     ; Ops [ PaintHs . TaFgColorPlaceholder ] 
         := PaintOp . Pair 
-             ( PaintOp . Transparent 
+             ( PaintOp . Transparent
+               (* PaintOpFromColor(Options.EPurple) *)
              , PaintOpFromColor ( Options . FgColorPlaceholder ) 
              ) 
     END SetCharOps 
 
-; PROCEDURE ComputeDerivedInfo ( Info : DerivedInfoRefTyp )
+; PROCEDURE ComputeOps ( Info : DerivedInfoRefTyp )
 
   = BEGIN
      Info ^ . DiPaintOpBg 
@@ -229,7 +253,7 @@ MODULE Ui
         END 
       END 
 *) 
-    END ComputeDerivedInfo 
+    END ComputeOps  
 
 ; TYPE AFT = MessageCodes . T 
 
@@ -239,7 +263,6 @@ MODULE Ui
   RAISES { Backout } 
 
   = VAR LWindow : EditWindow . T  
-  ; VAR LFont : Font . T 
   ; VAR LFvFontName 
            := FormsVBT . GetTextProperty 
                ( Form , "Fv_Window" , "Font" ) 
@@ -247,16 +270,18 @@ MODULE Ui
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LWindow := NEW ( EditWindow . T ) 
+      LWindow := NEW ( EditWindow . T )
+(*
     ; LFont := Font . FromName 
                  ( ARRAY OF TEXT 
                     { (* "-*-courier-medium-r-*-*-*-140-*-*-*-*-*-*" *)
                       LFvFontName 
                     }
                  , useXft := FALSE
-                 ) 
+                 )
+*)
 
-    ; EVAL EditWindow . Init ( LWindow , Form := Form , Font := LFont )
+    ; EVAL EditWindow . Init ( LWindow , Form := Form )
 
 
 (*  ; LOCK LWindow
@@ -3063,6 +3088,7 @@ ReadSelections (* q.v. *) ( Window , Time )
 
 ; BEGIN 
     GDerivedInfoRef := NEW ( DerivedInfoRefTyp )
-  ; ComputeDerivedInfo ( GDerivedInfoRef )  
+  ; GetIndependentFonts ( GDerivedInfoRef ) 
+  ; ComputeOps ( GDerivedInfoRef )  
   END Ui 
 . 

@@ -11,7 +11,6 @@ INTERFACE EditWindow
 ; FROM Failures IMPORT Backout 
 ; IMPORT FormsVBT  
 ; IMPORT Point 
-; IMPORT Font 
 ; IMPORT VBT 
 
 ; IMPORT Strings 
@@ -38,7 +37,6 @@ INTERFACE EditWindow
 ; PROCEDURE Init 
     ( Window : T 
     ; Form : FormsVBT . T 
-    ; Font : Font . T 
     ; Margin : Point . T := Point . Origin 
       (* Which means some other default. *) 
     ; VertGap : PixelCoordTyp := MinVertGap 

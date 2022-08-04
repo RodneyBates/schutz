@@ -19,13 +19,11 @@ MODULE EditWindow
 ; IMPORT Palette 
 ; IMPORT Path 
 ; IMPORT Pixmap
-; IMPORT PlttFrnds 
 ; IMPORT Point 
 ; IMPORT Rect 
 ; IMPORT Region
 ; IMPORT RTIO 
 ; IMPORT ScrnFont 
-; IMPORT ScrnPaintOp  
 ; IMPORT ScrnPixmap 
 ; IMPORT Stdio  
 ; IMPORT Text 
@@ -74,8 +72,6 @@ MODULE EditWindow
           := CharPointTyp { FIRST ( INTEGER ) , FIRST ( INTEGER ) } 
       END (* RECORD *) 
 
-; TYPE FontsTyp = ARRAY PaintHs . TextAttrComponentTyp OF Font . T 
-
 ; TYPE RedoStateTyp 
     = { Starting 
       , Rescreening 
@@ -92,7 +88,6 @@ MODULE EditWindow
             EwForm : FormsVBT . T := NIL 
 
           (* Independent info: *) 
-          ; EwFonts : FontsTyp 
           ; EwDomain : Rect . T := Rect . Empty 
           ; EwScreenType : VBT . ScreenType := NIL 
           ; EwMargin : Point . T := Point . Origin 
@@ -144,7 +139,6 @@ MODULE EditWindow
           METHODS 
             init 
               ( Form : FormsVBT . T 
-              ; font : Font . T 
               ; Margin : Point . T := Point . Origin 
                 (* Which means some other default. *) 
               ; VertGap : PixelCoordTyp := MinVertGap 
@@ -514,23 +508,25 @@ MODULE EditWindow
 
   ; BEGIN (* ComputeDerivedWindowInfo *) 
       IF Window . EwScreenType # NIL 
-      THEN 
+      THEN
+(*
         Window . EwFonts [ PaintHs . TaFontPlain ]  
           := Font . FromName
-               ( ARRAY OF TEXT { Options . FontNamePlain } , useXft := TRUE ) 
+               ( ARRAY OF TEXT { Options . FontNamePlain } , useXft := FALSE ) 
       ; Window . EwFonts [ PaintHs . TaFontBold ]  
           := Font . FromName
-               ( ARRAY OF TEXT { Options . FontNameBold } , useXft := TRUE ) 
+               ( ARRAY OF TEXT { Options . FontNameBold } , useXft := FALSE ) 
       ; Window . EwFonts [ PaintHs . TaFontItalic ]  
           := Font . FromName
-               ( ARRAY OF TEXT { Options . FontNameItalic } , useXft := TRUE ) 
+               ( ARRAY OF TEXT { Options . FontNameItalic } , useXft := FALSE ) 
       ; Window . EwFonts [ PaintHs . TaFontBoldItalic ]  
-          := Window . EwFonts [ PaintHs . TaFontItalic ]  
-
-      ; LMetrics 
+          := Window . EwFonts [ PaintHs . TaFontItalic ]
+      ; 
+*)
+        LMetrics 
           := Palette . ResolveFont 
                ( Window . EwScreenType 
-               , Window . EwFonts [ PaintHs . TaFontPlain ]  
+               , Ui .GDerivedInfoRef ^ . DiFonts [ PaintHs . TaFontPlain ]  
                ) 
              . metrics 
 (* TODO: Checks on consistency of font metrics. *) 
@@ -668,7 +664,6 @@ MODULE EditWindow
 ; PROCEDURE Init 
     ( Window : T  
     ; Form : FormsVBT . T 
-    ; font : Font . T 
     ; Margin : Point . T := Point . Origin 
       (* Which means some other default. *) 
     ; VertGap : PixelCoordTyp := MinVertGap 
@@ -685,7 +680,6 @@ MODULE EditWindow
           EVAL PaintHs . WindowRefTyp . init ( Window )  
           (* Apparently doesn't exist: VBT . Leaf . init ( Window ) *)
         ; Window . EwForm := Form 
-        ; Window . EwFonts [ PaintHs . TaFontPlain ] := font 
         ; Window . EwMargin := Point . Max ( Margin , MinMargin ) 
         ; Window . EwVertGap := MAX ( VertGap , MinVertGap ) 
         ; Window . EwDomain := Rect . Empty 
@@ -852,7 +846,52 @@ MODULE EditWindow
       END (* LOCK *) 
     ; VBT . PaintTint ( Window , Rect . Full , LOpBorder ) 
     ; VBT . PaintTint ( Window , LCharsRect , LOpBg ) 
-    END PaintWindowBlank 
+    END PaintWindowBlank
+
+(* =================== Some tracing of paint operators =================== *)
+
+; VAR GDoTraceOps : BOOLEAN := TRUE
+
+; PROCEDURE TraceOp ( FOp : PaintOp . T )
+  = BEGIN
+      IF GDoTraceOps
+      THEN 
+        RTIO . PutText ( "  Op = ") 
+      ; RTIO . PutText ( Fmt . Int ( FOp . op ) ) 
+      ; RTIO . PutText ( Wr . EOL ) 
+      ; RTIO . Flush ( )
+    END (* IF *) 
+    END TraceOp 
+
+; PROCEDURE TraceRect ( FRect : Rect . T )
+  = BEGIN
+      IF GDoTraceOps
+      THEN 
+        RTIO . PutText ( "  Rect = {") 
+      ; RTIO . PutText ( Fmt . Int ( FRect . west ) ) 
+      ; RTIO . PutText ( ", ") 
+      ; RTIO . PutText ( Fmt . Int ( FRect . east ) ) 
+      ; RTIO . PutText ( ", ") 
+      ; RTIO . PutText ( Fmt . Int ( FRect .north ) ) 
+      ; RTIO . PutText ( ", ") 
+      ; RTIO . PutText ( Fmt . Int ( FRect .south ) ) 
+      ; RTIO . PutText ( "}") 
+      ; RTIO . PutText ( Wr . EOL ) 
+      ; RTIO . Flush ( ) 
+    END (* IF *) 
+    END TraceRect 
+
+; PROCEDURE TraceText ( FText : TEXT )
+  = BEGIN
+      IF GDoTraceOps
+      THEN 
+        RTIO . PutText ( "  Text = \"") 
+      ; RTIO . PutText ( FText ) 
+      ; RTIO . PutText ( "\"" ) 
+      ; RTIO . PutText ( Wr . EOL ) 
+      ; RTIO . Flush ( ) 
+    END (* IF *) 
+    END TraceText  
 
 (* EXPORTED *) 
 ; PROCEDURE PaintLine  
@@ -896,6 +935,7 @@ MODULE EditWindow
 
   ; BEGIN (* PaintLine *) 
       VAR LCharPoint : CharPointTyp
+    ; VAR LFont : Font . T 
     ; VAR LOp : PaintOp . T
 
     ; BEGIN (* Block for PaintLine *) 
@@ -932,11 +972,17 @@ MODULE EditWindow
                 ) 
 
           (* Paint background. *) 
+          ; LOp := Ui . GDerivedInfoRef ^ . DiPaintOpsBg [ Attr . TaBgColor ]
+; RTIO . PutText ( "PaintTint: " ) 
+; TraceOp ( LOp ) 
+; TraceRect ( PtBoundingBox ) 
           ; VBT . PaintTint 
               ( v := Window 
               , clip := PtBoundingBox 
-              , op := Ui . GDerivedInfoRef ^ . DiPaintOpsBg [ Attr . TaBgColor ] 
-              ) 
+              , op := LOp 
+              )
+; VBT.Sync(Window,TRUE)
+; Assertions . DoNothing ( ) 
 
           (* Paint decoration, under the characters. *) 
           ; CASE Attr . TaDecoration 
@@ -979,17 +1025,29 @@ MODULE EditWindow
 
           (* Paint the characters.*)
 
-          
+          ; LFont := Ui . GDerivedInfoRef ^ . DiFonts [ Attr . TaFont ] 
+          ; LFont := Ui . GDerivedInfoRef ^ . DiFonts [ PaintHs . TaFontPlain ]
+(* Experimental ^Keep the same font for everything. *) 
+
           ; LOp := Ui . GDerivedInfoRef ^ . DiPaintOpsChar [ Attr . TaFgColor ] 
+          ; LOp := PaintOpFromColor ( Options . FgColorPlain ) 
+(* Experimental ^Keep the same operator for everything. *) 
+          
+; RTIO . PutText ( "PaintText: " ) 
+; TraceOp ( LOp ) 
+; TraceRect ( PtBoundingBox )
+; TraceText ( Text . Sub ( PaintText , FromSsInString , PtSubstringLength ) )
+
           ; VBT . PaintText 
               ( v := Window  
               , clip := PtBoundingBox    
               , pt := CharToPixel ( Window , LCharPoint ) 
-              , fnt := Window . EwFonts [ Attr . TaFont ] 
-              , t := Text . Sub 
-                       ( PaintText , FromSsInString , PtSubstringLength )
+              , fnt := LFont 
+              , t := Text . Sub ( PaintText , FromSsInString , PtSubstringLength )
               , op := LOp 
-              ) 
+              )
+; VBT . Sync ( Window ) 
+; Assertions . DoNothing ( ) 
           ; PaintInCursor ( Window ) 
           END (* IF *) 
         END (* IF *) 
@@ -2719,7 +2777,7 @@ MODULE EditWindow
   ; VAR LLineNo : LbeStd . LineNoSignedTyp 
 
   ; BEGIN
-      IF GLogEvents THEN RTIO . PutText ( "In RedoWorkProc: " ) END (* IF *) 
+      IF GLogEvents THEN RTIO . PutText ( "In RedoWorkProc:" ) END (* IF *) 
     ; LOCK Closure . Window 
       DO LDoRescreen := Closure . Window . EwHasRescreenPending
       ; IF LDoRescreen
