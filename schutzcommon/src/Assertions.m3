@@ -29,7 +29,7 @@ MODULE Assertions
       L := 0 
     END AF 
 
-; PROCEDURE FailText ( Message : TEXT ) RAISES { AssertionFailure } 
+; PROCEDURE FailText ( Message : TEXT ) RAISES { AssertionFailure }   
 
   = <* FATAL Thread . Alerted *> 
     <* FATAL Wr . Failure *> 
@@ -68,7 +68,6 @@ MODULE Assertions
     END AssertText 
 
 ; PROCEDURE Fail ( Code : AFT ) RAISES { AssertionFailure } 
-
   = <* FATAL Thread . Alerted *> 
     <* FATAL Wr . Failure *> 
     VAR LMessage : TEXT 

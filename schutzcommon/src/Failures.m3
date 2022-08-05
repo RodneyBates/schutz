@@ -375,11 +375,12 @@ UNSAFE MODULE Failures
      of a RAISES clause or unhandled. *) 
 
   = VAR LActPtr : RT0 . ActivationPtr
-  ; LExc : RT0 . ExceptionPtr
+  ; VAR LExc : RT0 . ExceptionPtr
   ; VAR LThreadInfoRef : ThreadInfoRefTyp
   ; VAR LRTArg : RuntimeError . T 
   ; VAR LAction : FailureActionTyp
   ; VAR LAllowedActions : FailureActionSetTyp
+  ; VAR LPrimaryWasBlocked : BOOLEAN 
   
   ; BEGIN
       LOCK GFailureSync 
@@ -421,7 +422,7 @@ UNSAFE MODULE Failures
       ; RTIO . PutText ( Wr . EOL )
       ; RTIO . Flush ( ) 
 
-      ; Crash ( Act  )
+      ; Crash ( Act )
       END (* IF *) 
 
     ; LExc := Act . exception 
@@ -472,11 +473,14 @@ UNSAFE MODULE Failures
                      }
             END (* IF *)
 
-          (* Query the user about what to do. *) 
+          (* Query the user about what to do. *)
+          ; LPrimaryWasBlocked := LRTArg = RuntimeError . T . BlockedException 
           ; LThreadInfoRef ^ . QueryingActPtr := LActPtr 
           ; LAction 
               := LThreadInfoRef . QueryProc
-                   ( Act , StoppedReason ( wasBlocked ) , LAllowedActions )  
+                   ( Act , StoppedReason ( LPrimaryWasBlocked )
+                   , LAllowedActions
+                   )  
           ; LThreadInfoRef ^ . QueryingActPtr := NIL
 
           (* Query's answer received. *) 
@@ -503,7 +507,7 @@ UNSAFE MODULE Failures
             | FailureActionTyp . FaCrash 
             =>  RTIO . PutText ( Wr . EOL )
               ; RTIO . PutText ( "##### " )
-              ; RTIO . PutText ( StoppedReason ( wasBlocked ) ) 
+              ; RTIO . PutText ( StoppedReason ( LPrimaryWasBlocked ) ) 
               ; RTIO . PutText ( " exception " )
               ; RTIO . PutText ( ExcName ( Act ) )
               ; RTIO . PutText ( "##### " )

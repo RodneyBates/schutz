@@ -55,7 +55,8 @@ INTERFACE Assertions
 
 ; TYPE AFT = MessageCodes . T 
 
-; EXCEPTION AssertionFailure ( TEXT ) 
+; <*IMPLICIT*>
+  EXCEPTION AssertionFailure ( TEXT ) 
 
 ; PROCEDURE Assert 
     ( Condition : BOOLEAN ; Code : AFT ) RAISES { AssertionFailure } 
