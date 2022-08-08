@@ -13,7 +13,8 @@ MODULE Assertions
 *) 
 
 ; IMPORT Wr 
-; IMPORT Fmt 
+; IMPORT Fmt
+; IMPORT RTIO 
 ; IMPORT Stdio 
 ; IMPORT Thread 
 
@@ -44,7 +45,10 @@ MODULE Assertions
     ; TRY
         RAISE AssertionFailure ( Message )
       EXCEPT
-        Failures . Ignore =>
+      | Failures . Ignore
+      =>  RTIO . PutText ( "Ignoring assertion failure." )
+        ; RTIO . PutText ( Wr . EOL )
+        ; RTIO . Flush ( ) 
       END (* EXCEPT *) 
     END FailText 
 
@@ -86,8 +90,11 @@ MODULE Assertions
     ; AF ( )
     ; TRY
         RAISE AssertionFailure ( LMessage ) 
-      EXCEPT
-        Failures . Ignore =>
+      EXCEPT 
+      | Failures . Ignore
+      =>  RTIO . PutText ( "Ignoring assertion failure." )
+        ; RTIO . PutText ( Wr . EOL )
+        ; RTIO . Flush ( ) 
       END (* EXCEPT *) 
     END Fail 
 
@@ -168,7 +175,8 @@ MODULE Assertions
     ; <* UNUSED *> Code : MessageCodes . T 
     ; <* UNUSED *> DoWriteCheckpoint : BOOLEAN 
     ) 
-  : BOOLEAN 
+  : BOOLEAN
+  RAISES { AssertionFailure } 
   (* Ignores RaiseOnFailure and always raises AssertionFailure. *) 
 
   = BEGIN 
@@ -196,6 +204,7 @@ MODULE Assertions
     ; <* UNUSED *> DoWriteCheckpoint : BOOLEAN 
     ) 
   : BOOLEAN 
+  RAISES { AssertionFailure } 
   (* The default QueryProc. Returns RaiseOnFailure. *) 
 
   = BEGIN 

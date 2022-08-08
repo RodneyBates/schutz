@@ -17,8 +17,8 @@ MODULE TextEdit
 ; IMPORT Ascii 
 ; IMPORT AssertDevel 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen 
-; FROM Failures IMPORT Backout  
+; FROM Assertions IMPORT Assert , CantHappen , AssertionFailure  
+; FROM Failures IMPORT Backout , Ignore 
 ; IMPORT Display 
 ; IMPORT EditWindow 
 ; IMPORT Errors 
@@ -186,7 +186,7 @@ MODULE TextEdit
              without raising Backout.
           *)   
     ) 
-  RAISES { Backout , Thread . Alerted } 
+  RAISES { Backout , Ignore , AssertionFailure , Thread . Alerted } 
 
   = VAR LLineCt : LbeStd . LineNoTyp 
   ; VAR LAtEndOfImage : BOOLEAN 
@@ -208,16 +208,14 @@ MODULE TextEdit
           , (* VAR *) TextAttrArrayRef := RegeneratedTextAttrArrayRef  
           , (* VAR *) LineErrArrayRef := RegeneratedLineErrArrayRef  
           ) 
-      ; Assert 
-          ( LLineCt = ExpectedLineCt , AFT . A_VerifyEditedLineBadLineCt ) 
+      ; Assert ( LLineCt = ExpectedLineCt , AFT . A_VerifyEditedLineBadLineCt ) 
       ; IF ExpectedLineCt = 0 
         THEN 
           IF NOT Strings . AreEqualButForTrailingBlanks 
                    ( ExpectedString , RegeneratedString ) 
           THEN 
-            IF FailureOccurred 
-            THEN
-              Assertions . Message ( AFT . A_VerifyEditedLineStringMismatch ) 
+            IF FailureOccurred (* Previously. *) 
+            THEN Assertions . Message ( AFT . A_VerifyEditedLineStringMismatch ) 
             ELSE 
               FailureOccurred := TRUE 
             ; CantHappen ( AFT . A_VerifyEditedLineStringMismatch ) 
@@ -226,9 +224,8 @@ MODULE TextEdit
         ELSE 
           IF Strings . Length ( RegeneratedString ) # 0 
           THEN 
-            IF FailureOccurred 
-            THEN
-              Assertions . Message ( AFT . A_VerifyEditedLineTextOnLine ) 
+            IF FailureOccurred (* Previously. *) 
+            THEN Assertions . Message ( AFT . A_VerifyEditedLineTextOnLine ) 
             ELSE 
               FailureOccurred := TRUE 
             ; CantHappen ( AFT . A_VerifyEditedLineTextOnLine ) 
@@ -240,9 +237,8 @@ MODULE TextEdit
           know it yet, without another call on GetNextLine. 
 *) 
         THEN 
-          IF FailureOccurred 
-          THEN
-            Assertions . Message ( AFT . A_VerifyEditedLineEOIMismatch ) 
+          IF FailureOccurred (* Previously. *) 
+          THEN Assertions . Message ( AFT . A_VerifyEditedLineEOIMismatch ) 
           ELSE 
             FailureOccurred := TRUE 
           ; CantHappen ( AFT . A_VerifyEditedLineEOIMismatch ) 
@@ -495,125 +491,130 @@ MODULE TextEdit
 
   ; BEGIN (* BruteForceVerifyAllLinesRefs *) 
       IF ImageRef # NIL 
-      THEN 
-        LImagePers := ImageRef . ItPers 
-      ; IF LImagePers # NIL 
-        THEN 
-          LFailureOccurred := FALSE 
-        ; LHeader := LImagePers . IpLineHeaderRef 
-        ; IF LHeader # NIL 
+      THEN
+        TRY (* EXCEPT *) 
+          LImagePers := ImageRef . ItPers 
+        ; IF LImagePers # NIL 
           THEN 
-            TYPECASE LHeader . LrRightLink 
-            OF NULL 
-            => CantHappen 
-                 ( AFT . A_BruteForceVerifyAllLinesRefs_NIL_header_link )  
-            | PaintHs . LinesRefMeatTyp ( TFirstLinesRef ) 
-            => LLinesRef := TFirstLinesRef 
-            ; IF NOT LHeader . LrGapAfter 
-                 AND NOT TFirstLinesRef . LrGapAfter 
-              THEN (* Verify this is the first line of the file. *) 
-                LineMarks . GetLMBegOfImage 
-                  ( LImagePers . IpLang 
-                  , LImagePers . IpEstRoot 
-                  , (* VAR *) LBegOfImageMark 
-                  ) 
-              ; VerifyEditedLine 
-                  ( ImageRef 
-                  , EstRoot := LImagePers . IpEstRoot 
-                  , StartBolTokMark := LBegOfImageMark 
-                  , ExpectedLineCt := TFirstLinesRef . LrLineCt 
-                  , ExpectedAtEndOfImage 
-                      := TFirstLinesRef . LrRightLink = LHeader 
-                  , ExpectedString := LineString ( TFirstLinesRef ) 
-                  , (* VAR *) RegeneratedString := LRegeneratedString 
-                  , (* VAR *) RegeneratedTextAttrArrayRef 
-                      := LTextAttrArrayRef 
-                  , (* VAR *) RegeneratedLineErrArrayRef := LLineErrArrayRef 
-                  , (* VAR *) EndBolTokMark := LNextMark 
-                  , (* IN OUT *) FailureOccurred := LFailureOccurred 
-                  ) 
-              END (* IF *) 
-            ; LOOP 
-                LPrevMark := LLinesRef . LrBolTokMark 
-              ; IF NOT LLinesRef . LrGapAfter 
-                THEN 
-                  VerifyEditedLine 
+            LFailureOccurred := FALSE 
+          ; LHeader := LImagePers . IpLineHeaderRef 
+          ; IF LHeader # NIL 
+            THEN 
+              TYPECASE LHeader . LrRightLink 
+              OF NULL 
+              => CantHappen 
+                   ( AFT . A_BruteForceVerifyAllLinesRefs_NIL_header_link )  
+              | PaintHs . LinesRefMeatTyp ( TFirstLinesRef ) 
+              => LLinesRef := TFirstLinesRef 
+              ; IF NOT LHeader . LrGapAfter 
+                   AND NOT TFirstLinesRef . LrGapAfter 
+                THEN (* Verify this is the first line of the file. *) 
+                  LineMarks . GetLMBegOfImage 
+                    ( LImagePers . IpLang 
+                    , LImagePers . IpEstRoot 
+                    , (* VAR *) LBegOfImageMark 
+                    ) 
+                ; VerifyEditedLine 
                     ( ImageRef 
                     , EstRoot := LImagePers . IpEstRoot 
-                    , StartBolTokMark := LLinesRef . LrBolTokMark 
-                    , ExpectedLineCt := LLinesRef . LrLineCt 
+                    , StartBolTokMark := LBegOfImageMark 
+                    , ExpectedLineCt := TFirstLinesRef . LrLineCt 
                     , ExpectedAtEndOfImage 
-                        := LLinesRef . LrRightLink 
-                           = LHeader 
-                    , ExpectedString := LineString ( LLinesRef ) 
+                        := TFirstLinesRef . LrRightLink = LHeader 
+                    , ExpectedString := LineString ( TFirstLinesRef ) 
                     , (* VAR *) RegeneratedString := LRegeneratedString 
                     , (* VAR *) RegeneratedTextAttrArrayRef 
-                         := LTextAttrArrayRef 
-                    , (* VAR *) RegeneratedLineErrArrayRef 
-                         := LLineErrArrayRef 
+                        := LTextAttrArrayRef 
+                    , (* VAR *) RegeneratedLineErrArrayRef := LLineErrArrayRef 
                     , (* VAR *) EndBolTokMark := LNextMark 
                     , (* IN OUT *) FailureOccurred := LFailureOccurred 
                     ) 
-                ; TYPECASE LLinesRef . LrRightLink 
-                  OF PaintHs . LinesRefMeatTyp ( TRightLinesRef ) 
-                  => LLinesRef := TRightLinesRef 
-                  ; IF NOT Marks . Equal 
-                             ( LLinesRef . LrBolTokMark , LNextMark ) 
-                       OR LLinesRef . LrBolTokMark . EstNodeCt 
-                          # LNextMark . EstNodeCt 
-                       (* Marks . Equal doesn't check EstNodeCt field, because
-                          it is redundant, if properly set, and if not, due
-                          to incomplete updating, we want other compares to
-                          succeed anyway.
-                       *) 
-                    THEN
-                      IF RepairIsOK 
-                      THEN 
-                        Assertions . MessageText 
-                          ( "Repairing LinesRef Mark " 
-                            & Marks . MarkImage ( LLinesRef . LrBolTokMark )  
-                            & " to " & Marks . MarkImage ( LNextMark )  
-                          ) 
-                      ; LLinesRef . LrBolTokMark := LNextMark 
-                      ELSE 
-                        Assertions . CantHappenText 
-                          ( "Incorrect LinesRef Mark " 
-                            & Marks . MarkImage ( LLinesRef . LrBolTokMark )  
-                            & " should be " & Marks . MarkImage ( LNextMark )  
-                          ) 
-                      END (* IF *) 
-                    END 
-                  ELSE 
-                    EXIT 
-                  END (* TYPECASE *) 
-                ELSE 
-                  TYPECASE LLinesRef . LrRightLink 
-                  OF PaintHs . LinesRefMeatTyp ( TRightLinesRef ) 
-                  => LLinesRef := TRightLinesRef 
-                  ELSE 
-                    EXIT 
-                  END (* TYPECASE *) 
                 END (* IF *) 
-              ; TRY 
-                  Assert 
-                    ( Marks . Compare ( LPrevMark , LLinesRef . LrBolTokMark )  
-                      = - 1 
-                    , AFT . A_BruteForceVerifyAllLinesRefs_OutOfOrderMark 
-                    ) 
-                EXCEPT Marks . Unordered 
-                => CantHappen 
-                     ( AFT . A_BruteForceVerifyAllLinesRefs_Unordered_marks ) 
-                END (* TRY EXCEPT *) 
-              END (* LOOP *)
-            ELSE (* No Meat nodes. *) 
-              Assert 
-                ( LHeader . LrLeftLink = LHeader 
-                  AND LHeader . LrRightLink = LHeader 
-                , AFT . A_BruteForceVerifyAllLinesRefs_Bad_empty_list
-                ) 
-            END (* TYPECASE *) 
-          END (* IF *) 
-        END (* IF *) 
+              ; LOOP 
+                  LPrevMark := LLinesRef . LrBolTokMark 
+                ; IF NOT LLinesRef . LrGapAfter 
+                  THEN 
+                    VerifyEditedLine 
+                      ( ImageRef 
+                      , EstRoot := LImagePers . IpEstRoot 
+                      , StartBolTokMark := LLinesRef . LrBolTokMark 
+                      , ExpectedLineCt := LLinesRef . LrLineCt 
+                      , ExpectedAtEndOfImage 
+                          := LLinesRef . LrRightLink 
+                             = LHeader 
+                      , ExpectedString := LineString ( LLinesRef ) 
+                      , (* VAR *) RegeneratedString := LRegeneratedString 
+                      , (* VAR *) RegeneratedTextAttrArrayRef 
+                           := LTextAttrArrayRef 
+                      , (* VAR *) RegeneratedLineErrArrayRef 
+                           := LLineErrArrayRef 
+                      , (* VAR *) EndBolTokMark := LNextMark 
+                      , (* IN OUT *) FailureOccurred := LFailureOccurred 
+                      ) 
+                  ; TYPECASE LLinesRef . LrRightLink 
+                    OF PaintHs . LinesRefMeatTyp ( TRightLinesRef ) 
+                    => LLinesRef := TRightLinesRef 
+                    ; IF NOT Marks . Equal 
+                               ( LLinesRef . LrBolTokMark , LNextMark ) 
+                         OR LLinesRef . LrBolTokMark . EstNodeCt 
+                            # LNextMark . EstNodeCt 
+                         (* Marks . Equal doesn't check EstNodeCt field, because
+                            it is redundant, if properly set, and if not, due
+                            to incomplete updating, we want other compares to
+                            succeed anyway.
+                         *) 
+                      THEN
+                        IF RepairIsOK 
+                        THEN 
+                          Assertions . MessageText 
+                            ( "Repairing LinesRef Mark " 
+                              & Marks . MarkImage ( LLinesRef . LrBolTokMark )  
+                              & " to " & Marks . MarkImage ( LNextMark )  
+                            ) 
+                        ; LLinesRef . LrBolTokMark := LNextMark 
+                        ELSE 
+                          Assertions . CantHappenText 
+                            ( "Incorrect LinesRef Mark " 
+                              & Marks . MarkImage ( LLinesRef . LrBolTokMark )  
+                              & " should be " & Marks . MarkImage ( LNextMark )  
+                            ) 
+                        END (* IF *) 
+                      END 
+                    ELSE 
+                      EXIT 
+                    END (* TYPECASE *) 
+                  ELSE 
+                    TYPECASE LLinesRef . LrRightLink 
+                    OF PaintHs . LinesRefMeatTyp ( TRightLinesRef ) 
+                    => LLinesRef := TRightLinesRef 
+                    ELSE 
+                      EXIT 
+                    END (* TYPECASE *) 
+                  END (* IF *) 
+                ; TRY 
+                    Assert 
+                      ( Marks . Compare ( LPrevMark , LLinesRef . LrBolTokMark )  
+                        = - 1 
+                      , AFT . A_BruteForceVerifyAllLinesRefs_OutOfOrderMark 
+                      ) 
+                  EXCEPT Marks . Unordered 
+                  => CantHappen 
+                       ( AFT . A_BruteForceVerifyAllLinesRefs_Unordered_marks ) 
+                  END (* TRY EXCEPT *) 
+                END (* LOOP *)
+              ELSE (* No Meat nodes. *) 
+                Assert 
+                  ( LHeader . LrLeftLink = LHeader 
+                    AND LHeader . LrRightLink = LHeader 
+                  , AFT . A_BruteForceVerifyAllLinesRefs_Bad_empty_list
+                  ) 
+              END (* TYPECASE *) 
+            END (* IF *) 
+          END (* IF *)
+        EXCEPT
+        | Ignore =>
+        | AssertionFailure => (* Should we do some repair here? *)  
+        END (* EXCEPT *) 
       END (* IF *) 
     END BruteForceVerifyAllLinesRefs 
 
@@ -1095,7 +1096,7 @@ MODULE TextEdit
       (* Damn the torpedos! Full speed ahead! 
          We need to call BruteForceVerifyAllLinesRefs, just to re-repair any
          marks that might have been changed for the new list of lines
-         refs.  But its usual function includes raising assertion
+         refs.  But its usual function ccould include raising assertion
          failures if anything is wrong.  Hopefully, we really did put
          things back together the way they were, in which case,
          nothing will go wron...noting woll goo worn... nthig wl
@@ -1107,7 +1108,8 @@ MODULE TextEdit
       ; Assertions . DefaultQueryProc := Assertions . NeverRaise 
       ; TRY   
           BruteForceVerifyAllLinesRefs ( ImageRef , RepairIsOK := TRUE ) 
-        EXCEPT 
+        EXCEPT
+        | AssertionFailure => (* Squelch this, it's too late *)
         ELSE 
         END (* TRY EXCEPT *) 
       ; Assertions . DefaultQueryProc := LSavedCallback 
@@ -1992,7 +1994,7 @@ MODULE TextEdit
               END (* IF *) 
             ; LWindowRef := LWindowRef . WrImageLink 
             END (* WHILE LWindowRef # NIL *) 
-          ; BruteForceRepairLineMarks ( ImageRef ) 
+          ; BruteForceRepairLineMarks ( ImageRef )
           ; IF IfteSecondOldLinesRef # NIL 
             THEN IfteSecondOldLinesRef . LrHasMark := FALSE 
                  (* ^Why? Isn't it garbage? *) 

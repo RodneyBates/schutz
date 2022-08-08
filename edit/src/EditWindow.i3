@@ -23,7 +23,11 @@ INTERFACE EditWindow
    this interface wants to use a GUI system other than Trestle. *) 
 
 ; TYPE CharCoordTyp = INTEGER 
-; TYPE CharPointTyp = RECORD h , v : CharCoordTyp END (* RECORD *) 
+; TYPE CharPointTyp = RECORD h , v : CharCoordTyp END (* RECORD *)
+  (* ^ This is structurally = Point.T, but has s different name
+       to help avoid mixups between points measured in pixels
+       (use Point.T), and Characters (use CharPointTyp).
+  *)
 ; TYPE PixelCoordTyp = INTEGER 
 
 ; TYPE T = WindowTyp 

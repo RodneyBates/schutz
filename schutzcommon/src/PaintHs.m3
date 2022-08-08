@@ -27,6 +27,8 @@ MODULE PaintHs
 ; FROM Assertions IMPORT Assert , CantHappen 
 ; FROM Failures IMPORT Backout  
 
+<* PRAGMA LL *> 
+
 ; TYPE AFT = MessageCodes . T 
 
 ; REVEAL WindowRefTyp 

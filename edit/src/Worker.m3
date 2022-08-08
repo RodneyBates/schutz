@@ -642,11 +642,6 @@ MODULE Worker
     ; RETURN LResult 
     END FailureDialogCommandLine 
 
-
-
-
-
-
 (*EXPORTED*)
 (* Registered as a callback. *)
 ; PROCEDURE FailureQuery
@@ -664,10 +659,11 @@ MODULE Worker
      command line in a dialog, and queries the user's desire what to do. 
   *)    
 
-  = VAR LInteractive : BOOLEAN
-  ; VAR LCheckpointMsg : TEXT 
+  = VAR LCheckpointMsg : TEXT 
   ; VAR LResult : Failures . FailureActionTyp 
-
+  ; VAR LInteractive : BOOLEAN
+  ; VAR LDoGuiActions : BOOLEAN
+  
   ; BEGIN 
       LOCK WorkerMu 
       DO IF StoredClosure # NIL
@@ -675,13 +671,14 @@ MODULE Worker
         ELSIF QueuedClosure # NIL
         THEN LInteractive := QueuedClosure . IsInteractive 
         ELSE LInteractive := FALSE
-        END (* IF *) 
+        END (* IF *)
+      ; LDoGuiActions := LInteractive AND IAmWorkerThread ( ) 
       END (* LOCK *)
     ; LCheckpointMsg := CheckpointForFailure ( MessageCodes . T . NullCode ) 
     ; FailureMessageCommandLine
         ( Act , StoppedReason , LCheckpointMsg ) 
 
-    ; IF DoGuiActions ( )
+    ; IF LDoGuiActions 
       THEN
         IF Failures . FailureActionTyp . FaBackout IN AllowedActions
         THEN FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Backout" )
@@ -707,18 +704,13 @@ MODULE Worker
            WrtBusyQueued, which means the only thing any other thread
            can do is wait on WaitingForIdle. 
         *) 
-      ; IF LInteractive 
-        THEN 
-          LOCK WorkerMu 
-          DO
-            QueryingAssert := TRUE 
-          ; WHILE QueryingAssert 
-            DO Thread . Wait ( WorkerMu , WaitingForGuiAssertDialog ) 
-            END (* WHILE *)
-          ; LResult := StoredFailureAction 
-          END (* LOCK *)
-        ELSE LResult := Failures . FailureActionTyp . FaCrash
-        END (* IF *) 
+      ; LOCK WorkerMu 
+        DO QueryingAssert := TRUE 
+        ; WHILE QueryingAssert 
+          DO Thread . Wait ( WorkerMu , WaitingForGuiAssertDialog ) 
+          END (* WHILE *)
+        ; LResult := StoredFailureAction 
+        END (* LOCK *)
       ; UiDevel . RemoveGuiAssertDialog ( ) 
       ELSE (* Command line for query. *) 
         IF LInteractive
@@ -734,7 +726,6 @@ MODULE Worker
              & "###############################################################"
              & Wr . EOL  
            ) 
-    ; RTIO . Flush ( )
       | Failures . FailureActionTyp . FaBackout  
       => RTIO . PutText
            ( "Backing up to before the last command." 
@@ -823,8 +814,7 @@ MODULE Worker
 
   = BEGIN 
       LOCK WorkerMu 
-      DO
-        RETURN IAmWorkerThread ( ) AND StoredClosure . IsInteractive 
+      DO RETURN IAmWorkerThread ( ) AND StoredClosure . IsInteractive 
       END (* LOCK *) 
     END DoGuiActions 
 

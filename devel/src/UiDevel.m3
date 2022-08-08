@@ -1425,8 +1425,8 @@ MODULE UiDevel
       END 
     ; Assertions . CantHappenText ( "User forced assertion failure" )
       (* CantHappenText will catch Ignore before it gets back here.
-         We want to let AssertionFailure and RuntimeError.E get
-         through uncaught or blocked, to test their conversion into
+         We want to let AssertionFailure and RuntimeError.E get through
+         unblocked and uncaught blocked, to test their conversion into
          Ignore (when requested by the user).  RuntimeError.E is
          <*IMPLICIT*>, so will be unhandled if we don't catch it here.
          AssertionFailure is blocked by this proceedure, so can be
@@ -1769,9 +1769,9 @@ MODULE UiDevel
         ( Options . MainForm , "Fv_Assert_Location" , Location )
     ; FormsVBT . PutText 
         ( Options . MainForm , "Fv_Assert_Checkpoint" , Checkpoint )
+    ; FormsVBT . MakeDormant ( Options . MainForm , "Fv_Background" ) 
     ; FormsVBT . PopUp
         ( Options . MainForm , "Fv_AssertDialog" , forcePlace := TRUE ) 
-    ; FormsVBT . MakeDormant ( Options . MainForm , "Fv_Background" ) 
     END ShowGuiAssertDialog  
 
 ; PROCEDURE AssertBackoutProc 
@@ -1815,8 +1815,8 @@ MODULE UiDevel
 
   = <* FATAL FormsVBT . Error *>
     BEGIN
-      FormsVBT . MakeActive ( Options . MainForm , "Fv_Background" ) 
-    ; FormsVBT . PopDown ( Options . MainForm , "Fv_AssertDialog" ) 
+      FormsVBT . PopDown ( Options . MainForm , "Fv_AssertDialog" ) 
+    ; FormsVBT . MakeActive ( Options . MainForm , "Fv_Background" )
     END RemoveGuiAssertDialog  
 
 (* EXPORTED: *) 

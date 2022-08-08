@@ -166,7 +166,10 @@ MODULE EditWindow
   (* The FormsVBT.T that this window is inside of. *)    
 
   = BEGIN
-      LOCK Window
+      IF Window = NIL THEN
+        RETURN NIL
+      END (* IF *)
+    ; LOCK Window
       DO RETURN Window . EwForm
       END (* LOCK *) 
     END Form 
@@ -195,7 +198,8 @@ MODULE EditWindow
     ( Window : T ; CharPoint : CharPointTyp ) : Point . T 
 
   = BEGIN (* CharToPixel *)
-      LOCK Window DO 
+      IF Window = NIL THEN RETURN Point . Origin END (* IF *)
+    ; LOCK Window DO 
         RETURN 
           Point . T 
             { Window . EwCharOrigin . h 
@@ -211,7 +215,8 @@ MODULE EditWindow
   (* Convert a character point to a pixel point by simple scaling. *) 
 
   = BEGIN (* PixelOffset *) 
-      LOCK Window DO 
+      IF Window = NIL THEN RETURN Point . Origin END (* IF *)
+    ; LOCK Window DO 
         RETURN 
           Point . T 
             { CharPoint . h * Window . EwCharSeparation . h 
@@ -706,7 +711,8 @@ MODULE EditWindow
   (* Follows the usual _to_ invariant, i.e. the first char _not_ included. *) 
 
   = BEGIN (* SouthEastToCorner *) 
-      LOCK Window DO 
+      IF Window = NIL THEN RETURN Point . Origin END (* IF *)
+    ; LOCK Window DO 
         RETURN Window . EwSouthEastChar 
       END (* LOCK *) 
     END SouthEastToCorner 
@@ -839,7 +845,8 @@ MODULE EditWindow
   ; VAR LCharsRect : Rect . T 
 
   ; BEGIN (* PaintWindowBlank *)
-      LOCK Window
+      IF Window = NIL THEN RETURN END (* IF *)
+    ; LOCK Window
       DO LOpBorder := Ui . GDerivedInfoRef ^ . DiPaintOpBorder
       ; LCharsRect := Window . EwCharsRect
       ; LOpBg := Ui . GDerivedInfoRef ^ . DiPaintOpBg
@@ -850,7 +857,7 @@ MODULE EditWindow
 
 (* =================== Some tracing of paint operators =================== *)
 
-; VAR GDoTraceOps : BOOLEAN := TRUE
+; VAR GDoTraceOps : BOOLEAN := FALSE 
 
 ; PROCEDURE TraceOp ( FOp : PaintOp . T )
   = BEGIN
@@ -973,7 +980,7 @@ MODULE EditWindow
 
           (* Paint background. *) 
           ; LOp := Ui . GDerivedInfoRef ^ . DiPaintOpsBg [ Attr . TaBgColor ]
-; RTIO . PutText ( "PaintTint: " ) 
+; IF GDoTraceOps THEN RTIO . PutText ( "PaintTint: " ) END  
 ; TraceOp ( LOp ) 
 ; TraceRect ( PtBoundingBox ) 
           ; VBT . PaintTint 
@@ -1033,7 +1040,7 @@ MODULE EditWindow
           ; LOp := PaintOpFromColor ( Options . FgColorPlain ) 
 (* Experimental ^Keep the same operator for everything. *) 
           
-; RTIO . PutText ( "PaintText: " ) 
+; IF GDoTraceOps THEN RTIO . PutText ( "PaintText: " ) END 
 ; TraceOp ( LOp ) 
 ; TraceRect ( PtBoundingBox )
 ; TraceText ( Text . Sub ( PaintText , FromSsInString , PtSubstringLength ) )
@@ -1046,7 +1053,7 @@ MODULE EditWindow
               , t := Text . Sub ( PaintText , FromSsInString , PtSubstringLength )
               , op := LOp 
               )
-; VBT . Sync ( Window ) 
+; VBT . Sync ( Window , wait := TRUE ) 
 ; Assertions . DoNothing ( ) 
           ; PaintInCursor ( Window ) 
           END (* IF *) 
@@ -2778,6 +2785,7 @@ MODULE EditWindow
 
   ; BEGIN
       IF GLogEvents THEN RTIO . PutText ( "In RedoWorkProc:" ) END (* IF *) 
+    ; IF Closure . Window = NIL THEN RETURN END (* IF *)
     ; LOCK Closure . Window 
       DO LDoRescreen := Closure . Window . EwHasRescreenPending
       ; IF LDoRescreen
@@ -2881,6 +2889,7 @@ MODULE EditWindow
       ; RTIO . PutText ( Wr . EOL ) 
       ; RTIO . Flush ( ) 
       END (* IF *) 
+    ; IF Window = NIL THEN RETURN END (* IF *)
     ; LOCK Window 
       DO
         Window . EwHasRescreenPending := TRUE  
@@ -2922,7 +2931,8 @@ MODULE EditWindow
   ; VAR LNewSize : Point . T 
 
   ; BEGIN (* ReshapeWorkProc *)
-      LOCK Closure . Window
+      IF Closure . Window = NIL THEN RETURN END (* IF *)
+    ; LOCK Closure . Window
       DO 
         LOldSize := Closure . Window . EwSouthEastChar 
       ; Closure . Window . EwDomain := Closure . Reshape . new 
@@ -2948,6 +2958,7 @@ MODULE EditWindow
       ; RTIO . PutText ( Wr . EOL ) 
       ; RTIO . Flush ( ) 
       END (* IF *) 
+    ; IF Window = NIL THEN RETURN END (* IF *)
     ; LOCK Window 
       DO
         Window . EwHasReshapePending := TRUE 
@@ -2987,7 +2998,8 @@ MODULE EditWindow
   ; VAR LDoRepaint : BOOLEAN 
 
   ; BEGIN (* RepaintWorkProc *) 
-      LOCK Closure . Window
+      IF Closure . Window = NIL THEN RETURN END (* IF *)
+    ; LOCK Closure . Window
       DO LDoRepaint
            := Closure . Window . EwScreenType # NIL 
               AND NOT Rect . IsEmpty ( Closure . Window . EwDomain )
@@ -3016,6 +3028,7 @@ MODULE EditWindow
       ; RTIO . PutText ( Wr . EOL ) 
       ; RTIO . Flush ( ) 
       END (* IF *) 
+    ; IF Window = NIL THEN RETURN END (* IF *)
     ; LOCK Window 
       DO
         Window . EwHasRepaintPending := TRUE 

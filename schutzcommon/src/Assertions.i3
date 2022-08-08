@@ -24,6 +24,7 @@ INTERFACE Assertions
         ; DoWriteCheckpoint : BOOLEAN 
         ) 
       : BOOLEAN 
+      RAISES { AssertionFailure } 
   (* When there is a registered QueryProc callback, an assertion failure
      or runtime error calls it to query the user as to what to do. 
      It returns TRUE to ask that AssertionFailure or Backout be raised. *)
@@ -82,6 +83,7 @@ INTERFACE Assertions
     ; DoWriteCheckpoint : BOOLEAN 
     ) 
   : BOOLEAN 
+  RAISES { AssertionFailure } 
   (* Ignores RaiseOnFailure and always raises AssertionFailure. *) 
 
 ; PROCEDURE NeverRaise 
@@ -98,6 +100,7 @@ INTERFACE Assertions
     ; DoWriteCheckpoint : BOOLEAN 
     ) 
   : BOOLEAN 
+  RAISES { AssertionFailure } 
   (* The default QueryProc. Returns RaiseOnFailure. *) 
 
 ; PROCEDURE DoNothing ( ) 

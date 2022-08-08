@@ -28,13 +28,18 @@ UNSAFE MODULE Failures
 ; IMPORT LbeStd 
 ; IMPORT Misc 
 
+<* PRAGMA LL *> 
+
 ; VAR GOldBackstop : RTException . Backstop
 
 ; TYPE FailureSyncTyp
-    = MUTEX OBJECT
+    = MUTEX OBJECT (* Protects its fields: *) 
         Depth : INTEGER := 0
       ; BackstopIdle : Thread . Condition := NIL 
       END (* FailureSyncTyp *)
+  (* ^To make sure no changes in backstop registration while executing
+     inside a backstop.
+  *) 
 
 ; VAR GFailureSync : FailureSyncTyp := NIL  
 
@@ -49,8 +54,6 @@ UNSAFE MODULE Failures
 ; REVEAL ThreadInfoRefTyp = BRANDED REF ThreadInfoTyp
 
 ; VAR GThreadInfoList : ThreadInfoRefTyp := NIL 
-
-; VAR GThreadInfoDefault := ThreadInfoTyp { NIL , NIL , NIL }
 
 (* EXPORTED *) 
 ; PROCEDURE RegisterQueryProc ( QueryProc : QueryProcTyp ; FDoGui := FALSE )
@@ -109,9 +112,9 @@ UNSAFE MODULE Failures
     END RegisterQueryProc 
 
  ; PROCEDURE QueryDefault
-     ( READONLY Act : RT0 . RaiseActivation
-     ; StoppedReason : TEXT 
-     ; AllowedActions : FailureActionSetTyp
+     ( <* UNUSED *> READONLY Act : RT0 . RaiseActivation
+     ; <* UNUSED *> StoppedReason : TEXT 
+     ; <* UNUSED *> AllowedActions : FailureActionSetTyp
      )
    : FailureActionTyp
 
@@ -239,7 +242,9 @@ UNSAFE MODULE Failures
   ; VAR LTextWrT : TextWr . T 
   ; VAR LRTArg : RuntimeError . T 
 
-  ; BEGIN
+  ; <* FATAL Wr . Failure *>
+    <* FATAL Thread . Alerted *>
+    BEGIN
       IF Exc = NIL OR Exc . name = NIL 
       THEN RETURN "<unknown exception>"
       ELSE
@@ -279,7 +284,9 @@ UNSAFE MODULE Failures
   ; VAR LProcAddr : ADDRESS  
   ; VAR LFileNameS , LProcNameS : ADDRESS 
 
-  ; BEGIN
+  ; <* FATAL Wr . Failure *> 
+    <* FATAL Thread . Alerted *>
+    BEGIN
       IF Act . module # NIL
       THEN LFileNameS := Act . module . file
       ELSE LFileNameS := NIL 
@@ -328,7 +335,7 @@ UNSAFE MODULE Failures
     END ActivationLocation 
 
 ; PROCEDURE Crash
-    ( READONLY Act : RT0 . RaiseActivation )
+    ( <* UNUSED *> READONLY Act : RT0 . RaiseActivation )
 
   = BEGIN
       RTIO . PutText ( Wr . EOL )
@@ -338,7 +345,7 @@ UNSAFE MODULE Failures
     ; RTIO . PutText ( ". #####" )
     ; RTIO . PutText ( Wr . EOL )
     ; RTIO . Flush ( ) 
-    ; RTProcess.Crash (NIL) 
+    ; RTProcess . Crash ( NIL ) 
     END Crash
 
 ; CONST SecondaryMap 
@@ -350,7 +357,8 @@ UNSAFE MODULE Failures
 
 ; PROCEDURE BackstopPrimary
     ( VAR Act : RT0 . RaiseActivation ; wasBlocked : BOOLEAN )
-  (* Turn the fault into a secondary RT error, using the same
+    RAISES ANY
+(* Turn the fault into a secondary RT error, using the same
      activation, and reraise it. *)
 
   (* This is mostly just duplication of the default backstop in the
@@ -392,8 +400,8 @@ UNSAFE MODULE Failures
     ; LActPtr := LOOPHOLE ( ADR ( Act ) , RT0 . ActivationPtr )
     ; IF LThreadInfoRef ^ . QueryingActPtr # NIL
          AND LThreadInfoRef ^ . QueryingActPtr # LActPtr
-         (* Act was raised from somewhere dynamically inside a query.
-            We can't do anything more with this.
+         (* Act was raised from somewhere dynamically inside a query about
+            a previous failure.  We can't do anything more with this.
          *) 
       THEN
 
@@ -456,7 +464,7 @@ UNSAFE MODULE Failures
           ; RTIO . Flush ( ) 
 
           ; Crash ( Act )
-          ELSE (* Client code has passed on two chances to catch: the original
+          ELSE (* Client code has passedup two chances to catch: the original
                   exception and a secondary exception (RT error: unhandled or
                   blocked), which also is now unhandled or blocked.  Now give
                   the human user some options. *)
@@ -478,7 +486,8 @@ UNSAFE MODULE Failures
           ; LThreadInfoRef ^ . QueryingActPtr := LActPtr 
           ; LAction 
               := LThreadInfoRef . QueryProc
-                   ( Act , StoppedReason ( LPrimaryWasBlocked )
+                   ( Act
+                   , StoppedReason ( LPrimaryWasBlocked )
                    , LAllowedActions
                    )  
           ; LThreadInfoRef ^ . QueryingActPtr := NIL
@@ -495,7 +504,8 @@ UNSAFE MODULE Failures
            is done here.  But in general, the primary exception to Backout
            can be anything.  What to do?
 *)
-              ; RTException . Raise ( Act ) 
+              ; RTException . Raise ( Act )
+              
             | FailureActionTyp . FaIgnore 
               => (* Ignoring an exception will likely work only when the
                     original exception was Assertions.AssertionFailure,
@@ -503,7 +513,8 @@ UNSAFE MODULE Failures
                     where it can catch Failures.Ignore and return without
                     action action. *)
                 Act . exception := GIgnoreRef 
-              ; RTException . Raise ( Act ) 
+              ; RTException . Raise ( Act )
+              
             | FailureActionTyp . FaCrash 
             =>  RTIO . PutText ( Wr . EOL )
               ; RTIO . PutText ( "##### " )
