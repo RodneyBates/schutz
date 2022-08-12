@@ -6,6 +6,8 @@
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
+(* EditWindow handles gui actions on the text portion of the editor window. *) 
+
 INTERFACE EditWindow 
 
 ; FROM Failures IMPORT Backout 
@@ -52,7 +54,9 @@ INTERFACE EditWindow
 ; TYPE CursorStateTyp 
     = { CsBlinkingOff   (* Used only in stored state *) 
       , CsBlinkingOn    (* Used only in stored state *) 
-      , CsInvisible , CsGrayed , CsSolid 
+      , CsInvisible
+      , CsGrayed
+      , CsSolid 
       , CsBlinking      (* Used only internally. *) 
       } 
 

@@ -21,6 +21,7 @@ MODULE Ui
 ; IMPORT Trestle 
 ; IMPORT TrestleComm 
 ; IMPORT VBT 
+; IMPORT VBTClass (* To show VBT.T is a MUTEX, thus EditWindow . T too. *)  
 ; IMPORT Wr 
 
 (* Application: *) 
@@ -283,7 +284,6 @@ MODULE Ui
 
     ; EVAL EditWindow . Init ( LWindow , Form := Form )
 
-
 (*  ; LOCK LWindow
       DO EVAL EditWindow . Init ( LWindow , Form := Form , Font := LFont )
       END (* LOCK *)
@@ -312,48 +312,72 @@ MODULE Ui
 
 (* Convenience procedures for setting standard fields of closures. *) 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SetImageTrans ( Closure : Worker . ClosureTyp ) 
   : Worker . ClosureTyp 
-  (* PRE: ImageTrans is set, set ImagePers from it. *) 
+  (* PRE: Window is set, set ImageTrans from it. *) 
 
   = BEGIN 
       IF Closure . Window # NIL 
-      THEN 
-        Closure . ImageTrans := Closure . Window . WrImageRef  
+      THEN
+        LOCK Closure . Window 
+        DO Closure . ImageTrans := Closure . Window . WrImageRef
+        END (* LOCK *) 
       END (* IF *) 
     ; RETURN Closure  
     END SetImageTrans 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SetImagePers ( Closure : Worker . ClosureTyp ) 
   : Worker . ClosureTyp 
   (* PRE: ImageTrans is set, set ImagePers from it. *) 
 
   = BEGIN 
-      IF Closure . ImageTrans # NIL 
-      THEN 
-        Closure . ImagePers := Closure . ImageTrans . ItPers 
+      IF Closure # NIL AND Closure . ImageTrans # NIL
+(* REVIEW: Do we need MU on Images? *) 
+      THEN Closure . ImagePers := Closure . ImageTrans . ItPers 
       END (* IF *) 
     ; RETURN Closure  
     END SetImagePers 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SetImageTransAndPers ( Closure : Worker . ClosureTyp ) 
   : Worker . ClosureTyp 
   (* PRE: Window is set, set ImageTrans and ImagePers from it. *) 
 
-  = BEGIN 
+  = BEGIN
       IF Closure . Window # NIL 
       THEN 
-        Closure . ImageTrans := Closure . Window . WrImageRef 
-      ; IF Closure . ImageTrans # NIL 
-        THEN 
-          Closure . ImagePers := Closure . ImageTrans . ItPers 
-        END (* IF *) 
+        LOCK Closure . Window 
+        DO Closure . ImageTrans := Closure . Window . WrImageRef 
+        ; IF Closure . ImageTrans # NIL 
+          THEN Closure . ImagePers := Closure . ImageTrans . ItPers 
+          END (* IF *) 
+        END (* LOCK *) 
       END (* IF *)
     ; RETURN Closure  
     END SetImageTransAndPers 
+
+(* EXPORTED: *) 
+; PROCEDURE SetFieldsFromForm ( Closure : Worker . ClosureTyp ) 
+  : Worker . ClosureTyp 
+  (* PRE: Closure . Form is set. *)
+  (* Set Closure . Window, ImageTrans, and ImagePers from it. *) 
+
+  = BEGIN
+      Closure . Window 
+        := FormsVBT . GetGeneric ( Closure . Form , "Fv_LbeWindow" )   
+    ; IF Closure . Window # NIL 
+      THEN
+        LOCK Closure . Window 
+        DO Closure . ImageTrans := Closure . Window . WrImageRef 
+        ; IF Closure . ImageTrans # NIL 
+          THEN Closure . ImagePers := Closure . ImageTrans . ItPers 
+          END (* IF *)
+        END (* LOCK *) 
+      END (* IF *)
+    ; RETURN Closure  
+    END SetFieldsFromForm  
 
 (******************************** Open ***********************************) 
 
@@ -619,7 +643,7 @@ MODULE Ui
     ; Options . OpeningImageRef := NIL 
     END OpenWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayFileOpen ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -879,7 +903,7 @@ MODULE Ui
       END (* IF *)  
     END FileSaveWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayFileSave ( RecordedName : TEXT ) 
 
   = VAR LImageName : TEXT 
@@ -1012,7 +1036,7 @@ MODULE Ui
     BEGIN 
       LForm := EditWindow . Form ( Closure . Window ) 
     ; IF SaveDialogInfo . DoCloseAllWindows 
-      THEN (* Only prompt fonce, even if it is in multiple windows. *) 
+      THEN (* Only prompt once, even if it is in multiple windows. *) 
         LCommandString 
           := UiRecPlay . BeginCommandPlusString  
                ( UiRecPlay . CommandTyp . FileCloseImage 
@@ -1041,11 +1065,11 @@ MODULE Ui
 (* TODO: Decide if we want to close the windows too. *) 
     END SaveDialogDisconnect 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE PromptAndCloseAllImages 
     ( Closure : Worker . ClosureTyp ; QuitAfter : BOOLEAN ) 
   RAISES { Backout , Thread . Alerted }
-  (* PRE: Closure . Window only is set. Image is chosen inside. *)  
+  (* PRE: Only Closure . Window is set. Image will be chosen inside. *)  
   (* Runs on worker thread. *) 
 
   = VAR LImageRef : PaintHs . ImageTransientTyp 
@@ -1100,8 +1124,7 @@ MODULE Ui
         ; IF SaveDialogInfo . DoCloseAllImages 
           THEN (* Do another image. *) 
             TRY 
-              PromptAndCloseAllImages 
-                ( Closure , SaveDialogInfo . QuitAfter ) 
+              PromptAndCloseAllImages ( Closure , SaveDialogInfo . QuitAfter ) 
             EXCEPT Thread . Alerted => (* Ignore. *) 
             END (* TRY EXCEPT *) 
           END (* IF *) 
@@ -1112,8 +1135,8 @@ MODULE Ui
             , "Save modified image " 
               & Closure . ImagePers . IpImageName & "?" 
             ) 
-        ; FormsVBT . PopUp ( LForm , "Fv_SaveDialog" ) 
         ; SaveDialogInfo . IsPoppedUp := TRUE 
+        ; FormsVBT . PopUp ( LForm , "Fv_SaveDialog" ) 
      (* ; FormsVBT . MakeDormant ( LForm , "Fv_Background" ) 
           This makes the stop sign dormant too. 
      *) 
@@ -1355,7 +1378,7 @@ MODULE Ui
       END (* IF *) 
     END ReplaySaveAsWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayFileSaveAs ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1424,8 +1447,7 @@ MODULE Ui
       LFileName := FormsVBT . GetText ( Form , "Fv_SaveAsDialog_FileName" )
     ; EVAL Worker . RequestWorkInteractive  
              ( NEW ( WorkerClosureTextTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )    
+                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
                    , Time := Time 
                    , TextParam := LFileName 
                    , apply := SaveAsOKWorkProc 
@@ -1630,7 +1652,7 @@ MODULE Ui
       END (* IF *) 
     END ReplayExportWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayFileExport ( FileName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1681,8 +1703,7 @@ MODULE Ui
       LFileName := FormsVBT . GetText ( Form , "Fv_ExportDialog_FileName" )
     ; EVAL Worker . RequestWorkInteractive  
              ( NEW ( WorkerClosureTextTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )    
+                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )
                    , Time := Time 
                    , TextParam := LFileName 
                    , apply := ExportOKWorkProc 
@@ -1733,7 +1754,7 @@ MODULE Ui
       END (* IF *) 
     END ReplayCloseImageWorkProc  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayFileCloseImage ( RecordedName : TEXT ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1778,8 +1799,7 @@ MODULE Ui
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
              ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
+                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
                    , Time := Time 
                    , apply := CloseImageWorkProc 
                    ) 
@@ -1847,7 +1867,7 @@ MODULE Ui
       END (* IF *) 
     END ReplayCloseWindowWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayFileCloseWindow 
     ( RecordedName : TEXT ; WindowNo : INTEGER ) 
 
@@ -1922,8 +1942,7 @@ MODULE Ui
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
              ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
+                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
                    , Time := Time 
                    , apply := CloseWindowWorkProc 
                    ) 
@@ -1953,8 +1972,7 @@ MODULE Ui
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
              ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
+                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
                    , Time := Time 
                    , apply := CloseAllWorkProc 
                    ) 
@@ -1963,7 +1981,7 @@ MODULE Ui
 
 (********************************* Quit **********************************) 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayFileQuit ( ) 
 
   = BEGIN 
@@ -1971,10 +1989,15 @@ MODULE Ui
     ; ReallyQuit ( ) 
     END ReplayFileQuit 
 
+(* EXPORTED: *)
 ; PROCEDURE QuitWorkProc ( Closure : Worker . ClosureTyp ) 
   RAISES { Backout , Thread . Alerted } 
   (* PRE: Closure . Window is set. *) 
-  (* Runs on worker thread. *)   
+  (* Runs on worker thread. *)
+
+(* TODO: Use a Closure w/ boolean for QuitAfter and combine WorkProcs
+         that call PromptAndCloseAllImages.
+*)
 
   = BEGIN 
       PromptAndCloseAllImages ( Closure , QuitAfter := TRUE ) 
@@ -1991,8 +2014,7 @@ MODULE Ui
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
              ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
+                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
                    , Time := Time 
                    , apply := QuitWorkProc 
                    ) 
@@ -2081,7 +2103,7 @@ MODULE Ui
       END (* IF *) 
     END EditCutWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayEditCut ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -2145,7 +2167,7 @@ MODULE Ui
     (* Do we want to clear the swept text attributes? *) 
     END EditCopyWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayEditCopy ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -2269,7 +2291,7 @@ MODULE Ui
     ; UiRecPlay . RecordString ( LCommandString ) 
     END EditPasteWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE Paste ( Window : EditWindow . WindowTyp ; Time : VBT . TimeStamp ) 
   <* LL . sup <= VBT . mu *> 
 
@@ -2281,10 +2303,8 @@ MODULE Ui
   ; VAR LCode2 : VBT . ErrorCode 
 
   ; BEGIN 
-
-ReadSelections (* q.v. *) ( Window , Time ) 
-; 
-      TRY 
+      ReadSelections (* q.v. *) ( Window , Time ) 
+    ; TRY 
         LValue 
           := VBT . Read ( Window , EditWindow . ScreenSelection ( ) , Time ) 
       EXCEPT 
@@ -2324,7 +2344,7 @@ ReadSelections (* q.v. *) ( Window , Time )
       END (* IF *) 
     END Paste
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayEditPaste ( Window : EditWindow . WindowTyp ; Text : TEXT ) 
 
   = BEGIN 
@@ -2414,7 +2434,7 @@ ReadSelections (* q.v. *) ( Window , Time )
     ; UiRecPlay . RecordString ( LCommandString ) 
     END AcceptRepairWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplaySemAccept ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -2489,7 +2509,7 @@ ReadSelections (* q.v. *) ( Window , Time )
       END (* IF *)  
     END ParseWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplaySemParse ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -2608,7 +2628,7 @@ ReadSelections (* q.v. *) ( Window , Time )
       END (* IF *) 
     END AnalyzeWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplaySemAnalyze ( ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -2683,16 +2703,19 @@ ReadSelections (* q.v. *) ( Window , Time )
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
-  = VAR LForm : FormsVBT . T 
+  = VAR LWindow : EditWindow . T
+  ; VAR LForm : FormsVBT . T 
   ; VAR LMax : INTEGER 
   ; VAR LThumb : INTEGER 
   ; VAR LValue : INTEGER 
-  ; VAR LCommandString : TEXT 
-
+  ; VAR LCommandString : TEXT
+  ; VAR LWrVertScroll : INTEGER
+  
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
+      LWindow := Closure . Window
+    ; LForm := EditWindow . Form ( LWindow ) 
     ; EVAL SetImageTrans ( Closure ) 
     ; IF Closure . ImageTrans # NIL 
       THEN 
@@ -2711,21 +2734,24 @@ ReadSelections (* q.v. *) ( Window , Time )
           IF LValue = 0 
           THEN (* Move to beginning, despite inaccuracies of estimation. *) 
             Display . VertScrollAndRepaint
-              ( WindowRef := Closure . Window 
+              ( WindowRef := LWindow 
               , WantedMovement := FIRST ( LbeStd . LineNoSignedTyp ) 
               , DoDragCursor := FALSE 
               ) 
           ELSIF LValue = LMax - LThumb  
           THEN (* Move to end, in spite of inaccuracies of estimation. *) 
             Display . VertScrollAndRepaint
-              ( WindowRef := Closure . Window 
+              ( WindowRef := LWindow 
               , WantedMovement := LAST ( LbeStd . LineNoSignedTyp ) 
               , DoDragCursor := FALSE 
               ) 
-          ELSE (* Move to somewhere in between. *)  
-            Display . VertScrollAndRepaint
-              ( WindowRef := Closure . Window 
-              , WantedMovement := LValue - Closure . Window . WrVertScroll 
+          ELSE (* Move to somewhere in between. *)
+            LOCK LWindow
+            DO LWrVertScroll := LWindow . WrVertScroll
+            END (* LOCK *)
+          ; Display . VertScrollAndRepaint
+              ( WindowRef := LWindow 
+              , WantedMovement := LValue - LWrVertScroll 
               , DoDragCursor := FALSE 
               ) 
           END (* IF *)  
@@ -2734,13 +2760,15 @@ ReadSelections (* q.v. *) ( Window , Time )
         => (* Trestle will have already moved the scroller thumb and will 
               move it back, but not until the mouse moves into the edit VBT. 
            *) 
-          EditWindow . UpdateVertScroller ( Closure . Window ) 
+          EditWindow . UpdateVertScroller ( LWindow ) 
+(* FIXME: ^I think this needs to be inside the LOCK. *)
+(* REVIEW: Compare to HorizScroll. *)
         ; RAISE Thread . Alerted 
         END (* TRY EXCEPT *) 
       END (* IF *) 
     END VertScrollWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayVertScroll 
     ( Max : INTEGER ; Thumb : INTEGER ; Value : INTEGER ) 
 
@@ -2790,7 +2818,9 @@ ReadSelections (* q.v. *) ( Window , Time )
   (* PRE: Closure . Window is set. *) 
   (* Runs on worker thread. *)   
 
-  = VAR LValue : INTEGER 
+  = VAR LWindow : EditWindow . T
+  ; LValue : INTEGER 
+  ; LWrHorizScroll : INTEGER 
   ; VAR LCommandString : TEXT 
 
   ; <* FATAL FormsVBT . Error *>
@@ -2801,14 +2831,18 @@ ReadSelections (* q.v. *) ( Window , Time )
       THEN 
         LCommandString 
           := UiRecPlay . BeginCommandPlusInt 
-               ( UiRecPlay . CommandTyp . HorizScroll , LValue ) 
+               ( UiRecPlay . CommandTyp . HorizScroll , LValue )
+      ; LWindow := Closure . Window 
       ; LValue 
           := FormsVBT . GetInteger 
-               ( EditWindow . Form ( Closure . Window ) , "Fv_HorizScroller" )
-      ; TRY 
+               ( EditWindow . Form ( LWindow ) , "Fv_HorizScroller" )
+      ; LOCK LWindow
+        DO LWrHorizScroll := LWindow . WrHorizScroll
+        END (* LOCK *) 
+      ; TRY  
           Display . HorizScrollWindowRef
-            ( WindowRef := Closure . Window 
-            , WindowMovement := LValue - Closure . Window . WrHorizScroll 
+            ( WindowRef := LWindow 
+            , WindowMovement := LValue - LWrHorizScroll 
             , DoDragCursor := FALSE 
             ) 
         ; UiRecPlay . RecordString ( LCommandString ) 
@@ -2816,13 +2850,14 @@ ReadSelections (* q.v. *) ( Window , Time )
         => (* Trestle will have already moved the scroller thumb and will 
               move it back, but not  until the mouse moves into the edit VBT. 
            *) 
-          EditWindow . UpdateHorizScroller ( Closure . Window ) 
+          EditWindow . UpdateHorizScroller ( LWindow )
+(* FIXME: ^I think this needs to be inside the LOCK. *) 
         ; RAISE Thread . Alerted 
         END (* TRY EXCEPT *) 
       END (* IF *) 
     END HorizScrollWorkProc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayHorizScroll ( Value : INTEGER ) 
 
   = <* FATAL FormsVBT . Unimplemented *>
@@ -2862,7 +2897,7 @@ ReadSelections (* q.v. *) ( Window , Time )
                ) 
     END HorizScrollCallback 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ParseKbd 
     ( <* UNUSED *> Lang : LbeStd . LangTyp 
     ; <* UNUSED *> ScanIf : ScannerIf . ScanIfTyp 
@@ -2962,7 +2997,7 @@ ReadSelections (* q.v. *) ( Window , Time )
       END (* IF *) 
     END TrestleInstall 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE Install 
     ( EditFileName : TEXT 
     ; PlaybackFileName : TEXT 
@@ -3073,7 +3108,7 @@ ReadSelections (* q.v. *) ( Window , Time )
     ; RETURN TRUE 
     END Install 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DefaultWindow ( ) : PaintHs . WindowRefTyp 
 
   = VAR LForm : FormsVBT . T 

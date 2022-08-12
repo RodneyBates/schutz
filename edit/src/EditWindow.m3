@@ -6,6 +6,8 @@
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
+(* EditWindow handles gui actions on the text portion of the editor window. *) 
+
 MODULE EditWindow 
 
 ; IMPORT Axis 
@@ -179,7 +181,8 @@ MODULE EditWindow
 ; TYPE BlanksRefTyp = REF ARRAY OF CHAR 
 
 <* LL >= {VBT.mu} *> 
-; VAR BlanksRef : BlanksRefTyp := NIL 
+; VAR BlanksRef : BlanksRefTyp := NIL
+(* TODO: This is unused. 2022-8-10. *)
 
 ; PROCEDURE ExpandBlanks ( Size : CharCoordTyp ) 
   <* LL >= VBT.mu *> 
@@ -665,7 +668,7 @@ MODULE EditWindow
 
 ; VAR MinMargin := Point . T { 6 , 3 } 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE Init 
     ( Window : T  
     ; Form : FormsVBT . T 
@@ -706,7 +709,7 @@ MODULE EditWindow
     ; RETURN Window 
     END Init 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE SouthEastToCorner ( Window : WindowTyp ) : CharPointTyp 
   (* Follows the usual _to_ invariant, i.e. the first char _not_ included. *) 
 
@@ -821,7 +824,7 @@ MODULE EditWindow
       END (* CASE *) 
     END PaintInCursor 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE MakeCursorVisible ( Window : WindowTyp ) 
   <* LL . sup < BlinkerLock *> 
 
@@ -836,7 +839,7 @@ MODULE EditWindow
       END (* LOCK *) 
     END MakeCursorVisible 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintWindowBlank ( Window : WindowTyp ) 
   <* LL . sup < Window . mu *> 
 
@@ -900,7 +903,7 @@ MODULE EditWindow
     END (* IF *) 
     END TraceText  
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintLine  
     ( Window : WindowTyp 
     ; FromPosInWindow : CharCoordTyp 
@@ -1061,7 +1064,7 @@ MODULE EditWindow
       END (* Block *) 
     END PaintLine  
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE ClearLine 
     ( Window : WindowTyp 
     ; FromPosInWindow : CharCoordTyp 
@@ -1131,7 +1134,7 @@ MODULE EditWindow
       END (* IF *) 
     END PaintArrow 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintLeftArrow
     ( Window : WindowTyp 
     ; LineNoInWindow : CharCoordTyp 
@@ -1150,7 +1153,7 @@ MODULE EditWindow
         ) 
     END PaintLeftArrow
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintRightArrow 
     ( Window : WindowTyp 
     ; LineNoInWindow : CharCoordTyp 
@@ -1169,7 +1172,7 @@ MODULE EditWindow
         ) 
     END PaintRightArrow 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintBackground 
     ( Window : WindowTyp 
     ; LineNoInWindow : CharCoordTyp 
@@ -1200,7 +1203,7 @@ MODULE EditWindow
     ; PaintInCursor ( Window ) 
     END PaintBackground  
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE SetCursorPosition 
     ( Window : WindowTyp 
     ; CharPosInWindow : CharCoordTyp 
@@ -1252,7 +1255,7 @@ MODULE EditWindow
       END (* IF *) 
     END SetCursorPosition 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintCursorCoordinates ( Window : WindowTyp ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1282,7 +1285,7 @@ MODULE EditWindow
         )
     END PaintCursorCoordinates 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintInsertMode ( Window : WindowTyp ) 
 
   = VAR LValue : TEXT 
@@ -1310,7 +1313,7 @@ MODULE EditWindow
       END (* IF *) 
     END RedGreenBoolean
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE UpdateVertScroller ( Window : WindowTyp ) 
   <* LL.sup < Window *> 
 
@@ -1370,7 +1373,7 @@ MODULE EditWindow
       END (* IF *) 
     END UpdateVertScroller 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE UpdateHorizScroller ( Window : WindowTyp ) 
   <* LL.sup < Window *> 
 
@@ -1492,7 +1495,7 @@ MODULE EditWindow
       END (* IF *) 
     END SetCursorState 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintText 
     ( <*UNUSED*> Window : WindowTyp ; VbtName : TEXT ; Value : TEXT ) 
 
@@ -1502,7 +1505,7 @@ MODULE EditWindow
       FormsVBT . PutText ( Options . MainForm , VbtName , Value ) 
     END PaintText  
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintWindowState 
     ( Window : WindowTyp ; VbtName : TEXT ; State : INTEGER ) 
 
@@ -1513,7 +1516,7 @@ MODULE EditWindow
         ( Form ( Window )  , VbtName , ORD ( State ) ) 
     END PaintWindowState 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE PaintWindowSavedState ( Window : WindowTyp ; State : BOOLEAN ) 
 
   = <* FATAL FormsVBT . Error *>
@@ -1523,7 +1526,7 @@ MODULE EditWindow
         ( Form ( Window ) , "Fv_Modified" , ORD ( NOT State ) ) 
     END PaintWindowSavedState 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE Beep ( ) 
 
   = BEGIN (* Beep *) 
@@ -1560,7 +1563,7 @@ MODULE EditWindow
       END (* IF *) 
     END TakeKBFocusLocked 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE TakeKBFocus 
    ( Window : WindowTyp ; TimeStamp : VBT . TimeStamp ) 
   <* LL . sup < Window . mu *> 
@@ -1571,7 +1574,7 @@ MODULE EditWindow
       END (* LOCK *) 
     END TakeKBFocus 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE ScreenSelection ( ) : VBT . Selection 
 
   = BEGIN 
@@ -1628,7 +1631,7 @@ MODULE EditWindow
       END (* IF *) 
     END MouseClickWorkProc 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayMouseClickPixel 
     ( Window : WindowTyp ; H : INTEGER ; V : INTEGER ) 
 
@@ -1650,7 +1653,7 @@ MODULE EditWindow
       END (* TRY EXCEPT *) 
     END ReplayMouseClickPixel  
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayMouseClickChar 
     ( Window : WindowTyp ; H : INTEGER ; V : INTEGER ) 
 
@@ -1748,7 +1751,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END ClearSelectionWorkProc 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayClearSelection ( ) 
 
   = BEGIN 
@@ -1807,7 +1810,7 @@ MODULE EditWindow
     ; GSweeping := FALSE 
     END EndSweepSelection 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayEndSweepSelection ( Window : WindowTyp ) 
   <* LL . sup < Window . mu *> 
 
@@ -1888,7 +1891,7 @@ MODULE EditWindow
       END (* IF *) 
     END SweepSelectionWorkProc 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplaySweepSelection 
     ( Window : WindowTyp ; H : INTEGER ; V : INTEGER ) 
 
@@ -1958,7 +1961,8 @@ MODULE EditWindow
   = Worker . ClosureTyp OBJECT BoolParam : BOOLEAN END 
 
 ; PROCEDURE PromptAndCloseWorkProc ( Closure : WorkerClosureBoolTyp ) 
-  RAISES { Backout , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted }
+  (* PRE: only Closure . Window is set. Image will be chosen inside. *)  
 
   = BEGIN 
       Ui . PromptAndCloseAllImages 
@@ -1971,7 +1975,9 @@ MODULE EditWindow
      LL . sup = VBT . mu
   *) 
 
-  = BEGIN (* Misc *) 
+  = VAR WorkResult : Worker . WorkResultTyp 
+  
+  ; BEGIN (* Misc *) 
       IF MiscRec . type = VBT . TakeSelection 
       THEN 
         IF MiscRec . selection = VBT . KBFocus 
@@ -2006,25 +2012,25 @@ MODULE EditWindow
         THEN 
           Assertions . DoNothing ( )  
         END (* IF *) 
-      ELSIF MiscRec . type = VBT . Deleted 
-            OR MiscRec . type = VBT . Disconnected 
-      THEN 
-(* FIX: Figure out why we aren't getting this when Schutz is closed by
-        the window manager. 
-*) 
-        TRY 
-          EVAL Worker . RequestWork 
-                 ( NEW ( WorkerClosureBoolTyp 
-                       , BoolParam := FALSE  
-                         (* ^We will presumably quit anyway. *) 
-                       , apply := PromptAndCloseWorkProc 
-                       ) 
-                 , Interactive := FALSE 
-                 , WaitToStart := TRUE 
-                 , WaitToFinish := TRUE 
-                 ) 
-        EXCEPT Thread . Alerted => 
-        END (* TRY EXCEPT *) 
+      ELSIF Window = Options . MainWindow
+            AND ( MiscRec . type = VBT . Deleted 
+                  OR MiscRec . type = VBT . Disconnected
+                ) 
+      THEN
+        Ui . PromptAndCloseAllImages
+          ( NEW ( Worker . ClosureTyp , Window := Window ) , QuitAfter := TRUE )
+(*
+        EVAL Worker . RequestWorkInteractive  
+          ( NEW ( Worker . ClosureTyp 
+                , Window := Window 
+                , Time := MiscRec . time 
+                , apply := Ui . QuitWorkProc 
+                ) 
+          )
+      ; WorkResult := Worker . AwaitIdle ( )
+        (* ^Don't return from Misc, until worker tread work is done. *)
+*)
+      ; Assertions . DoNothing ( ) (* For breakpoint. *) 
       ELSIF MiscRec . type = GEndSweepMiscCode
       THEN 
         EndSweepSelection ( Window , MiscRec . time ) 
@@ -2046,7 +2052,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END BeginKeyWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayBeginKey ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2075,7 +2081,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END EndKeyWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayEndKey ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2104,7 +2110,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END CharDelFwdWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayCharDelFwd ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2133,7 +2139,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END CharDelBwdWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayCharDelBwd ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2163,7 +2169,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END DeleteRestOfLineWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayDeleteRestOfLine ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2192,7 +2198,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END CharTransposeWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayCharTranspose ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2222,7 +2228,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END CursorLeftWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayCursorLeft ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2252,7 +2258,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END CursorRightWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayCursorRight ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2282,7 +2288,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END CursorUpWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayCursorUp ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2312,7 +2318,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END CursorDownWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayCursorDown ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2346,7 +2352,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END PriorKeyWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayPriorKey ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2380,7 +2386,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END NextKeyWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayNextKey ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2413,7 +2419,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END HomeKeyWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayHomeKey ( Window : WindowTyp ) 
 
   = BEGIN 
@@ -2451,7 +2457,7 @@ MODULE EditWindow
     ; RecordInsertMode ( Closure . BoolParam ) 
     END SetInsertModeWorkProc  
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplaySetInsertMode ( Window : WindowTyp ; Value : BOOLEAN ) 
 
   = BEGIN 
@@ -2480,7 +2486,7 @@ MODULE EditWindow
     ; RecordInsertMode ( LIsInsert ) 
     END ToggleInsertModeWorkProc  
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE ToggleInsertMode ( Window : WindowTyp ) 
 
   = BEGIN
@@ -2514,7 +2520,7 @@ MODULE EditWindow
     ; UiRecPlay . RecordString ( LCommandString ) 
     END CharTypeWorkProc 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ReplayCharType ( Window : WindowTyp ; Ch : CHAR ) 
 
   = BEGIN 
@@ -2882,7 +2888,9 @@ MODULE EditWindow
     RAISES { } 
   <* LL.sup = VBT.mu.Window *> 
 
-  = BEGIN (* Rescreen *) 
+  = VAR LCancelledClosure : Worker . ClosureTyp
+
+  ; BEGIN (* Rescreen *) 
       IF GLogEvents
       THEN
         RTIO . PutText ( "Rescreen Callback. " )
@@ -2905,11 +2913,12 @@ MODULE EditWindow
         , RedoStateTyp . Done 
         => (* Start it over.  This will cancel it if already running. *)  
           Window . EwRedoState := RedoStateTyp . Starting  
-        ; TRY 
-            EVAL Worker . RequestQueuedWork 
+        ; TRY LCancelledClosure
+              := Worker . RequestQueuedWork 
                    ( Window . EwRedoClosure
-                   , Worker . GranularityTyp . Image  
-                   ) 
+                   , Worker . GranularityTyp . Window   
+                   )
+(* REVIEW ^Anything to be done with LCancelledClosure? *)   
           EXCEPT Thread . Alerted => (* Ignore. *) 
           END (* TRY EXCEPT *) 
         END (* CASE *) 
@@ -2951,7 +2960,9 @@ MODULE EditWindow
   RAISES { } 
   <* LL.sup = VBT.mu.Window *> 
 
-  = BEGIN (* Reshape   *) 
+  = VAR LCancelledClosure : Worker . ClosureTyp
+
+  ; BEGIN (* Reshape *) 
       IF GLogEvents
       THEN
         RTIO . PutText ( "Reshape Callback. " )
@@ -2973,11 +2984,12 @@ MODULE EditWindow
         , RedoStateTyp . Done 
         => (* Start it over.  This will cancel it if already running. *)  
           Window . EwRedoState := RedoStateTyp . Starting  
-        ; TRY 
-            EVAL Worker . RequestQueuedWork 
+        ; TRY LCancelledClosure
+              := Worker . RequestQueuedWork 
                    ( Window . EwRedoClosure
                    , Worker . GranularityTyp . Image  
                    ) 
+(* REVIEW ^Anything to be done with LCancelledClosure? *)   
           EXCEPT Thread . Alerted => (* Ignore. *) 
           END (* TRY EXCEPT *) 
         END (* CASE *) 
@@ -3021,7 +3033,9 @@ MODULE EditWindow
     RAISES { } 
   <* LL.sup = VBT.mu.Window *> 
 
-  = BEGIN (* Repaint   *) 
+  = VAR LCancelledClosure : Worker . ClosureTyp
+
+  ; BEGIN (* Repaint *) 
       IF GLogEvents
       THEN
         RTIO . PutText ( "Repaint Callback. " )
@@ -3042,11 +3056,12 @@ MODULE EditWindow
         , RedoStateTyp . Done 
         => (* Start it over.  This will cancel it if already running. *)  
           Window . EwRedoState := RedoStateTyp . Starting  
-        ; TRY 
-            EVAL Worker . RequestQueuedWork 
+        ; TRY LCancelledClosure
+              := Worker . RequestQueuedWork 
                    ( Window . EwRedoClosure
                    , Worker . GranularityTyp . Image  
                    ) 
+(* REVIEW ^Anything to be done with LCancelledClosure? *)   
           EXCEPT Thread . Alerted => (* Ignore. *) 
           END (* TRY EXCEPT *) 
         END (* CASE *) 
@@ -3136,7 +3151,7 @@ MODULE EditWindow
   = BEGIN (* Write   *) 
     END Write 
 
-; PROCEDURE Discard ( <*UNUSED*> Window : WindowTyp ) 
+; PROCEDURE Discard ( Window : WindowTyp ) 
   <* LL >= { } *> 
   (* This is the callback for the VBT discard method, which is called with
      LL . sup = VBT . mu 
@@ -3148,7 +3163,9 @@ MODULE EditWindow
       TRY 
         EVAL Worker . RequestWork 
                ( NEW ( WorkerClosureBoolTyp 
-                     , BoolParam := TRUE 
+                     , Window := Window
+                     , IsInteractive := TRUE 
+                     , BoolParam := TRUE (* QuitAfter *) 
                      , apply := PromptAndCloseWorkProc 
                      ) 
                , Interactive := FALSE 
@@ -3159,7 +3176,7 @@ MODULE EditWindow
       END (* TRY EXCEPT *) 
     END Discard 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE BeginPaintGroup ( Window : WindowTyp ) 
   <* LL . sup < Window . mu *> 
 
@@ -3167,7 +3184,7 @@ MODULE EditWindow
       VBT . BeginGroup ( Window ) 
     END BeginPaintGroup 
 
-(* EXPORTED *) 
+(* EXPORTED: *) 
 ; PROCEDURE EndPaintGroup ( Window : WindowTyp ) 
   <* LL . sup < Window . mu *> 
 

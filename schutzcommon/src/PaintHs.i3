@@ -12,6 +12,7 @@ INTERFACE PaintHs
 
 ; IMPORT FormsVBT 
 ; IMPORT VBT 
+; IMPORT VBTClass (* VBT.T is a MUTEX *)  
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
@@ -567,7 +568,7 @@ INTERFACE PaintHs
 
 (* Windows *) 
 
-; TYPE WindowPrivateTyp <: VBT . T 
+; TYPE WindowPrivateTyp <: VBT . T
 
 ; TYPE WindowPublic 
     = WindowPrivateTyp 

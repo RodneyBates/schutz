@@ -12,6 +12,7 @@
 
 INTERFACE Worker 
 
+; IMPORT FormsVBT 
 ; IMPORT Thread 
 ; IMPORT VBT 
 
@@ -21,7 +22,23 @@ INTERFACE Worker
 ; IMPORT MessageCodes
 ; IMPORT PaintHs 
 
-<* PRAGMA LL *> 
+<* PRAGMA LL *>
+
+(* ====================== Scheduling of worker thread. ===================== *)
+
+(* Scheduling of worker thread jobs will contain at most, one
+   immediate job and one queued job.  This is ensured by Request*
+   procedures' either refusing a request, or keeping the requesting
+   thread waiting in the request procedure.
+   
+   If there is an immediate job, it is already scheduled, meaning
+   either it is currently being worked on, or will be next, when the
+   worker thread receives CPU cycles.
+   
+   The one queued job, if any, could suffer starvation behind arriving
+   immediate jobs.  A queued job is scheduled when no job is in front
+   of it, whence it is further treated the same as an immediate job.
+*) 
 
 ; TYPE GranularityTyp  
     = { Global (* Must exclude all other work. *) 
@@ -31,7 +48,8 @@ INTERFACE Worker
 
 ; TYPE ClosureTyp  
     = OBJECT 
-        Window : EditWindow . T (* PaintHs . WindowRefTyp *)  
+        Form : FormsVBT . T 
+      ; Window : EditWindow . T (* PaintHs . WindowRefTyp *)  
         (* For VBT-level callbacks, the Form is not known. *) 
       ; Time : VBT . TimeStamp := FIRST ( INTEGER ) 
       ; ImageTrans : PaintHs . ImageTransientTyp := NIL 
@@ -56,16 +74,17 @@ INTERFACE Worker
      } 
 
 ; TYPE WorkResultNotRefusedTyp 
-   = [ WorkResultTyp . WrtBusyImmed .. WorkResultTyp . WrtFailed ] 
+   = [ WorkResultTyp . WrtBusyImmed .. WorkResultTyp . WrtFailed ]
 
-; PROCEDURE RequestWork 
+; PROCEDURE RequestWork (* Immediate. *) 
     ( Closure : ClosureTyp 
     ; Interactive : BOOLEAN := FALSE  
-      (* ^Causes assertion failures to query the user about what to do. *)
+      (* ^Causes assertion failures or runtime errors raised in the 
+          worker thread to query the user about what to do. *)
       (* Default is appropriate for playback work. *) 
     ; Granularity : GranularityTyp := GranularityTyp . Global 
     ; WaitToStart : BOOLEAN := FALSE 
-      (* Instead of accepting a refusal, wait to start the work. *) 
+      (* Instead of refusing, wait to start the work, before returning . *) 
     ; WaitToFinish : BOOLEAN := TRUE  
       (* ^Don't return until work is refused or done. *) 
       (* Default is appropriate for playback work. *) 
@@ -75,7 +94,7 @@ INTERFACE Worker
   <* LL.sup <= VBT.mu *> 
   (* GUI threads call this to ask for work to be done. *) 
 
-; PROCEDURE RequestWorkInteractive 
+; PROCEDURE RequestWorkInteractive (* Immediate. *) 
     ( Closure : ClosureTyp 
     ; Granularity : GranularityTyp := GranularityTyp . Global 
     ) 
@@ -110,9 +129,12 @@ INTERFACE Worker
     ( Closure : ClosureTyp 
     ; Granularity : GranularityTyp := GranularityTyp . Global 
     ) 
-  : ClosureTyp (* A previously queued closure that was cancelled, or NIL. *) 
+  : ClosureTyp (* A previously queued closure that was cancelled, or NIL. *)
   RAISES { Thread . Alerted } 
-  <* LL.sup <= VBT.mu *> 
+  <* LL.sup <= VBT.mu *>
+  (* If there is a previously queued and not yet scheduled job, cancel it
+     and return its closure.
+  *)
 
 ; PROCEDURE CancelQueuedWork 
     ( WaitToFinish : BOOLEAN := FALSE 

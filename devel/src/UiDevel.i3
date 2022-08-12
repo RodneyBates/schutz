@@ -6,6 +6,8 @@
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
+(* UiDevel provides functions in the Devel pulldown menu. *)
+
 INTERFACE UiDevel 
 
 ; IMPORT FormsVBT 

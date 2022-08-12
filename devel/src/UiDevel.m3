@@ -6,7 +6,11 @@
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
-MODULE UiDevel 
+(* UiDevel provides functions in the Devel pulldown menu. *)
+
+MODULE UiDevel
+
+<* PRAGMA LL *>
 
 ; IMPORT RuntimeError 
 
@@ -29,6 +33,7 @@ MODULE UiDevel
 ; IMPORT TrestleComm 
 ; IMPORT TypescriptVBT 
 ; IMPORT VBT 
+; IMPORT VBTClass (* To show VBT.T is a MUTEX, thus EditWindow . T too. *)  
 ; IMPORT Wr 
 
 ; IMPORT Assertions 
@@ -78,7 +83,7 @@ MODULE UiDevel
 
 ; TYPE WorkerClosureWriteTyp 
    = Worker . ClosureTyp 
-        OBJECT 
+        OBJECT
           FileName : TEXT := NIL 
         ; WrT : Wr . T := NIL 
         ; DoAll : BOOLEAN := FALSE  
@@ -110,7 +115,7 @@ MODULE UiDevel
     ; Closure : WorkerClosureWriteTyp 
     ; MustBeAnalyzed : BOOLEAN 
     ) 
-  (* PRE: Closure . Window, Time, and DoAll are set.  
+  (* PRE: Closure . Window, ImageTrans, ImagePers Time, and DoAll are set.  
           Closure . apply is overridden with a WorkProc. 
   *) 
   (* This is called when user wants one of the generated files to be
@@ -118,8 +123,6 @@ MODULE UiDevel
   *) 
 
   = VAR LForm : FormsVBT . T 
-  ; VAR LImageTrans : PaintHs . ImageTransientTyp 
-  ; VAR LImagePers : PaintHs . ImagePersistentTyp 
   ; VAR LPreloadFileName : TEXT 
   ; VAR LVBTClosure : FormsVBT . Closure 
 
@@ -127,65 +130,59 @@ MODULE UiDevel
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
       LForm := EditWindow . Form ( Closure . Window ) 
-    ; IF Closure . Window # NIL 
-      THEN 
-        LImageTrans := Closure . Window . WrImageRef 
-      ; IF LImageTrans # NIL 
-        THEN
-          LImagePers := LImageTrans . ItPers  
-        ; IF LImagePers . IpLang  < LbeStd . LangFirstLdl  
-             OR LImagePers . IpLang > LbeStd . LangLastLdl  
-          THEN  
-            FormsVBT . PutText 
-              ( LForm 
-              , "Fv_ErrorPopup_Message" 
-              , "The open image is not a Language Definition Language"
-              )
+    ; IF Closure . ImageTrans # NIL 
+      THEN
+        IF Closure . ImagePers . IpLang  < LbeStd . LangFirstLdl  
+           OR Closure . ImagePers . IpLang > LbeStd . LangLastLdl  
+        THEN  
+          FormsVBT . PutText 
+            ( LForm 
+            , "Fv_ErrorPopup_Message" 
+            , "The open image is not a Language Definition Language"
+            )
+        ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+        ELSIF MustBeAnalyzed AND NOT Closure . ImagePers . IpIsAnalyzed 
+        THEN 
+          FormsVBT . PutText 
+            ( LForm 
+            , "Fv_ErrorPopup_Message" 
+            , "The open image must be analyzed."
+            )
           ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
-          ELSIF MustBeAnalyzed AND NOT LImagePers . IpIsAnalyzed 
-          THEN 
-            FormsVBT . PutText 
-              ( LForm 
-              , "Fv_ErrorPopup_Message" 
-              , "The open image must be analyzed."
-              )
-            ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+        ELSE 
+          FormsVBT . PutText
+            ( LForm 
+            , "Fv_BootWriteDialog_Title" 
+            , DialogName 
+            )
+        ; LPreloadFileName 
+            := Misc . JoinPath 
+                 ( Options . DevelWritePath 
+                 , LdlSemantics . LdlModuleName
+                     ( Closure . ImageTrans ) & FileSuffix
+                 )
+        ; FormsVBT . PutText 
+            ( LForm 
+            , "Fv_BootWriteDialog_FileName" 
+            , LPreloadFileName 
+            )
+        ; TYPECASE FormsVBT . GetTheEvent ( LForm ) 
+          OF AnyEvent . Misc ( TMisc ) 
+          => IF TMisc . misc . type = FormsVBT . MakeEventMiscCodeType 
+             THEN (* This was precipitated by a previous write dialog
+                     finishing its WorkProc and finding DoAll TRUE. *) 
+               Closure . DoAll := TRUE 
+             END (* IF *) 
           ELSE 
-            FormsVBT . PutText
-              ( LForm 
-              , "Fv_BootWriteDialog_Title" 
-              , DialogName 
-              )
-          ; LPreloadFileName 
-              := Misc . JoinPath 
-                   ( Options . DevelWritePath 
-                   , LdlSemantics . LdlModuleName 
-                       ( Closure . Window . WrImageRef ) 
-                     & FileSuffix 
+          END (* TYPECASE *) 
+        ; LVBTClosure 
+            := NEW ( WriteOKClosureTyp 
+                   , WorkerClosure := Closure 
+                   , apply := WriteOKCallback 
                    ) 
-          ; FormsVBT . PutText 
-              ( LForm 
-              , "Fv_BootWriteDialog_FileName" 
-              , LPreloadFileName 
-              )
-          ; TYPECASE FormsVBT . GetTheEvent ( LForm ) 
-            OF AnyEvent . Misc ( TMisc ) 
-            => IF TMisc . misc . type = FormsVBT . MakeEventMiscCodeType 
-               THEN (* This was precipitated by a previous write dialog
-                       finishing its WorkProc and finding DoAll TRUE. *) 
-                 Closure . DoAll := TRUE 
-               END (* IF *) 
-            ELSE 
-            END (* TYPECASE *) 
-          ; LVBTClosure 
-              := NEW ( WriteOKClosureTyp 
-                     , WorkerClosure := Closure 
-                     , apply := WriteOKCallback 
-                     ) 
-          ; FormsVBT . Attach 
-              ( LForm , "Fv_BootWriteDialog_OK" , LVBTClosure ) 
-          ; FormsVBT . PopUp ( LForm , "Fv_BootWriteDialog" ) 
-          END (* IF *) 
+        ; FormsVBT . Attach 
+            ( LForm , "Fv_BootWriteDialog_OK" , LVBTClosure ) 
+        ; FormsVBT . PopUp ( LForm , "Fv_BootWriteDialog" ) 
         END (* IF *) 
       END (* IF *) 
     END WriteFileNameDialog  
@@ -213,7 +210,7 @@ MODULE UiDevel
     ; FormsVBT . Attach 
         ( Options . MainForm , "Fv_BootWriteDialog_OK" , NIL ) 
  *) 
-    (* Although very unlikely, there is technicallly a messy timing problem, 
+    (* Although very unlikely, there is technically a messy timing problem, 
        because FormsVBT.MakeEvent does not queue the event, but executes it
        entirely inside its dymanic scope.  After "GenarateAll", it could
        still be keeping the worker thread busy after popping the file name
@@ -337,15 +334,14 @@ MODULE UiDevel
 
 ; PROCEDURE WriteStatsWorkProc ( Closure : WorkerClosureWriteTyp ) 
   RAISES { Backout , Thread . Alerted }   
-  (* PRE: Closure . Window, DoAll, and FileName are set. *) 
+  (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *) 
-
+(* REVIEW: No use of DoAll? *) 
   = VAR LStats : EstUtil . StatisticsTyp 
   ; VAR LCommandString : TEXT  
 
   ; BEGIN 
-      EVAL Ui . SetImageTransAndPers ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . WriteStats , Closure . FileName ) 
     ; IF OpenWrite ( Closure ) 
@@ -370,26 +366,28 @@ MODULE UiDevel
 (* EXPORTED: *) 
 ; PROCEDURE ReplayWriteStats ( FileName : TEXT ) 
 
-  = <* FATAL FormsVBT . Error *>
+  = VAR LClosure : WorkerClosureWriteTyp 
+
+  ; <* FATAL FormsVBT . Error *>
     BEGIN 
-      TRY 
-        EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureWriteTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , FileName := FileName 
-                     , DoAll := FALSE 
-                     , apply := WriteStatsWorkProc 
-                     ) 
-               ) 
+      LClosure  
+        := Ui . SetFieldsFromForm
+             ( NEW ( WorkerClosureWriteTyp
+                   , Form := Options . MainForm 
+                   , FileName := FileName 
+                   , DoAll := FALSE 
+                   , apply := WriteStatsWorkProc 
+                   )
+             ) 
+    ; TRY 
+        EVAL Worker . RequestWork ( LClosure )  
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
     END ReplayWriteStats 
 
 ; PROCEDURE WriteStatsCallback 
     ( Form : FormsVBT . T 
-    ; <* UNUSED *> Name : TEXT 
+    ; Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
     ; Time : VBT . TimeStamp 
     ) 
@@ -400,13 +398,15 @@ MODULE UiDevel
         ( "Write Ldl Statistics"
         , StatisticsName 
         , Closure
-            := NEW ( WorkerClosureWriteTyp
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , DoAll := FALSE (* May change later. *) 
-                   , apply := WriteStatsWorkProc 
-                   )  
+            := Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp
+                       , Form := Form 
+                       , Time := Time 
+                       , FileName := Name 
+                       , DoAll := FALSE (* May change later. *) 
+                       , apply := WriteStatsWorkProc 
+                       )
+                 ) 
         , MustBeAnalyzed := FALSE 
         ) 
     END WriteStatsCallback 
@@ -415,15 +415,14 @@ MODULE UiDevel
 
 ; PROCEDURE WriteEstPickleWorkProc ( Closure : WorkerClosureWriteTyp )  
   RAISES { Thread . Alerted }   
-  (* PRE: Closure . Window, DoAll, and FileName are set. *) 
+  (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *) 
 
   = VAR LCommandString : TEXT  
   ; VAR LSuccess : BOOLEAN 
 
   ; BEGIN 
-      EVAL Ui . SetImageTransAndPers ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . WriteEstPickle , Closure . FileName ) 
     ; IF OpenWrite ( Closure ) 
@@ -459,14 +458,14 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureWriteTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , FileName := FileName 
-                     , DoAll := FALSE 
-                     , apply := WriteEstPickleWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp 
+                         , Form := Options . MainForm 
+                         , FileName := FileName 
+                         , DoAll := FALSE 
+                         , apply := WriteEstPickleWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -474,7 +473,7 @@ MODULE UiDevel
 
 ; PROCEDURE WriteEstPickleCallback 
     ( Form : FormsVBT . T 
-    ; <* UNUSED *> Name : TEXT 
+    ; Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
     ; Time : VBT . TimeStamp 
     ) 
@@ -485,13 +484,15 @@ MODULE UiDevel
         ( "Write Est Pickle " 
         , EstPickleName 
         , Closure
-            := NEW ( WorkerClosureWriteTyp
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , DoAll := FALSE (* May change later. *) 
-                   , apply := WriteEstPickleWorkProc 
-                   )  
+            := Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp
+                       , Form := Form 
+                       , Time := Time 
+                       , FileName := Name 
+                       , DoAll := FALSE (* May change later. *) 
+                       , apply := WriteEstPickleWorkProc 
+                       )
+                 )
         , MustBeAnalyzed := FALSE 
         ) 
     END WriteEstPickleCallback 
@@ -500,7 +501,7 @@ MODULE UiDevel
 
 ; PROCEDURE GenEstModuleWorkProc ( Closure : WorkerClosureWriteTyp )  
   RAISES { Backout , Thread . Alerted }   
-  (* PRE: Closure . Window, DoAll, and FileName are set. *) 
+  (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)   
 
   = VAR LLangInfoRef : LdlSemantics . LangInfoRefTyp 
@@ -508,8 +509,7 @@ MODULE UiDevel
   ; VAR LSuccess : BOOLEAN 
 
   ; BEGIN 
-      EVAL Ui . SetImageTransAndPers ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . GenEstModule , Closure . FileName ) 
     ; IF OpenWrite ( Closure ) 
@@ -549,14 +549,14 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureWriteTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , FileName := FileName 
-                     , DoAll := FALSE 
-                     , apply := GenEstModuleWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp 
+                         , Form := Options . MainForm 
+                         , FileName := FileName 
+                         , DoAll := FALSE 
+                         , apply := GenEstModuleWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -564,7 +564,7 @@ MODULE UiDevel
 
 ; PROCEDURE GenEstModuleCallback 
     ( Form : FormsVBT . T 
-    ; <* UNUSED *> Name : TEXT 
+    ; Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
     ; Time : VBT . TimeStamp 
     ) 
@@ -575,13 +575,15 @@ MODULE UiDevel
         ( "Generate Est-builder module"
         , MakeEstName & ".m3" 
         , Closure
-            := NEW ( WorkerClosureWriteTyp
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , DoAll := FALSE (* May change later. *) 
-                   , apply := GenEstModuleWorkProc 
-                   )  
+            := Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp
+                       , Form := Form 
+                       , Time := Time
+                       , FileName := Name 
+                       , DoAll := FALSE (* May change later. *) 
+                       , apply := GenEstModuleWorkProc 
+                       )
+                 )
         , MustBeAnalyzed := FALSE 
         ) 
     END GenEstModuleCallback 
@@ -590,7 +592,7 @@ MODULE UiDevel
 
 ; PROCEDURE WriteParseInfoWorkProc ( Closure : WorkerClosureWriteTyp )  
   RAISES { Thread . Alerted }   
-  (* PRE: Closure . Window, DoAll, and FileName are set. *) 
+  (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)  
 
   = VAR LLangInfoRef : LdlSemantics . LangInfoRefTyp   
@@ -598,8 +600,7 @@ MODULE UiDevel
   ; VAR LSuccess : BOOLEAN 
 
   ; BEGIN 
-      EVAL Ui . SetImageTransAndPers ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . WriteParseInfo , Closure . FileName ) 
     ; IF OpenWrite ( Closure ) 
@@ -635,14 +636,14 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureWriteTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , FileName := FileName 
-                     , DoAll := FALSE 
-                     , apply := WriteParseInfoWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp
+                         , Form := Options . MainForm 
+                         , FileName := FileName 
+                         , DoAll := FALSE 
+                         , apply := WriteParseInfoWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -650,7 +651,7 @@ MODULE UiDevel
 
 ; PROCEDURE WriteParseInfoCallback 
     ( Form : FormsVBT . T 
-    ; <* UNUSED *> Name : TEXT 
+    ; Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
     ; Time : VBT . TimeStamp 
     ) 
@@ -661,13 +662,15 @@ MODULE UiDevel
         ( "Write Ldl parse info"
         , ParseInfoName 
         , Closure
-            := NEW ( WorkerClosureWriteTyp
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , DoAll := FALSE (* May change later. *) 
-                   , apply := WriteParseInfoWorkProc 
-                   )  
+            := Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp
+                       , Form := Form 
+                       , Time := Time
+                       , FileName := Name 
+                       , DoAll := FALSE (* May change later. *) 
+                       , apply := WriteParseInfoWorkProc 
+                       )
+                 )
         , MustBeAnalyzed := TRUE  
         ) 
     END WriteParseInfoCallback 
@@ -676,15 +679,14 @@ MODULE UiDevel
 
 ; PROCEDURE WriteFsTreesWorkProc ( Closure : WorkerClosureWriteTyp )  
   RAISES { Thread . Alerted }   
-  (* PRE: Closure . Window, DoAll, and FileName are set. *) 
+  (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)  
 
   = VAR LCommandString : TEXT 
   ; VAR LSuccess : BOOLEAN 
 
   ; BEGIN 
-      EVAL Ui . SetImageTransAndPers ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . WriteFsTrees , Closure . FileName ) 
     ; IF OpenWrite ( Closure ) 
@@ -720,14 +722,14 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureWriteTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , FileName := FileName 
-                     , DoAll := FALSE 
-                     , apply := WriteFsTreesWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp 
+                         , Form := Options . MainForm 
+                         , FileName := FileName 
+                         , DoAll := FALSE 
+                         , apply := WriteFsTreesWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -735,7 +737,7 @@ MODULE UiDevel
 
 ; PROCEDURE WriteFsTreesCallback 
     ( Form : FormsVBT . T 
-    ; <* UNUSED *> Name : TEXT 
+    ; Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
     ; Time : VBT . TimeStamp 
     ) 
@@ -746,13 +748,15 @@ MODULE UiDevel
         ( "Write format syntax trees"
         , FsTreesName  
         , Closure
-            := NEW ( WorkerClosureWriteTyp
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , DoAll := FALSE (* May change later. *) 
-                   , apply := WriteFsTreesWorkProc 
-                   )  
+            := Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp
+                       , Form := Form 
+                       , Time := Time 
+                       , FileName := Name 
+                       , DoAll := FALSE (* May change later. *) 
+                       , apply := WriteFsTreesWorkProc 
+                       )
+                 )
         , MustBeAnalyzed := TRUE  
         ) 
     END WriteFsTreesCallback 
@@ -761,15 +765,14 @@ MODULE UiDevel
 
 ; PROCEDURE WriteSemPickleWorkProc ( Closure : WorkerClosureWriteTyp )  
   RAISES { Thread . Alerted }   
-  (* PRE: Closure . Window, DoAll, and FileName are set. *) 
+  (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)  
 
   = VAR LCommandString : TEXT 
   ; VAR LSuccess : BOOLEAN 
 
   ; BEGIN 
-      EVAL Ui . SetImageTransAndPers ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . WriteSemPickle , Closure . FileName ) 
     ; IF OpenWrite ( Closure ) 
@@ -803,14 +806,14 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureWriteTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , FileName := FileName 
-                     , DoAll := FALSE 
-                     , apply := WriteSemPickleWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp
+                         , Form := Options . MainForm 
+                         , FileName := FileName 
+                         , DoAll := FALSE 
+                         , apply := WriteSemPickleWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -818,7 +821,7 @@ MODULE UiDevel
 
 ; PROCEDURE WriteSemPickleCallback 
     ( Form : FormsVBT . T 
-    ; <* UNUSED *> Name : TEXT 
+    ; Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
     ; Time : VBT . TimeStamp 
     ) 
@@ -829,13 +832,15 @@ MODULE UiDevel
         ( "Write Ldl semantic pickle"
         , SemPickleName 
         , Closure
-            := NEW ( WorkerClosureWriteTyp
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , DoAll := FALSE (* May change later. *) 
-                   , apply := WriteSemPickleWorkProc 
-                   )  
+            := Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp
+                       , Form := Form 
+                       , Time := Time
+                       , FileName := Name 
+                       , DoAll := FALSE (* May change later. *) 
+                       , apply := WriteSemPickleWorkProc 
+                       ) 
+                 ) 
         , MustBeAnalyzed := TRUE
         ) 
     END WriteSemPickleCallback 
@@ -844,7 +849,7 @@ MODULE UiDevel
 
 ; PROCEDURE GenTokInterfaceWorkProc ( Closure : WorkerClosureWriteTyp )  
   RAISES { Thread . Alerted }   
-  (* PRE: Closure . Window, DoAll, and FileName are set. *) 
+  (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)  
 
   = VAR LForm : FormsVBT . T 
@@ -857,7 +862,6 @@ MODULE UiDevel
     <* FATAL Wr . Failure *> 
     BEGIN 
       LForm := EditWindow . Form ( Closure . Window ) 
-    ; EVAL Ui . SetImageTransAndPers ( Closure ) 
     ; LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . GenTokInterface , Closure . FileName ) 
@@ -911,14 +915,14 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureWriteTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , FileName := FileName 
-                     , DoAll := FALSE 
-                     , apply := GenTokInterfaceWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp 
+                         , Form := Options . MainForm 
+                         , FileName := FileName 
+                         , DoAll := FALSE 
+                         , apply := GenTokInterfaceWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -926,7 +930,7 @@ MODULE UiDevel
 
 ; PROCEDURE GenTokInterfaceCallback 
     ( Form : FormsVBT . T 
-    ; <* UNUSED *> Name : TEXT 
+    ; Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
     ; Time : VBT . TimeStamp 
     ) 
@@ -937,13 +941,15 @@ MODULE UiDevel
         ( "Generate LdlTok interface "
         , TokInterfaceName & ".i3"
         , Closure
-            := NEW ( WorkerClosureWriteTyp
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , DoAll := FALSE (* May change later. *) 
-                   , apply := GenTokInterfaceWorkProc 
-                   )  
+            := Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp
+                       , Form := Form 
+                       , Time := Time 
+                       , FileName := Name 
+                       , DoAll := FALSE (* May change later. *) 
+                       , apply := GenTokInterfaceWorkProc 
+                       )
+                 )
         , MustBeAnalyzed := TRUE 
         ) 
     END GenTokInterfaceCallback 
@@ -952,7 +958,7 @@ MODULE UiDevel
 
 ; PROCEDURE GenChildInterfaceWorkProc ( Closure : WorkerClosureWriteTyp )  
   RAISES { Backout , Thread . Alerted }   
-  (* PRE: Closure . Window, DoAll, and FileName are set. *) 
+  (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)  
 
   = VAR LForm : FormsVBT . T 
@@ -965,7 +971,6 @@ MODULE UiDevel
     <* FATAL Wr . Failure *> 
     BEGIN 
       LForm := EditWindow . Form ( Closure . Window ) 
-    ; EVAL Ui . SetImageTransAndPers ( Closure ) 
     ; LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . GenChildInterface 
@@ -1022,14 +1027,14 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureWriteTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , FileName := FileName 
-                     , DoAll := FALSE 
-                     , apply := GenChildInterfaceWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp 
+                         , Form := Options . MainForm 
+                         , FileName := FileName 
+                         , DoAll := FALSE 
+                         , apply := GenChildInterfaceWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -1037,7 +1042,7 @@ MODULE UiDevel
 
 ; PROCEDURE GenChildInterfaceCallback 
     ( Form : FormsVBT . T 
-    ; <* UNUSED *> Name : TEXT 
+    ; Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
     ; Time : VBT . TimeStamp 
     ) 
@@ -1048,13 +1053,15 @@ MODULE UiDevel
         ( "Generate LdlChild interface"
         , ChildInterfaceName  & ".i3"
         , Closure
-            := NEW ( WorkerClosureWriteTyp
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , DoAll := FALSE (* May change later. *) 
-                   , apply := GenChildInterfaceWorkProc 
-                   )  
+            := Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp
+                       , Form := Form 
+                       , Time := Time 
+                       , FileName := Name 
+                       , DoAll := FALSE (* May change later. *) 
+                       , apply := GenChildInterfaceWorkProc 
+                       )
+                 )
         , MustBeAnalyzed := TRUE 
         ) 
     END GenChildInterfaceCallback 
@@ -1063,7 +1070,7 @@ MODULE UiDevel
 
 ; PROCEDURE GenAllCallback 
     ( Form : FormsVBT . T 
-    ; <* UNUSED *> Name : TEXT 
+    ; Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
     ; Time : VBT . TimeStamp 
     ) 
@@ -1074,13 +1081,16 @@ MODULE UiDevel
         ( "Write Ldl Statistics"
         , StatisticsName 
         , Closure
-            := NEW ( WorkerClosureWriteTyp
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , DoAll := TRUE 
-                   , apply := WriteStatsWorkProc 
-                   )  
+            := Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp
+                       , Form := Form 
+                       , Time := Time 
+                       , FileName := Name 
+                       , DoAll := TRUE 
+                       , apply := WriteStatsWorkProc
+(* Huh? ------------------------- ^ *)
+                       )
+                 )
         , MustBeAnalyzed := FALSE (* Applies only to WriteStats. *)  
         ) 
     END GenAllCallback
@@ -1090,7 +1100,7 @@ MODULE UiDevel
 (* Write checkpoint. *) 
 
 ; PROCEDURE WriteCheckpointWorkProc ( Closure : Worker . ClosureTyp )  
-  (* PRE: Closure . Window is set. *) 
+  (* PRE: Closure . Window, ImageTrans, and ImagePers are set. *) 
   (* Runs on worker thread. *)   
 
   = VAR LForm : FormsVBT . T 
@@ -1100,7 +1110,6 @@ MODULE UiDevel
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
       LForm := EditWindow . Form ( Closure . Window ) 
-    ; EVAL Ui . SetImageTransAndPers ( Closure ) 
     ; IF Closure . ImageTrans # NIL 
       THEN 
         Closure . ImagePers . IpCrashCode 
@@ -1171,12 +1180,12 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := WriteCheckpointWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp 
+                         , Form := Options . MainForm 
+                         , apply := WriteCheckpointWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -1192,12 +1201,13 @@ MODULE UiDevel
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )    
-                   , Time := Time 
-                   , apply := WriteCheckpointWorkProc 
-                   ) 
+             ( Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , apply := WriteCheckpointWorkProc 
+                       )
+                 ) 
              ) 
     END WriteCheckpointCallback  
 
@@ -1214,7 +1224,9 @@ MODULE UiDevel
         := FormsVBT . GetGeneric ( Options . MainForm , "Fv_LbeWindow" )  
 (*  ; UiRecPlay . Record ( UiRecPlay . CommandTyp . TakeFocus ) 
       This was ridiculous. 
-*) 
+*)
+
+(* TODO: Someda, when there are multiple windows, record/replay will matter. *)
     ; EditWindow . TakeKBFocus ( LWindow , NullTime ) 
     END ReplayTakeFocus  
 
@@ -1301,14 +1313,13 @@ MODULE UiDevel
 
 ; PROCEDURE ReconstructLinesWorkProc ( Closure : Worker . ClosureTyp )  
   RAISES { Backout , Thread . Alerted }   
-  (* PRE: Closure . Window is set. *) 
+  (* PRE: Closure . Window and ImageTrans are set. *) 
   (* Runs on worker thread. *)   
 
   = VAR LCommandString : TEXT 
 
   ; BEGIN 
-      EVAL Ui . SetImageTrans ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommand 
              ( UiRecPlay . CommandTyp . ReconstructLines ) 
     ; Display . ReconstructLinesAndPaint ( Closure . ImageTrans )
@@ -1322,12 +1333,12 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := ReconstructLinesWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp 
+                         , Form := Options . MainForm 
+                         , apply := ReconstructLinesWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -1343,12 +1354,13 @@ MODULE UiDevel
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )    
-                   , Time := Time 
-                   , apply := ReconstructLinesWorkProc 
-                   ) 
+             ( Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , apply := ReconstructLinesWorkProc 
+                       )
+                 )
              ) 
     END ReconstructLinesCallback
 
@@ -1356,14 +1368,13 @@ MODULE UiDevel
 
 ; PROCEDURE VerifyLinesRefsWorkProc ( Closure : Worker . ClosureTyp )  
   RAISES { Backout , Thread . Alerted }   
-  (* PRE: Closure . Window is set. *) 
+  (* PRE: Closure . Window and ImageTrans are set. *) 
   (* Runs on worker thread. *)   
  
   = VAR LCommandString : TEXT 
 
   ; BEGIN 
-      EVAL Ui . SetImageTrans ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommand 
              ( UiRecPlay . CommandTyp . VerifyLinesRefs ) 
     ; TextEdit . BruteForceVerifyAllLinesRefs 
@@ -1378,12 +1389,12 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := VerifyLinesRefsWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp 
+                         , Form := Options . MainForm 
+                         , apply := VerifyLinesRefsWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -1399,12 +1410,13 @@ MODULE UiDevel
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )    
-                   , Time := Time 
-                   , apply := VerifyLinesRefsWorkProc 
-                   ) 
+             ( Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , apply := VerifyLinesRefsWorkProc 
+                       )
+                 )
              ) 
     END VerifyLinesRefsCallback
 
@@ -1426,7 +1438,7 @@ MODULE UiDevel
     ; Assertions . CantHappenText ( "User forced assertion failure" )
       (* CantHappenText will catch Ignore before it gets back here.
          We want to let AssertionFailure and RuntimeError.E get through
-         unblocked and uncaught blocked, to test their conversion into
+         unblocked and uncaught, to test their conversion into
          Ignore (when requested by the user).  RuntimeError.E is
          <*IMPLICIT*>, so will be unhandled if we don't catch it here.
          AssertionFailure is blocked by this proceedure, so can be
@@ -1451,13 +1463,7 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := ForceAssertWorkProc 
-                     ) 
-               ) 
+               ( NEW ( Worker . ClosureTyp , apply := ForceAssertWorkProc ) ) 
       EXCEPT Thread . Alerted => (* Discard. *) 
       END (* TRY EXCEPT *) 
     END ReplayForceAssert  
@@ -1472,13 +1478,7 @@ MODULE UiDevel
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , apply := ForceAssertWorkProc  
-                   ) 
-             ) 
+             ( NEW ( Worker . ClosureTyp , apply := ForceAssertWorkProc ) ) 
     END ForceAssertCallback  
 
 (* Replay last operation. No worker thread needed yet. *) 
@@ -1487,8 +1487,9 @@ MODULE UiDevel
     ( Form : FormsVBT . T 
     ; <* UNUSED *> Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
-    ; <* UNUSED *> Time : VBT . TimeStamp 
+    ; <* UNUSED *> Time : VBT . TimeStamp
     ) 
+  <* LL < Form."Fv_LbeWindow" *>
 
   = VAR LWindow : EditWindow . T 
   ; VAR LImageRef : PaintHs . ImageTransientTyp 
@@ -1496,12 +1497,13 @@ MODULE UiDevel
 
   ; <* FATAL FormsVBT . Error *>
     BEGIN 
-      LWindow 
-        := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )  
+      LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )  
     ; IF LWindow # NIL 
-      THEN 
-        LImageRef := LWindow . WrImageRef 
-      ; IF LImageRef # NIL AND LImageRef . ItPers . IpCrashCommand # NIL  
+      THEN
+        LOCK LWindow DO LImageRef := LWindow . WrImageRef END (* LOCK *)
+      ; IF LImageRef # NIL
+           AND LImageRef . ItPers # NIL  
+           AND LImageRef . ItPers . IpCrashCommand # NIL  
         THEN 
           Assertions . MessageText 
             ( "Replaying failing command: " 
@@ -1524,14 +1526,13 @@ MODULE UiDevel
 
 ; PROCEDURE MergeTextWorkProc ( Closure : Worker . ClosureTyp )  
   RAISES { Backout , Thread . Alerted }   
-  (* PRE: Closure . Window is set. *) 
+  (* PRE: Closure . Window and ImageTrans are set. *) 
   (* Runs on worker thread. *)  
  
   = VAR LCommandString : TEXT 
 
   ; BEGIN 
-      EVAL Ui . SetImageTrans ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommand ( UiRecPlay . CommandTyp . MergeText ) 
     ; TextEdit . FlushEdit ( Closure . ImageTrans ) 
     ; UiRecPlay . RecordString ( LCommandString ) 
@@ -1544,12 +1545,12 @@ MODULE UiDevel
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := MergeTextWorkProc 
-                     ) 
+               ( Ui . SetFieldsFromForm
+                   ( NEW ( WorkerClosureWriteTyp 
+                         , Form := Options . MainForm 
+                         , apply := MergeTextWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => (* Discard. *) 
       END (* TRY EXCEPT *) 
@@ -1565,18 +1566,20 @@ MODULE UiDevel
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , apply := MergeTextWorkProc  
-                   ) 
+             ( Ui . SetFieldsFromForm
+                 ( NEW ( WorkerClosureWriteTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , apply := MergeTextWorkProc  
+                       )
+                 )
              ) 
     END MergeTextCallback  
 
 (* Browse Est. This has its own thread. *) 
 
-; PROCEDURE BrowseThread ( Self : BrowserClosure ) : REFANY 
+; PROCEDURE BrowseThread ( Self : BrowserClosure ) : REFANY
+  <* LL < Self . Window *> 
 
   = VAR LSession : TreeBrowse . T 
   ; VAR LTypescript : TypescriptVBT . T 
@@ -1586,13 +1589,16 @@ MODULE UiDevel
       LTypescript := FormsVBT . GetVBT ( Self . Form , "Br_Typescript" ) 
     ; UiRecPlay . Record ( UiRecPlay . CommandTyp . BrowseEst ) 
 (* CHECK: Do we really want to record this? *) 
-    ; LSession 
-        := NEW ( TreeBrowse . T ) . initSessionRdWr  
-              ( Self . Window . WrImageRef . ItPers . IpEstRoot   
-              , Self . Window . WrImageRef . ItPers . IpLang 
-              , TypescriptVBT . GetRd ( LTypescript ) 
-              , TypescriptVBT . GetWr ( LTypescript ) 
-              ) 
+    ; LOCK Self . Window
+      DO LSession 
+           := NEW ( TreeBrowse . T )
+              . initSessionRdWr  
+                  ( Self . Window . WrImageRef . ItPers . IpEstRoot   
+                  , Self . Window . WrImageRef . ItPers . IpLang 
+                  , TypescriptVBT . GetRd ( LTypescript ) 
+                  , TypescriptVBT . GetWr ( LTypescript ) 
+                  )
+      END (* LOCK *) 
     ; TRY 
         TreeBrowse . Interp ( LSession ) 
       EXCEPT Backout => (* Disregard. *) 
@@ -1620,7 +1626,7 @@ MODULE UiDevel
         , "Fv_Devel_BrowseEst"                 
         , NullTime 
         )
-    END ReplayBrowseEst 
+    END ReplayBrowseEst
 
 ; PROCEDURE BrowseEstCallback 
     ( Form : FormsVBT . T 
@@ -1628,52 +1634,59 @@ MODULE UiDevel
     ; <* UNUSED *> EventData : REFANY 
     ; <* UNUSED *> Time : VBT . TimeStamp 
     ) 
+  <* LL < Form."Fv_LbeWindow" *>
 
   = VAR LForm : FormsVBT . T 
-  ; VAR LWindow : EditWindow . T 
+  ; VAR LWindow : EditWindow . T
+  ; VAR LImageRef : PaintHs . ImageTransientTyp 
   ; VAR LThread : Thread . T 
 
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
       LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )  
-    ; IF LWindow . WrImageRef # NIL 
+    ; IF LWindow # NIL
       THEN
-	TRY 
-	  LForm 
-	    := NEW ( FormsVBT . T ) 
-	       . initFromRsrc ( "Browse.fv" , Options . ResourcePath )
-	EXCEPT 
-	  Rsrc . NotFound , Rd . Failure 
-	  => FormsVBT . PutText 
-	       ( Options . MainForm , "Fv_ErrorPopup_Message" 
-	       , "Unable to locate resource Browse.fv" 
-	       ) 
-	  ; FormsVBT . PopUp ( Options . MainForm , "Fv_ErrorPopup" ) 
-	  ; RETURN 
-	| Thread . Alerted 
-	  => RETURN 
-	END 
-      ; TRY
-	  Trestle . Install ( LForm ) 
-	EXCEPT
-	| TrestleComm . Failure 
-	  => FormsVBT . PutText 
-	       ( Options . MainForm , "Fv_ErrorPopup_Message" 
-	       , "Could not open Browser window on display " 
-                 & Options . Display 
-	       ) 
-	  ; FormsVBT . PopUp ( Options . MainForm , "Fv_ErrorPopup" ) 
-	  ; RETURN 
-	END 
-      ; LThread 
-	  := Thread . Fork 
-	       ( NEW ( BrowserClosure , Window := LWindow , Form := LForm ) ) 
-      END 
+        LOCK LWindow DO LImageRef := LWindow . WrImageRef END (* LOCK *)
+      ; IF LImageRef # NIL  
+        THEN
+          TRY 
+            LForm 
+              := NEW ( FormsVBT . T ) 
+                 . initFromRsrc ( "Browse.fv" , Options . ResourcePath )
+          EXCEPT 
+            Rsrc . NotFound , Rd . Failure 
+            => FormsVBT . PutText 
+                 ( Options . MainForm , "Fv_ErrorPopup_Message" 
+                 , "Unable to locate resource Browse.fv" 
+                 ) 
+            ; FormsVBT . PopUp ( Options . MainForm , "Fv_ErrorPopup" ) 
+            ; RETURN 
+          | Thread . Alerted 
+            => RETURN 
+          END 
+        ; TRY
+            Trestle . Install ( LForm ) 
+          EXCEPT
+          | TrestleComm . Failure 
+            => FormsVBT . PutText 
+                 ( Options . MainForm , "Fv_ErrorPopup_Message" 
+                 , "Could not open Browser window on display " 
+                   & Options . Display 
+                 ) 
+            ; FormsVBT . PopUp ( Options . MainForm , "Fv_ErrorPopup" ) 
+            ; RETURN 
+          END 
+        ; LThread 
+            := Thread . Fork 
+                 ( NEW ( BrowserClosure , Window := LWindow , Form := LForm ) ) 
+        END (* IF *)
+      END (* IF *)  
     END BrowseEstCallback 
 
 (* Set debug level. No worker thread needed. *) 
 
+(* Review: debug options. *)
 (* EXPORTED: *) 
 ; PROCEDURE ShowDebugOptions ( ) 
 
@@ -1849,24 +1862,15 @@ MODULE UiDevel
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN (* AttachMenuHandlers *) 
       FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_WriteCheckpoint" 
-        , WriteCheckpointCallback 
-        ) 
+        ( Form , "Fv_Devel_WriteCheckpoint" , WriteCheckpointCallback ) 
     ; FormsVBT . AttachProc 
         ( Form , "Fv_Devel_TakeFocus" , TakeFocusCallback ) 
     ; FormsVBT . AttachProc 
         ( Form , "Fv_Devel_Repaint" , RepaintCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_ReconstructLines" 
-        , ReconstructLinesCallback 
-        ) 
+        ( Form , "Fv_Devel_ReconstructLines" , ReconstructLinesCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_VerifyLinesRefs" 
-        , VerifyLinesRefsCallback 
-        ) 
+        ( Form , "Fv_Devel_VerifyLinesRefs" , VerifyLinesRefsCallback ) 
     ; FormsVBT . AttachProc 
         ( Form , "Fv_Devel_ForceAssert" , ForceAssertCallback ) 
     ; FormsVBT . AttachProc 
@@ -1876,57 +1880,27 @@ MODULE UiDevel
     ; FormsVBT . AttachProc 
         ( Form , "Fv_Devel_BrowseEst" , BrowseEstCallback )
     ; FormsVBT . PutInteger (* Initial debug level. *) 
-        ( Form 
-        , "Fv_Devel_DebugLevelValue" 
-        , Options . DebugLevel 
-        )  
+        ( Form , "Fv_Devel_DebugLevelValue" , Options . DebugLevel )  
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_DebugLevelApply" 
-        , SetDebugLevelCallback 
-        ) 
+        ( Form , "Fv_Devel_DebugLevelApply" , SetDebugLevelCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_DebugLevelOK" 
-        , SetDebugLevelOKCallback 
-        ) 
+        ( Form , "Fv_Devel_DebugLevelOK" , SetDebugLevelOKCallback ) 
     ; FormsVBT . AttachProc 
         ( Form , "Fv_Devel_WriteStats" , WriteStatsCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_WriteEstPickle" 
-        , WriteEstPickleCallback 
-        ) 
+        ( Form , "Fv_Devel_WriteEstPickle" , WriteEstPickleCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_GenEstModule" 
-        , GenEstModuleCallback 
-        ) 
+        ( Form , "Fv_Devel_GenEstModule" , GenEstModuleCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_WriteParseInfo" 
-        , WriteParseInfoCallback 
-        ) 
+        ( Form , "Fv_Devel_WriteParseInfo" , WriteParseInfoCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_WriteFsTrees" 
-        , WriteFsTreesCallback 
-        ) 
+        ( Form , "Fv_Devel_WriteFsTrees" , WriteFsTreesCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_WriteSemPickle" 
-        , WriteSemPickleCallback 
-        ) 
+        ( Form , "Fv_Devel_WriteSemPickle" , WriteSemPickleCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_GenTokInterface" 
-        , GenTokInterfaceCallback 
-        ) 
+        ( Form , "Fv_Devel_GenTokInterface" , GenTokInterfaceCallback ) 
     ; FormsVBT . AttachProc 
-        ( Form 
-        , "Fv_Devel_GenChildInterface" 
-        , GenChildInterfaceCallback 
-        ) 
+        ( Form , "Fv_Devel_GenChildInterface" , GenChildInterfaceCallback ) 
     ; FormsVBT . AttachProc 
         ( Form , "Fv_Devel_GenAll" , GenAllCallback ) 
     END AttachMenuHandlers 

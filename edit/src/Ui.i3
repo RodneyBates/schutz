@@ -99,6 +99,11 @@ INTERFACE Ui
     ) 
   (* Parse from the keyboard. *) 
 
+; PROCEDURE QuitWorkProc ( Closure : Worker . ClosureTyp ) 
+  RAISES { Backout , Thread . Alerted } 
+  (* PRE: Closure . Window is set. *) 
+  (* Runs on worker thread. *)   
+
 ; PROCEDURE Install 
     ( EditFileName : TEXT 
     ; PlaybackFileName : TEXT 
@@ -114,7 +119,7 @@ INTERFACE Ui
 
 ; PROCEDURE SetImageTrans ( Closure : Worker . ClosureTyp ) 
   : Worker . ClosureTyp 
-  (* PRE: ImageTrans is set, set ImagePers from it. *) 
+  (* PRE: Window is set, set ImageTrans from it. *) 
 
 ; PROCEDURE SetImagePers ( Closure : Worker . ClosureTyp ) 
   : Worker . ClosureTyp 
@@ -123,6 +128,11 @@ INTERFACE Ui
 ; PROCEDURE SetImageTransAndPers ( Closure : Worker . ClosureTyp ) 
   : Worker . ClosureTyp 
   (* PRE: Window is set, set ImageTrans and ImagePers from it. *) 
+
+; PROCEDURE SetFieldsFromForm ( Closure : Worker . ClosureTyp ) 
+  : Worker . ClosureTyp 
+  (* PRE: Closure . Form is set. *)
+  (* Set Closure . Window, ImageTrans, and ImagePers from it. *) 
 
 (* ************************************************************** *) 
 

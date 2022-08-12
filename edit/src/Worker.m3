@@ -108,7 +108,7 @@ MODULE Worker
 ; VAR WaitingForGuiAssertDialog : Thread . Condition := NIL  
 ; VAR StoredState : WorkResultNotRefusedTyp := WrtDone 
 ; VAR QueryingAssert : BOOLEAN := FALSE
-; VAR StoredClosure : ClosureTyp := NIL 
+; VAR ActiveClosure : ClosureTyp := NIL 
       (* ^When # NIL,  immediate work has been accepted, though worker
          may or may not have gotten it.  If also StoredState = WrtBusy,  
          then worker is working on it. 
@@ -116,7 +116,7 @@ MODULE Worker
 ; VAR StoredFailureAction : Failures . FailureActionTyp 
 ; VAR QueuedClosure : ClosureTyp := NIL
       (* ^When QueuedClosure # NIL, it is either queued or being worked on.
-         If also StoredClosure # NIL, then immediate work was accepted or in
+         If also ActiveClosure # NIL, then immediate work was accepted or in
          progress at the time QueuedClosure was requested and is continuing.
       *)   
       (* There will have to be one of these for every window open, when we go 
@@ -127,14 +127,15 @@ MODULE Worker
 (* End of WorkerMu-protected variables. *)
 
 (*EXPORTED*) 
-; PROCEDURE RequestWork 
+; PROCEDURE RequestWork (* Immediate. *)  
     ( Closure : ClosureTyp 
     ; Interactive : BOOLEAN := FALSE  
-      (* ^Causes assertion failures to query the user about what to do. *)
+      (* ^Causes assertion failures or runtime errors raised in the 
+          worker thread to query the user about what to do. *)
       (* Default is appropriate for playback work. *) 
     ; Granularity : GranularityTyp := GranularityTyp . Global 
     ; WaitToStart : BOOLEAN := FALSE 
-      (* Instead of accepting a refusal, wait to start the work. *) 
+      (* Instead of refusing, wait to start the work, before returning . *) 
     ; WaitToFinish : BOOLEAN := TRUE  
       (* ^Don't return until work is refused or done. *) 
       (* Default is appropriate for playback work. *) 
@@ -153,14 +154,7 @@ MODULE Worker
            *) 
         TRY 
           Closure . apply ( ) 
-        EXCEPT 
-        | Backout 
-        => IF Assertions . DoTerminate 
-           THEN 
-             Assertions . TerminatingNormally := TRUE 
-           ; Process . Exit ( 1 ) <* NORETURN *>
-           ELSE RETURN WrtFailed  
-           END (* IF *) 
+        EXCEPT Backout => 
         END (* TRY EXCEPT *) 
       ; RETURN WrtDone 
       ELSE 
@@ -168,21 +162,21 @@ MODULE Worker
         DO 
           IF WaitToStart  
           THEN 
-            WHILE StoredClosure # NIL OR QueuedClosure # NIL  
+            WHILE ActiveClosure # NIL OR QueuedClosure # NIL  
             DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
             END (* WHILE *) 
-          ELSIF StoredClosure # NIL 
+          ELSIF ActiveClosure # NIL 
           THEN 
-           (* NOTE: Will not refuse immediate work when busy with queued. *)
+           (* NOTE: Will not refuse immediate work when busy with queued work. *)
             RETURN WrtRefused 
           END (* IF *) 
-        ; StoredClosure := Closure 
-        ; StoredClosure . IsInteractive := Interactive 
+        ; ActiveClosure := Closure 
+        ; ActiveClosure . IsInteractive := Interactive 
         ; Closure . Granularity := Granularity 
         ; Thread . Signal ( WaitingForWork ) 
         ; IF WaitToFinish 
           THEN
-            WHILE StoredClosure # NIL 
+            WHILE ActiveClosure # NIL 
             DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
             END (* WHILE *) 
           ; LResult := StoredState 
@@ -199,14 +193,14 @@ MODULE Worker
     END RequestWork 
 
 (*EXPORTED*) 
-; PROCEDURE RequestWorkInteractive 
+; PROCEDURE RequestWorkInteractive (* Immediate. *)  
     ( Closure : ClosureTyp 
     ; Granularity : GranularityTyp := GranularityTyp . Global 
     ) 
   : WorkResultTyp 
 
   <* LL.sup <= VBT.mu *> 
-  (* Same as RequestWork 
+  (* Same function as RequestWork 
        ( .. 
        , Interactive := TRUE , WaitToFinish := FALSE, WaitToStart:= FALSE 
        ) 
@@ -229,25 +223,19 @@ MODULE Worker
          when the cancel was "refused" because it was too late.
 *) 
         ; RETURN WrtStopped  
-        | Backout 
-        => IF Assertions . DoTerminate 
-           THEN 
-             Assertions . TerminatingNormally := TRUE 
-           ; Process . Exit ( 1 ) <* NORETURN *>
-           ELSE RETURN WrtFailed  
-           END (* IF *) 
+        | Backout =>
         END (* TRY EXCEPT *) 
       ; RETURN WrtDone 
       ELSE 
         LOCK WorkerMu 
         DO
-          IF StoredClosure # NIL   
+          IF ActiveClosure # NIL   
           THEN 
           (* NOTE: Will not refuse immediate work when there is queued. *)
             LResult := WrtRefused 
           ELSE 
-            StoredClosure := Closure 
-          ; StoredClosure . IsInteractive := TRUE 
+            ActiveClosure := Closure 
+          ; ActiveClosure . IsInteractive := TRUE 
           ; Closure . Granularity := Granularity 
           ; Thread . Signal ( WaitingForWork ) 
           (* Even though worker hasn't found the work yet, we can forcast 
@@ -281,7 +269,7 @@ MODULE Worker
   = BEGIN 
       LOCK WorkerMu 
       DO 
-        StoredClosure := NIL 
+        ActiveClosure := NIL 
       ; IF StoredState = WrtBusyImmed 
         THEN 
           Thread . Alert ( WorkerThread )  
@@ -303,6 +291,9 @@ MODULE Worker
     ) 
   : ClosureTyp (* The previously queued closure that was cancelled, or NIL. *) 
   <* LL.sup <= VBT.mu *> 
+  (* If there is a previously queued and not yet scheduled job, cancel it
+     and return its closure.
+  *)
 
   = VAR LResult : ClosureTyp 
 
@@ -310,7 +301,7 @@ MODULE Worker
       Closure . Granularity := Granularity 
     ; LOCK WorkerMu 
       DO 
-        LResult := QueuedClosure (* The one cancelled, if any. *)  
+        LResult := QueuedClosure (* The one to be cancelled, if any. *)  
       ; QueuedClosure := Closure 
       ; IF StoredState = WrtBusyQueued 
         THEN (* Busy doing queued work, cancel it. *) 
@@ -338,7 +329,7 @@ MODULE Worker
   ; BEGIN
       LOCK WorkerMu 
       DO 
-        LResult := QueuedClosure (* The one cancelled, if any. *) 
+        LResult := QueuedClosure (* The one to be cancelled, if any. *) 
       ; QueuedClosure := NIL 
       ; IF StoredState = WrtBusyQueued 
         THEN (* Busy doing queued work, cancel it. *) 
@@ -377,7 +368,7 @@ MODULE Worker
   ; BEGIN 
       LOCK WorkerMu 
       DO
-        LResult := StoredClosure = NIL AND QueuedClosure = NIL 
+        LResult := ActiveClosure = NIL AND QueuedClosure = NIL 
       END (* LOCK *) 
     ; RETURN LResult  
     END IsIdle 
@@ -395,7 +386,7 @@ MODULE Worker
   ; BEGIN
       LOCK WorkerMu 
       DO
-        WHILE StoredClosure # NIL OR QueuedClosure # NIL 
+        WHILE ActiveClosure # NIL OR QueuedClosure # NIL 
         DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
         END (* WHILE *) 
       ; LResult := StoredState 
@@ -414,16 +405,16 @@ MODULE Worker
   = BEGIN 
       LOCK WorkerMu 
       DO
-        WHILE StoredClosure = NIL AND QueuedClosure = NIL 
+        WHILE ActiveClosure = NIL AND QueuedClosure = NIL 
         DO Thread . Wait ( WorkerMu , WaitingForWork ) 
         END (* WHILE *) 
-      ; IF QueuedClosure # NIL 
+      ; IF ActiveClosure # NIL 
         THEN 
+          Closure := ActiveClosure 
+        ; StoredState := WrtBusyImmed 
+        ELSE 
           Closure := QueuedClosure 
         ; StoredState := WrtBusyQueued 
-        ELSE 
-          Closure := StoredClosure 
-        ; StoredState := WrtBusyImmed 
         END (* IF *) 
       ; Thread . Signal ( WaitingForBusy ) 
       END (* LOCK *)  
@@ -453,14 +444,14 @@ MODULE Worker
         THEN NewState := WrtStopped 
         END (* IF *) 
       ; IF NewState = WrtStopped  
-        THEN (* Whoever stopped it will have set StoredClosure or 
+        THEN (* Whoever stopped it will have set ActiveClosure or 
                 QueuedClosure to NIL or maybe to a newer task that
                 must not be overlaid. 
              *) 
         ELSE (* We need to set the closure that was executing to NIL *) 
           CASE StoredState <* NOWARN *> 
           OF WrtBusyImmed 
-          => StoredClosure := NIL 
+          => ActiveClosure := NIL 
           | WrtBusyQueued 
           => QueuedClosure := NIL 
           END (* CASE *) 
@@ -666,10 +657,8 @@ MODULE Worker
   
   ; BEGIN 
       LOCK WorkerMu 
-      DO IF StoredClosure # NIL
-        THEN LInteractive := StoredClosure . IsInteractive 
-        ELSIF QueuedClosure # NIL
-        THEN LInteractive := QueuedClosure . IsInteractive 
+      DO IF ActiveClosure # NIL
+        THEN LInteractive := ActiveClosure . IsInteractive 
         ELSE LInteractive := FALSE
         END (* IF *)
       ; LDoGuiActions := LInteractive AND IAmWorkerThread ( ) 
@@ -698,8 +687,8 @@ MODULE Worker
           , LCheckpointMsg 
           ) 
         (* It would be more obviously right to show and remove this dialog  
-           while holding WorkerMu, but I can't figure out a way that satisfies a 
-           consistent lock order.  In any case, unlocking WorkerMu is OK,
+           while holding WorkerMu, but I can't figure out a way that satisfies 
+           a consistent lock order.  In any case, unlocking WorkerMu is OK,
            because we will only get here when StoredState = WrtBusyImmed or
            WrtBusyQueued, which means the only thing any other thread
            can do is wait on WaitingForIdle. 
@@ -782,13 +771,7 @@ MODULE Worker
          when the cancel was "refused" because it was too late?
 *) 
         ; BecomeIdle ( WrtStopped ) 
-        | Backout 
-        => IF Assertions . DoTerminate OR NOT StoredClosure . IsInteractive 
-           THEN 
-             Assertions . TerminatingNormally := TRUE 
-           ; Process . Exit ( 1 ) <* NORETURN *>
-           ELSE BecomeIdle ( WrtFailed ) 
-           END (* IF *) 
+        | Backout => 
         END (* TRY EXCEPT *) 
       END (* LOOP *) 
     END WorkerThreadApply 
@@ -814,7 +797,7 @@ MODULE Worker
 
   = BEGIN 
       LOCK WorkerMu 
-      DO RETURN IAmWorkerThread ( ) AND StoredClosure . IsInteractive 
+      DO RETURN IAmWorkerThread ( ) AND ActiveClosure . IsInteractive 
       END (* LOCK *) 
     END DoGuiActions 
 

@@ -6,7 +6,7 @@
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
-(* This module carries out various text editing operations. *) 
+(* TextEdit carries out text editing the Est and text painting. *) 
 
 MODULE TextEdit 
 
@@ -470,7 +470,7 @@ MODULE TextEdit
       END (* IF *) 
     END LineString 
 
-(* VISIBLE: *) 
+(* EXPORTED: *)
 ; PROCEDURE BruteForceVerifyAllLinesRefs 
     ( ImageRef : PaintHs . ImageTransientTyp ; RepairIsOK : BOOLEAN ) 
   RAISES { Backout , Thread . Alerted } 
@@ -2023,7 +2023,7 @@ MODULE TextEdit
       END (* Block *) 
     END InnerFlushTempEdit 
 
-(* VISIBLE: *) 
+(* EXPORTED: *)
 ; PROCEDURE FlushEdit ( ImageRef : PaintHs . ImageTransientTyp ) 
   RAISES { Backout , Thread . Alerted } 
 
@@ -2757,7 +2757,7 @@ MODULE TextEdit
       END (* IF *) 
     END SimpleDeleteChar 
 
-(* VISIBLE: *) 
+(* EXPORTED: *)
 ; PROCEDURE DeleteChar 
     ( WindowRef : PaintHs . WindowRefTyp ; DeletingBwd : BOOLEAN ) 
   RAISES { Backout , Thread . Alerted } 
@@ -2936,7 +2936,7 @@ MODULE TextEdit
       END (* IF *) 
     END DeleteChar 
 
-(* VISIBLE: *) 
+(* EXPORTED: *)
 ; PROCEDURE InsertOrOverlayChar 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; NewChar : CHAR 
@@ -3323,7 +3323,7 @@ MODULE TextEdit
       END (* IF *) 
     END InsertOrOverlayChar 
 
-(* VISIBLE: *) 
+(* EXPORTED: *)
 ; PROCEDURE InsertOrOverlayString  
     ( WindowRef : PaintHs . WindowRefTyp 
     ; String : TEXT 
@@ -3362,7 +3362,7 @@ MODULE TextEdit
       END (* FOR *) 
     END InsertOrOverlayString  
 
-(* VISIBLE: *) 
+(* EXPORTED: *)
 ; PROCEDURE TransposeChars ( WindowRef : PaintHs . WindowRefTyp ) 
     RAISES { Backout , Thread . Alerted } 
 
@@ -3539,7 +3539,7 @@ MODULE TextEdit
       END (* IF *) 
     END TransposeChars 
 
-(* VISIBLE: *) 
+(* EXPORTED: *)
 ; PROCEDURE DeleteRestOfLine ( WindowRef : PaintHs . WindowRefTyp ) 
     RAISES { Backout , Thread . Alerted } 
 
@@ -3765,7 +3765,7 @@ MODULE TextEdit
       END (* TRY EXCEPT *) 
     END DeleteTempEditedCharRange 
 
-(* VISIBLE: *) 
+(* EXPORTED: *)
 ; PROCEDURE DeleteBetweenMarks 
     ( ImageTrans : PaintHs . ImageTransientTyp   
     ; FromMark : PaintHs . LineMarkMeatTyp 
@@ -4003,7 +4003,7 @@ MODULE TextEdit
       END (* IF *) 
     END DeleteBetweenMarks 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE AcceptRepairUnderCursor ( WindowRef : PaintHs . WindowRefTyp ) 
   RAISES { Backout , Thread . Alerted } 
 
@@ -4261,7 +4261,7 @@ MODULE TextEdit
       END (* Block *) 
     END AcceptRepairUnderCursor 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE ToggleInsertMode ( Window : PaintHs . WindowRefTyp ) 
   : BOOLEAN (* Now Is insert. *) 
 
@@ -4271,7 +4271,7 @@ MODULE TextEdit
     ; RETURN Window . WrInsertMode 
     END ToggleInsertMode 
 
-(* VISIBLE *) 
+(* EXPORTED: *) 
 ; PROCEDURE SetInsertMode 
     ( Window : PaintHs . WindowRefTyp ; Value : BOOLEAN ) 
 

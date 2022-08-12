@@ -6,7 +6,7 @@
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
 
-(* This module carries out various text editing operations. *) 
+(* TextEdit carries out text editing the Est and text painting. *) 
 
 INTERFACE TextEdit 
 
