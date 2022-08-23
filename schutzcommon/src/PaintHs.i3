@@ -69,9 +69,9 @@ INTERFACE PaintHs
 ; CONST TaBgColorMatched = 4
 
 ; CONST TaFgColorPlain = 0 
-; CONST TaFgColorIdent = 1 
+; CONST TaFgColorCmnt = 1 
 ; CONST TaFgColorLiteral = 2 
-; CONST TaFgColorCmnt = 3 
+; CONST TaFgColorIdent = 3 
 ; CONST TaFgColorPlaceholder = 4 
 
 ; CONST TaFontPlain = 0 

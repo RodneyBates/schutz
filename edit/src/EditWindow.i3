@@ -85,7 +85,7 @@ INTERFACE EditWindow
   <* LL.sup < Window *> 
 
 ; PROCEDURE MakeCursorVisible ( Window : WindowTyp ) 
-  <* LL . sup < BlinkerLock *> 
+  <* LL . sup < VBT . mu *> 
 
 ; PROCEDURE PaintWindowBlank ( Window : WindowTyp ) 
   <* LL . sup < Window . mu *> 
@@ -144,7 +144,7 @@ INTERFACE EditWindow
 ; PROCEDURE Beep ( ) 
 
 ; PROCEDURE TakeKBFocus ( Window : WindowTyp ; TimeStamp : VBT . TimeStamp ) 
-  <* LL . sup < Window . mu *> 
+  <* LL . sup < BlinkerLock *> 
 
 ; PROCEDURE ScreenSelection ( ) : VBT . Selection 
 

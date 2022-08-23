@@ -1,4 +1,4 @@
-
+ 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
 (* Copyright 1988..2022, Rodney M. Bates.                                    *)
@@ -113,84 +113,78 @@ MODULE Ui
     ; RETURN PaintOp . FromRGB ( LRed , LGreen , LBlue )  
     END PaintOpFromColor 
 
-; PROCEDURE SetBgOps ( VAR Ops : PaintOpsTyp ) 
-  (* Initialize Ops with tint PaintOps for background colors. *) 
+; PROCEDURE SetBgOps ( VAR BgOps : PaintOpsTyp ) 
+  (* Initialize BgOps with tint PaintOps for background colors. *) 
 
   = BEGIN 
-      Ops [ PaintHs . TaBgColorPlain ] 
-        := PaintOpFromColor ( Options . White (*BgColorPlain*) ) 
-    ; Ops [ PaintHs . TaBgColorCmnt ] 
-        := PaintOpFromColor ( Options . Pink (*BgColorCmnt*) ) 
-    ; Ops [ PaintHs . TaBgColorLiteral ] 
-        := PaintOpFromColor ( Options . Red (*BgColorLiteral*) ) 
-    ; Ops [ PaintHs . TaBgColorSelected ] 
-        := PaintOpFromColor ( Options . Periwinkle (*BgColorSelected*) ) 
-    ; Ops [ PaintHs . TaBgColorMatched ] 
+      BgOps [ PaintHs . TaBgColorPlain ] 
+        := PaintOpFromColor ( Options . BgColorPlain ) 
+    ; BgOps [ PaintHs . TaBgColorCmnt ] 
+        := PaintOpFromColor ( Options . BgColorCmnt ) 
+    ; BgOps [ PaintHs . TaBgColorLiteral ] 
+        := PaintOpFromColor ( Options . BgColorLiteral ) 
+    ; BgOps [ PaintHs . TaBgColorSelected ] 
+        := PaintOpFromColor ( Options . BgColorSelected ) 
+    ; BgOps [ PaintHs . TaBgColorMatched ] 
         := PaintOpFromColor ( Options . BgColorMatched ) 
     END SetBgOps 
 
-; PROCEDURE SetDecOps ( VAR Ops : PaintOpsTyp ) 
-  (* Initialize Ops with transparent/Fg PaintOps for decorations. *) 
+; PROCEDURE SetDecOps ( VAR DecOps : PaintOpsTyp ) 
+  (* Initialize DecOps with transparent/Fg PaintOps for decorations. *) 
 
   = BEGIN 
-      Ops [ PaintHs . TaDecPlain ] 
+      DecOps [ PaintHs . TaDecPlain ] 
         := PaintOp . Pair ( PaintOp . Transparent , PaintOp . Transparent ) 
       (* ^Defensive.  Probably won't be used. *) 
-    ; Ops [ PaintHs . TaDecStrikeout ] 
+    ; DecOps [ PaintHs . TaDecStrikeout ] 
         := PaintOp . Pair 
              ( PaintOp . Transparent 
              , PaintOpFromColor ( Options . DecColorErr ) 
              ) 
-    ; Ops [ PaintHs . TaDecCaret ] 
+    ; DecOps [ PaintHs . TaDecCaret ] 
         := PaintOp . Pair 
              ( PaintOp . Transparent 
              , PaintOpFromColor ( Options . DecColorErr ) 
              ) 
-    ; Ops [ PaintHs . TaDecUnderline1 ] 
+    ; DecOps [ PaintHs . TaDecUnderline1 ] 
         := PaintOp . Pair 
              ( PaintOp . Transparent 
              , PaintOpFromColor ( Options . DecColorTyped ) 
              ) 
-    ; Ops [ PaintHs . TaDecUnderline2 ] 
+    ; DecOps [ PaintHs . TaDecUnderline2 ] 
         := PaintOp . Pair 
              ( PaintOp . Transparent 
              , PaintOpFromColor ( Options . DecColorTouched ) 
              ) 
     END SetDecOps 
 
-; PROCEDURE SetCharOps ( VAR Ops : PaintOpsTyp ) 
-  (* Initialize Ops with transparent/Fg PaintOps for characters. *) 
+; PROCEDURE SetCharOps ( VAR CharOps : PaintOpsTyp ) 
+  (* Initialize CharOps with transparent/Fg PaintOps for characters. *) 
 
   = BEGIN 
-      Ops [ PaintHs . TaFgColorPlain ] 
+      CharOps [ PaintHs . TaFgColorPlain ] 
         := PaintOp . Pair 
              ( PaintOp . Transparent
-               (* PaintOpFromColor(Options.EBrown) *)
-(* CLEANUP ^ These colors are for debug experiments. *) 
              , PaintOpFromColor ( Options . FgColorPlain ) 
              ) 
-    ; Ops [ PaintHs . TaFgColorIdent ] 
+    ; CharOps [ PaintHs . TaFgColorIdent ] 
         := PaintOp . Pair 
              ( PaintOp . Transparent
-               (* PaintOpFromColor(Options.EGreen) *)
              , PaintOpFromColor ( Options . FgColorIdent ) 
              ) 
-    ; Ops [ PaintHs . TaFgColorLiteral ] 
+    ; CharOps [ PaintHs . TaFgColorLiteral ] 
         := PaintOp . Pair 
-             ( PaintOp . Transparent
-               (* PaintOpFromColor(Options.ERed) *)
+             ( PaintOp . Transparent 
              , PaintOpFromColor ( Options . FgColorLiteral ) 
              ) 
-    ; Ops [ PaintHs . TaFgColorCmnt ] 
+    ; CharOps [ PaintHs . TaFgColorCmnt ] 
         := PaintOp . Pair 
              ( PaintOp . Transparent
-               (* PaintOpFromColor(Options.EBlue) *)
              , PaintOpFromColor ( Options . FgColorCmnt ) 
              ) 
-    ; Ops [ PaintHs . TaFgColorPlaceholder ] 
+    ; CharOps [ PaintHs . TaFgColorPlaceholder ] 
         := PaintOp . Pair 
              ( PaintOp . Transparent
-               (* PaintOpFromColor(Options.EPurple) *)
              , PaintOpFromColor ( Options . FgColorPlaceholder ) 
              ) 
     END SetCharOps 
@@ -226,19 +220,19 @@ MODULE Ui
     ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
           TO LAST ( PaintHs . TextAttrComponentTyp ) 
       DO 
-      Info ^ . DiBgDecOpsError 
+        Info ^ . DiBgDecOpsError 
           := BgDecPaintOp ( RBg , Options . FgColorError ) 
       END (* FOR *)   
     ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
           TO LAST ( PaintHs . TextAttrComponentTyp ) 
       DO 
-      Info ^ . DiBgDecOpsTyped 
+        Info ^ . DiBgDecOpsTyped 
           := BgDecPaintOp ( RBg , Options . FgColorTyped ) 
       END (* FOR *)   
     ; FOR RBg := FIRST ( PaintHs . TextAttrComponentTyp ) 
           TO LAST ( PaintHs . TextAttrComponentTyp ) 
       DO 
-      Info ^ . DiBgDecOpsTouched
+        Info ^ . DiBgDecOpsTouched
           := BgDecPaintOp ( RBg , Options . FgColorTouched 
       END (* FOR *)   
 *) 
@@ -249,7 +243,7 @@ MODULE Ui
         FOR RFg := FIRST ( PaintHs . TextAttrComponentTyp ) 
             TO LAST ( PaintHs . TextAttrComponentTyp ) 
         DO
-        Info ^ . DiPaintOps2D [ RBg , RFg ] 
+          Info ^ . DiPaintOps2D [ RBg , RFg ] 
             := TextPaintOp ( RBg , RFg ) 
         END 
       END 
@@ -379,6 +373,32 @@ MODULE Ui
     ; RETURN Closure  
     END SetFieldsFromForm  
 
+; PROCEDURE SetFieldsFromWindow ( Closure : Worker . ClosureTyp ) 
+  : Worker . ClosureTyp 
+  (* PRE: Closure . Window is set. *)
+  (* Set Closure . form, ImageTrans, and ImagePers from it. *) 
+
+  = BEGIN
+      IF Closure . Window = NIL 
+      THEN
+        Closure . Form := NIL
+      ; Closure . ImageTrans := NIL
+      ; Closure . ImagePers := NIL 
+      ELSE 
+        LOCK Closure . Window 
+        DO
+          Closure . Form := EditWindow . Form ( Closure . Window )
+(* REVIEW ^ This requires that Closure.Window be an EditWindow.T *) 
+        ; Closure . ImageTrans := Closure . Window . WrImageRef 
+        ; IF Closure . ImageTrans = NIL 
+          THEN Closure . ImagePers := NIL 
+          ELSE Closure . ImagePers := Closure . ImageTrans . ItPers 
+          END (* IF *)
+        END (* LOCK *) 
+      END (* IF *)
+    ; RETURN Closure  
+    END SetFieldsFromWindow   
+
 (******************************** Open ***********************************) 
 
 ; PROCEDURE OpenEmptyFile 
@@ -426,7 +446,7 @@ MODULE Ui
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
 
-    BEGIN (* OpenWork *) 
+    BEGIN (* OpenWorkProc *) 
       TRY (* EXCEPT *) 
         LForm := EditWindow . Form ( Self . Window ) 
       ; LSimpleName := Pathname . Last ( Self . TextParam ) 
@@ -450,7 +470,7 @@ MODULE Ui
             RAISE Files . Error 
               ( "Already open as " & Self . ImagePers . IpAbsPklFileName ) 
           ELSE 
-            FormsVBT . MakeDormant ( LForm , "Fv_File_Open" ) 
+            FormsVBT . MakeDormant ( Self . Form , "Fv_File_Open" ) 
           ; IF Self . ImageTrans . ItPers . IpLang = LbeStd . LangLdl0 
                OR Self . ImageTrans . ItPers . IpLang = LbeStd . LangLdl1 
             THEN 
@@ -496,16 +516,16 @@ MODULE Ui
             THEN  
               IF Thread . TestAlert ( ) THEN RAISE Thread . Alerted END 
             ; FormsVBT . PutText 
-                ( LForm 
+                ( Self . Form 
                 , "Fv_AltOpenDialog_FirstFileName" 
                 , LAbsPickleFileName  
                 ) 
             ; FormsVBT . PutText 
-                ( LForm 
+                ( Self . Form 
                 , "Fv_AltOpenDialog_SecondFileName" 
                 , LAbsTextFileName 
                 ) 
-            ; FormsVBT . PopUp ( LForm , "Fv_AltOpenDialog" ) 
+            ; FormsVBT . PopUp ( Self . Form , "Fv_AltOpenDialog" ) 
             ELSE 
               LCommandString 
                 := UiRecPlay . BeginCommandPlusString 
@@ -551,16 +571,16 @@ MODULE Ui
               THEN  
                 IF Thread . TestAlert ( ) THEN RAISE Thread . Alerted END 
               ; FormsVBT . PutText 
-                  ( LForm 
+                  ( Self . Form 
                   , "Fv_AltOpenDialog_FirstFileName" 
                   , LAbsTextFileName 
                   ) 
               ; FormsVBT . PutText 
-                  ( LForm 
+                  ( Self . Form 
                   , "Fv_AltOpenDialog_SecondFileName" 
                   , LAbsPickleFileName 
                   ) 
-              ; FormsVBT . PopUp ( LForm , "Fv_AltOpenDialog" ) 
+              ; FormsVBT . PopUp ( Self . Form , "Fv_AltOpenDialog" ) 
             ELSE 
               LCommandString  
                 := UiRecPlay . BeginCommandPlusString 
@@ -581,7 +601,7 @@ MODULE Ui
         THEN
           Images . ConnectImageToWindow ( Self . ImageTrans , Self . Window ) 
         ; Display . InitImageFirstWindow ( Self . ImageTrans ) 
-        ; FormsVBT . MakeDormant ( LForm , "Fv_File_Open" ) 
+        ; FormsVBT . MakeDormant ( Self . Form , "Fv_File_Open" ) 
         ; IF Self . ImageTrans . ItPers . IpLang = LbeStd . LangLdl0 
              OR Self . ImageTrans . ItPers . IpLang = LbeStd . LangLdl1 
           THEN 
@@ -596,12 +616,13 @@ MODULE Ui
         THEN 
           IF Thread . TestAlert ( )    
           THEN 
-            FormsVBT . MakeActive ( LForm , "Fv_File_Open" ) 
+            FormsVBT . MakeActive ( Self . Form , "Fv_File_Open" ) 
           ; Options . OpeningImageRef := NIL 
           ; RAISE Thread . Alerted 
           ELSE 
-            FormsVBT . PutText ( LForm , "Fv_ErrorPopup_Message" , EMessage ) 
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+            FormsVBT . PutText
+              ( Self . Form , "Fv_ErrorPopup_Message" , EMessage ) 
+          ; FormsVBT . PopUp ( Self . Form , "Fv_ErrorPopup" ) 
           (* Leave the Open dialog up and let the user either change
              something and try again, or explicitly cancel. *) 
           END (* IF *) 
@@ -616,12 +637,13 @@ MODULE Ui
         THEN 
           IF NOT Thread . TestAlert ( )    
           THEN 
-            FormsVBT . MakeActive ( LForm , "Fv_File_Open" ) 
+            FormsVBT . MakeActive ( Self . Form , "Fv_File_Open" ) 
           ; Options . OpeningImageRef := NIL 
           ; RAISE Thread . Alerted 
           ELSE 
-            FormsVBT . PutText ( LForm , "Fv_ErrorPopup_Message" , EMessage ) 
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+            FormsVBT . PutText
+              ( Self . Form , "Fv_ErrorPopup_Message" , EMessage ) 
+          ; FormsVBT . PopUp ( Self . Form , "Fv_ErrorPopup" ) 
           (* Leave the Open dialog up and let the user either change
              something and try again, or explicitly cancel. *)  
           END (* IF *) 
@@ -632,7 +654,7 @@ MODULE Ui
         END (* IF *) 
 
       | Thread . Alerted 
-      => FormsVBT . MakeActive ( LForm , "Fv_File_Open" ) 
+      => FormsVBT . MakeActive ( Self . Form , "Fv_File_Open" ) 
       ; Options . OpeningImageRef := NIL 
       ; RAISE Thread . Alerted 
 
@@ -652,13 +674,14 @@ MODULE Ui
       THEN
         TRY 
           EVAL Worker . RequestWork 
-                 ( NEW ( WorkerClosureTextTyp 
-                       , Window 
-                           := FormsVBT . GetGeneric 
-                                ( Options . MainForm , "Fv_LbeWindow" )   
-                       , TextParam := FileName 
-                       , apply := OpenWorkProc 
-                       ) 
+                 ( SetFieldsFromForm
+                     ( NEW ( WorkerClosureTextTyp
+                           , Form := Options . MainForm 
+                           , TextParam := FileName
+                           , IsInteractive := FALSE 
+                           , apply := OpenWorkProc 
+                           )
+                     ) 
                  ) 
         ; TRY 
             FormsVBT . PutText 
@@ -689,12 +712,15 @@ MODULE Ui
         LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
       ; EditWindow . TakeKBFocus ( LWindow , Time ) 
       ; EVAL Worker . RequestWorkInteractive  
-               ( NEW ( WorkerClosureTextTyp 
-                     , Window := LWindow 
-                     , Time := Time 
-                     , TextParam := LFileName 
-                     , apply := OpenWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( WorkerClosureTextTyp 
+                         , Form := Form 
+                         , Time := Time 
+                         , TextParam := LFileName 
+                         , IsInteractive := TRUE  
+                         , apply := OpenWorkProc 
+                         )
+                   ) 
                ) 
       ; FormsVBT . PopDown ( Form , "Fv_OpenDialog" )
       END (* IF *) 
@@ -717,13 +743,15 @@ MODULE Ui
     ; IF LFileName # NIL AND NOT Text . Equal ( LFileName , "" ) 
       THEN 
         EVAL Worker . RequestWorkInteractive  
-               ( NEW ( WorkerClosureTextTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                     , Time := Time 
-                     , TextParam := LFileName 
-                     , apply := OpenWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( WorkerClosureTextTyp 
+                         , Form := Form 
+                         , Time := Time 
+                         , TextParam := LFileName 
+                         , IsInteractive := TRUE  
+                         , apply := OpenWorkProc 
+                         )
+                   ) 
                ) 
       ; FormsVBT . PopDown ( Form , "Fv_AltOpenDialog" )
       ; FormsVBT . PopDown ( Form , "Fv_OpenDialog" )
@@ -802,13 +830,15 @@ MODULE Ui
     ; IF LFileName # NIL AND NOT Text . Equal ( LFileName , "" ) 
       THEN 
         EVAL Worker . RequestWorkInteractive  
-               ( NEW ( WorkerClosureTextTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                     , Time := Time 
-                     , TextParam := LFileName 
-                     , apply := AltOpenNoWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( WorkerClosureTextTyp 
+                         , Form := Form 
+                         , Time := Time 
+                         , TextParam := LFileName 
+                         , IsInteractive := TRUE  
+                         , apply := AltOpenNoWorkProc 
+                         )
+                   ) 
                ) 
       ; FormsVBT . PopDown ( Form , "Fv_AltOpenDialog" )
       ; FormsVBT . PopDown ( Form , "Fv_OpenDialog" )
@@ -832,16 +862,13 @@ MODULE Ui
 
 ; PROCEDURE InnerSave ( Closure : Worker . ClosureTyp ) 
   : BOOLEAN (* Success *) 
-  (* PRE: Closure . Window, ImageTrans, and ImagePers set. *) 
+  (* PRE: Closure . Form, ImageTrans, ImagePers, and IsInteractive are set. *) 
   (* Runs on worker thread. *) 
 
-  = VAR LForm : FormsVBT . T 
-
-  ; <* FATAL FormsVBT . Error *>
+  = <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
-    ; IF Closure . ImageTrans # NIL 
+      IF Closure . ImageTrans # NIL 
       THEN 
         TRY 
           Files . WriteImagePickle 
@@ -858,8 +885,8 @@ MODULE Ui
         => IF Closure . IsInteractive 
            THEN 
              FormsVBT . PutText 
-               ( LForm , "Fv_ErrorPopup_Message" , EMessage ) 
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+               ( Closure . Form , "Fv_ErrorPopup_Message" , EMessage ) 
+          ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
           (* Leave the Save dialog up and let the user either change
              something and try again, or explicitly cancel. *)  
           END (* IF *) 
@@ -868,12 +895,12 @@ MODULE Ui
           IF Closure . IsInteractive 
           THEN 
              FormsVBT . PutText 
-               ( LForm 
+               ( Closure . Form 
                , "Fv_ErrorPopup_Message" 
                , "Save failed for " 
                  & Closure . ImagePers . IpAbsPklFileName 
                ) 
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+          ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
           (* Leave the Save dialog up and let the user either change
              something and try again, or explicitly cancel. *)  
           END (* IF *) 
@@ -885,14 +912,13 @@ MODULE Ui
     END InnerSave  
 
 ; PROCEDURE FileSaveWorkProc ( Closure : Worker . ClosureTyp ) 
-  (* PRE: Closure . Window and ImageTrans set by caller. *) 
+  (* PRE: Closure . Form, ImageTrans, ImagePers, and IsInteractive are set. *) 
   (* Runs on worker thread. *) 
 
   = VAR LCommandString : TEXT 
 
   ; BEGIN 
-      EVAL SetImagePers ( Closure ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommandPlusString 
               ( UiRecPlay . CommandTyp . FileSave
               , Closure . ImagePers . IpImageName  
@@ -918,13 +944,13 @@ MODULE Ui
         LImageTrans := LRef 
       ; TRY 
           EVAL Worker . RequestWork 
-                 ( NEW ( Worker . ClosureTyp 
-                       , Window 
-                           := FormsVBT . GetGeneric 
-                                ( Options . MainForm , "Fv_LbeWindow" )   
-                       , ImageTrans := LImageTrans 
-                       , apply := FileSaveWorkProc 
-                       ) 
+                 ( SetFieldsFromForm
+                     ( NEW ( Worker . ClosureTyp 
+                           , Form := Options . MainForm
+                           , IsInteractive := FALSE 
+                           , apply := FileSaveWorkProc 
+                           )
+                     ) 
                  ) 
         EXCEPT Thread . Alerted => 
         END (* TRY EXCEPT *) 
@@ -938,28 +964,23 @@ MODULE Ui
     ; Time : VBT . TimeStamp 
     ) 
 
-  = VAR LWindow : EditWindow . T 
-
-  ; <* FATAL FormsVBT . Error *>
+  = <* FATAL FormsVBT . Error *>
     BEGIN 
-      LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )  
-    ; IF LWindow # NIL AND LWindow . WrImageRef # NIL  
-      THEN 
-        EVAL Worker . RequestWorkInteractive  
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                     , Window := LWindow 
-                     , ImageTrans := LWindow . WrImageRef 
-                     , Time := Time 
-                     , apply := FileSaveWorkProc 
-                     ) 
-               ) 
-      END (* IF *) 
+      EVAL Worker . RequestWorkInteractive  
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := FileSaveWorkProc 
+                       )
+                 ) 
+             ) 
     END SaveCallback  
 
 ; PROCEDURE SaveAndExportWorkProc ( Closure : WorkerClosureTextTyp ) 
-  (* PRE: Closure . Window, ImageTrans, and ImagePers are set. *) 
+  (* PRE: Closure . Form, Window, ImageTrans, ImagePers, TextParam,
+          and IsInteractive are set. *) 
   (* PRE: TextParam is file name. *) 
   (* Runs on worker thread. *) 
 
@@ -979,29 +1000,26 @@ MODULE Ui
     ; Time : VBT . TimeStamp 
     ) 
 
-  = VAR LWindow : EditWindow . T 
+  = VAR LClosure : WorkerClosureTextTyp 
   ; VAR LImageTrans : PaintHs . ImageTransientTyp 
   ; VAR LImagePers : PaintHs . ImagePersistentTyp 
 
   ; <* FATAL FormsVBT . Error *>
-    BEGIN 
-      LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )  
-    ; IF LWindow # NIL 
-      THEN 
-        LImageTrans := LWindow . WrImageRef 
-      ; IF LImageTrans # NIL 
-        THEN 
-          LImagePers := LImageTrans . ItPers 
-        ; EVAL Worker . RequestWorkInteractive  
-                 ( NEW ( WorkerClosureTextTyp 
-                       , Window := LWindow 
-                       , ImageTrans := LWindow . WrImageRef 
-                       , TextParam := LImagePers . IpAbsTextFileName 
-                       , Time := Time 
-                       , apply := SaveAndExportWorkProc 
-                       ) 
-                 ) 
-        END (* IF*) 
+    BEGIN
+      LClosure
+        := SetFieldsFromForm
+             ( NEW ( WorkerClosureTextTyp 
+                   , Form := Form 
+                   , TextParam := LImagePers . IpAbsTextFileName 
+                   , IsInteractive := TRUE 
+                   , Time := Time
+                   , apply := SaveAndExportWorkProc 
+                   )
+             ) 
+    ; IF LClosure . ImagePers # NIL
+      THEN
+        LClosure . TextParam := LClosure . ImagePers . IpAbsTextFileName 
+      ; EVAL Worker . RequestWorkInteractive ( LClosure )   
       END (* IF *) 
     END SaveAndExportCallback  
 
@@ -1147,7 +1165,7 @@ MODULE Ui
 ; PROCEDURE ExtractAnImage ( ) : PaintHs . ImageTransientTyp 
   (* Get an arbitrary Image from those that are open. 
      NIL if none exists. *) 
-
+  (* Runs on worker thread. *) 
   = VAR LTblIterator : TextRefTbl . Iterator 
   ; VAR LName : TEXT 
   ; VAR LRef : REFANY 
@@ -1187,16 +1205,13 @@ MODULE Ui
 ; PROCEDURE SaveDialogWorkProc 
     ( Closure : WorkerClosureTextTyp (* TextParam is button name. *) ) 
   RAISES { Backout } 
-  (* PRE: Closure . Window is set.  Closure . Textparm is button name. *) 
+  (* PRE: Closure . Form, ImageTrans, ImagePers, TextParam,
+          and IsInteractive are set. *) 
   (* Runs on worker thread. *) 
 
-  = VAR LForm : FormsVBT . T 
-
-  ; <* FATAL FormsVBT . Error *>
+  = <* FATAL FormsVBT . Error *>
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
-    ; EVAL SetImageTransAndPers ( Closure ) 
-    ; IF SaveDialogInfo . IsPoppedUp 
+      IF SaveDialogInfo . IsPoppedUp 
       THEN (* Bad playback sequences could cause it not to be. *) 
         IF Text . Equal ( Closure . TextParam , "Fv_SaveDialog_Cancel" ) 
         THEN 
@@ -1216,8 +1231,8 @@ MODULE Ui
         ELSE 
           CantHappen ( AFT . A_Files_SaveDialogApply_BadComponentName ) 
         END (* IF *) 
-      ; FormsVBT . MakeActive ( LForm , "Fv_Background" ) 
-      ; FormsVBT . PopDown ( LForm , "Fv_SaveDialog" ) 
+      ; FormsVBT . MakeActive ( Closure . Form , "Fv_Background" ) 
+      ; FormsVBT . PopDown ( Closure . Form , "Fv_SaveDialog" ) 
       ; SaveDialogInfo . IsPoppedUp := FALSE  
       ; IF SaveDialogInfo . DoCloseAllImages 
         THEN 
@@ -1241,13 +1256,15 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN (* SaveDialogCallback *) 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( WorkerClosureTextTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )    
-                   , Time := Time 
-                   , TextParam := Name (* Of the button. *) 
-                   , apply := SaveDialogWorkProc 
-                   ) 
+             ( SetFieldsFromForm
+                 ( NEW ( WorkerClosureTextTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , TextParam := Name (* Of the button. *) 
+                       , IsInteractive := TRUE  
+                       , apply := SaveDialogWorkProc 
+                       )
+                 ) 
              ) 
     END SaveDialogCallback 
 
@@ -1261,34 +1278,37 @@ MODULE Ui
     ) 
   (* Just pop the SaveAs dialog. *) 
 
-  = VAR LWindow : EditWindow . T  
+  = VAR LWindow : EditWindow . T
+  ; VAR LImageTrans : PaintHs . ImageTransientTyp 
 
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LWindow 
-        := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
-    ; IF LWindow . WrImageRef # NIL 
-      THEN 
-        FormsVBT . PutText 
-          ( Form 
-          , "Fv_SaveAsDialog_FileName" 
-          , LWindow . WrImageRef . ItPers . IpAbsPklFileName 
-          )
-      ; FormsVBT . PopUp ( Form , "Fv_SaveAsDialog" ) 
+      LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
+    ; IF LWindow # NIL
+      THEN
+        LOCK LWindow DO LImageTrans := LWindow . WrImageRef END (* LOCK *) 
+      ; IF LImageTrans # NIL AND LImageTrans .ItPers # NIL 
+        THEN 
+          FormsVBT . PutText 
+            ( Form 
+            , "Fv_SaveAsDialog_FileName" 
+            , LImageTrans . ItPers . IpAbsPklFileName 
+            )
+        END (* IF *) 
       END (* IF *) 
+    ; FormsVBT . PopUp ( Form , "Fv_SaveAsDialog" ) 
     END SaveAsCallback  
 
 ; PROCEDURE InnerSaveAsOK ( Closure : WorkerClosureTextTyp ) 
   : BOOLEAN (* Success *) 
   (* Handle the internal name change. *) 
-  (* PRE: Closure . Window, ImageTrans, ImagePers are set,
-          Closure . TextParam is new image name. 
-  *) 
+  (* PRE: Closure . Form, Window, ImageTrans, ImagePers, TextParam,
+          and IsInteractive are set. *) 
+  (* Closure . TextParam is new image name. *) 
   (* Runs on worker thread. *) 
 
-  = VAR LForm : FormsVBT . T 
-  ; VAR LSimpleName : TEXT 
+  = VAR LSimpleName : TEXT 
   ; VAR LImageName : TEXT 
   ; VAR LCommandString : TEXT := NIL 
   ; VAR LRef : REFANY  
@@ -1297,8 +1317,7 @@ MODULE Ui
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
-    ; IF Closure . TextParam # NIL 
+      IF Closure . TextParam # NIL 
          AND NOT Text . Equal ( Closure . TextParam , "" )  
          AND Closure . Window # NIL 
          AND Closure . ImageTrans # NIL 
@@ -1317,7 +1336,7 @@ MODULE Ui
         THEN (* Image name is not changing. *) 
           Closure . ImagePers . IpAbsPklFileName := Closure . TextParam 
         ; FormsVBT . PutText 
-            ( LForm , "Fv_PathName" , Closure . TextParam )
+            ( Closure . Form , "Fv_PathName" , Closure . TextParam )
         ; LSuccess := TRUE 
         ELSE (* There is a change of image name. *) 
           IF Images . ImageTable . get ( LImageName , LRef ) 
@@ -1325,12 +1344,12 @@ MODULE Ui
             IF Closure . IsInteractive 
             THEN 
               FormsVBT . PutText 
-                ( LForm 
+                ( Closure . Form 
                 , "Fv_SaveAsDuplDialog_Name" 
                 , LImageName 
                 )
             ; FormsVBT . PopUp 
-                ( LForm , "Fv_SaveAsDuplDialog" ) 
+                ( Closure . Form , "Fv_SaveAsDuplDialog" ) 
             END (* IF *) 
           ; LSuccess := FALSE 
           ELSE 
@@ -1341,9 +1360,9 @@ MODULE Ui
           ; Closure . ImagePers . IpAbsPklFileName := Closure . TextParam 
           ; Closure . ImagePers . IpImageName := LImageName 
           ; FormsVBT . PutText 
-              ( LForm , "Fv_PathName" , Closure . TextParam )
+              ( Closure . Form , "Fv_PathName" , Closure . TextParam )
           ; FormsVBT . PutText 
-              ( LForm , "Fv_ImageName" , LImageName )
+              ( Closure . Form , "Fv_ImageName" , LImageName )
           ; LSuccess := TRUE 
           END (* IF *) 
         END (* IF *) 
@@ -1360,19 +1379,16 @@ MODULE Ui
 
 ; PROCEDURE ReplaySaveAsWorkProc 
     ( Closure : WorkerClosureTextTyp ) 
-  (* PRE: Closure . Window is set.  Closure . TextParam is file name. *) 
+  (* PRE: Closure . Form, Window, ImageTrans, ImagePers, TextParam,
+          and IsInteractive are set. *) 
   (* Runs on worker thread. *) 
 
   = BEGIN 
-      EVAL SetImageTransAndPers ( Closure ) 
-    ; IF InnerSaveAsOK ( Closure ) 
+      IF InnerSaveAsOK ( Closure ) 
       THEN (* Unless something changed, we should always get here. *) 
         TRY 
           FormsVBT . PutText 
-            ( EditWindow . Form ( Closure . Window )  
-            , "Fv_SaveAsDialog_FileName" 
-            , Closure . TextParam  
-            )
+            ( Closure . Form , "Fv_SaveAsDialog_FileName" , Closure . TextParam )
         EXCEPT ELSE (* Oh forget it. *)  
         END (* TRY EXCEPT *) 
       END (* IF *) 
@@ -1385,13 +1401,14 @@ MODULE Ui
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureTextTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , TextParam := FileName 
-                     , apply := ReplaySaveAsWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( WorkerClosureTextTyp 
+                         , Form := Options . MainForm 
+                         , TextParam := FileName 
+                         , IsInteractive := FALSE 
+                         , apply := ReplaySaveAsWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -1399,7 +1416,8 @@ MODULE Ui
 
 ; PROCEDURE SaveAsOKWorkProc 
     ( Closure : WorkerClosureTextTyp ) 
-  (* PRE: Closure . Window is set, Closure . TextParam is file name. *) 
+  (* PRE: Closure . Form, Window, ImageTrans, ImagePers, TextParam,
+          and IsInteractive are set. *) 
   (* Runs on worker thread. *) 
 
   = VAR LForm : FormsVBT . T 
@@ -1446,12 +1464,15 @@ MODULE Ui
     BEGIN 
       LFileName := FormsVBT . GetText ( Form , "Fv_SaveAsDialog_FileName" )
     ; EVAL Worker . RequestWorkInteractive  
-             ( NEW ( WorkerClosureTextTyp 
-                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
-                   , Time := Time 
-                   , TextParam := LFileName 
-                   , apply := SaveAsOKWorkProc 
-                   ) 
+             ( SetFieldsFromForm
+                 ( NEW ( WorkerClosureTextTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , TextParam := LFileName 
+                       , IsInteractive := TRUE  
+                       , apply := SaveAsOKWorkProc 
+                       )
+                 ) 
              ) 
     END SaveAsOKCallback  
 
@@ -1500,14 +1521,17 @@ MODULE Ui
 ; PROCEDURE WriteText 
     ( Closure : WorkerClosureTextTyp (* TextParam is file name. *) ) 
   : BOOLEAN (* True if successful *) 
-  RAISES { Backout , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted }
+  (* PRE: Closure.Form, ImageTrans, TextParam, and IsInteractive are set. *) 
   (* Do the actual writing. *) 
+  (* Runs on worker thread. *) 
 
   = PROCEDURE WriteProc  
       ( <* UNUSED *> ImageRef : PaintHs . ImageTransientTyp 
       ; String : Strings . StringTyp 
       )  
-    RAISES { Backout , Thread . Alerted } 
+    RAISES { Backout , Thread . Alerted }
+    (* Callback given to WriteTrv.WriteText, which writes a line. *) 
 
     = BEGIN
         TRY 
@@ -1524,12 +1548,10 @@ MODULE Ui
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN (* WriteText *) 
 
-      VAR LForm : FormsVBT . T 
-    ; VAR LSuccess : BOOLEAN 
+      VAR LSuccess : BOOLEAN 
 
     ; BEGIN (* Block for WriteText *) 
-        LForm := EditWindow . Form ( Closure . Window ) 
-      ; TRY 
+        TRY 
           WTWrT := VersionedFiles . OpenWrite ( Closure . TextParam ) 
         ; TextEdit . FlushEdit ( Closure . ImageTrans ) 
         ; WriteTrv . WriteText 
@@ -1541,12 +1563,12 @@ MODULE Ui
         => IF Closure . IsInteractive 
            THEN 
              FormsVBT . PutText 
-               ( LForm 
+               ( Closure . Form 
                , "Fv_ErrorPopup_Message" 
                , "Can't open file \"" & Closure . TextParam & "\": "
                  & EMessage 
                )
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+          ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
           END (* IF *) 
         ; LSuccess := FALSE  
         | Thread . Alerted => RAISE Thread . Alerted 
@@ -1555,11 +1577,11 @@ MODULE Ui
           IF Closure . IsInteractive
            THEN 
              FormsVBT . PutText 
-               ( LForm 
+               ( Closure . Form 
                , "Fv_ErrorPopup_Message" 
                , "Can't write file \"" & Closure . TextParam & "\""
                )
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+          ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
           END (* IF *) 
         ; LSuccess := FALSE  
         END (* TRY EXCEPT *) 
@@ -1576,28 +1598,34 @@ MODULE Ui
   (* Just pop the export file name dialog. *) 
 
   = VAR LWindow : EditWindow . T  
+  ; VAR LImageTrans : PaintHs . ImageTransientTyp 
 
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
-    ; IF LWindow . WrImageRef # NIL 
-      THEN 
-        FormsVBT . PutText 
-          ( Form 
-          , "Fv_ExportDialog_FileName" 
-          , LWindow . WrImageRef . ItPers . IpAbsTextFileName 
-          )
-      ; FormsVBT . PopUp ( Form , "Fv_ExportDialog" ) 
+      LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )
+    ; IF LWindow # NIL
+      THEN
+        LOCK LWindow DO LImageTrans := LWindow . WrImageRef END (* LOCK *) 
+      ; IF LImageTrans # NIL AND LImageTrans . ItPers # NIL 
+        THEN 
+          FormsVBT . PutText 
+            ( Form 
+            , "Fv_ExportDialog_FileName" 
+            , LImageTrans . ItPers . IpAbsTextFileName 
+            )
+        END (* IF *) 
       END (* IF *) 
+    ; FormsVBT . PopUp ( Form , "Fv_ExportDialog" ) 
     END ExportCallback  
 
 ; PROCEDURE InnerExportOK 
     ( Closure : WorkerClosureTextTyp ) 
   : BOOLEAN (* Success *) 
   RAISES { Backout , Thread . Alerted } 
-  (* PRE: Closure . Window, ImageTrans, and ImagePers are set. *) 
-  (* PRE: TextParam is file name. *) 
+  (* PRE: Closure . Form, Window, ImageTrans, ImagePers, TextParam,
+          and IsInteractive are set. *) 
+  (* PRE: TextParam is name of file to export to. *) 
   (* Runs on worker thread. *) 
 
   = VAR LCommandString : TEXT := NIL 
@@ -1634,12 +1662,13 @@ MODULE Ui
 ; PROCEDURE ReplayExportWorkProc 
     ( Closure : WorkerClosureTextTyp ) 
   RAISES { Backout , Thread . Alerted } 
-  (* PRE: Closure . Window is set. Closure . TextParam is file name. *) 
+  (* PRE: Closure . Form, Window, ImageTrans, ImagePers, TextParam,
+          and IsInteractive are set. *) 
+  (* PRE: TextParam is file name. *) 
   (* Runs on worker thread. *) 
 
   = BEGIN 
-      EVAL SetImageTransAndPers ( Closure ) 
-    ; IF InnerExportOK ( Closure ) 
+      IF InnerExportOK ( Closure ) 
       THEN
         TRY 
           FormsVBT . PutText 
@@ -1659,13 +1688,14 @@ MODULE Ui
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureTextTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , TextParam := FileName 
-                     , apply := ReplayExportWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( WorkerClosureTextTyp 
+                         , Form := Options . MainForm 
+                         , TextParam := FileName
+                         , IsInteractive := FALSE 
+                         , apply := ReplayExportWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -1673,13 +1703,14 @@ MODULE Ui
 
 ; PROCEDURE ExportOKWorkProc ( Closure : WorkerClosureTextTyp ) 
   RAISES { Backout , Thread . Alerted } 
+  (* PRE: Closure . Form, Window, ImageTrans, ImagePers, TextParam,
+          and IsInteractive are set. *) 
   (* PRE: Closure . Window is set. Closure . TextParam is file name.*) 
   (* Runs on worker thread. *) 
 
   = <* FATAL FormsVBT . Error *>
     BEGIN 
-      EVAL SetImageTransAndPers ( Closure ) 
-    ; IF InnerExportOK ( Closure ) 
+      IF InnerExportOK ( Closure ) 
       THEN 
         FormsVBT . PopDown 
           ( EditWindow . Form ( Closure . Window ) , "Fv_ExportDialog" ) 
@@ -1702,12 +1733,15 @@ MODULE Ui
     BEGIN 
       LFileName := FormsVBT . GetText ( Form , "Fv_ExportDialog_FileName" )
     ; EVAL Worker . RequestWorkInteractive  
-             ( NEW ( WorkerClosureTextTyp 
-                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )
-                   , Time := Time 
-                   , TextParam := LFileName 
-                   , apply := ExportOKWorkProc 
-                   ) 
+             ( SetFieldsFromForm
+                 ( NEW ( WorkerClosureTextTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , TextParam := LFileName
+                       , IsInteractive := TRUE 
+                       , apply := ExportOKWorkProc 
+                       )
+                 ) 
              ) 
     END ExportOKCallback  
 
@@ -1715,12 +1749,12 @@ MODULE Ui
      ( Closure : WorkerClosureTextTyp ) 
   RAISES { Backout , Thread . Alerted } 
   (* Does unconditional export, using IpAbsTextFileName *) 
-  (* PRE: Closure . Window is set. Closure . TextParam is file name.*) 
+  (* PRE: Closure . Form, Window, ImageTrans, ImagePers, TextParam,
+          and IsInteractive are set. *) 
   (* Runs on worker thread. *) 
 
   = BEGIN 
-      EVAL SetImageTransAndPers ( Closure ) 
-    ; EVAL InnerExportOK ( Closure ) 
+      EVAL InnerExportOK ( Closure ) 
     END ExportButtonWorkProc 
 
 (*********************************Close***********************************) 
@@ -1761,13 +1795,14 @@ MODULE Ui
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureTextTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , TextParam := RecordedName 
-                     , apply := ReplayCloseImageWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( WorkerClosureTextTyp 
+                         , Form := Options . MainForm 
+                         , TextParam := RecordedName 
+                         , IsInteractive := FALSE 
+                         , apply := ReplayCloseImageWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -1798,11 +1833,14 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
-                   , Time := Time 
-                   , apply := CloseImageWorkProc 
-                   ) 
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := CloseImageWorkProc 
+                       )
+                 ) 
              ) 
     END CloseImageCallback   
 
@@ -1875,14 +1913,15 @@ MODULE Ui
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureTextIntTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , TextParam := RecordedName 
-                     , IntParam := WindowNo 
-                     , apply := ReplayCloseWindowWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( WorkerClosureTextIntTyp 
+                         , Form := Options . MainForm 
+                         , TextParam := RecordedName 
+                         , IntParam := WindowNo 
+                         , IsInteractive := FALSE 
+                         , apply := ReplayCloseWindowWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -1931,7 +1970,8 @@ MODULE Ui
       END (* TRY EXCEPT *) 
     END CloseWindowWorkProc 
 
-; <* UNUSED *> PROCEDURE CloseWindowCallback 
+; <* UNUSED *>
+  PROCEDURE CloseWindowCallback 
     ( Form : FormsVBT . T 
     ; <* UNUSED *> Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
@@ -1941,11 +1981,14 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
-                   , Time := Time 
-                   , apply := CloseWindowWorkProc 
-                   ) 
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := CloseWindowWorkProc 
+                       )
+                 ) 
              ) 
     END CloseWindowCallback   
 
@@ -1961,7 +2004,8 @@ MODULE Ui
       END (* TRY EXCEPT *) 
     END CloseAllWorkProc 
 
-; <* UNUSED *> PROCEDURE CloseAllCallback 
+; <* UNUSED *>
+  PROCEDURE CloseAllCallback 
     ( Form : FormsVBT . T 
     ; <* UNUSED *> Name : TEXT 
     ; <* UNUSED *> EventData : REFANY 
@@ -1971,11 +2015,14 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , apply := CloseAllWorkProc 
-                   ) 
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := CloseAllWorkProc 
+                       )
+                 ) 
              ) 
     END CloseAllCallback 
 
@@ -2013,11 +2060,14 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
-                   , Time := Time 
-                   , apply := QuitWorkProc 
-                   ) 
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := QuitWorkProc 
+                       )
+                 ) 
              ) 
     END QuitCallback 
 
@@ -2073,7 +2123,7 @@ MODULE Ui
   ; BEGIN 
       LSel := Selection . Current 
     ; IF LSel # NIL 
-         AND Closure . Window . WrImageRef = LSel . SelImage 
+         AND Closure . ImageTrans = LSel . SelImage 
       THEN (* Don't cut from a window whose image the selection isn't in. *) 
         LCommandString 
           := UiRecPlay . BeginCommand ( UiRecPlay . CommandTyp . EditCut ) 
@@ -2110,12 +2160,13 @@ MODULE Ui
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := EditCutWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( Worker . ClosureTyp 
+                         , Form := Options . MainForm 
+                         , IsInteractive := FALSE 
+                         , apply := EditCutWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -2139,11 +2190,14 @@ MODULE Ui
       THEN 
         LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
       ; EVAL Worker . RequestWorkInteractive  
-               ( NEW ( Worker  . ClosureTyp 
-                     , Window := LWindow 
-                     , Time := Time 
-                     , apply := EditCutWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( Worker  . ClosureTyp 
+                         , Form := Form 
+                         , Time := Time 
+                         , IsInteractive := TRUE  
+                         , apply := EditCutWorkProc 
+                         )
+                   )
                ) 
       END (* IF *) 
     END EditCutCallback 
@@ -2174,12 +2228,13 @@ MODULE Ui
     BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := EditCopyWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( Worker . ClosureTyp 
+                         , Form := Options . MainForm 
+                         , IsInteractive := FALSE 
+                         , apply := EditCopyWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -2203,11 +2258,14 @@ MODULE Ui
       THEN 
         LWindow := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" ) 
       ; EVAL Worker . RequestWorkInteractive  
-               ( NEW ( Worker  . ClosureTyp 
-                     , Window := LWindow 
-                     , Time := Time 
-                     , apply := EditCopyWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( Worker  . ClosureTyp 
+                         , Form := Form 
+                         , Time := Time 
+                         , IsInteractive := TRUE  
+                         , apply := EditCopyWorkProc 
+                         )
+                   )
                ) 
       END (* IF *) 
     END EditCopyCallback 
@@ -2316,14 +2374,15 @@ MODULE Ui
       THEN (* Emacs may have some data here: *) 
         TRY 
           LValue 
-            := VBT . Read ( Window , EditWindow . ScreenSelection ( ) , Time ) 
+            := VBT . Read ( Window , EditWindow . ScreenSelection ( ) , Time )
+(* FIXME: ^ What? Pure duplication of above. *) 
         EXCEPT 
           VBT . Error ( ECode ) 
         => LExceptionCaught2 := TRUE 
         ; LCode2 := ECode 
         END (* TRY EXCEPT *) 
       END (* IF *) 
-    ; IF NOT LExceptionCaught2 AND NOT LExceptionCaught2 AND LValue # NIL 
+    ; IF NOT LExceptionCaught1 AND NOT LExceptionCaught2 AND LValue # NIL 
       THEN 
         TRY 
           LRef := LValue . toRef ( ) 
@@ -2331,11 +2390,14 @@ MODULE Ui
           OF NULL => 
           | TEXT ( TString ) 
           => EVAL Worker . RequestWorkInteractive 
-               ( NEW ( WorkerClosureTextTyp 
-                     , Window := Window 
-                     , TextParam := TString  
-                     , apply := EditPasteWorkProc 
-                     ) 
+               ( SetFieldsFromWindow
+                   ( NEW ( WorkerClosureTextTyp 
+                         , Window := Window 
+                         , TextParam := TString  
+                         , IsInteractive := TRUE
+                         , apply := EditPasteWorkProc 
+                         )
+                   )
                ) 
           ELSE 
           END (* TYPECASE *) 
@@ -2350,11 +2412,14 @@ MODULE Ui
   = BEGIN 
       TRY 
         EVAL Worker . RequestWork 
-               ( NEW ( WorkerClosureTextTyp 
-                     , Window := Window 
-                     , TextParam := Text 
-                     , apply := EditPasteWorkProc 
-                     ) 
+               ( SetFieldsFromWindow
+                   ( NEW ( WorkerClosureTextTyp 
+                         , Window := Window 
+                         , TextParam := Text 
+                         , IsInteractive := FALSE 
+                         , apply := EditPasteWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -2441,12 +2506,13 @@ MODULE Ui
     BEGIN 
       TRY 
         EVAL Worker . RequestWork  
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := AcceptRepairWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( Worker . ClosureTyp 
+                         , Form := Options . MainForm 
+                         , IsInteractive := FALSE 
+                         , apply := AcceptRepairWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -2462,13 +2528,15 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , apply := AcceptRepairWorkProc 
-                   ) 
-               ) 
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := AcceptRepairWorkProc 
+                       )
+                 )
+             ) 
     END AcceptRepairCallback 
 
 (*********************************** Parse *******************************) 
@@ -2516,12 +2584,13 @@ MODULE Ui
     BEGIN 
       TRY 
         EVAL Worker . RequestWork  
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := ParseWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( Worker . ClosureTyp 
+                         , Form := Options . MainForm 
+                         , IsInteractive := FALSE 
+                         , apply := ParseWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -2537,13 +2606,15 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , apply := ParseWorkProc 
-                   ) 
-               ) 
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := ParseWorkProc 
+                       )
+                 ) 
+             ) 
     END ParseCallback 
 
 (********************************** Analyze ******************************) 
@@ -2635,12 +2706,13 @@ MODULE Ui
     BEGIN 
       TRY 
         EVAL Worker . RequestWork  
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := AnalyzeWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( Worker . ClosureTyp 
+                         , Form := Options . MainForm 
+                         , IsInteractive := FALSE 
+                         , apply := AnalyzeWorkProc 
+                         )
+                   ) 
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -2656,13 +2728,15 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , apply := AnalyzeWorkProc 
-                   ) 
-               ) 
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := AnalyzeWorkProc 
+                       )
+                 ) 
+             ) 
     END AnalyzeCallback   
 
 (*************************** Toggle insert mode **************************) 
@@ -2783,12 +2857,13 @@ MODULE Ui
       ; FormsVBT . PutInteger  
           ( Options . MainForm , "Fv_VertScroller" , Value )
       ; EVAL Worker . RequestWork  
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := VertScrollWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( Worker . ClosureTyp 
+                         , Form := Options . MainForm 
+                         , IsInteractive := FALSE 
+                         , apply := VertScrollWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -2804,13 +2879,15 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , apply := VertScrollWorkProc 
-                   ) 
-               ) 
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := VertScrollWorkProc 
+                       )
+                 )
+             ) 
     END VertScrollCallback 
 
 ; PROCEDURE HorizScrollWorkProc ( Closure : Worker . ClosureTyp )  
@@ -2867,12 +2944,13 @@ MODULE Ui
         FormsVBT . PutInteger  
           ( Options . MainForm , "Fv_HorizScroller" , Value )
       ; EVAL Worker . RequestWork  
-               ( NEW ( Worker . ClosureTyp 
-                     , Window 
-                         := FormsVBT . GetGeneric 
-                              ( Options . MainForm , "Fv_LbeWindow" )   
-                     , apply := HorizScrollWorkProc 
-                     ) 
+               ( SetFieldsFromForm
+                   ( NEW ( Worker . ClosureTyp 
+                         , Form := Options . MainForm 
+                         , IsInteractive := FALSE 
+                         , apply := HorizScrollWorkProc 
+                         )
+                   )
                ) 
       EXCEPT Thread . Alerted => 
       END (* TRY EXCEPT *) 
@@ -2888,12 +2966,14 @@ MODULE Ui
   = <* FATAL FormsVBT . Error *>
     BEGIN 
       EVAL Worker . RequestWorkInteractive  
-             ( NEW ( Worker . ClosureTyp 
-                   , Window 
-                       := FormsVBT . GetGeneric ( Form , "Fv_LbeWindow" )   
-                   , Time := Time 
-                   , apply := HorizScrollWorkProc 
-                   ) 
+             ( SetFieldsFromForm
+                 ( NEW ( Worker . ClosureTyp 
+                       , Form := Form 
+                       , Time := Time 
+                       , IsInteractive := TRUE  
+                       , apply := HorizScrollWorkProc 
+                       )
+                 )
                ) 
     END HorizScrollCallback 
 

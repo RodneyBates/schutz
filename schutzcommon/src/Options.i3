@@ -119,6 +119,7 @@ INTERFACE Options
 ; CONST ERed = ColorTyp { 16_b2b2 , 16_2222 , 16_2222 }  
 ; CONST EPurple = ColorTyp { 16_a0a0 , 16_2020 , 16_f0f0 }  
 ; CONST ETurquoise = ColorTyp { 16_5f5f , 16_9e9e , 16_a0a0 }  
+; CONST LightTurquoise = ColorTyp { 16_9f9f , 16_dede , 16_e4e4 }  
 ; CONST ESelectionBlue = ColorTyp { 16_4646 , 16_8282 , 16_b4b4 }  
 
 ; CONST GimpOrange = ColorTyp { 16_ffff , 16_8c8c , 16_0000 } 
@@ -128,20 +129,23 @@ INTERFACE Options
 ; VAR BgColorBorder := DarkSage 
 
 ; VAR BgColorPlain := VeryVeryPaleBlue
-; VAR BgColorCmnt := VeryVeryPaleBlue  
-; VAR BgColorLiteral := VeryVeryPaleBlue    
+; VAR BgColorCmnt := LightSkyBlue1  
+; VAR BgColorLiteral := LightTurquoise     
 ; VAR BgColorSelected := MedGray       
 ; VAR BgColorMatched := LightSkyBlue1        
 
 ; VAR FgColorPlain := Black 
-; VAR FgColorIdent := DarkGreen 
-; VAR FgColorLiteral := Turquoise  
 ; VAR FgColorCmnt := RoyalBlue 
+; VAR FgColorLiteral := Turquoise  
+; VAR FgColorIdent := DarkGreen 
 ; VAR FgColorPlaceholder := EPurple  
 
 ; VAR DecColorErr := EBlue  
 ; VAR DecColorTyped := Butterscotch 
-; VAR DecColorTouched := GrayBrown  
+; VAR DecColorTouched := GrayBrown
+
+; VAR OneFont := TRUE 
+; VAR DullColors := TRUE 
 
 ; VAR MainForm : FormsVBT . T 
 ; VAR MainWindow : PaintHs . WindowRefTyp 

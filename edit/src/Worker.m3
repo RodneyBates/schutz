@@ -18,6 +18,7 @@
 
 MODULE Worker 
 
+(* Library: *) 
 ; IMPORT FormsVBT 
 ; IMPORT Process
 ; IMPORT Rd 
@@ -29,7 +30,9 @@ MODULE Worker
 ; IMPORT Thread
 ; IMPORT Wr 
 (* ; IMPORT VBT (* Used in LL pragmas. *) *) 
+; IMPORT VBTClass (* To show VBT.T is a MUTEX, thus EditWindow . T too. *)  
 
+(* Application: *) 
 ; IMPORT AssertDevel 
 ; IMPORT Assertions 
 ; FROM Failures IMPORT Backout 
@@ -412,7 +415,7 @@ MODULE Worker
         THEN 
           Closure := ActiveClosure 
         ; StoredState := WrtBusyImmed 
-        ELSE 
+        ELSE (* Whoa, can this happen? *) 
           Closure := QueuedClosure 
         ; StoredState := WrtBusyQueued 
         END (* IF *) 
@@ -761,8 +764,11 @@ MODULE Worker
       Failures . RegisterQueryProc ( FailureQuery ) 
     ; LOOP 
         GetWork ( LClosure  ) 
-      ; TRY 
-          LClosure . apply ( ) 
+      ; TRY
+          (* LOCK LClosure . Window DO *)
+          (* Some worker procs (re)lock this themselves. *) 
+          LClosure . apply ( )
+          (* END (* LOCK *) *) 
         ; BecomeIdle ( WrtDone ) 
         EXCEPT 
         | Thread . Alerted 

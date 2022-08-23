@@ -122,36 +122,34 @@ MODULE UiDevel
      written. It pops either an error dialog, or a file name dialog. 
   *) 
 
-  = VAR LForm : FormsVBT . T 
-  ; VAR LPreloadFileName : TEXT 
+  = VAR LPreloadFileName : TEXT 
   ; VAR LVBTClosure : FormsVBT . Closure 
 
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
-    ; IF Closure . ImageTrans # NIL 
+      IF Closure . ImageTrans # NIL 
       THEN
         IF Closure . ImagePers . IpLang  < LbeStd . LangFirstLdl  
            OR Closure . ImagePers . IpLang > LbeStd . LangLastLdl  
         THEN  
           FormsVBT . PutText 
-            ( LForm 
+            ( Closure . Form 
             , "Fv_ErrorPopup_Message" 
             , "The open image is not a Language Definition Language"
             )
-        ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+        ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
         ELSIF MustBeAnalyzed AND NOT Closure . ImagePers . IpIsAnalyzed 
         THEN 
           FormsVBT . PutText 
-            ( LForm 
+            ( Closure . Form 
             , "Fv_ErrorPopup_Message" 
             , "The open image must be analyzed."
             )
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+          ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
         ELSE 
           FormsVBT . PutText
-            ( LForm 
+            ( Closure . Form 
             , "Fv_BootWriteDialog_Title" 
             , DialogName 
             )
@@ -162,11 +160,11 @@ MODULE UiDevel
                      ( Closure . ImageTrans ) & FileSuffix
                  )
         ; FormsVBT . PutText 
-            ( LForm 
+            ( Closure . Form 
             , "Fv_BootWriteDialog_FileName" 
             , LPreloadFileName 
             )
-        ; TYPECASE FormsVBT . GetTheEvent ( LForm ) 
+        ; TYPECASE FormsVBT . GetTheEvent ( Closure . Form ) 
           OF AnyEvent . Misc ( TMisc ) 
           => IF TMisc . misc . type = FormsVBT . MakeEventMiscCodeType 
              THEN (* This was precipitated by a previous write dialog
@@ -181,8 +179,8 @@ MODULE UiDevel
                    , apply := WriteOKCallback 
                    ) 
         ; FormsVBT . Attach 
-            ( LForm , "Fv_BootWriteDialog_OK" , LVBTClosure ) 
-        ; FormsVBT . PopUp ( LForm , "Fv_BootWriteDialog" ) 
+            ( Closure . Form , "Fv_BootWriteDialog_OK" , LVBTClosure ) 
+        ; FormsVBT . PopUp ( Closure . Form , "Fv_BootWriteDialog" ) 
         END (* IF *) 
       END (* IF *) 
     END WriteFileNameDialog  
@@ -195,7 +193,9 @@ MODULE UiDevel
     ; <* UNUSED *> Name : TEXT 
     ; Time : VBT . TimeStamp 
     ) 
-  (* PRE: CallbackClosure . WorkerClosure . Window, Time, and DoAll are set.  
+  (* PRE: CallbackClosure . WorkerClosure . Window, Time, and DoAll are set.
+
+(* FIXME: Also Form ImageTrans, ImagePers?  *)
           CallbackClosure . WorkerClosure . apply is overridden with a
            WorkProc. 
   *) 
@@ -236,23 +236,21 @@ MODULE UiDevel
   (* POST: If opened successfully, Closure . WrT is set and open. *) 
   (* Runs on worker thread. *) 
 
-  = VAR LForm : FormsVBT . T 
-  ; VAR LSuccess : BOOLEAN 
+  = VAR LSuccess : BOOLEAN 
 
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
-    ; IF Closure . FileName = NIL OR Text . Equal ( Closure . FileName , "" )  
+      IF Closure . FileName = NIL OR Text . Equal ( Closure . FileName , "" )  
       THEN 
          IF Closure . IsInteractive 
          THEN 
            FormsVBT . PutText 
-             ( LForm 
+             ( Closure . Form 
              , "Fv_ErrorPopup_Message" 
              , "Empty file name specified." 
              )
-        ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+        ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
         END (* IF *) 
       ; Closure . WrT := NIL 
       ; LSuccess := FALSE 
@@ -265,12 +263,12 @@ MODULE UiDevel
         => IF Closure . IsInteractive 
            THEN 
              FormsVBT . PutText 
-               ( LForm 
+               ( Closure . Form 
                , "Fv_ErrorPopup_Message" 
                , "Couldn't open file \"" & Closure . FileName & "\": "
                  & EMessage 
                )
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+          ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
           END (* IF *) 
         ; Closure . WrT := NIL 
         ; LSuccess := FALSE
@@ -289,22 +287,19 @@ MODULE UiDevel
   (* PRE: Closure . Window, FileName, DoAll, and WrT are set, WrT is open. *) 
   (* Runs on worker thread. *) 
 
-  = VAR LForm : FormsVBT . T 
-
-  ; <* FATAL FormsVBT . Error *>
+  = <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
-    ; TRY 
+      TRY 
         Wr . Close ( Closure . WrT ) 
       EXCEPT Wr . Failure 
       => Success := FALSE 
       END (* TRY EXCEPT *) 
     ; IF Success 
       THEN 
-        FormsVBT . PopDown ( LForm , "Fv_BootWriteDialog" )
+        FormsVBT . PopDown ( Closure . Form , "Fv_BootWriteDialog" )
       ; FormsVBT . Attach 
-          ( LForm , "Fv_BootWriteDialog_OK" , NIL ) 
+          ( Closure . Form , "Fv_BootWriteDialog_OK" , NIL ) 
       ; Options . DevelWritePath 
           := Pathname . Prefix 
                ( Misc . AbsFileName ( Closure . FileName ) )  
@@ -312,7 +307,7 @@ MODULE UiDevel
       ; IF Closure . DoAll 
         THEN 
           FormsVBT . MakeEvent 
-            ( LForm 
+            ( Closure . Form 
             , SuccessorName 
             , Closure . Time (* Which will surely be outdated by now. *)  
             ) 
@@ -321,11 +316,11 @@ MODULE UiDevel
         IF Closure . IsInteractive 
         THEN 
           FormsVBT . PutText 
-            ( LForm 
+            ( Closure . Form 
             , "Fv_ErrorPopup_Message" 
             , "Failed to write file \"" & Closure . FileName & "\""
             )
-        ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+        ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
         END (* IF *) 
       END (* IF *) 
     END FinishWrite 
@@ -852,8 +847,7 @@ MODULE UiDevel
   (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)  
 
-  = VAR LForm : FormsVBT . T 
-  ; VAR LLangInfoRef : LdlSemantics . LangInfoRefTyp 
+  = VAR LLangInfoRef : LdlSemantics . LangInfoRefTyp 
   ; VAR LCommandString : TEXT 
   ; VAR LSuccess : BOOLEAN 
 
@@ -861,8 +855,7 @@ MODULE UiDevel
     <* FATAL FormsVBT . Unimplemented *> 
     <* FATAL Wr . Failure *> 
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . GenTokInterface , Closure . FileName ) 
     ; IF OpenWrite ( Closure ) 
@@ -886,11 +879,11 @@ MODULE UiDevel
             => IF Closure . IsInteractive 
                THEN
                  FormsVBT . PutText 
-                   ( LForm 
+                   ( Closure . Form 
                    , "Fv_ErrorPopup_Message" 
                    , "Write failure writing \"" & Closure . FileName & "\"" 
                    ) 
-               ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+               ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
                END (* IF *) 
             ; Wr . Close ( Closure . WrT ) 
             ; LSuccess := FALSE 
@@ -961,8 +954,7 @@ MODULE UiDevel
   (* PRE: Closure . Window, ImageTrans, ImagePers, DoAll, and FileName are set. *) 
   (* Runs on worker thread. *)  
 
-  = VAR LForm : FormsVBT . T 
-  ; VAR LLangInfoRef : LdlSemantics . LangInfoRefTyp 
+  = VAR LLangInfoRef : LdlSemantics . LangInfoRefTyp 
   ; VAR VAR LCommandString : TEXT 
   ; VAR LSuccess : BOOLEAN 
 
@@ -970,8 +962,7 @@ MODULE UiDevel
     <* FATAL FormsVBT . Unimplemented *> 
     <* FATAL Wr . Failure *> 
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
-    ; LCommandString 
+      LCommandString 
         := UiRecPlay . BeginCommandPlusString 
              ( UiRecPlay . CommandTyp . GenChildInterface 
              , Closure . FileName 
@@ -997,11 +988,11 @@ MODULE UiDevel
             => IF Closure . IsInteractive 
                THEN
                  FormsVBT . PutText 
-                   ( LForm 
+                   ( Closure . Form 
                    , "Fv_ErrorPopup_Message" 
                    , "Write failure writing \"" & Closure . FileName & "\"" 
                    ) 
-               ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+               ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
                END (* IF *) 
             ; Wr . Close ( Closure . WrT ) 
             ; LSuccess := FALSE 
@@ -1103,14 +1094,12 @@ MODULE UiDevel
   (* PRE: Closure . Window, ImageTrans, and ImagePers are set. *) 
   (* Runs on worker thread. *)   
 
-  = VAR LForm : FormsVBT . T 
-  ; VAR LCheckpointName : TEXT 
+  = VAR LCheckpointName : TEXT 
 
   ; <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
     BEGIN 
-      LForm := EditWindow . Form ( Closure . Window ) 
-    ; IF Closure . ImageTrans # NIL 
+      IF Closure . ImageTrans # NIL 
       THEN 
         Closure . ImagePers . IpCrashCode 
           := ORD ( MessageCodes . T . NullCode )   
@@ -1137,23 +1126,23 @@ MODULE UiDevel
         ; IF Closure . IsInteractive  
           THEN 
              FormsVBT . PutText 
-               ( LForm 
+               ( Closure . Form 
                , "Fv_ErrorPopup_Message" 
                , "Checkpoint written to file \"" & LCheckpointName & "\""     
                ) 
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+          ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
           END (* IF *) 
         EXCEPT
           Files . Error ( EMessage ) 
         => IF Closure . IsInteractive 
            THEN 
              FormsVBT . PutText 
-               ( LForm 
+               ( Closure . Form 
                , "Fv_ErrorPopup_Message" 
                , "Checkpoint failed for file \"" & LCheckpointName 
                  & "\", because: " & EMessage 
                ) 
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+          ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
           (* Leave the Save dialog up and let the user either change
              something and try again, or explicitly cancel. *)  
           END (* IF *) 
@@ -1161,11 +1150,11 @@ MODULE UiDevel
           IF Closure . IsInteractive 
           THEN 
              FormsVBT . PutText 
-               ( LForm 
+               ( Closure . Form 
                , "Fv_ErrorPopup_Message" 
                , "Checkpoint failed for file \"" & LCheckpointName & "\""     
                ) 
-          ; FormsVBT . PopUp ( LForm , "Fv_ErrorPopup" ) 
+          ; FormsVBT . PopUp ( Closure . Form , "Fv_ErrorPopup" ) 
           (* Leave the Save dialog up and let the user either change
              something and try again, or explicitly cancel. *)  
           END (* IF *) 
@@ -1226,7 +1215,7 @@ MODULE UiDevel
       This was ridiculous. 
 *)
 
-(* TODO: Someda, when there are multiple windows, record/replay will matter. *)
+(* TODO: Someday, when there are multiple windows, record/replay will matter. *)
     ; EditWindow . TakeKBFocus ( LWindow , NullTime ) 
     END ReplayTakeFocus  
 

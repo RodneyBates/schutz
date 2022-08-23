@@ -10,6 +10,7 @@
 
 MODULE EditWindow 
 
+(* Library: *)
 ; IMPORT Axis 
 ; IMPORT Color  
 ; IMPORT Fmt 
@@ -34,6 +35,7 @@ MODULE EditWindow
 ; IMPORT VBTRep 
 ; IMPORT Wr 
 
+(* Application: *)
 ; IMPORT Assertions 
 ; IMPORT Display 
 ; IMPORT Errors 
@@ -172,7 +174,11 @@ MODULE EditWindow
         RETURN NIL
       END (* IF *)
     ; LOCK Window
-      DO RETURN Window . EwForm
+      DO TYPECASE Window
+         OF NULL => RETURN NIL
+         | T => RETURN Window . EwForm
+         ELSE RETURN NIL
+         END (* TYPECASE *) 
       END (* LOCK *) 
     END Form 
 
@@ -721,7 +727,7 @@ MODULE EditWindow
     END SouthEastToCorner 
 
 ; PROCEDURE PaintCursor ( Window : WindowTyp ; State : CursorStoredStateTyp ) 
-  <* LL.sup < Window . mu *> 
+  <* LL . sup < Window . mu *>
 
   = BEGIN (* PaintCursor *) 
 (* TODO: Consistify cursor paint ops with character paintops *) 
@@ -780,7 +786,7 @@ MODULE EditWindow
     END PaintCursor 
 
 ; PROCEDURE PaintOutCursor ( Window : WindowTyp ) 
-  <* LL . sup < Window . mu *> 
+  <* LL . sup < Window . mu *>
 
   = BEGIN (* PaintOutCursor *) 
       CASE Window . EwCursor . State 
@@ -793,7 +799,7 @@ MODULE EditWindow
     END PaintOutCursor 
 
 ; PROCEDURE PaintInCursor ( Window : WindowTyp ) 
-  <* LL . sup < Window . mu *> 
+  <* LL . sup < Window . mu *>
 
   = <* UNUSED *> VAR LMissedRegion : Region . T 
 
@@ -828,13 +834,11 @@ MODULE EditWindow
 ; PROCEDURE MakeCursorVisible ( Window : WindowTyp ) 
   <* LL . sup < BlinkerLock *> 
 
-  = BEGIN (* MakeCursorVisible *) 
+  = BEGIN (* MakeCursorVisible *)
       LOCK BlinkerLock 
       DO IF WindowWithFocus = Window 
-         THEN 
-           SetCursorState ( Window , CursorStateTyp . CsBlinking ) 
-         ELSE 
-           SetCursorState ( Window , CursorStateTyp . CsSolid ) 
+         THEN SetCursorState ( Window , CursorStateTyp . CsBlinking ) 
+         ELSE SetCursorState ( Window , CursorStateTyp . CsSolid ) 
          END (* IF *) 
       END (* LOCK *) 
     END MakeCursorVisible 
@@ -901,7 +905,14 @@ MODULE EditWindow
       ; RTIO . PutText ( Wr . EOL ) 
       ; RTIO . Flush ( ) 
     END (* IF *) 
-    END TraceText  
+    END TraceText
+
+
+; VAR GBgOps := ARRAY BOOLEAN OF PaintOp.T
+                  { PaintOpFromColor ( Options . LightSage )
+                  , PaintOpFromColor ( Options . DarkSage ) 
+                  } 
+; VAR GBgBool := FALSE 
 
 (* EXPORTED: *) 
 ; PROCEDURE PaintLine  
@@ -924,6 +935,7 @@ MODULE EditWindow
       ; Op := PaintOp . BgFg 
       ; Width : CARDINAL := 0 
       ) 
+    <* LL >= {VBT.mu} *>
 
     = VAR LPixelOffset : Point . T 
 
@@ -967,7 +979,7 @@ MODULE EditWindow
                  ) 
       ; IF FromSsInString < ToSsInString 
         THEN 
-          PtSubstringLength := ToSsInString - FromSsInString 
+          PtSubstringLength := ToSsInString - FromSsInString
         ; IF FromSsInString < Text . Length ( PaintText )  
           THEN 
             PaintOutCursor ( Window ) 
@@ -982,10 +994,18 @@ MODULE EditWindow
                 ) 
 
           (* Paint background. *) 
+
+
+; LOp := GBgOps [ GBgBool ]
+; GBgBool := NOT GBgBool
+(* ^Experimental.  Alternate background colors. *) 
+
           ; LOp := Ui . GDerivedInfoRef ^ . DiPaintOpsBg [ Attr . TaBgColor ]
+
 ; IF GDoTraceOps THEN RTIO . PutText ( "PaintTint: " ) END  
 ; TraceOp ( LOp ) 
-; TraceRect ( PtBoundingBox ) 
+; TraceRect ( PtBoundingBox )
+
           ; VBT . PaintTint 
               ( v := Window 
               , clip := PtBoundingBox 
@@ -994,7 +1014,9 @@ MODULE EditWindow
 ; VBT.Sync(Window,TRUE)
 ; Assertions . DoNothing ( ) 
 
-          (* Paint decoration, under the characters. *) 
+          (* Paint decoration, under the characters. *)
+
+(*
           ; CASE Attr . TaDecoration 
             OF PaintHs . TaDecPlain 
             => (* Nothing. *)    
@@ -1002,7 +1024,8 @@ MODULE EditWindow
             => PtDecorationLine 
                  ( Window . EwStrikeoutFrom 
                  , Window . EwStrikeoutThru 
-                 , Ui . GDerivedInfoRef ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
+                 , Ui . GDerivedInfoRef
+                   ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
                  , Width := 2 
                  ) 
             | PaintHs . TaDecUnderline1   
@@ -1010,12 +1033,14 @@ MODULE EditWindow
             => PtDecorationLine 
                  ( Window . EwUnderlineFrom 
                  , Window . EwUnderlineThru 
-                 , Ui . GDerivedInfoRef ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
+                 , Ui . GDerivedInfoRef
+                   ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
                  , Width := 2 
                  ) 
             | PaintHs . TaDecCaret   
             => WITH WPaintOp
-                 = Ui . GDerivedInfoRef ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
+                 = Ui . GDerivedInfoRef
+                   ^ . DiPaintOpsDec [ Attr . TaDecoration ] 
                DO 
                  PtDecorationLine 
                    ( Window . EwCaretFrom 
@@ -1031,18 +1056,22 @@ MODULE EditWindow
                    ) 
               END (* WITH *) 
             ELSE (* No decoration to add. *) 
-            END (* CASE *) 
+            END (* CASE *)
+*) 
 
           (* Paint the characters.*)
 
           ; LFont := Ui . GDerivedInfoRef ^ . DiFonts [ Attr . TaFont ] 
-          ; LFont := Ui . GDerivedInfoRef ^ . DiFonts [ PaintHs . TaFontPlain ]
-(* Experimental ^Keep the same font for everything. *) 
+          ; IF Options . OneFont
+            THEN
+              LFont := Ui . GDerivedInfoRef ^ . DiFonts [ PaintHs . TaFontPlain ]
+            END (* IF *) 
 
           ; LOp := Ui . GDerivedInfoRef ^ . DiPaintOpsChar [ Attr . TaFgColor ] 
-          ; LOp := PaintOpFromColor ( Options . FgColorPlain ) 
-(* Experimental ^Keep the same operator for everything. *) 
-          
+          ; IF Options . DullColors
+            THEN LOp := PaintOpFromColor ( Options . FgColorPlain )
+            END (* IF *) 
+
 ; IF GDoTraceOps THEN RTIO . PutText ( "PaintText: " ) END 
 ; TraceOp ( LOp ) 
 ; TraceRect ( PtBoundingBox )
@@ -1059,7 +1088,7 @@ MODULE EditWindow
 ; VBT . Sync ( Window , wait := TRUE ) 
 ; Assertions . DoNothing ( ) 
           ; PaintInCursor ( Window ) 
-          END (* IF *) 
+          END (* IF *)
         END (* IF *) 
       END (* Block *) 
     END PaintLine  
@@ -1074,7 +1103,7 @@ MODULE EditWindow
 
   = VAR LBoundingBox : Rect . T 
 
-  ; BEGIN (* ClearLine *) 
+  ; BEGIN (* ClearLine *)
       PaintOutCursor ( Window ) 
     ; LBoundingBox 
         := Rect . Add 
@@ -1091,7 +1120,7 @@ MODULE EditWindow
         , clip := LBoundingBox 
         , op := Ui . GDerivedInfoRef ^ . DiPaintOpBg 
         ) 
-    ; PaintInCursor ( Window ) 
+    ; PaintInCursor ( Window )
     END ClearLine 
 
 ; PROCEDURE PaintArrow   
@@ -1408,8 +1437,9 @@ MODULE EditWindow
    phase as the focus moves, repaints happen, etc. *) 
 
 ; VAR BlinkerLock : MUTEX := NEW ( MUTEX ) 
-  (* In the lock order, VBT.mu < BlinkerLock < Window . mu, 
-     forall Window : WindowTyp. *) 
+  (* In the lock order,
+     VBT.mu < BlinkerLock < Window . mu FORALL Window : WindowTyp.
+  *) 
 
 (* BlinkerLock protects the following variables: *) 
 ; VAR BlinkerThread : Thread . T := NIL 
@@ -1430,47 +1460,43 @@ MODULE EditWindow
   = BEGIN (* Blink *) 
       LOOP 
         Thread . Pause ( HalfCycleDuration ) 
-      ; LOCK VBT . mu 
-(* REVIEW ^ Why is this needed? *) 
-        DO LOCK BlinkerLock 
-          DO IF WindowWithFocus = NIL 
-             THEN 
+      ; LOCK BlinkerLock
+        DO IF WindowWithFocus = NIL 
+           THEN 
+             INC ( IdleBlinkCt ) 
+           ELSE 
+             PaintOutCursor ( WindowWithFocus ) 
+           ; CASE WindowWithFocus . EwCursor . State 
+             OF CursorStateTyp . CsBlinkingOff 
+             => WindowWithFocus . EwCursor . State 
+                  := CursorStateTyp . CsBlinkingOn 
+             ; PaintCursor 
+                 ( WindowWithFocus , WindowWithFocus . EwCursor . State ) 
+             ; IdleBlinkCt := 0 
+             | CursorStateTyp . CsBlinkingOn 
+             => WindowWithFocus . EwCursor . State 
+                  := CursorStateTyp . CsBlinkingOff 
+             ; PaintCursor 
+                 ( WindowWithFocus , WindowWithFocus . EwCursor . State ) 
+             ; IdleBlinkCt := 0 
+             ELSE (* Leave it alone. *) 
                INC ( IdleBlinkCt ) 
-             ELSE 
-               PaintOutCursor ( WindowWithFocus ) 
-             ; CASE WindowWithFocus . EwCursor . State 
-               OF CursorStateTyp . CsBlinkingOff 
-               => WindowWithFocus . EwCursor . State 
-                    := CursorStateTyp . CsBlinkingOn 
-               ; PaintCursor 
-                   ( WindowWithFocus , WindowWithFocus . EwCursor . State ) 
-               ; IdleBlinkCt := 0 
-               | CursorStateTyp . CsBlinkingOn 
-               => WindowWithFocus . EwCursor . State 
-                    := CursorStateTyp . CsBlinkingOff 
-               ; PaintCursor 
-                   ( WindowWithFocus , WindowWithFocus . EwCursor . State ) 
-               ; IdleBlinkCt := 0 
-               ELSE (* Leave it alone. *) 
-                 INC ( IdleBlinkCt ) 
-               END (* CASE *) 
-             END (* IF *) 
-          ; IF IdleBlinkCt >= IdleLifetime 
-            THEN (* Commit suicide. *) 
-              BlinkerThread := NIL 
-            ; BlinkerState := CursorStateTyp . CsInvisible 
-            ; IdleBlinkCt := 0 
-            ; RETURN NIL 
-            END (* IF *) 
-          END (* LOCK *) 
-        END (* LOCK *) 
+             END (* CASE *) 
+           END (* IF *) 
+        ; IF IdleBlinkCt >= IdleLifetime 
+          THEN (* Commit suicide. *) 
+            BlinkerThread := NIL 
+          ; BlinkerState := CursorStateTyp . CsInvisible 
+          ; IdleBlinkCt := 0 
+          ; RETURN NIL 
+          END (* IF *) 
+        END (* LOCK BlinkerLock *) 
       END (* LOOP *) 
     END Blink 
 
 ; PROCEDURE SetCursorState 
     ( Window : WindowTyp ; State : CursorSetStateTyp ) 
-  <* LL >= { BlinkerLock } *>
-  <* LL . sup < Window . mu *> 
+  <* LL . sup = BlinkerLock *>
 
   = BEGIN (* SetCursorState *) 
       IF State # Window . EwCursor . State 
@@ -1547,8 +1573,7 @@ MODULE EditWindow
 
 ; PROCEDURE TakeKBFocusLocked 
     ( Window : WindowTyp ; TimeStamp : VBT . TimeStamp ) 
-  <* LL >= { BlinkerLock } *>
-  <* LL . sup < Window . mu *> 
+  <* LL . sup = BlinkerLock *>
 
   = BEGIN (* TakeKBFocusLocked *) 
       IF Window # WindowWithFocus 
@@ -1566,12 +1591,10 @@ MODULE EditWindow
 (* EXPORTED: *) 
 ; PROCEDURE TakeKBFocus 
    ( Window : WindowTyp ; TimeStamp : VBT . TimeStamp ) 
-  <* LL . sup < Window . mu *> 
+  <* LL . sup < BlinkerLock *> 
 
-  = BEGIN (* TakeKBFocus *) 
-      LOCK BlinkerLock 
-      DO TakeKBFocusLocked ( Window , TimeStamp ) 
-      END (* LOCK *) 
+  = BEGIN (* TakeKBFocus *)
+      LOCK BlinkerLock DO TakeKBFocusLocked ( Window , TimeStamp ) END (* LOCK *)
     END TakeKBFocus 
 
 (* EXPORTED: *) 
@@ -1686,7 +1709,7 @@ MODULE EditWindow
     ; Time : VBT . TimeStamp 
     ; CursorPosition : VBT . CursorPosition 
     )
-  <* LL . sup < Window . mu *> 
+  <* LL . sup = VBT . mu *> 
 
   = VAR LCharPoint : CharPointTyp 
   ; VAR LGotFocus : BOOLEAN := FALSE 
@@ -1718,7 +1741,7 @@ MODULE EditWindow
                      , apply := MouseClickWorkProc 
                      ) 
                ) 
-      ; VBT . SetCage 
+      ; VBT . SetCage (* LL . sup < Window *)
           ( Window 
           , VBT . Cage 
               { rect 
@@ -1826,10 +1849,8 @@ MODULE EditWindow
 
 ; PROCEDURE Mouse 
     ( Window : WindowTyp ; READONLY MouseRec : VBT . MouseRec ) 
-  <* LL . sup <= VBT . mu *> 
-  (* This is the callback for the VBT mouse method, which is called with 
-     LL . sup = VBT . mu
-  *) 
+  <* LL . sup = VBT . mu *> 
+  (* This is the callback for the VBT mouse method. *) 
 
   = BEGIN (* Mouse *) 
       TRY 
@@ -1970,10 +1991,8 @@ MODULE EditWindow
     END PromptAndCloseWorkProc
 
 ; PROCEDURE Misc ( Window : T ; READONLY MiscRec : VBT . MiscRec ) 
-  <* LL . sup < Window . mu *> 
-  (* This is the callback for the VBT misc. method, which is called with 
-     LL . sup = VBT . mu
-  *) 
+  <* LL . sup = VBT . mu *> 
+  (* This is the callback for the VBT misc. method. *) 
 
   = VAR WorkResult : Worker . WorkResultTyp 
   
@@ -2028,7 +2047,7 @@ MODULE EditWindow
                 ) 
           )
       ; WorkResult := Worker . AwaitIdle ( )
-        (* ^Don't return from Misc, until worker tread work is done. *)
+        (* ^Don't return from Misc, until worker thread work is done. *)
 *)
       ; Assertions . DoNothing ( ) (* For breakpoint. *) 
       ELSIF MiscRec . type = GEndSweepMiscCode
@@ -2928,8 +2947,9 @@ MODULE EditWindow
 ; TYPE WorkerClosureReshapeTyp
     = Worker . ClosureTyp OBJECT Reshape : VBT . ReshapeRec END 
 
+(* CHECK: Will we need it someday? *)
+(*
 ; <* UNUSED *> 
-(* CHECK: Will we need it someday? *) 
   PROCEDURE ReshapeWorkProc ( Closure : WorkerClosureReshapeTyp )  
   RAISES { Backout , Thread . Alerted } 
   <* LL.sup = VBT.mu.Window *> 
@@ -2953,7 +2973,8 @@ MODULE EditWindow
         Display . ReshapeWindowRef ( Closure . Window , LOldSize , LNewSize ) 
       END (* IF *) 
 (* CHECK: Do we want to record and replay reshape? *) 
-    END ReshapeWorkProc 
+    END ReshapeWorkProc
+*)
 
 ; PROCEDURE Reshape 
     ( Window : WindowTyp ; READONLY ReshapeRec : VBT . ReshapeRec ) 
@@ -2996,8 +3017,9 @@ MODULE EditWindow
       END (* LOCK *) 
     END Reshape 
 
+(* CHECK: Will we need it someday? *)
+(*
 ; <* UNUSED *> 
-(* CHECK: Will we need it someday? *) 
   PROCEDURE RepaintWorkProc ( Closure : Worker . ClosureTyp )   
   RAISES { Backout , Thread . Alerted } 
   <* LL.sup = VBT.mu.Window *> 
@@ -3026,7 +3048,8 @@ MODULE EditWindow
           )
       END (* IF *) 
 (* CHECK: Do we want to record and replay repaint? *) 
-    END RepaintWorkProc 
+    END RepaintWorkProc
+*)
 
 ; PROCEDURE Repaint 
     ( Window : WindowTyp ; READONLY Region : Region . T ) 
