@@ -11,19 +11,21 @@ UNSAFE MODULE Failures
 (* UNSAFE stuff needed for snagging runtime errors from the RTS and
    querying the user about what to do with them. *)
 
+(* Library: *)
 ; IMPORT Compiler 
 ; IMPORT Fmt 
-; IMPORT M3toC 
+; IMPORT M3toC
+; IMPORT Process 
 ; IMPORT RT0
 ; IMPORT RTException
 ; IMPORT RTIO 
 ; IMPORT RTProcedureSRC  
-; IMPORT RTProcess 
 ; IMPORT RuntimeError
 ; IMPORT TextWr 
 ; IMPORT Thread
 ; IMPORT Wr 
 
+(* Application: *)
 ; IMPORT Assertions
 ; IMPORT LbeStd 
 ; IMPORT Misc 
@@ -78,7 +80,7 @@ UNSAFE MODULE Failures
                  , Link := GThreadInfoList
                  , Thread := LThreadSelf
                  , QueryProc := QueryProc
-                 , QueryingActPtr := NIL
+                 , QueryingActPtr := NIL 
                  , DoGui := FDoGui 
                  )
       ; IF GThreadInfoList = NIL
@@ -269,14 +271,16 @@ UNSAFE MODULE Failures
         ; Wr . PutText ( LTextWrT , LOOPHOLE ( Arg , TEXT ) ) 
         ; Wr . PutText ( LTextWrT , "\")" ) 
         END (* IF *)
-      ; LResult := TextWr . ToText ( LTextWrT ) 
+      ; LResult := TextWr . ToText ( LTextWrT )
+      ; IF LResult = NIL THEN LResult := "" END (* IF *)
+        (* ^Do we really need this? *) 
       ; RETURN LResult 
       END (* IF *) 
     END ExcNameInternal
 
 (* EXPORTED *) 
 ; PROCEDURE ActivationLocation ( READONLY Act : RT0 . RaiseActivation ) : TEXT
-    (* Code location where the raise denoted by Apt. *) 
+    (* Code location where the raise denoted by Apt occurred. *) 
 
   = VAR LResult : TEXT
   ; LWrT : TextWr . T
@@ -334,7 +338,7 @@ UNSAFE MODULE Failures
     ; RETURN LResult 
     END ActivationLocation 
 
-; PROCEDURE Crash
+; PROCEDURE DoTerminate
     ( <* UNUSED *> READONLY Act : RT0 . RaiseActivation )
 
   = BEGIN
@@ -344,9 +348,22 @@ UNSAFE MODULE Failures
     ; RTIO . PutText ( LbeStd . AppName )
     ; RTIO . PutText ( ". #####" )
     ; RTIO . PutText ( Wr . EOL )
+    ; RTIO . Flush ( )
+    ; RAISE Terminate ( "" ) 
+    END DoTerminate
+
+; PROCEDURE TerminateBluntly ( ExitCode : INTEGER ) 
+
+  = BEGIN
+      RTIO . PutText ( "##### Bluntly terminating " )
+    ; RTIO . PutText ( LbeStd . AppName )
+    ; RTIO . PutText ( " with exit code " )
+    ; RTIO . PutText ( Fmt . Int ( ExitCode ) ) 
+    ; RTIO . PutText ( ". #####" )
+    ; RTIO . PutText ( Wr . EOL )
     ; RTIO . Flush ( ) 
-    ; RTProcess . Crash ( NIL ) 
-    END Crash
+    ; Process . Exit ( ExitCode ) <* NORETURN *>
+    END TerminateBluntly
 
 ; CONST SecondaryMap 
    = ARRAY BOOLEAN (* wasBlocked *)
@@ -354,6 +371,16 @@ UNSAFE MODULE Failures
           { RuntimeError . T . UnhandledException
           , RuntimeError . T . BlockedException
           }
+
+; PROCEDURE ActIsFresh ( READONLY Act : RT0 . RaiseActivation ) : BOOLEAN
+  (* We got this activation directly through RTHooks.Raise. *) 
+
+  = BEGIN
+      RETURN Act . info0 = NIL
+             AND Act . info1 = NIL 
+             AND Act . un_except = NIL 
+             AND Act . un_arg = NIL 
+    END ActIsFresh 
 
 ; PROCEDURE BackstopPrimary
     ( VAR Act : RT0 . RaiseActivation ; wasBlocked : BOOLEAN )
@@ -388,6 +415,7 @@ UNSAFE MODULE Failures
   ; VAR LRTArg : RuntimeError . T 
   ; VAR LAction : FailureActionTyp
   ; VAR LAllowedActions : FailureActionSetTyp
+  ; VAR LActIsFresh : BOOLEAN 
   ; VAR LPrimaryWasBlocked : BOOLEAN 
   
   ; BEGIN
@@ -398,13 +426,39 @@ UNSAFE MODULE Failures
       END (* LOCK *) 
 
     ; LActPtr := LOOPHOLE ( ADR ( Act ) , RT0 . ActivationPtr )
-    ; IF LThreadInfoRef ^ . QueryingActPtr # NIL
-         AND LThreadInfoRef ^ . QueryingActPtr # LActPtr
-         (* Act was raised from somewhere dynamically inside a query about
-            a previous failure.  We can't do anything more with this.
-         *) 
-      THEN
+    ; IF Act . exception = GTerminateRef 
+      THEN (* This shouldn't happen. *) 
+        RTIO . PutText ( Wr . EOL )
+      ; RTIO . PutText ( "##### " )
+      ; RTIO . PutText ( StoppedReason ( wasBlocked ) )  
+      ; RTIO . PutText ( " exception Failures.Terminate. #####" )
+      ; RTIO . PutText ( Wr . EOL )
+      ; TerminateBluntly ( 2 ) <* NORETURN *> 
+      END (* IF *)
 
+    ; LActIsFresh := ActIsFresh ( Act )
+
+    ; IF LActIsFresh AND Act . exception = GBackoutRef
+      THEN (* Backout raised outside Failures and not handled. *) 
+        RTIO . PutText ( Wr . EOL )
+      ; RTIO . PutText ( "##### " )
+      ; RTIO . PutText ( StoppedReason ( wasBlocked ) )  
+      ; RTIO . PutText ( " exception Failures.Backout. #####" )
+      ; RTIO . PutText ( Wr . EOL )
+      ; TerminateBluntly ( 3 ) <* NORETURN *>
+      ELSIF LActIsFresh AND Act . exception = GIgnoreRef
+      THEN (* Ignore raised outside Failures and not handled. *)
+        RTIO . PutText ( Wr . EOL )
+      ; RTIO . PutText ( "##### " )
+      ; RTIO . PutText ( StoppedReason ( wasBlocked ) )  
+      ; RTIO . PutText ( " exception Failures.Ignore. #####" )
+      ; RTIO . PutText ( Wr . EOL )
+      ; TerminateBluntly ( 4 ) <* NORETURN *>
+      ELSIF LActIsFresh AND LThreadInfoRef ^ . QueryingActPtr # NIL  
+        (* Act was raised from somewhere dynamically inside a query about
+           a previous failure.  We can't do anything more with this.
+        *) 
+      THEN
         RTIO . PutText ( Wr . EOL )
       ; RTIO . PutText ( "##### " )
       ; RTIO . PutText ( StoppedReason ( wasBlocked ) )  
@@ -412,8 +466,7 @@ UNSAFE MODULE Failures
       ; RTIO . PutText ( Wr . EOL )
 
       ; RTIO . PutText ( "Original exception: " )
-      ; RTIO . PutText
-          ( ExcName ( LThreadInfoRef ^ . QueryingActPtr ^  ) ) 
+      ; RTIO . PutText ( ExcName ( LThreadInfoRef ^ . QueryingActPtr ^ ) ) 
       ; RTIO . PutText ( Wr . EOL )
 
       ; RTIO . PutText ( "Raised at: " )
@@ -430,41 +483,19 @@ UNSAFE MODULE Failures
       ; RTIO . PutText ( Wr . EOL )
       ; RTIO . Flush ( ) 
 
-      ; Crash ( Act )
-      END (* IF *) 
-
-    ; LExc := Act . exception 
-    ; IF LExc # GRuntimeErrorRef (* Programmer-declared exception. *) 
-      THEN BackstopPrimary ( Act , wasBlocked )
-      ELSE (* RuntimeError.E => runtime error. *)
-        LRTArg := RTExcArg ( Act . arg )
-      ; IF NOT LRTArg IN SecondaryRtes  
-        THEN (* Primary RT error. *)
-          BackstopPrimary ( Act , wasBlocked )
-        ELSE (* Secondary RT error (Unhandled or blocked), which
-                is now also Unhandled or blocked. *)
-          IF Act . un_except = GBackoutRef (* Primary was Backout. *) 
-             OR Act . exception = GIgnoreRef 
-             (* Primary was Failures.Ignore.  This should not happen
-                in the absence of bugs in Assertions, which should
-                always catch Ignore. *) 
-          THEN
-            RTIO . PutText ( Wr . EOL )
-          ; RTIO . PutText ( "##### " )
-          ; RTIO . PutText ( StoppedReason ( wasBlocked ) ) 
-          ; RTIO . PutText ( " exception " )
-          ; RTIO . PutText ( ExcName ( Act ) )
-          ; RTIO . PutText ( " #####" )
-          ; RTIO . PutText ( Wr . EOL )
-
-          ; RTIO . PutText
-              ( "Raised by user request, in response to exception raised at " )
-          ; RTIO . PutText ( ActivationLocation ( Act ) ) 
-          ; RTIO . PutText ( Wr . EOL )
-          ; RTIO . Flush ( ) 
-
-          ; Crash ( Act )
-          ELSE (* Client code has passedup two chances to catch: the original
+      ; TerminateBluntly ( 4 ) <* NORETURN *>
+      ELSE 
+        LExc := Act . exception 
+      ; IF LExc # GRuntimeErrorRef (* Programmer-declared exception. *) 
+        THEN BackstopPrimary ( Act , wasBlocked )
+        ELSE (* RuntimeError.E => runtime error. *)
+          LRTArg := RTExcArg ( Act . arg )
+        ; IF NOT LRTArg IN SecondaryRtes  
+          THEN (* Primary RT error. *)
+            BackstopPrimary ( Act , wasBlocked )
+          ELSE (* Secondary RT error (Unhandled or blocked), which
+                  is now also Unhandled or blocked. 
+                  Client code has passedup two chances to catch: the original
                   exception and a secondary exception (RT error: unhandled or
                   blocked), which also is now unhandled or blocked.  Now give
                   the human user some options. *)
@@ -483,16 +514,16 @@ UNSAFE MODULE Failures
 
           (* Query the user about what to do. *)
           ; LPrimaryWasBlocked := LRTArg = RuntimeError . T . BlockedException 
-          ; LThreadInfoRef ^ . QueryingActPtr := LActPtr 
+          ; LThreadInfoRef ^ . QueryingActPtr := LActPtr   
           ; LAction 
               := LThreadInfoRef . QueryProc
                    ( Act
                    , StoppedReason ( LPrimaryWasBlocked )
                    , LAllowedActions
                    )  
-          ; LThreadInfoRef ^ . QueryingActPtr := NIL
 
           (* Query's answer received. *) 
+          ; LThreadInfoRef ^ . QueryingActPtr := NIL  
           ; CASE LAction 
             OF FailureActionTyp . FaBackout 
               => (* Change to Failures.Backout, which client code
@@ -505,7 +536,7 @@ UNSAFE MODULE Failures
            can be anything.  What to do?
 *)
               ; RTException . Raise ( Act )
-              
+
             | FailureActionTyp . FaIgnore 
               => (* Ignoring an exception will likely work only when the
                     original exception was Assertions.AssertionFailure,
@@ -514,7 +545,7 @@ UNSAFE MODULE Failures
                     action action. *)
                 Act . exception := GIgnoreRef 
               ; RTException . Raise ( Act )
-              
+
             | FailureActionTyp . FaCrash 
             =>  RTIO . PutText ( Wr . EOL )
               ; RTIO . PutText ( "##### " )
@@ -523,6 +554,7 @@ UNSAFE MODULE Failures
               ; RTIO . PutText ( ExcName ( Act ) )
               ; RTIO . PutText ( "##### " )
               ; RTIO . PutText ( Wr . EOL )
+
               ; RTIO . PutText ( "  allowed to fail by user." )
               ; RTIO . PutText ( Wr . EOL )
 
@@ -531,10 +563,10 @@ UNSAFE MODULE Failures
               ; RTIO . PutText ( Wr . EOL )
               ; RTIO . Flush ( ) 
 
-              ; Crash ( Act )
+              ; DoTerminate ( Act )
             END (* CASE *)
-          END (* IF *)
-        END (* IF *) 
+          END (* IF *) 
+        END (* IF *)
       END (* IF *)
     ; LOCK GFailureSync 
       DO
@@ -591,6 +623,28 @@ UNSAFE MODULE Failures
       END (* IF *)
     END InitIgnoreRef
 
+; VAR GTerminateRef : RT0 . ExceptionPtr := NIL  
+
+; PROCEDURE InitTerminateRef ( ) 
+  (* Initialize GTerminateRef, the RT0.ExceptionPtr for exception Terminate. *)
+
+  = BEGIN
+      IF GTerminateRef = NIL
+      THEN 
+        TRY
+          RAISE Terminate ( "" ) 
+        EXCEPT
+        | Terminate 
+        => GTerminateRef
+           := LOOPHOLE ( Compiler . ThisException ( ) , RT0 . ActivationPtr ) 
+                         (* ^ NOTE: Misnamed Compiler.ThisException should
+                            be named ThisActivation!! *) 
+              ^ . exception 
+        ELSE RETURN 
+        END (* EXCEPT *)
+      END (* IF *)
+    END InitTerminateRef
+
 ; VAR GAssertionFailureRef : RT0 . ExceptionPtr := NIL  
 
 ; PROCEDURE InitAssertionFailureRef ( ) 
@@ -624,6 +678,7 @@ UNSAFE MODULE Failures
     *) 
     InitBackoutRef ( ) 
   ; InitIgnoreRef ( ) 
+  ; InitTerminateRef ( ) 
   ; InitAssertionFailureRef ( )
   ; GRuntimeErrorRef := RuntimeError . Self ( )
   ; GOldBackstop := RTException . SetBackstop ( Backstop )

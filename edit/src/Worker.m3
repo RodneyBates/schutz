@@ -28,6 +28,7 @@ MODULE Worker
 ; IMPORT Text 
 ; IMPORT TextWr 
 ; IMPORT Thread
+; IMPORT Trestle 
 ; IMPORT Wr 
 (* ; IMPORT VBT (* Used in LL pragmas. *) *) 
 ; IMPORT VBTClass (* To show VBT.T is a MUTEX, thus EditWindow . T too. *)  
@@ -758,7 +759,8 @@ MODULE Worker
 ; PROCEDURE WorkerThreadApply 
     ( <* UNUSED *> Self : WorkerThreadClosureTyp ) : REFANY 
 
-  = VAR LClosure : ClosureTyp 
+  = VAR LClosure : ClosureTyp
+  ; VAR LDebug : INTEGER := 0 
 
   ; BEGIN
       Failures . RegisterQueryProc ( FailureQuery ) 
@@ -777,7 +779,11 @@ MODULE Worker
          when the cancel was "refused" because it was too late?
 *) 
         ; BecomeIdle ( WrtStopped ) 
-        | Backout => 
+        | Backout =>
+          INC ( LDebug ) 
+        ; BecomeIdle ( WrtFailed ) 
+        | Failures . Terminate
+        => Trestle . Delete ( Options . MainForm ) 
         END (* TRY EXCEPT *) 
       END (* LOOP *) 
     END WorkerThreadApply 

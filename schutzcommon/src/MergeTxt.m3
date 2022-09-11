@@ -29,7 +29,7 @@ MODULE MergeTxt
 ; IMPORT TravUtil 
 
 ; IMPORT Assertions 
-; FROM Assertions IMPORT Assert , CantHappen  
+; FROM Assertions IMPORT Assert , AssertionFailure , CantHappen  
 ; FROM Failures IMPORT Backout  
 
 ; TYPE AFT = MessageCodes . T 
@@ -1956,7 +1956,7 @@ MODULE MergeTxt
             ; MteFwdPrevTok := Tok 
             END (* IF *) 
           EXCEPT Strings . SsOutOfBounds 
-          => RAISE Backout ( "Strings.SsOutOfBounds" )  
+          => RAISE AssertionFailure ( "Strings.SsOutOfBounds" )  
           END (* TRY EXCEPT *) 
         END MteTeFwdString 
 

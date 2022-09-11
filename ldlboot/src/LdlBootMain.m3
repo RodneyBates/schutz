@@ -9,6 +9,7 @@
 MODULE LdlBootMain 
 EXPORTS Main 
 
+; IMPORT Compiler 
 ; IMPORT FileRd 
 ; IMPORT Fmt
 ; IMPORT OSError 
@@ -19,17 +20,18 @@ EXPORTS Main
 *) 
 ; IMPORT Pickle2 AS Pickle (* The Pickle2 mess. *)
 ; IMPORT Process
-; IMPORT Rd 
+; IMPORT Rd
+; IMPORT RTIO 
 ; IMPORT Stdio 
 ; IMPORT Text 
 ; IMPORT Thread 
 ; IMPORT Wr 
 
-; IMPORT Assertions 
 ; FROM Failures IMPORT Backout 
 ; IMPORT Boot 
 ; IMPORT SchutzCoroutine 
-; IMPORT EstUtil 
+; IMPORT EstUtil
+; IMPORT Failures 
 ; IMPORT Files 
 ; IMPORT GenConstEst 
 ; IMPORT GrammarGen  
@@ -38,6 +40,7 @@ EXPORTS Main
 ; IMPORT LangUtil 
 ; IMPORT LbeStd 
 ; IMPORT Ldl0MakeEst
+; IMPORT UnsafeUtils 
 (* Sometime bootstrap problem:  
      LdlBootMain IMPORTs Ldl0MakeEst.m3, so it can (conditionally, -E option,
      UseGeneratedEst variable) use the Est that Ldl0MakeEst.m3 builds for the 
@@ -782,7 +785,8 @@ EXPORTS Main
 
 ; BEGIN
     Misc . LoadYourself ( )
-    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *)  ; GetParams ( ) 
+    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *)
+  ; GetParams ( ) 
   ; IF DoDisplayHelp 
     THEN DisplayVersion ( ) 
     ; DisplayHelp ( )
@@ -790,9 +794,23 @@ EXPORTS Main
     THEN DisplayVersion ( ) 
     ELSE 
       TRY  
-        Work ( ) 
-      EXCEPT Backout => 
-        Process . Exit ( 2 ) <* NORETURN *>
+        Work ( )
+      EXCEPT 
+      ELSE (* Including Failures . Terminate. *)  
+        RTIO . PutText ( "LbeBoot, Unhandled exception: " ) 
+      ; RTIO . PutText 
+          ( Failures . ExcName
+              ( UnsafeUtils . AdrToRT0_ActivationPtr 
+                  ( Compiler . ThisException ( ) 
+                    (* ^ NOTE: Misnamed Compiler.ThisException should
+                        be named ThisActivation!! *)
+                  )
+                ^ 
+              ) 
+          )
+      ; RTIO . PutText ( Wr . EOL )  
+      ; RTIO . Flush ( ) 
+      ; Process . Exit ( 2 ) <* NORETURN *>
       END (* TRY EXCEPT *) 
     END (* IF *) 
   END LdlBootMain

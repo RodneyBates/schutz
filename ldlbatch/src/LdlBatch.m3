@@ -10,6 +10,8 @@ MODULE LdlBatch
 
 EXPORTS Main 
 
+(* Library: *)
+; IMPORT Compiler 
 ; IMPORT FileRd 
 ; IMPORT Fingerprint 
 ; IMPORT Pathname 
@@ -22,17 +24,21 @@ EXPORTS Main
 ; IMPORT Process 
 ; IMPORT Rd 
 ; IMPORT RefList 
-; IMPORT Rsrc 
+; IMPORT Rsrc
+(* ; IMPORT RT0 *)  
+; IMPORT RTIO  
 ; IMPORT Stdio 
 ; IMPORT Text 
 ; IMPORT Thread 
 ; IMPORT Wr 
 
-; FROM Failures IMPORT Backout
+(* Application: *) 
 ; IMPORT AstView 
 ; IMPORT Boot 
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
+; IMPORT Failures 
+; FROM Failures IMPORT Backout
 ; IMPORT Files
 ; IMPORT GenConstEst 
 ; IMPORT GrammarGen 
@@ -61,7 +67,8 @@ EXPORTS Main
 ; IMPORT SharedStrings 
 ; IMPORT Strings 
 ; IMPORT SuffixInfo 
-; IMPORT TreeBrowse 
+; IMPORT TreeBrowse
+; IMPORT UnsafeUtils 
 ; IMPORT Version 
 ; IMPORT VersionedFiles 
 ; IMPORT WriteTrv 
@@ -983,8 +990,22 @@ EXPORTS Main
       TRY 
         Init ( ) 
       ; Work ( ) 
-      EXCEPT Backout => 
-        Process . Exit ( 2 ) <* NORETURN *>
+      EXCEPT 
+      ELSE (* Including Failures . Terminate. *)
+        RTIO . PutText ( "LbeBatch, Unhandled exception: " ) 
+      ; RTIO . PutText 
+          ( Failures . ExcName
+              ( UnsafeUtils . AdrToRT0_ActivationPtr 
+                  ( Compiler . ThisException ( ) 
+                    (* ^ NOTE: Misnamed Compiler.ThisException should
+                        be named ThisActivation!! *)
+                  )
+                ^ 
+              ) 
+          )
+      ; RTIO . PutText ( Wr . EOL )  
+      ; RTIO . Flush ( ) 
+      ; Process . Exit ( 2 ) <* NORETURN *>
       END (* TRY EXCEPT *) 
     END (* IF *) 
   END LdlBatch 

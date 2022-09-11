@@ -22,7 +22,8 @@ EXPORTS Main
 ; IMPORT Stdio 
 ; IMPORT Text 
 ; IMPORT TextRd 
-; IMPORT Thread  
+; IMPORT Thread
+; IMPORT Trestle 
 ; IMPORT Wr 
 
 ; IMPORT AssertDevel  
@@ -402,44 +403,43 @@ EXPORTS Main
     ; EVAL LNewDefault (* Place to put a breakpoint. *) 
     END StackSize 
 
-; PROCEDURE Work ( ) 
+; PROCEDURE RunLbe ( ) 
 
-  = <* FATAL Backout *> 
-    BEGIN (* Work *) 
-      SetDefaults ( ) 
-    ; IF GetArgs ( ) 
-      THEN 
+  = BEGIN (* RunLbe *)
+      TRY (* EXCEPT *) 
+        SetDefaults ( ) 
+      ; IF GetArgs ( ) 
+        THEN 
+          Assertions . DoNothing ( )
 (* No longer load languages eagerly. 
-        EVAL LangUtil . LoadLanguage ( "ldl0" ) 
-      ; EVAL LangUtil . LoadLanguage ( "ldl1" ) 
-      ; EVAL LangUtil . LoadLanguage ( "m3" ) 
-      ; 
+        ; EVAL LangUtil . LoadLanguage ( "ldl0" ) 
+        ; EVAL LangUtil . LoadLanguage ( "ldl1" ) 
+        ; EVAL LangUtil . LoadLanguage ( "m3" ) 
 *)
-  (* Assertions . CauseRuntimeError ( "" ) For testing
-     ; 
-*) 
-  Assertions . DoNothing ( )
-; 
-        IF NOT Ui . Install 
-                 ( Options . EditFileName 
-                 , PlaybackFileName 
-                 , DoRunPlayback 
-                 , RespectStops 
-                 , RecordFileName 
-                 , DelayTime 
-                 )
-        THEN Assertions . TerminatingNormally := TRUE 
-        ELSE UiDevel . ShowDebugOptions ( )
+(*      ; Assertions . CauseRuntimeError ( "" ) For testing *) 
+        ; IF NOT Ui . Install 
+                   ( Options . EditFileName 
+                   , PlaybackFileName 
+                   , DoRunPlayback 
+                   , RespectStops 
+                   , RecordFileName 
+                   , DelayTime 
+                   )
+          THEN Assertions . TerminatingNormally := TRUE 
+          ELSE UiDevel . ShowDebugOptions ( )
+          END (* IF *)
+        ELSE Assertions . TerminatingNormally := TRUE 
         END (* IF *)
-      ELSE Assertions . TerminatingNormally := TRUE 
-      END (* IF *)
-    END Work
+      EXCEPT ELSE 
+        Trestle . Delete ( Options . MainForm ) 
+      END (* EXCEPT *) 
+    END RunLbe
 
 ; BEGIN (* Lbe *) 
     Misc . LoadYourself ( )
     (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *) 
   ; StackSize ( WantedThreadStackSize )
   ; Worker . Init ( ) 
-  ; Work ( ) 
+  ; RunLbe ( ) 
   END Lbe 
 . 

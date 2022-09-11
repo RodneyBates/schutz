@@ -17,6 +17,29 @@ INTERFACE Failures
 ; IMPORT RT0
 ; IMPORT Thread 
 
+; <*IMPLICIT*>
+  EXCEPTION Backout ( TEXT )  
+  (* Backout and recover from an unhandled exception or runtime failure.
+     If this goes uncaught, a crash will result.  It's implicit, so no
+     danger of its being blocked.
+     
+     Don't raise this, only catch it.  It will be raised inside
+     module Failures. 
+  *) 
+
+; <*IMPLICIT*>
+  EXCEPTION Ignore
+  (* Ignore an unhandled exception or runtime failure, and proceed.
+  
+     Don't raise this. It will be raised inside module Failures.
+     Catch it at and only at a place where an exception or runtime
+     error can be ignored. 
+  *) 
+
+; <*IMPLICIT*>
+  EXCEPTION Terminate ( TEXT )
+  (* Raise to terminate gracefully, even when there are windows up. *)
+  
 ; TYPE FailureActionTyp = { FaCrash , FaBackout , FaIgnore }
 ; TYPE FailureActionSetTyp = SET OF FailureActionTyp 
 
@@ -54,25 +77,6 @@ INTERFACE Failures
 
 ; PROCEDURE ActivationLocation ( READONLY Act : RT0 . RaiseActivation ) : TEXT
     (* Code location where the raise denoted by Apt. *) 
-
-; <*IMPLICIT*>
-  EXCEPTION Backout ( TEXT )  
-  (* Backout and recover from an unhandled exception or runtime failure.
-     If this goes uncaught, a crash will result.  It's implicit, so no
-     danger of its being blocked.
-     
-     Don't raise this, only catch it.  It will be raised inside
-     module Failures. 
-  *) 
-
-; <*IMPLICIT*>
-  EXCEPTION Ignore
-  (* Ignore an unhandled exception or runtime failure, and proceed.
-  
-     Don't raise this. It will be raised inside module Failures.
-     Catch it only IFF at a place where an exception or runtime
-     error can be ignored. 
-  *) 
 
 ; END Failures
 .

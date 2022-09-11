@@ -1016,7 +1016,6 @@ MODULE EditWindow
 
           (* Paint decoration, under the characters. *)
 
-(*
           ; CASE Attr . TaDecoration 
             OF PaintHs . TaDecPlain 
             => (* Nothing. *)    
@@ -1057,7 +1056,6 @@ MODULE EditWindow
               END (* WITH *) 
             ELSE (* No decoration to add. *) 
             END (* CASE *)
-*) 
 
           (* Paint the characters.*)
 

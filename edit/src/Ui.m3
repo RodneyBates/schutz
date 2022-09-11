@@ -8,7 +8,8 @@
 
 MODULE Ui 
 
-(* Library: *) 
+(* Library: *)
+; IMPORT Compiler 
 ; IMPORT Font 
 ; IMPORT FormsVBT
 ; IMPORT PaintOp 
@@ -27,6 +28,7 @@ MODULE Ui
 (* Application: *) 
 ; IMPORT Assertions 
 ; FROM Assertions IMPORT Assert , CantHappen 
+; IMPORT Failures 
 ; FROM Failures IMPORT Backout   
 ; IMPORT Display 
 ; IMPORT EditWindow 
@@ -48,7 +50,8 @@ MODULE Ui
 ; IMPORT TextEdit 
 ; IMPORT UiDevel 
 ; IMPORT UiRecPlay 
-; IMPORT UiSearch 
+; IMPORT UiSearch
+; IMPORT UnsafeUtils 
 ; IMPORT VersionedFiles 
 ; IMPORT Worker 
 ; IMPORT WriteTrv 
@@ -3162,8 +3165,7 @@ MODULE Ui
           END (* TRY EXCEPT *) 
         END (* IF *) 
       (* Do this after playback, in case they have the same name. *) 
-      ; IF RecordFileName # NIL 
-           AND NOT Text . Equal ( RecordFileName , "" ) 
+      ; IF RecordFileName # NIL AND NOT Text . Equal ( RecordFileName , "" ) 
         THEN
           OpenRecPlayWindow ( )
         ; IF UiRecPlay . RecordOpen 
@@ -3176,15 +3178,33 @@ MODULE Ui
           END (* IF *) 
         END (* IF *) 
       ; Trestle . AwaitDelete ( Options . MainForm ) 
-   (* ; UiRecPlay . RecordClose ( ) *)
       EXCEPT
       | TrestleComm . Failure =>
           DL ( LbeStd . AppName 
                & ": Could not open display " & Options . Display 
              )
         ; Assertions . TerminatingNormally := TRUE
+        ; RETURN FALSE
+      | Failures . Terminate ( Msg )
+      => DL ( LbeStd . AppName & "Terminating due to failure." )
+        ; Assertions . TerminatingNormally := TRUE
+        ; Trestle . Delete ( Options . MainForm )
         ; RETURN FALSE 
-      END
+      ELSE
+        DL ( LbeStd . AppName & "Unhandled exception: " 
+              & Failures . ExcName
+                  ( UnsafeUtils . AdrToRT0_ActivationPtr 
+                      ( Compiler . ThisException ( ) 
+                        (* ^ NOTE: Misnamed Compiler.ThisException should
+                            be named ThisActivation!! *)
+                      )
+                    ^ 
+                  ) 
+            )
+        ; Assertions . TerminatingNormally := TRUE
+        ; Trestle . Delete ( Options . MainForm )
+        ; RETURN FALSE 
+      END (* EXCEPT *) 
     ; RETURN TRUE 
     END Install 
 
