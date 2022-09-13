@@ -393,7 +393,7 @@ INTERFACE LbeStd
                                    e.g. identifier. *) 
       , TokClassVarTermMod      (* Used in a ModTok for a VarTerminal *) 
       , TokClassAsPlus          (* Abstract plus list node. *) 
-      , TokClassAsStar          (* Abstract plus list node. *) 
+      , TokClassAsStar          (* Abstract star list node. *) 
       , TokClassAsPlusTrailing  (* Abstract plus list node with optional 
                                    trailing separators. *) 
       , TokClassAsStarTrailing  (* Abstract star list node with optional 

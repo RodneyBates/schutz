@@ -110,7 +110,7 @@ INTERFACE Marks
       ; BlCharPos : LbeStd . CharNoTyp := LbeStd . CharNoUnknown 
         (* Maintained only when Kind = BlankLine.  The CharPos at the end of
            the line before the blank lines. *)  
-      ; Tok : LbeStd . TokTyp := LbeStd . Tok__Null  
+      ; TmTok : LbeStd . TokTyp := LbeStd . Tok__Null  
         (* For ChildFmtNo, the token in node number EstNodeNo.
            For LeftSibFmtNo and RightSibFmtNo, the token in the
            parent of node number EstNodeNo, i.e., the list node. 

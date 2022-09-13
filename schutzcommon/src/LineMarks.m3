@@ -637,7 +637,7 @@ MODULE LineMarks
                    , FmtNo := FsNodeRef . FsFmtNo 
                    , StartAtEnd := TRUE
                    , IsImpliedNewLine := FALSE 
-                   , Tok := LbeStd . Tok__BlankLine  
+                   , TmTok := LbeStd . Tok__BlankLine  
                    } 
           ; IF Marks . Equal ( ExistingMark , NewMark ) 
             THEN DidHitExistingMark := TRUE 
@@ -686,7 +686,7 @@ MODULE LineMarks
                       , FmtNo := FsNodeRef . FsFmtNo 
                       , StartAtEnd := FALSE 
                       , IsImpliedNewLine := FALSE 
-                      , Tok := LbeStd . Tok__BlankLine 
+                      , TmTok := LbeStd . Tok__BlankLine 
                       } 
             ; IF Marks . Equal ( ExistingMark , NewMark ) 
               THEN DidHitExistingMark := TRUE 
@@ -706,7 +706,7 @@ MODULE LineMarks
                       , FmtNo := FsNodeRef . FsFmtNo 
                       , StartAtEnd := FALSE 
                       , IsImpliedNewLine := FALSE 
-                      , Tok := LbeStd . Tok__BlankLine 
+                      , TmTok := LbeStd . Tok__BlankLine 
                       } 
             ; IF Marks . Equal ( ExistingMark , NewMark ) 
               THEN DidHitExistingMark := TRUE 
@@ -762,7 +762,7 @@ MODULE LineMarks
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := TRUE 
                      , IsImpliedNewLine := FALSE 
-                     , Tok := LbeStd . Tok__CmntAtEndOfLine  
+                     , TmTok := LbeStd . Tok__CmntAtEndOfLine  
                      } 
             ; IF Marks . Equal ( ExistingMark , NewMark ) 
               THEN DidHitExistingMark := TRUE 
@@ -841,7 +841,7 @@ MODULE LineMarks
                           , FmtNo := FsNodeRef . FsFmtNo 
                           , StartAtEnd := FALSE 
                           , IsImpliedNewLine := LIsImpliedNewLine  
-                          , Tok := LbeStd . Tok__Cmnt  
+                          , TmTok := LbeStd . Tok__Cmnt  
                           } 
                 ; IF Marks . Equal ( ExistingMark , NewMark ) 
                   THEN DidHitExistingMark := TRUE 
@@ -891,7 +891,7 @@ MODULE LineMarks
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := TRUE 
                      , IsImpliedNewLine := FALSE 
-                     , Tok := LbeStd . Tok__ModText  
+                     , TmTok := LbeStd . Tok__ModText  
                      } 
             ; IF Marks . Equal ( ExistingMark , NewMark ) 
               THEN DidHitExistingMark := TRUE 
@@ -955,7 +955,7 @@ MODULE LineMarks
                         , IsImpliedNewLine := FALSE 
                         , FmtNo := FsNodeRef . FsFmtNo 
                         , StartAtEnd := FALSE 
-                        , Tok := LbeStd . Tok__ModText 
+                        , TmTok := LbeStd . Tok__ModText 
                         } 
               ; IF Marks . Equal ( ExistingMark , NewMark ) 
                 THEN DidHitExistingMark := TRUE 
@@ -1032,7 +1032,7 @@ MODULE LineMarks
                        , IsImpliedNewLine := FALSE 
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE 
-                       , Tok := EstRef . EstTok 
+                       , TmTok := EstRef . EstTok 
                        } 
               ; IF Marks . Equal ( ExistingMark , NewMark ) 
                 THEN DidHitExistingMark := TRUE 
@@ -1289,7 +1289,7 @@ MODULE LineMarks
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
-                     , Tok := LTok 
+                     , TmTok := LTok 
                      } 
             ELSIF GnlTeEstTravInfo . EtiChildNo 
                   < GnlTeEstTravInfo . EtiChildCt 
@@ -1313,7 +1313,7 @@ MODULE LineMarks
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
-                     , Tok := LTok 
+                     , TmTok := LTok 
                      } 
             ELSE (* There is an Est child to the left but not to the right. 
                     Build a RightSibFmtNo mark. *) 
@@ -1329,7 +1329,7 @@ MODULE LineMarks
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
-                     , Tok := LTok 
+                     , TmTok := LTok 
                      } 
             END (* IF *) 
           ; IF Marks . Equal ( ExistingMark , NewMark ) 
@@ -2090,7 +2090,7 @@ MODULE LineMarks
                       , FmtNo := FsNodeRef . FsFmtNo 
                       , StartAtEnd := FALSE 
                       , IsImpliedNewLine := FALSE 
-                      , Tok := LbeStd . Tok__BlankLine 
+                      , TmTok := LbeStd . Tok__BlankLine 
                       } 
             ; GplState := GplStateTyp . GplStateDoneWithLine 
 
@@ -2109,7 +2109,7 @@ MODULE LineMarks
                       , FmtNo := FsNodeRef . FsFmtNo 
                       , StartAtEnd := TRUE 
                       , IsImpliedNewLine := FALSE 
-                      , Tok := LbeStd . Tok__BlankLine 
+                      , TmTok := LbeStd . Tok__BlankLine 
                       } 
             ; GplState := GplStateTyp . GplStateDoneWithLine 
 
@@ -2160,7 +2160,7 @@ MODULE LineMarks
                         , FmtNo := FsNodeRef . FsFmtNo 
                         , StartAtEnd := FALSE 
                         , IsImpliedNewLine := NOT NlBefore  
-                        , Tok := Tok 
+                        , TmTok := Tok 
                         } 
                ; GplState := GplStateTyp . GplStateDoneWithLine 
                ELSE (* Traverse backwards through the mod. *) 
@@ -2192,7 +2192,7 @@ MODULE LineMarks
                         , FmtNo := FsNodeRef . FsFmtNo 
                         , StartAtEnd := TRUE 
                         , IsImpliedNewLine := FALSE 
-                        , Tok := Tok 
+                        , TmTok := Tok 
                         } 
                ; GplState := GplStateTyp . GplStateDoneWithLine 
                ELSIF NlBefore 
@@ -2210,7 +2210,7 @@ MODULE LineMarks
                         , FmtNo := FsNodeRef . FsFmtNo 
                         , StartAtEnd := FALSE 
                         , IsImpliedNewLine := NOT NlBefore 
-                        , Tok := Tok 
+                        , TmTok := Tok 
                         } 
                ; GplState := GplStateTyp . GplStateDoneWithLine 
                ELSE (* Traverse backwards through the mod. *) 
@@ -2454,7 +2454,7 @@ MODULE LineMarks
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
-                     , Tok := LTok 
+                     , TmTok := LTok 
                      } 
             ELSIF GplTeEstTravInfo . EtiChildNo 
                   >= GplTeEstTravInfo . EtiChildCt - 1 
@@ -2477,7 +2477,7 @@ MODULE LineMarks
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
-                     , Tok := LTok 
+                     , TmTok := LTok 
                      } 
             ELSE (* Make it LeftSibFmtNo *) 
               NewMark 
@@ -2493,7 +2493,7 @@ MODULE LineMarks
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
-                     , Tok := LTok 
+                     , TmTok := LTok 
                      } 
             END (* IF *) 
           END GplTeTfsBuildFmtNoMark 
@@ -3049,7 +3049,7 @@ MODULE LineMarks
                  , FmtNo := 0 
                  , StartAtEnd := FALSE 
                  , IsImpliedNewLine := FALSE 
-                 , Tok := LbeStd . Tok__BegOfImage  
+                 , TmTok := LbeStd . Tok__BegOfImage  
                  } 
         ELSE 
           NewMark 
@@ -3066,7 +3066,7 @@ MODULE LineMarks
                  , FmtNo := LChildFsNodeRef . FsFmtNo 
                  , StartAtEnd := FALSE 
                  , IsImpliedNewLine := FALSE 
-                 , Tok := EstUtil . EstTok 
+                 , TmTok := EstUtil . EstTok 
                             ( LEstTravInfo . EtiChildLeafElem . LeChildRef ) 
                  }
         END (* IF *)
@@ -3079,7 +3079,7 @@ MODULE LineMarks
                , FmtNo := LChildFsNodeRef . FsFmtNo 
                , StartAtEnd := FALSE 
                , IsImpliedNewLine := FALSE 
-               , Tok := EstUtil . EstTok ( RootEstRef )  
+               , TmTok := EstUtil . EstTok ( RootEstRef )  
                } 
       END (* IF *) 
     END GetLMBegOfImage 
@@ -3185,7 +3185,7 @@ MODULE LineMarks
                , FmtNo := LChildFsNodeRef . FsFmtNo 
                , StartAtEnd := FALSE 
                , IsImpliedNewLine := FALSE 
-               , Tok := EstUtil . EstTok  
+               , TmTok := EstUtil . EstTok  
                           ( LEstTravInfo . EtiChildLeafElem . LeChildRef ) 
                } 
       ELSE 
@@ -3197,7 +3197,7 @@ MODULE LineMarks
                , FmtNo := LChildFsNodeRef . FsFmtNo 
                , StartAtEnd := FALSE 
                , IsImpliedNewLine := FALSE 
-               , Tok := EstUtil . EstTok ( RootEstRef )   
+               , TmTok := EstUtil . EstTok ( RootEstRef )   
                } 
       END (* IF *) 
     END GetEndOfImage 

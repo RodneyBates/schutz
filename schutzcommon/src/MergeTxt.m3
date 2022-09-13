@@ -68,8 +68,15 @@ MODULE MergeTxt
           LbeStd . LimitedCharNoInfinity. 
       *) 
     ; VAR NewEstRootRef : EstHs . EstRefTyp 
-    ; VAR NodeNoChange : LbeStd . EstNodeNoTyp 
-    ; VAR MaxTouchedNodeNo : LbeStd . EstNodeNoTyp 
+    ; VAR NodeNoChange : LbeStd . EstNodeNoTyp   
+    ; VAR MaxTouchedNodeNo : LbeStd . EstNodeNoTyp
+      (* ^Est nodes with old node numbers > MaxTouchedNodeNo will have node
+          numbers in the new tree that differ by NodeNoChange, which can be
+          negative or positive.  Any references to them need to be adjusted
+          to match.  MergeTextEdit doesn't know where they are, so caller
+          must do it.  OTOH, MergeTextEdit does adjust node numbers in
+          marks it produces.
+      *) 
     ; VAR NewBolTokMark : Marks . TokMarkTyp 
     ; VAR NewLinesCt : LbeStd . LineNoTyp 
     ; VAR LeadingBlankLinesIncluded : LbeStd . LineNoTyp  
@@ -216,7 +223,7 @@ MODULE MergeTxt
              Nl after of ModBlankLine, ModCmnt, or ModText 
              LexError 
              InsTok 
-             AstString Tok 
+             AstStringTok 
              BOI 
              LineBreak, either started-at or passed. 
         *) 
@@ -1433,7 +1440,7 @@ MODULE MergeTxt
                        , FmtNo := FmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
-                       , Tok := LbeStd . Tok__BlankLine  
+                       , TmTok := LbeStd . Tok__BlankLine  
                        }
               ; INC ( NewLinesCt ) 
               ; IF LNewBlankLinesBefore = 0 
@@ -1478,7 +1485,7 @@ MODULE MergeTxt
                          , FmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
-                         , Tok := LbeStd . Tok__ModText 
+                         , TmTok := LbeStd . Tok__ModText 
                          } 
                 ; *) 
                   INC ( NewLinesCt ) 
@@ -1507,7 +1514,7 @@ MODULE MergeTxt
                          , FmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
-                         , Tok := LbeStd . Tok__ModText 
+                         , TmTok := LbeStd . Tok__ModText 
                          } 
                 ; INC ( NewLinesCt ) 
                 ; MteState := MteStateTyp . MteStateDone 
@@ -1529,7 +1536,7 @@ MODULE MergeTxt
                        , FmtNo := FmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
-                       , Tok := LbeStd . Tok__BlankLine 
+                       , TmTok := LbeStd . Tok__BlankLine 
                        } 
               ; INC ( NewLinesCt ) 
               ; MteState := MteStateTyp . MteStateDone 
@@ -2385,7 +2392,7 @@ MODULE MergeTxt
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := TRUE 
                        , IsImpliedNewLine := FALSE 
-                       , Tok := LbeStd . Tok__BlankLine 
+                       , TmTok := LbeStd . Tok__BlankLine 
                        } 
               ; INC ( NewLinesCt ) (* For the Nl at the end. *) 
               ; MteState := MteStateTyp . MteStateDone 
@@ -2419,7 +2426,7 @@ MODULE MergeTxt
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE  
                        , IsImpliedNewLine := FALSE 
-                       , Tok := LbeStd . Tok__BlankLine 
+                       , TmTok := LbeStd . Tok__BlankLine 
                        } 
                 ; INC ( NewLinesCt ) (* For the Nl at the end. *) 
                 ; MteState := MteStateTyp . MteStateDone 
@@ -2745,7 +2752,7 @@ MODULE MergeTxt
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE
                      , IsImpliedNewLine := NOT ModCmnt . ModCmntNlBefore 
-                     , Tok := LTok  
+                     , TmTok := LTok  
                      } 
               ; INC ( NewLinesCt ) 
               ; MteState := MteStateTyp . MteStateDone 
@@ -3004,7 +3011,7 @@ MODULE MergeTxt
                               , FmtNo := FsNodeRef . FsFmtNo 
                               , StartAtEnd := TRUE 
                               , IsImpliedNewLine := FALSE 
-                              , Tok := LbeStd . Tok__CmntAtEndOfLine 
+                              , TmTok := LbeStd . Tok__CmntAtEndOfLine 
                               } 
                      ; INC ( NewLinesCt ) 
                      ; MteState := MteStateTyp . MteStateDone 
@@ -3130,7 +3137,7 @@ MODULE MergeTxt
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
-                       , Tok := LbeStd . Tok__ModText 
+                       , TmTok := LbeStd . Tok__ModText 
                        } 
               ; INC ( NewLinesCt ) 
               ; MteState := MteStateTyp . MteStateDone 
@@ -3295,7 +3302,7 @@ MODULE MergeTxt
                               , FmtNo := FsNodeRef . FsFmtNo 
                               , StartAtEnd := TRUE 
                               , IsImpliedNewLine := FALSE 
-                              , Tok := LbeStd . Tok__ModText 
+                              , TmTok := LbeStd . Tok__ModText 
                               } 
                      ; INC ( NewLinesCt ) 
                      ; MteState := MteStateTyp . MteStateDone 
@@ -3415,7 +3422,7 @@ MODULE MergeTxt
                          , FmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
-                         , Tok := EstRef . EstTok  
+                         , TmTok := EstRef . EstTok  
                          } 
                 ; MteState := MteStateTyp . MteStateDone 
                 END
@@ -3505,7 +3512,7 @@ MODULE MergeTxt
                          , FmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := TRUE  
-                         , Tok := LTok 
+                         , TmTok := LTok 
                          } 
                 ; INC ( NewLinesCt ) 
                 ; MteState := MteStateTyp . MteStateDone 
@@ -3580,7 +3587,7 @@ MODULE MergeTxt
                          , FmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := TRUE  
-                         , Tok := LbeStd . Tok__Null  
+                         , TmTok := LbeStd . Tok__Null  
                          } 
                 ; INC ( NewLinesCt ) 
                 ; MteState := MteStateTyp . MteStateDone 
@@ -3719,11 +3726,13 @@ MODULE MergeTxt
               INC ( NewBolTokMark . EstNodeNo 
                   , MteTeEstTravInfo . EtiChildRelNodeNo 
                   )
+(*
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo , NewBolTokMark . EstNodeNo ) 
 (* FIXME: There is a fundamental inconsistency in this.  This computation uses
           node numbers in the new est, but everywhere else, it is the old tree.
-*) 
+*)
+*)
             END (* IF *) 
           ; CASE MteState (* Which may have changed since above. *)  
             OF MteStateTyp . MteStateFwd 
@@ -4066,7 +4075,7 @@ MODULE MergeTxt
                    , FmtNo := FsNodeRef . FsFmtNo 
                    , StartAtEnd := FALSE 
                    , IsImpliedNewLine := FALSE 
-                   , Tok := MteTeEstTravInfo . EtiParentRef . EstTok 
+                   , TmTok := MteTeEstTravInfo . EtiParentRef . EstTok 
 (* TODO: ^This probably needs a case for OptSingletonList, but this field
           is not being used anyway.
 *) 
@@ -5256,11 +5265,13 @@ MODULE MergeTxt
       ; Assert
           ( MteState = MteStateTyp . MteStateDone 
           , AFT . A_MergeTextEdit_NotDone 
-          ) 
+          )
+(* EstNodeNoNull is zero, which is a valid number:
       ; Assert 
           ( MaxTouchedNodeNo # LbeStd . EstNodeNoNull  
           , AFT . A_MergeTextEdit_No_MaxTouchedNodeNo  
-          ) 
+          )
+*)
       ; NewEstRootRef := LNewEstRootRef 
       ; Assert 
           ( NewBolTokMark . EstNodeCt 

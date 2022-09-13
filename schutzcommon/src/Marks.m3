@@ -58,8 +58,8 @@ MODULE Marks
   
   ; BEGIN
       IF Lang = LbeStd . LangNull
-      THEN LTokImage := LbeStd . NumIdTokImage ( Mark . Tok ) 
-      ELSE LTokImage := LangUtil . TokImage ( Mark . Tok , Lang ) 
+      THEN LTokImage := LbeStd . NumIdTokImage ( Mark . TmTok ) 
+      ELSE LTokImage := LangUtil . TokImage ( Mark . TmTok , Lang ) 
       END (* IF *) 
     ; IF Mark . Kind = MarkKindTyp . BlankLine
       THEN

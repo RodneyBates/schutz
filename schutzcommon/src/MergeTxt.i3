@@ -65,6 +65,13 @@ INTERFACE MergeTxt
     ; VAR NewEstRootRef : EstHs . EstRefTyp  
     ; VAR NodeNoChange : LbeStd . EstNodeNoTyp 
     ; VAR MaxTouchedNodeNo : LbeStd . EstNodeNoTyp 
+      (* ^Est nodes with old node numbers > MaxTouchedNodeNo will have node
+          numbers in the new tree that differ by NodeNoChange, which can be
+          negative or positive.  Any references to them need to be adjusted
+          to match.  MergeTextEdit doesn't know where they are, so caller
+          must do it.  OTOH, MergeTextEdit does adjust node numbers in
+          marks it produces.
+      *) 
     ; VAR NewBolTokMark : Marks . TokMarkTyp 
     ; VAR NewLinesCt : LbeStd . LineNoTyp 
     ; VAR LeadingBlankLinesIncluded : LbeStd . LineNoTyp  
