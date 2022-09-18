@@ -827,7 +827,7 @@ MODULE MergeTxt
       ; BEGIN (* MteTeFlushBlankLines *) 
           IF MteNewBlankLineFmtNo # EstHs . FmtNoNull 
           THEN (* Some unconstructed blank lines are waiting.
-                  Turn them into a new or reused read ModBlankLine. *) 
+                  Turn them into a new or reused ModBlankLine. *) 
             MteTeFindLeftSib (* Of the leftmost already waiting Est child. *) 
               ( LExists , LEstChildNo , LChildLeafElem , LFmtNo ) 
           ; IF LExists 
@@ -1502,9 +1502,10 @@ MODULE MergeTxt
                   , FmtNo 
                   , EstHs . EdgeKindTyp . EdgeKindLeadingMod  
                   ) 
-              ; IF LLeftNewModRef . ModTextLeftTokToPos = 0 (* Nl before *) 
-                THEN (* This is not the inserted Nl. *)
-                  NewBolTokMark (* Could get overlaid. *) 
+              ; IF LLeftNewModRef . ModTextLeftTokToPos = 0 (* Nl before *)
+                   AND LNewBlankLinesBefore = 0
+                THEN (* This replaces the original starting Nl. *)
+                  NewBolTokMark 
                     := Marks . TokMarkTyp 
                          { EstNodeNo := MarkNodeNo 
                            (* ^This could be the wrong value, but if
@@ -3497,7 +3498,9 @@ MODULE MergeTxt
                END (* IF *) 
             ; DEC ( MteItemCt ) 
             ; MteTeMaybeFinishBwdEdit 
-                ( FsNodeRef . FsFmtNo , MarkNodeNo := LMarkNodeNo ) 
+                ( FsNodeRef . FsFmtNo
+                , MarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo
+                ) 
             ; IF MteItemCt <= 0 
 (* CHECK ^In case LexErrChars could be implicitly the first item on a line. 
           Can this happen? *) 
@@ -3506,18 +3509,22 @@ MODULE MergeTxt
                 THEN 
                   NewBolTokMark 
                     := Marks . TokMarkTyp 
-                         { EstNodeNo := LMarkNodeNo 
+                         { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo  
                          , EstNodeCt := 1   
                          , Kind := MarkKindTyp . Plain 
                          , FmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := TRUE  
                          , TmTok := LTok 
-                         } 
+                         }
                 ; INC ( NewLinesCt ) 
-                ; MteState := MteStateTyp . MteStateDone 
+(* ; MteState := MteStateTyp . MteStateDone *) 
                 END
               END (* IF *) 
+            ; MaxTouchedNodeNo 
+                := MAX ( MaxTouchedNodeNo 
+                       , EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
+                       ) 
             ; MteTeDecEstChild ( ) 
             END (* CASE MteState *) 
           END MteTeTfsLexErrChars  
@@ -3572,7 +3579,9 @@ MODULE MergeTxt
                END (* IF *) 
             ; DEC ( MteItemCt ) 
             ; MteTeMaybeFinishBwdEdit 
-                ( FmtNo := FsNodeRef . FsFmtNo , MarkNodeNo := LMarkNodeNo ) 
+                ( FmtNo := FsNodeRef . FsFmtNo
+                , MarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo
+                ) 
             ; IF MteItemCt <= 0 
 (* CHECK ^In case error could be implicitly the first item on a line. 
           Can this happen? *) 
@@ -3581,7 +3590,7 @@ MODULE MergeTxt
                 THEN 
                   NewBolTokMark 
                     := Marks . TokMarkTyp 
-                         { EstNodeNo := LMarkNodeNo 
+                         { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo  
                          , EstNodeCt := 1   
                          , Kind := MarkKindTyp . Plain 
                          , FmtNo := FsNodeRef . FsFmtNo 
@@ -3590,9 +3599,13 @@ MODULE MergeTxt
                          , TmTok := LbeStd . Tok__Null  
                          } 
                 ; INC ( NewLinesCt ) 
-                ; MteState := MteStateTyp . MteStateDone 
+(* ; MteState := MteStateTyp . MteStateDone *)  
                 END
               END (* IF *) 
+            ; MaxTouchedNodeNo 
+                := MAX ( MaxTouchedNodeNo 
+                       , EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
+                       ) 
             ; MteTeDecEstChild ( ) 
 
             ELSE 
@@ -4081,7 +4094,7 @@ MODULE MergeTxt
 *) 
                    } 
           ; INC ( NewLinesCt ) 
-          ; MteState := MteStateTyp . MteStateDone 
+       (* ; MteState := MteStateTyp . MteStateDone *) 
           END MteTeTfsBuildFmtNoMark 
 
       (* Format Syntax Trees: *) 
@@ -4126,7 +4139,8 @@ MODULE MergeTxt
                   ) 
               ; IF MteState # MteStateTyp . MteStateDone 
                 THEN
-                  MteTeTfsBuildFmtNoMark ( ) 
+                  MteTeTfsBuildFmtNoMark ( )
+                ; MteState := MteStateTyp . MteStateDone
                 END 
               ELSE 
                 CantHappen ( AFT . A_MteTeTfsBegOfImageBadState ) 
@@ -5266,12 +5280,10 @@ MODULE MergeTxt
           ( MteState = MteStateTyp . MteStateDone 
           , AFT . A_MergeTextEdit_NotDone 
           )
-(* EstNodeNoNull is zero, which is a valid number:
       ; Assert 
           ( MaxTouchedNodeNo # LbeStd . EstNodeNoNull  
           , AFT . A_MergeTextEdit_No_MaxTouchedNodeNo  
           )
-*)
       ; NewEstRootRef := LNewEstRootRef 
       ; Assert 
           ( NewBolTokMark . EstNodeCt 
