@@ -166,13 +166,13 @@ MODULE EditWindow
           ; write := Write 
           END (* OBJECT *) 
 
+(* EXPORTED: *) 
 ; PROCEDURE Form ( Window : T ) : FormsVBT . T 
-  (* The FormsVBT.T that this window is inside of. *)    
+  (* The FormsVBT.T that this window is inside of. *)
+  <* LL.sup < Window *>
 
   = BEGIN
-      IF Window = NIL THEN
-        RETURN NIL
-      END (* IF *)
+      IF Window = NIL THEN RETURN NIL END (* IF *)
     ; LOCK Window
       DO TYPECASE Window
          OF NULL => RETURN NIL
@@ -181,6 +181,20 @@ MODULE EditWindow
          END (* TYPECASE *) 
       END (* LOCK *) 
     END Form 
+
+(* EXPORTED: *) 
+; PROCEDURE FormLocked ( Window : T ) : FormsVBT . T 
+  (* The FormsVBT.T that this window is inside of. *)    
+  <* LL <= {Window} *>
+
+  = BEGIN
+      IF Window = NIL THEN RETURN NIL END (* IF *)
+    ; TYPECASE Window
+       OF NULL => RETURN NIL
+       | T => RETURN Window . EwForm
+       ELSE RETURN NIL
+       END (* TYPECASE *) 
+    END FormLocked 
 
 ; VAR DefaultFont := Font . BuiltIn 
 

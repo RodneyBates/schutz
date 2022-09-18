@@ -379,7 +379,7 @@ MODULE Ui
 ; PROCEDURE SetFieldsFromWindow ( Closure : Worker . ClosureTyp ) 
   : Worker . ClosureTyp 
   (* PRE: Closure . Window is set. *)
-  (* Set Closure . form, ImageTrans, and ImagePers from it. *) 
+  (* Set Closure . Form, ImageTrans, and ImagePers from it. *) 
 
   = BEGIN
       IF Closure . Window = NIL 
@@ -390,8 +390,7 @@ MODULE Ui
       ELSE 
         LOCK Closure . Window 
         DO
-          Closure . Form := EditWindow . Form ( Closure . Window )
-(* REVIEW ^ This requires that Closure.Window be an EditWindow.T *) 
+          Closure . Form := EditWindow . FormLocked ( Closure . Window )  
         ; Closure . ImageTrans := Closure . Window . WrImageRef 
         ; IF Closure . ImageTrans = NIL 
           THEN Closure . ImagePers := NIL 
@@ -438,8 +437,7 @@ MODULE Ui
   (* PRE: Self . Window is set. Self . TextParam is file name. *) 
   (* Runs on worker thread. *) 
 
-  = VAR LForm : FormsVBT . T 
-  ; VAR LSimpleName : TEXT 
+  = VAR LSimpleName : TEXT 
   ; VAR LImageName : TEXT 
   ; VAR LAbsFileName : TEXT 
   ; VAR LAbsTextFileName : TEXT 
@@ -451,8 +449,7 @@ MODULE Ui
 
     BEGIN (* OpenWorkProc *) 
       TRY (* EXCEPT *) 
-        LForm := EditWindow . Form ( Self . Window ) 
-      ; LSimpleName := Pathname . Last ( Self . TextParam ) 
+        LSimpleName := Pathname . Last ( Self . TextParam ) 
       ; LImageName := Misc . TextName ( LSimpleName ) 
       ; LAbsFileName := Misc . AbsFileName ( Self . TextParam ) 
       ; IF Images . ImageTable . get ( LImageName , LRef ) 

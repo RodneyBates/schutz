@@ -2082,6 +2082,7 @@ Enabled := FALSE ;
         ^ Can't do this running a thread that handles a VBT event.
           It tries to reacquire the same MUTEX, VBT.mu. 
           No need for this thread to wait anyway. *) 
+        ; Trestle . MoveNear ( Options . RecPlayForm , MainForm ) 
         END (* IF *) 
       EXCEPT
       | TrestleComm . Failure 

@@ -65,6 +65,11 @@ INTERFACE EditWindow
 
 ; PROCEDURE Form ( Window : T ) : FormsVBT . T
   (* The FormsVBT.T that this window is inside of. *)    
+  <* LL.sup < Window *>
+
+; PROCEDURE FormLocked ( Window : T ) : FormsVBT . T 
+  (* The FormsVBT.T that this window is inside of. *)    
+  <* LL <= {Window} *>
 
 ; PROCEDURE SouthEastToCorner ( Window : WindowTyp ) : CharPointTyp 
   (* Follows the usual _to_ invariant, i.e. the first char _not_ included. *) 
