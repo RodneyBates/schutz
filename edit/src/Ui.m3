@@ -3104,7 +3104,8 @@ MODULE Ui
         ; RETURN FALSE
       | FormsVBT . Error ( msg )
         => DL ( LbeStd . AppName & ": Unable to init from resource Schutz.fv ("
-                & msg & ")" )  
+                & msg & ")"
+              )  
         ; RETURN FALSE
       | Thread . Alerted 
         => RETURN FALSE 
@@ -3183,7 +3184,7 @@ MODULE Ui
         ; Assertions . TerminatingNormally := TRUE
         ; RETURN FALSE
       | Failures . Terminate ( Msg )
-      => DL ( LbeStd . AppName & "Terminating due to failure." )
+      => DL ( LbeStd . AppName & "Terminating due to failure, " & Msg )
         ; Assertions . TerminatingNormally := TRUE
         ; Trestle . Delete ( Options . MainForm )
         ; RETURN FALSE 

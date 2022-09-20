@@ -338,12 +338,12 @@ EXPORTS Main
         => WL ( EMessage & "while trying to open " & Label 
                 &  " \"" & FileName & "\" for writing." 
               ) 
-      ; Process . Exit ( 1 ) 
+      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       ELSE 
         WL ( "Unable to open " & Label 
              & " \"" & FileName & "\" for writing." 
            ) 
-      ; Process . Exit ( 1 ) 
+      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       END (* TRY EXCEPT *) 
     ; TRY 
         Pickle . Write ( LWriter , PickleIdInfoRef ) 
@@ -358,10 +358,10 @@ EXPORTS Main
               & " \"" & FileName & "\":" 
             ) 
       ; WL ( "  ConvertPacking.Error(" & EMessage & ")" ) 
-      ; Process . Exit ( 1 ) 
+      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       ELSE 
         WL ( "Unable to write " & Label & " \"" & FileName & "\"" ) 
-      ; Process . Exit ( 1 ) 
+      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       END (* TRY EXCEPT *) 
     END WritePkl 
 
@@ -745,7 +745,7 @@ EXPORTS Main
 *) 
         ; IF FALSE AND NOT LAnalyzedOK 
           THEN  
-            Process . Exit ( 1 ) <* NORETURN *>
+            Failures . ExitAfterTerminate ( ) <* NORETURN *> 
           END (* IF *) 
         END (* IF *) 
       ; GLangInfoRef 
@@ -954,11 +954,11 @@ EXPORTS Main
       ; IF HasErrors ( ) OR NOT LAnalyzedOK 
         THEN
           DL ( "LDL translation failed" ) 
-        ; Process . Exit ( 1 ) <* NORETURN *>
+        ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
         END (* IF *)  
 
       ELSE (* Open failed. *) 
-        Process . Exit ( 1 ) <* NORETURN *>
+        Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       END (* IF *) 
     END Work 
 
@@ -976,7 +976,7 @@ EXPORTS Main
 
 ; BEGIN
     Misc . LoadYourself ( )
-    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *)
+    (* Load libschutz right away, so m3gdb can set breakpoints therein. *)
   ; GetParams ( )
   ; SetDefaults ( ) 
   ; IF DoDisplayHelp 
@@ -1005,8 +1005,8 @@ EXPORTS Main
           )
       ; RTIO . PutText ( Wr . EOL )  
       ; RTIO . Flush ( ) 
-      ; Process . Exit ( 2 ) <* NORETURN *>
       END (* TRY EXCEPT *) 
+    ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
     END (* IF *) 
   END LdlBatch 
 .

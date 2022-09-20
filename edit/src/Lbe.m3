@@ -10,6 +10,7 @@ UNSAFE MODULE Lbe
 
 EXPORTS Main 
 
+(* Library: *) 
 ; IMPORT Env 
 ; IMPORT FloatMode 
 ; IMPORT Fmt 
@@ -26,8 +27,10 @@ EXPORTS Main
 ; IMPORT Trestle 
 ; IMPORT Wr 
 
+(* Schutz: *) 
 ; IMPORT AssertDevel  
-; IMPORT Assertions 
+; IMPORT Assertions
+; IMPORT Failures 
 ; FROM Failures IMPORT Backout 
 ; IMPORT Files
 ; IMPORT GrammarGen    (* Not "used", but types declared within 
@@ -183,7 +186,6 @@ EXPORTS Main
  (* ; Assertions . DefaultQueryProc := AssertDevel . AssertDialogCommandLine *) 
  (* ; Assertions . DefaultQueryProc := Assertions . NeverRaise *) 
     ; AssertDevel . DoStop := TRUE 
- (* ; RTProcess . RegisterExitor ( Exitor ) *)
     END SetDefaults 
 
 ; PROCEDURE GetArgs ( ) : BOOLEAN (* True iff should continue. *) 
@@ -366,7 +368,10 @@ EXPORTS Main
           Options . ResourcePath 
             := RefList . AppendD 
                  ( Rsrc . BuildPath 
-                     ( Options . ResourceDir , "$LBERESOURCE" , LbeBundle . Get ( ) ) 
+                     ( Options . ResourceDir
+                     , "$LBERESOURCE"
+                     , LbeBundle . Get ( )
+                     ) 
                  , Rsrc . BuildPath 
                      ( Ldl0Bundle . Get ( ) 
                      , Ldl1Bundle . Get ( ) 
@@ -379,15 +384,8 @@ EXPORTS Main
       END (* Block *)
     END GetArgs
 
-; PROCEDURE Exitor ( )
-  = BEGIN
-     IF NOT Options . Crash
-     THEN
-    (* AssertDevel . RuntimeFailureDialog ( ) *)  
-     END (* IF *) 
-    END Exitor 
-
 (* TODO: Make manual language loading and tree browsing devel gui functions. *) 
+
 ; VAR WantedThreadStackSize := 64000 (* Word.T's *) 
       (* = 256 K Bytes on 32-bit . *)  
 

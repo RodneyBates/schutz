@@ -9,6 +9,7 @@
 MODULE LdlBootMain 
 EXPORTS Main 
 
+(* Library: *) 
 ; IMPORT Compiler 
 ; IMPORT FileRd 
 ; IMPORT Fmt
@@ -27,11 +28,12 @@ EXPORTS Main
 ; IMPORT Thread 
 ; IMPORT Wr 
 
-; FROM Failures IMPORT Backout 
+(* Ldlboot: *) 
 ; IMPORT Boot 
 ; IMPORT SchutzCoroutine 
 ; IMPORT EstUtil
 ; IMPORT Failures 
+; FROM Failures IMPORT Backout 
 ; IMPORT Files 
 ; IMPORT GenConstEst 
 ; IMPORT GrammarGen  
@@ -40,7 +42,7 @@ EXPORTS Main
 ; IMPORT LangUtil 
 ; IMPORT LbeStd 
 ; IMPORT Ldl0MakeEst
-; IMPORT UnsafeUtils 
+
 (* Sometime bootstrap problem:  
      LdlBootMain IMPORTs Ldl0MakeEst.m3, so it can (conditionally, -E option,
      UseGeneratedEst variable) use the Est that Ldl0MakeEst.m3 builds for the 
@@ -65,6 +67,7 @@ EXPORTS Main
      LdlBootMain with -E.  Depending on the changes made, the old compiled 
      library Ldl0MakeEst could even run, even though it won't compile.   
 *)  
+
 ; IMPORT Ldl0Scanner 
 ; IMPORT Ldl0Semantics
 ; IMPORT LdlSemantics
@@ -80,6 +83,7 @@ EXPORTS Main
 ; IMPORT SharedStrings 
 ; IMPORT Strings 
 ; IMPORT TreeBrowse 
+; IMPORT UnsafeUtils 
 ; IMPORT Version 
 ; IMPORT VersionedFiles 
 ; IMPORT WriteTrv 
@@ -282,12 +286,12 @@ EXPORTS Main
         => DL ( EMessage & "while trying to open " & Label 
                 &  " \"" & FileName & "\" for writing." 
               ) 
-      ; Process . Exit ( 1 ) 
+      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       ELSE 
         DL ( "Unable to open " & Label 
              & " \"" & FileName & "\" for writing." 
            ) 
-      ; Process . Exit ( 1 ) 
+      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       END (* TRY EXCEPT *) 
     ; TRY 
         Pickle . Write ( Writer , InfoRef ) 
@@ -300,10 +304,10 @@ EXPORTS Main
               & " \"" & FileName & "\":" 
             ) 
       ; DL ( "  ConvertPacking.Error(" & EMessage & ")" ) 
-      ; Process . Exit ( 1 ) 
+      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       ELSE 
         DL ( "Unable to write " & Label & " \"" & FileName & "\"" ) 
-      ; Process . Exit ( 1 ) 
+      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       END (* TRY EXCEPT *) 
     END WritePkl 
 
@@ -626,7 +630,7 @@ EXPORTS Main
     ; IF HasErrors ( ) 
       THEN 
         DL ( "Second analysis failed" ) 
-      ; Process . Exit ( 1 ) 
+      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
       END (* IF *) 
     ; SetSuffixes ( LdlLangInfoRef ) 
     ; LangMap . AddOrChange ( LangLdl0 , LdlLangInfoRef2 ) 
@@ -720,7 +724,7 @@ EXPORTS Main
       ; MaybeBrowse ( LdlRoot2 , LangLdl0 , TreeId := "Reparsed tree: " ) 
       ; IF LHasSyntErrors 
         THEN 
-          Process . Exit ( 1 ) 
+          Failures . ExitAfterTerminate ( ) <* NORETURN *> 
         END (* IF *) 
 
       (* Write text file from reparsed Ldl in Ldl. *)  
@@ -776,7 +780,7 @@ EXPORTS Main
         ; IF HasErrors ( ) 
           THEN 
             DL ( "Reanalysis failed" ) 
-          ; Process . Exit ( 1 ) 
+          ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
           END (* IF *) 
         ; SetSuffixes ( LdlLangInfoRef1 ) 
         END (* IF *) 
@@ -785,10 +789,11 @@ EXPORTS Main
 
 ; BEGIN
     Misc . LoadYourself ( )
-    (* ^Get libschutz loaded right away, so m3gdb can set breakpoints therein. *)
+    (* ^Load libschutz right away, so m3gdb can set breakpoints therein. *)
   ; GetParams ( ) 
   ; IF DoDisplayHelp 
-    THEN DisplayVersion ( ) 
+    THEN
+      DisplayVersion ( ) 
     ; DisplayHelp ( )
     ELSIF DoDisplayVersion 
     THEN DisplayVersion ( ) 
@@ -810,8 +815,8 @@ EXPORTS Main
           )
       ; RTIO . PutText ( Wr . EOL )  
       ; RTIO . Flush ( ) 
-      ; Process . Exit ( 2 ) <* NORETURN *>
-      END (* TRY EXCEPT *) 
+      END (* TRY EXCEPT *)
+    ; Failures . ExitAfterTerminate ( ) 
     END (* IF *) 
   END LdlBootMain
 .

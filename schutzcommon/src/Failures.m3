@@ -352,6 +352,13 @@ UNSAFE MODULE Failures
     ; RAISE Terminate ( "" ) 
     END DoTerminate
 
+(* EXPORTED *) 
+; PROCEDURE ExitAfterTerminate ( )
+
+  = BEGIN
+      Process . Exit ( RcTerminate  ) <* NORETURN *>
+    END ExitAfterTerminate 
+
 ; PROCEDURE TerminateBluntly ( ExitCode : INTEGER ) 
 
   = BEGIN
@@ -363,7 +370,7 @@ UNSAFE MODULE Failures
     ; RTIO . PutText ( Wr . EOL )
     ; RTIO . Flush ( ) 
     ; Process . Exit ( ExitCode ) <* NORETURN *>
-    END TerminateBluntly
+    END TerminateBluntly 
 
 ; CONST SecondaryMap 
    = ARRAY BOOLEAN (* wasBlocked *)
@@ -433,32 +440,38 @@ UNSAFE MODULE Failures
       ; RTIO . PutText ( StoppedReason ( wasBlocked ) )  
       ; RTIO . PutText ( " exception Failures.Terminate. #####" )
       ; RTIO . PutText ( Wr . EOL )
-      ; TerminateBluntly ( 2 ) <* NORETURN *> 
+      ; RTIO . Flush ( ) 
+      ; TerminateBluntly ( RcBadTerminate ) <* NORETURN *> 
       END (* IF *)
 
     ; LActIsFresh := ActIsFresh ( Act )
 
     ; IF LActIsFresh AND Act . exception = GBackoutRef
-      THEN (* Backout raised outside Failures and not handled. *) 
+      THEN (* Backout raised outside Failures and not handled. *)
+        (* This shouldn't happen. *) 
         RTIO . PutText ( Wr . EOL )
       ; RTIO . PutText ( "##### " )
       ; RTIO . PutText ( StoppedReason ( wasBlocked ) )  
       ; RTIO . PutText ( " exception Failures.Backout. #####" )
       ; RTIO . PutText ( Wr . EOL )
-      ; TerminateBluntly ( 3 ) <* NORETURN *>
+      ; RTIO . Flush ( ) 
+      ; TerminateBluntly ( RcBadBackout ) <* NORETURN *>
       ELSIF LActIsFresh AND Act . exception = GIgnoreRef
       THEN (* Ignore raised outside Failures and not handled. *)
+        (* This shouldn't happen. *) 
         RTIO . PutText ( Wr . EOL )
       ; RTIO . PutText ( "##### " )
       ; RTIO . PutText ( StoppedReason ( wasBlocked ) )  
       ; RTIO . PutText ( " exception Failures.Ignore. #####" )
       ; RTIO . PutText ( Wr . EOL )
-      ; TerminateBluntly ( 4 ) <* NORETURN *>
+      ; RTIO . Flush ( ) 
+      ; TerminateBluntly ( RcBadIgnore ) <* NORETURN *>
       ELSIF LActIsFresh AND LThreadInfoRef ^ . QueryingActPtr # NIL  
         (* Act was raised from somewhere dynamically inside a query about
            a previous failure.  We can't do anything more with this.
         *) 
       THEN
+        (* This shouldn't happen. *) 
         RTIO . PutText ( Wr . EOL )
       ; RTIO . PutText ( "##### " )
       ; RTIO . PutText ( StoppedReason ( wasBlocked ) )  
@@ -483,19 +496,19 @@ UNSAFE MODULE Failures
       ; RTIO . PutText ( Wr . EOL )
       ; RTIO . Flush ( ) 
 
-      ; TerminateBluntly ( 4 ) <* NORETURN *>
+      ; TerminateBluntly ( RcBadQuery ) <* NORETURN *>
       ELSE 
         LExc := Act . exception 
-      ; IF LExc # GRuntimeErrorRef (* Programmer-declared exception. *) 
+      ; IF LExc # GRuntimeErrorRef (* A programmer-declared exception. *) 
         THEN BackstopPrimary ( Act , wasBlocked )
         ELSE (* RuntimeError.E => runtime error. *)
           LRTArg := RTExcArg ( Act . arg )
         ; IF NOT LRTArg IN SecondaryRtes  
           THEN (* Primary RT error. *)
             BackstopPrimary ( Act , wasBlocked )
-          ELSE (* Secondary RT error (Unhandled or blocked), which
-                  is now also Unhandled or blocked. 
-                  Client code has passedup two chances to catch: the original
+          ELSE (* Secondary RT error (Unhandled or blocked), which is now
+                  also Unhandled or blocked. 
+                  Client code has passed up two chances to catch: the original
                   exception and a secondary exception (RT error: unhandled or
                   blocked), which also is now unhandled or blocked.  Now give
                   the human user some options. *)
@@ -538,7 +551,9 @@ UNSAFE MODULE Failures
               ; RTException . Raise ( Act )
 
             | FailureActionTyp . FaIgnore 
-              => (* Ignoring an exception will likely work only when the
+              => (* Change to Failures.Ignore, which client code can
+                    catch to forge ahead in spite of the failure.
+                    Ignoring an exception will likely work only when the
                     original exception was Assertions.AssertionFailure,
                     and thus something in Assertions is in the call chain,
                     where it can catch Failures.Ignore and return without

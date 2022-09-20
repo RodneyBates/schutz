@@ -11,7 +11,7 @@ INTERFACE Failures
 (* Support for handling runtime errors and uncaught exceptions (which are
    turned into runtime errors). *)
 
-(* Lots of code in the exporting module is invoked, directly or indirectly,
+(* Lots of code in exporting module Failures is invoked, directly or indirectly,
    via its registering of a backstop callback with the runtime system. *)
 
 ; IMPORT RT0
@@ -50,6 +50,16 @@ INTERFACE Failures
       ; AllowedActions : FailureActionSetTyp
       )
     : FailureActionTyp
+
+(* Abnormal return codes: *)
+; CONST RcTerminate = 1 (* Assertion failure or runtime error. *)
+(* These are misuse of the failure handling mechanism: *) 
+; CONST RcBadTerminate = 2 
+; CONST RcBadBackout = 3 
+; CONST RcBadIgnore = 4
+; CONST RcBadQuery = 5 
+
+; PROCEDURE ExitAfterTerminate ( ) 
 
 ; TYPE BackstopProcTyp
   = PROCEDURE
