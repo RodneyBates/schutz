@@ -2205,7 +2205,10 @@ MODULE MergeTxt
               CantHappen ( AFT . A_MteTeTokBwdEditLeftOfTouchedRegion ) 
             END (* IF *) 
           ; MteTeBwdBlanks ( ) 
-          ; DEC ( MteItemCt ) 
+          ; DEC ( MteItemCt )
+          ; IF MteItemCt <= 0
+            THEN MteState := MteStateTyp . MteStateDone 
+            END (* IF *) 
 
           | MteStateTyp . MteStateBwdNl 
           , MteStateTyp . MteStateDone  
@@ -2213,6 +2216,9 @@ MODULE MergeTxt
 (* TODO: ^Something about the saturation arithmetic here. *) 
           ; MteTeBwdBlanks ( ) 
           ; DEC ( MteItemCt ) 
+          ; IF MteItemCt <= 0
+            THEN MteState := MteStateTyp . MteStateDone 
+            END (* IF *) 
 
           ELSE 
             CantHappen ( AFT . A_MteTeTokBadMteState ) 
@@ -2612,6 +2618,9 @@ MODULE MergeTxt
             , MteStateTyp . MteStateDone  
             => DEC ( MteItemCt ) (* For the Nl after. *) 
             ; IF MteItemCt = MteNlItemNo THEN MteLineShift := 0 END  
+            ; IF MteItemCt <= 0
+              THEN MteState := MteStateTyp . MteStateDone 
+              END (* IF *) 
             ; MteTeTfsModBlankLine1stBwd ( ModBlankLine )  
 
             END (* CASE MteState *) 
@@ -3372,6 +3381,9 @@ MODULE MergeTxt
                 THEN (* The ModTok has already been Decremented. *)
                   MteTeInterestingChildrenExist := TRUE 
                 ; DEC ( MteItemCt )
+                ; IF MteItemCt <= 0
+                  THEN MteState := MteStateTyp . MteStateDone 
+                  END (* IF *) 
                 ; RETURN 
                 END (* IF *) 
               END (* IF *)  
@@ -3434,8 +3446,10 @@ MODULE MergeTxt
                   ) 
               ; IF MteItemCt = MteNlItemNo THEN MteLineShift := 0 END  
               ; DEC ( MteItemCt )
+              ; IF MteItemCt <= 0
+                THEN MteState := MteStateTyp . MteStateDone 
+                END (* IF *) 
               END (* IF *) 
-
             END (* CASE MteState *) 
           END MteTeTfsModTok
 
@@ -3518,7 +3532,7 @@ MODULE MergeTxt
                          , TmTok := LTok 
                          }
                 ; INC ( NewLinesCt ) 
-(* ; MteState := MteStateTyp . MteStateDone *) 
+                ; MteState := MteStateTyp . MteStateDone 
                 END
               END (* IF *) 
             ; MaxTouchedNodeNo 
@@ -3599,8 +3613,8 @@ MODULE MergeTxt
                          , TmTok := LbeStd . Tok__Null  
                          } 
                 ; INC ( NewLinesCt ) 
-(* ; MteState := MteStateTyp . MteStateDone *)  
-                END
+                ; MteState := MteStateTyp . MteStateDone   
+                END (* IF *) 
               END (* IF *) 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
@@ -3714,7 +3728,7 @@ MODULE MergeTxt
             ; MteTeFlushBlankLines ( ) 
               (* Waiting things not yet closed will be safe because they 
                  use variables local to MergeTextEdit *) 
-(* CHECK: ^Huh? *) 
+(* CHECK:        ^Huh? *) 
             ; LWasGoingFwd := FALSE 
             ; LChildFmtKind := LangUtil . FmtKindTyp . FmtKindUnknown 
             ; LChildIndentPos1 := LbeStd . LimitedCharNoUnknown 
@@ -4372,6 +4386,7 @@ MODULE MergeTxt
                 ; IF MteState # MteStateTyp . MteStateDone  
                   THEN  
                     MteTeTfsBuildFmtNoMark ( ) 
+                  ; MteState := MteStateTyp . MteStateDone 
                   END
                 ELSE
                   Assert 
