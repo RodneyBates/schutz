@@ -1449,7 +1449,7 @@ MODULE MergeTxt
                 ELSE (* This is the replacement for the start Nl. *)  
                   MteState := MteStateTyp . MteStateDone 
                 END 
-              ELSE (* Edited text is empty. *) 
+              ELSE (* New edited text is empty. *) 
                 MteState := MteStateTyp . MteStateBwdNl  
               END 
             ELSE (* We have at least one ModText *) 
@@ -1520,7 +1520,20 @@ MODULE MergeTxt
                 ; INC ( NewLinesCt ) 
                 ; MteState := MteStateTyp . MteStateDone 
                 ELSE  
-                  MteState := MteStateTyp . MteStateBwdNl (* Could change. *)
+                  NewBolTokMark 
+                    := Marks . TokMarkTyp 
+                         { EstNodeNo := MarkNodeNo 
+                           (* ^This could be the wrong value, but if
+                               so, the whole mark will be overlaid. *) 
+                         , EstNodeCt := 1 
+                         , Kind := MarkKindTyp . Plain 
+                         , FmtNo := FmtNo 
+                         , StartAtEnd := FALSE 
+                         , IsImpliedNewLine := FALSE 
+                         , TmTok := LbeStd . Tok__ModText 
+                         } 
+                ; INC ( NewLinesCt ) 
+                ; MteState := MteStateTyp . MteStateBwdNl (* Could change. *)
                 END (* IF *) 
               END 
 
@@ -3447,7 +3460,20 @@ MODULE MergeTxt
               ; IF MteItemCt = MteNlItemNo THEN MteLineShift := 0 END  
               ; DEC ( MteItemCt )
               ; IF MteItemCt <= 0
-                THEN MteState := MteStateTyp . MteStateDone 
+                THEN
+                  NewBolTokMark 
+                    := Marks . TokMarkTyp 
+                         { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
+                         , EstNodeCt 
+                             := EstUtil . EstNodeCt 
+                                  ( MteTeEstTravInfo . EtiNodeRef ) 
+                         , Kind := MarkKindTyp . Plain
+                         , FmtNo := FsNodeRef . FsFmtNo 
+                         , StartAtEnd := FALSE 
+                         , IsImpliedNewLine := FALSE 
+                         , TmTok := EstRef . EstTok  
+                         } 
+                ; MteState := MteStateTyp . MteStateDone 
                 END (* IF *) 
               END (* IF *) 
             END (* CASE MteState *) 
