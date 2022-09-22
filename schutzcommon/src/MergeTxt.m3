@@ -2156,9 +2156,13 @@ MODULE MergeTxt
     ; PROCEDURE MteTeSetIndentInfo ( )  
 
       = BEGIN 
-          MteTeIsFirstLine 
-            := MteTeEstTravInfo . EtiChildNo 
-               < MteTeEstTravInfo . EtiParentRef . KTreeEstChildCtLeftOfNl 
+          IF MteTeEstTravInfo . EtiParentRef = NIL
+          THEN MteTeIsFirstLine := TRUE
+          ELSE
+            MteTeIsFirstLine 
+              := MteTeEstTravInfo . EtiChildNo 
+                 < MteTeEstTravInfo . EtiParentRef . KTreeEstChildCtLeftOfNl
+          END (* IF *) 
         ; IF MteTeIsFirstLine 
           THEN
             MteTeIndentPos := EstIndentPos1 

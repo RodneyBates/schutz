@@ -342,10 +342,14 @@ MODULE LineMarks
 
     ; PROCEDURE GnlTeSetIndentInfo ( )  
 
-      = BEGIN 
-          GnlTeIsFirstLine 
-            := GnlTeEstTravInfo . EtiChildNo 
-               < GnlTeEstTravInfo . EtiParentRef . KTreeEstChildCtLeftOfNl 
+      = BEGIN
+          IF GnlTeEstTravInfo . EtiParentRef = NIL
+          THEN GnlTeIsFirstLine := TRUE
+          ELSE 
+            GnlTeIsFirstLine 
+              := GnlTeEstTravInfo . EtiChildNo 
+                 < GnlTeEstTravInfo . EtiParentRef . KTreeEstChildCtLeftOfNl
+          END (* IF *) 
         ; IF GnlTeIsFirstLine 
           THEN
             GnlTeIndentPos := EstIndentPos1 

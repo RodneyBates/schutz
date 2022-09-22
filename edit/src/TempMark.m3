@@ -599,10 +599,18 @@ MODULE TempMark
 
       = PROCEDURE BtmTeTfsSetIndentInfo ( )  
 
+(* MAYBE: This code occurs twice in TempMark and once in each of
+          MergeTxt and LIneMarks.  Consider factoring it out into
+          TravUtil.  It would require 4 parameters.
+*)
         = BEGIN 
-            BtmTeIsFirstLine 
-              := BtmTeEstTravInfo . EtiChildNo 
-                 < BtmTeEstTravInfo . EtiParentRef . KTreeEstChildCtLeftOfNl 
+            IF BtmTeEstTravInfo . EtiParentRef = NIL
+            THEN BtmTeIsFirstLine := TRUE
+            ELSE 
+              BtmTeIsFirstLine 
+                := BtmTeEstTravInfo . EtiChildNo 
+                   < BtmTeEstTravInfo . EtiParentRef . KTreeEstChildCtLeftOfNl
+            END (* IF *) 
           ; IF BtmTeIsFirstLine 
             THEN
               BtmTeIndentPos := EstIndentPos1 
@@ -2519,9 +2527,13 @@ MODULE TempMark
       = PROCEDURE RbmTeTfsSetIndentInfo ( Bwd : BOOLEAN )  
 
         = BEGIN 
-            RbmTeIsFirstLine 
-              := RbmTeEstTravInfo . EtiChildNo 
-                 < RbmTeEstTravInfo . EtiParentRef . KTreeEstChildCtLeftOfNl 
+            IF RbmTeEstTravInfo . EtiParentRef = NIL
+            THEN RbmTeIsFirstLine := TRUE
+            ELSE 
+              RbmTeIsFirstLine 
+                := RbmTeEstTravInfo . EtiChildNo 
+                   < RbmTeEstTravInfo . EtiParentRef . KTreeEstChildCtLeftOfNl
+            END (* IF *) 
           ; IF RbmTeIsFirstLine 
             THEN
               RbmTeIndentPos := EstIndentPos1 
