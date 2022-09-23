@@ -2635,9 +2635,6 @@ MODULE MergeTxt
             , MteStateTyp . MteStateDone  
             => DEC ( MteItemCt ) (* For the Nl after. *) 
             ; IF MteItemCt = MteNlItemNo THEN MteLineShift := 0 END  
-            ; IF MteItemCt <= 0
-              THEN MteState := MteStateTyp . MteStateDone 
-              END (* IF *) 
             ; MteTeTfsModBlankLine1stBwd ( ModBlankLine )  
 
             END (* CASE MteState *) 
@@ -3031,7 +3028,7 @@ MODULE MergeTxt
                      THEN (* Mark the Nl at end of comment. *) 
                        NewBolTokMark 
                          := Marks . TokMarkTyp 
-                              { EstNodeNo 
+                              { EstNodeNo
                                   := MteTeEstTravInfo . EtiChildRelNodeNo 
                               , EstNodeCt := 1   
                               , Kind := MarkKindTyp . Plain 
@@ -3319,10 +3316,10 @@ MODULE MergeTxt
                        , MarkNodeNo := MteTeRightChildRelNodeNo 
                        ) 
                    ; IF MteState # MteStateTyp . MteStateDone  
-                     THEN (* Mark the Nl at end of this ModText. *) 
+                     THEN (* Mark the Nl at end of this ModText. *)
                        NewBolTokMark 
                          := Marks . TokMarkTyp 
-                              { EstNodeNo 
+                              { EstNodeNo
                                   := MteTeEstTravInfo . EtiChildRelNodeNo 
                               , EstNodeCt := 1  
                               , Kind := MarkKindTyp . Plain 

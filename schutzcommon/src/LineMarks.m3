@@ -73,10 +73,11 @@ MODULE LineMarks
 
   ; TYPE GnlStateTyp 
       = { GnlStateStartAtBeg 
-          (* ^Start a line at the first new line of the token. *) 
+          (* ^Start a line at the beginning of the token.
+             This could be an implied new line. *) 
         , GnlStateStartAtEnd 
-          (* ^Start a line at the last new line of a token 
-             that has a new line at the end. 
+          (* ^Start a line at the end of the token, 
+             which will have a new line at the end. 
              (blank line, comment or text mod) *) 
         , GnlStatePassingNl 
           (* Passing a group of Nl's at the left end of the line. *) 
@@ -467,7 +468,8 @@ MODULE LineMarks
              ; GnlPrevTok := LTok 
              END (* IF *) 
           | GnlStateTyp . GnlStateRightNlFound 
-          => GnlState := GnlStateTyp . GnlStateDoneWithLine 
+          => GnlState := GnlStateTyp . GnlStateDoneWithLine
+       (* ELSE Can't happen. *) 
           END (* CASE *) 
         END GnlTeAstString 
 
