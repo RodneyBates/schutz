@@ -314,7 +314,15 @@ MODULE MergeTxt
       : ARRAY LbeStd . LimitedCharNoTyp OF LbeStd . LimitedCharNoSignedTyp 
 
   ; VAR MteNewChars1 : ARRAY LbeStd . LimitedCharNoTyp OF CHAR 
-  ; VAR MteNewChars2 : ARRAY LbeStd . LimitedCharNoTyp OF CHAR 
+  ; VAR MteNewChars2 : ARRAY LbeStd . LimitedCharNoTyp OF CHAR
+
+  ; VAR MteMarkCt : INTEGER := 0
+    (* As of 2022-9-26, this is computed but not used.  But it may have
+       value for debugging, so it's left in.  It's the number of times
+       a new mark is built, during backwards traversal, only the temporally
+       last (leftmost) of which will be used, the others being overlaid
+       in NewBolTokMark. 
+    *) 
 
   (* Recursive traversal of format syntax trees. *) 
 
@@ -2418,7 +2426,7 @@ MODULE MergeTxt
                        , IsImpliedNewLine := FALSE 
                        , TmTok := LbeStd . Tok__BlankLine 
                        } 
-              ; INC ( NewLinesCt ) (* For the Nl at the end. *) 
+              ; INC ( MteMarkCt ) (* For the Nl at the end. *) 
               ; MteState := MteStateTyp . MteStateDone 
               END 
             ; MaxTouchedNodeNo 
@@ -2452,7 +2460,7 @@ MODULE MergeTxt
                        , IsImpliedNewLine := FALSE 
                        , TmTok := LbeStd . Tok__BlankLine 
                        } 
-                ; INC ( NewLinesCt ) (* For the Nl at the end. *) 
+                ; INC ( MteMarkCt ) (* For the Nl at the end. *) 
                 ; MteState := MteStateTyp . MteStateDone 
                 END 
               ELSE 
@@ -2778,7 +2786,7 @@ MODULE MergeTxt
                      , IsImpliedNewLine := NOT ModCmnt . ModCmntNlBefore 
                      , TmTok := LTok  
                      } 
-              ; INC ( NewLinesCt ) 
+              ; INC ( MteMarkCt ) 
               ; MteState := MteStateTyp . MteStateDone 
               END 
             ELSIF ModCmnt . ModCmntNlBefore AND MteItemCt = MteNlItemNo 
@@ -3037,7 +3045,7 @@ MODULE MergeTxt
                               , IsImpliedNewLine := FALSE 
                               , TmTok := LbeStd . Tok__CmntAtEndOfLine 
                               } 
-                     ; INC ( NewLinesCt ) 
+                     ; INC ( MteMarkCt ) 
                      ; MteState := MteStateTyp . MteStateDone 
                      END 
                  ELSE 
@@ -3163,7 +3171,7 @@ MODULE MergeTxt
                        , IsImpliedNewLine := FALSE 
                        , TmTok := LbeStd . Tok__ModText 
                        } 
-              ; INC ( NewLinesCt ) 
+              ; INC ( MteMarkCt ) 
               ; MteState := MteStateTyp . MteStateDone 
               END (* IF*) 
             ELSIF ModText . ModTextLeftTokToPos = 0 (* Nl before *) 
@@ -3328,7 +3336,7 @@ MODULE MergeTxt
                               , IsImpliedNewLine := FALSE 
                               , TmTok := LbeStd . Tok__ModText 
                               } 
-                     ; INC ( NewLinesCt ) 
+                     ; INC ( MteMarkCt ) 
                      ; MteState := MteStateTyp . MteStateDone 
                      END
                  ELSE (* Handle the trailing blanks here. *) 
@@ -3558,7 +3566,7 @@ MODULE MergeTxt
                          , IsImpliedNewLine := TRUE  
                          , TmTok := LTok 
                          }
-                ; INC ( NewLinesCt ) 
+                ; INC ( MteMarkCt ) 
                 ; MteState := MteStateTyp . MteStateDone 
                 END
               END (* IF *) 
@@ -3639,7 +3647,7 @@ MODULE MergeTxt
                          , IsImpliedNewLine := TRUE  
                          , TmTok := LbeStd . Tok__Null  
                          } 
-                ; INC ( NewLinesCt ) 
+                ; INC ( MteMarkCt ) 
                 ; MteState := MteStateTyp . MteStateDone   
                 END (* IF *) 
               END (* IF *) 
@@ -3761,7 +3769,10 @@ MODULE MergeTxt
             ; LChildIndentPos1 := LbeStd . LimitedCharNoUnknown 
             ; LChildIndentPosN := LbeStd . LimitedCharNoUnknown 
 
-            END (* CASE *) 
+            END (* CASE *)
+
+          ; MteMarkCt := 0 
+
           ; MteTraverseEst 
               ( MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
               , MteTeEstTravInfo . EtiChildLeafElem . LeKindSet  
@@ -4134,7 +4145,7 @@ MODULE MergeTxt
           is not being used anyway.
 *) 
                    } 
-          ; INC ( NewLinesCt ) 
+          ; INC ( MteMarkCt ) 
        (* ; MteState := MteStateTyp . MteStateDone *) 
           END MteTeTfsBuildFmtNoMark 
 

@@ -1490,8 +1490,7 @@ MODULE TextEdit
         ; LPredOfEditedLinesRefs := LEditedLinesRefMeat . LrLeftLink 
         ; IfteSecondOldLinesRef := NIL 
         ; LSecondOldActualLineCt := 0 
-        ; IF Display . LinesRefIsEndOfImage 
-               ( ImageRef , LEditedLinesRefMeat ) 
+        ; IF Display . LinesRefIsEndOfImage ( ImageRef , LEditedLinesRefMeat ) 
           THEN (* LEditedLinesRefMeat is the empty EOI one. *) 
           (* Do not unlink anything, not even LinesRef. *) 
             IfteOldFromLinesRef := NIL 
@@ -1506,8 +1505,7 @@ MODULE TextEdit
           ELSE (* Not editing in EOI. *) 
             IfteOldFromLinesRef := LEditedLinesRefMeat  
           ; IfteFirstOldActualLineCt 
-              := Display . ActualNoOfLines 
-                   ( LEditedLinesRefMeat . LrLineCt ) 
+              := Display . ActualNoOfLines ( LEditedLinesRefMeat . LrLineCt ) 
           ; Assert 
               ( TempEditRef . TeLineNo < IfteFirstOldActualLineCt 
               , AFT . A_InnerFlushTempEdit_EditingBeyondLineCt   
@@ -1527,7 +1525,7 @@ MODULE TextEdit
               ; IfteSecondOldLinesRef := TSecondOldLinesRef 
               ; Display . SecureSucc ( ImageRef , IfteSecondOldLinesRef ) 
               ; LSecondOldActualLineCt 
-                  := Display . ActualNoOfLines 
+                  := Display . ActualNoOfLines
                        ( IfteSecondOldLinesRef . LrLineCt )
               ; Assert 
                   ( NOT Display . LinesRefIsEndOfImage 
