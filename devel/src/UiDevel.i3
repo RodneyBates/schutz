@@ -55,7 +55,8 @@ INTERFACE UiDevel
 
 ; PROCEDURE ShowCheckpointNotice ( Message: TEXT (* May be multiline. *) ) 
 
-; PROCEDURE ShowDebugOptions ( ) 
+(* Replaced.  Eventually remove. *) 
+; PROCEDURE ShowDebugOptionsx ( ) 
 
 ; END UiDevel  
 . 

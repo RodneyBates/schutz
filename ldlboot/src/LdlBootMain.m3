@@ -286,12 +286,12 @@ EXPORTS Main
         => DL ( EMessage & "while trying to open " & Label 
                 &  " \"" & FileName & "\" for writing." 
               ) 
-      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+      ; Failures . ExitWFailure ( ) <* NORETURN *> 
       ELSE 
         DL ( "Unable to open " & Label 
              & " \"" & FileName & "\" for writing." 
            ) 
-      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+      ; Failures . ExitWFailure ( ) <* NORETURN *> 
       END (* TRY EXCEPT *) 
     ; TRY 
         Pickle . Write ( Writer , InfoRef ) 
@@ -304,10 +304,10 @@ EXPORTS Main
               & " \"" & FileName & "\":" 
             ) 
       ; DL ( "  ConvertPacking.Error(" & EMessage & ")" ) 
-      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+      ; Failures . ExitWFailure ( ) <* NORETURN *> 
       ELSE 
         DL ( "Unable to write " & Label & " \"" & FileName & "\"" ) 
-      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+      ; Failures . ExitWFailure ( ) <* NORETURN *> 
       END (* TRY EXCEPT *) 
     END WritePkl 
 
@@ -630,7 +630,7 @@ EXPORTS Main
     ; IF HasErrors ( ) 
       THEN 
         DL ( "Second analysis failed" ) 
-      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+      ; Failures . ExitWFailure ( ) <* NORETURN *> 
       END (* IF *) 
     ; SetSuffixes ( LdlLangInfoRef ) 
     ; LangMap . AddOrChange ( LangLdl0 , LdlLangInfoRef2 ) 
@@ -724,7 +724,7 @@ EXPORTS Main
       ; MaybeBrowse ( LdlRoot2 , LangLdl0 , TreeId := "Reparsed tree: " ) 
       ; IF LHasSyntErrors 
         THEN 
-          Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+          Failures . ExitWFailure ( ) <* NORETURN *> 
         END (* IF *) 
 
       (* Write text file from reparsed Ldl in Ldl. *)  
@@ -780,7 +780,7 @@ EXPORTS Main
         ; IF HasErrors ( ) 
           THEN 
             DL ( "Reanalysis failed" ) 
-          ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+          ; Failures . ExitWFailure ( ) <* NORETURN *> 
           END (* IF *) 
         ; SetSuffixes ( LdlLangInfoRef1 ) 
         END (* IF *) 
@@ -816,7 +816,7 @@ EXPORTS Main
       ; RTIO . PutText ( Wr . EOL )  
       ; RTIO . Flush ( ) 
       END (* TRY EXCEPT *)
-    ; Failures . ExitAfterTerminate ( ) 
+    ; Failures . ExitWFailure ( ) 
     END (* IF *) 
   END LdlBootMain
 .

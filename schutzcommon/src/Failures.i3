@@ -51,15 +51,18 @@ INTERFACE Failures
       )
     : FailureActionTyp
 
-(* Abnormal return codes: *)
-; CONST RcTerminate = 1 (* Assertion failure or runtime error. *)
+(* Return codes: *)
+; CONST RcNormal = 0 
+; CONST RcProblem = 1 (* Couldn't find files, etc. *)
+; CONST RcCancelled = 2
+; CONST RcFailure = 3 (* Assertion failure or runtime error. *)
 (* These are misuse of the failure handling mechanism: *) 
-; CONST RcBadTerminate = 2 
-; CONST RcBadBackout = 3 
-; CONST RcBadIgnore = 4
-; CONST RcBadQuery = 5 
+; CONST RcBadTerminate = 4 
+; CONST RcBadBackout = 5 
+; CONST RcBadIgnore = 6
+; CONST RcBadQuery = 7 
 
-; PROCEDURE ExitAfterTerminate ( ) 
+; PROCEDURE ExitWFailure ( ) 
 
 ; TYPE BackstopProcTyp
   = PROCEDURE

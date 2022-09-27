@@ -1675,9 +1675,9 @@ MODULE UiDevel
 
 (* Set debug level. No worker thread needed. *) 
 
-(* Review: debug options. *)
+(* Replaced.  Eventually remove. *) 
 (* EXPORTED: *) 
-; PROCEDURE ShowDebugOptions ( ) 
+; PROCEDURE ShowDebugOptionsx ( ) 
 
   = <* FATAL FormsVBT . Error *> 
     BEGIN
@@ -1696,7 +1696,7 @@ MODULE UiDevel
           FormsVBT . MakeDormant ( Options . MainForm , "Fv_Assert_Terminate" ) 
         END (* IF *)
       END (* IF *) 
-    END ShowDebugOptions 
+    END ShowDebugOptionsx 
 
 (* EXPORTED: *)
 ; PROCEDURE ReplaySetDebugLevel ( Level : INTEGER ) 
@@ -1736,7 +1736,6 @@ MODULE UiDevel
                      ) 
                ) 
     ; Options . SetDerivedDebugOptions ( ) 
-    ; ShowDebugOptions ( ) 
     ; UiRecPlay . RecordPlusInt 
         ( UiRecPlay . CommandTyp . SetDebugLevel , LValue ) 
     END SetDebugLevelCallback 

@@ -353,11 +353,11 @@ UNSAFE MODULE Failures
     END DoTerminate
 
 (* EXPORTED *) 
-; PROCEDURE ExitAfterTerminate ( )
+; PROCEDURE ExitWFailure ( )
 
   = BEGIN
-      Process . Exit ( RcTerminate  ) <* NORETURN *>
-    END ExitAfterTerminate 
+      Process . Exit ( RcFailure ) <* NORETURN *>
+    END ExitWFailure 
 
 ; PROCEDURE TerminateBluntly ( ExitCode : INTEGER ) 
 
@@ -562,10 +562,14 @@ UNSAFE MODULE Failures
               ; RTException . Raise ( Act )
 
             | FailureActionTyp . FaCrash 
-            =>  RTIO . PutText ( Wr . EOL )
+            =>
+            (* This duplicates output already produced by Worker.FailureQuery.
+               But what about on threads that don't do that?  
+                RTIO . PutText ( Wr . EOL )
               ; RTIO . PutText ( "##### " )
               ; RTIO . PutText ( StoppedReason ( LPrimaryWasBlocked ) ) 
               ; RTIO . PutText ( " exception " )
+              ; RTIO . PutText ( Wr . EOL )
               ; RTIO . PutText ( ExcName ( Act ) )
               ; RTIO . PutText ( "##### " )
               ; RTIO . PutText ( Wr . EOL )
@@ -576,9 +580,10 @@ UNSAFE MODULE Failures
               ; RTIO . PutText ( "Raised at: " )
               ; RTIO . PutText ( ActivationLocation ( Act ) ) 
               ; RTIO . PutText ( Wr . EOL )
-              ; RTIO . Flush ( ) 
+              ; RTIO . Flush ( )
+            *)
 
-              ; DoTerminate ( Act )
+                DoTerminate ( Act )
             END (* CASE *)
           END (* IF *) 
         END (* IF *)

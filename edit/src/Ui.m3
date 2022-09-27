@@ -3086,7 +3086,7 @@ MODULE Ui
     ; RecordFileName : TEXT 
     ; DelayTime : INTEGER 
     )
-  : BOOLEAN (* => Success. *) 
+  : INTEGER (* Exit code, see Failures.Rc* *) 
   RAISES { Backout } 
   = <* FATAL FormsVBT . Error *>
     <* FATAL FormsVBT . Unimplemented *>
@@ -3098,21 +3098,21 @@ MODULE Ui
       EXCEPT 
         Rsrc . NotFound 
         => DL ( LbeStd . AppName & ": Unable to locate resource Schutz.fv" )  
-        ; RETURN FALSE 
+        ; RETURN Failures . RcProblem  
       | Rd . Failure  
         => DL ( LbeStd . AppName & ": Unable to read resource Schutz.fv" )  
-        ; RETURN FALSE
+        ; RETURN Failures . RcProblem
       | FormsVBT . Error ( msg )
         => DL ( LbeStd . AppName & ": Unable to init from resource Schutz.fv ("
                 & msg & ")"
               )  
-        ; RETURN FALSE
+        ; RETURN Failures . RcProblem 
       | Thread . Alerted 
-        => RETURN FALSE 
+        => RETURN Failures . RcCancelled 
       END 
     ; UiRecPlay . RespectStops := RespectStops 
     ; InitForm ( Options . MainForm ) 
-    ; IF Options . MainForm = NIL THEN RETURN FALSE END 
+    ; IF Options . MainForm = NIL THEN RETURN Failures . RcProblem END 
     ; Options . MainWindow 
         := FormsVBT . GetGeneric ( Options . MainForm , "Fv_LbeWindow" ) 
     ; FormsVBT . PutInteger 
@@ -3181,13 +3181,14 @@ MODULE Ui
           DL ( LbeStd . AppName 
                & ": Could not open display " & Options . Display 
              )
-        ; Assertions . TerminatingNormally := TRUE
-        ; RETURN FALSE
+        ; Assertions . TerminatingNormally := FALSE
+        ; Trestle . Delete ( Options . MainForm ) 
+        ; RETURN Failures . RcProblem 
       | Failures . Terminate ( Msg )
       => DL ( LbeStd . AppName & "Terminating due to failure, " & Msg )
-        ; Assertions . TerminatingNormally := TRUE
+        ; Assertions . TerminatingNormally := FALSE 
         ; Trestle . Delete ( Options . MainForm )
-        ; RETURN FALSE 
+        ; RETURN Failures . RcFailure  
       ELSE
         DL ( LbeStd . AppName & "Unhandled exception: " 
               & Failures . ExcName
@@ -3199,11 +3200,11 @@ MODULE Ui
                     ^ 
                   ) 
             )
-        ; Assertions . TerminatingNormally := TRUE
+        ; Assertions . TerminatingNormally := FALSE 
         ; Trestle . Delete ( Options . MainForm )
-        ; RETURN FALSE 
+        ; RETURN Failures . RcFailure   
       END (* EXCEPT *) 
-    ; RETURN TRUE 
+    ; RETURN Failures . RcNormal 
     END Install 
 
 (* EXPORTED: *) 

@@ -15,7 +15,8 @@ EXPORTS Main
 ; IMPORT FloatMode 
 ; IMPORT Fmt 
 ; IMPORT Lex 
-; IMPORT Params 
+; IMPORT Params
+; IMPORT Process 
 ; IMPORT Rd 
 ; IMPORT RefList 
 ; IMPORT Rsrc 
@@ -403,7 +404,9 @@ EXPORTS Main
 
 ; PROCEDURE RunLbe ( ) 
 
-  = BEGIN (* RunLbe *)
+  = VAR LReturnCode : INTEGER
+
+  ; BEGIN (* RunLbe *)
       TRY (* EXCEPT *) 
         SetDefaults ( ) 
       ; IF GetArgs ( ) 
@@ -415,22 +418,27 @@ EXPORTS Main
         ; EVAL LangUtil . LoadLanguage ( "m3" ) 
 *)
 (*      ; Assertions . CauseRuntimeError ( "" ) For testing *) 
-        ; IF NOT Ui . Install 
-                   ( Options . EditFileName 
-                   , PlaybackFileName 
-                   , DoRunPlayback 
-                   , RespectStops 
-                   , RecordFileName 
-                   , DelayTime 
-                   )
+        ; LReturnCode
+            := Ui . Install 
+                 ( Options . EditFileName 
+                 , PlaybackFileName 
+                 , DoRunPlayback 
+                 , RespectStops 
+                 , RecordFileName 
+                 , DelayTime 
+                 )
+        ; IF LReturnCode = Failures . RcNormal 
           THEN Assertions . TerminatingNormally := TRUE 
-          ELSE UiDevel . ShowDebugOptions ( )
+          ELSE Assertions . TerminatingNormally := FALSE 
           END (* IF *)
         ELSE Assertions . TerminatingNormally := TRUE 
         END (* IF *)
       EXCEPT ELSE 
-        Trestle . Delete ( Options . MainForm ) 
-      END (* EXCEPT *) 
+      END (* EXCEPT *)
+    ; IF LReturnCode # Failures . RcNormal
+      THEN
+        Process . Exit ( LReturnCode ) 
+      END (* IF *) 
     END RunLbe
 
 ; BEGIN (* Lbe *) 

@@ -110,7 +110,8 @@ MODULE Worker
 ; VAR WaitingForBusy : Thread . Condition := NIL   
 ; VAR WaitingForIdle : Thread . Condition := NIL  
 ; VAR WaitingForGuiAssertDialog : Thread . Condition := NIL  
-; VAR StoredState : WorkResultNotRefusedTyp := WrtDone 
+; VAR StoredState : WorkResultNotRefusedTyp := WrtDone
+; VAR StoredFailureMsg : TEXT 
 ; VAR QueryingAssert : BOOLEAN := FALSE
 ; VAR ActiveClosure : ClosureTyp := NIL 
       (* ^When # NIL,  immediate work has been accepted, though worker
@@ -168,10 +169,14 @@ MODULE Worker
           THEN 
             WHILE ActiveClosure # NIL OR QueuedClosure # NIL  
             DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
-            END (* WHILE *) 
+            END (* WHILE *)
+          ; IF StoredState = WrtFailed
+            THEN RAISE Failures . Terminate ( StoredFailureMsg )
+                 (* ^We are now in the requesting thread. *) 
+            END (* IF *) 
           ELSIF ActiveClosure # NIL 
           THEN 
-           (* NOTE: Will not refuse immediate work when busy with queued work. *)
+            (* NOTE: Won't refuse immediate work when busy with queued work. *)
             RETURN WrtRefused 
           END (* IF *) 
         ; ActiveClosure := Closure 
@@ -183,6 +188,10 @@ MODULE Worker
             WHILE ActiveClosure # NIL 
             DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
             END (* WHILE *) 
+          ; IF StoredState = WrtFailed
+            THEN RAISE Failures . Terminate ( StoredFailureMsg )
+                 (* ^We are now in the requesting thread. *) 
+            END (* IF *) 
           ; LResult := StoredState 
           ELSE 
             LResult := WrtBusyImmed 
@@ -283,6 +292,10 @@ MODULE Worker
           WHILE StoredState = WrtBusyImmed 
           DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
           END (* WHILE *) 
+        ; IF StoredState = WrtFailed
+          THEN RAISE Failures . Terminate ( StoredFailureMsg )
+               (* ^We are now in the requesting thread. *) 
+          END (* IF *) 
         END (* IF*) 
       ; RETURN StoredState 
       END (* LOCK *)  
@@ -344,6 +357,10 @@ MODULE Worker
           WHILE StoredState = WrtBusyQueued  
           DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
           END (* WHILE *) 
+        ; IF StoredState = WrtFailed
+          THEN RAISE Failures . Terminate ( StoredFailureMsg )
+               (* ^We are now in the requesting thread. *) 
+          END (* IF *) 
         END (* IF*) 
       END (* LOCK *) 
     ; RETURN LResult  
@@ -393,9 +410,13 @@ MODULE Worker
         WHILE ActiveClosure # NIL OR QueuedClosure # NIL 
         DO Thread . AlertWait ( WorkerMu , WaitingForIdle ) 
         END (* WHILE *) 
-      ; LResult := StoredState 
+      ; LResult := StoredState
       END (* LOCK *) 
-    ; RETURN LResult  
+    ; IF LResult = WrtFailed
+      THEN RAISE Failures . Terminate ( StoredFailureMsg )
+           (* ^We are now in the requesting thread. *) 
+      END (* IF *) 
+    ; RETURN LResult   
     END AwaitIdle  
 
 (* Synchronization procedures called by the worker thread. *) 
@@ -779,11 +800,16 @@ MODULE Worker
          when the cancel was "refused" because it was too late?
 *) 
         ; BecomeIdle ( WrtStopped ) 
-        | Backout =>
-          INC ( LDebug ) 
-        ; BecomeIdle ( WrtFailed ) 
-        | Failures . Terminate
-        => Trestle . Delete ( Options . MainForm ) 
+        | Backout
+        => INC ( LDebug ) 
+        ; BecomeIdle ( WrtStopped ) 
+        | Failures . Terminate ( EMsg ) 
+        => StoredFailureMsg := EMsg
+        ; BecomeIdle ( WrtFailed )
+          (* Can't handle Failures.Terminate here, because we are in the
+             worker thread.  Arrange for it to be raised by the requesting
+             thread.
+          *) 
         END (* TRY EXCEPT *) 
       END (* LOOP *) 
     END WorkerThreadApply 

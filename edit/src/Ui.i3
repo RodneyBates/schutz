@@ -112,7 +112,7 @@ INTERFACE Ui
     ; RecordFileName : TEXT 
     ; DelayTime : INTEGER 
     ) 
-  : BOOLEAN (* => Success. *) 
+  : INTEGER (* Exit code, see Failures.Rc* *) 
   RAISES { Backout } 
 
 (* Convenience procedures for setting standard fields of closures. *) 

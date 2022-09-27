@@ -338,12 +338,12 @@ EXPORTS Main
         => WL ( EMessage & "while trying to open " & Label 
                 &  " \"" & FileName & "\" for writing." 
               ) 
-      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+      ; Failures . ExitWFailure ( ) <* NORETURN *> 
       ELSE 
         WL ( "Unable to open " & Label 
              & " \"" & FileName & "\" for writing." 
            ) 
-      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+      ; Failures . ExitWFailure ( ) <* NORETURN *> 
       END (* TRY EXCEPT *) 
     ; TRY 
         Pickle . Write ( LWriter , PickleIdInfoRef ) 
@@ -358,10 +358,10 @@ EXPORTS Main
               & " \"" & FileName & "\":" 
             ) 
       ; WL ( "  ConvertPacking.Error(" & EMessage & ")" ) 
-      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+      ; Failures . ExitWFailure ( ) <* NORETURN *> 
       ELSE 
         WL ( "Unable to write " & Label & " \"" & FileName & "\"" ) 
-      ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+      ; Failures . ExitWFailure ( ) <* NORETURN *> 
       END (* TRY EXCEPT *) 
     END WritePkl 
 
@@ -745,7 +745,7 @@ EXPORTS Main
 *) 
         ; IF FALSE AND NOT LAnalyzedOK 
           THEN  
-            Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+            Failures . ExitWFailure ( ) <* NORETURN *> 
           END (* IF *) 
         END (* IF *) 
       ; GLangInfoRef 
@@ -954,11 +954,11 @@ EXPORTS Main
       ; IF HasErrors ( ) OR NOT LAnalyzedOK 
         THEN
           DL ( "LDL translation failed" ) 
-        ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+        ; Failures . ExitWFailure ( ) <* NORETURN *> 
         END (* IF *)  
 
       ELSE (* Open failed. *) 
-        Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+        Failures . ExitWFailure ( ) <* NORETURN *> 
       END (* IF *) 
     END Work 
 
@@ -1006,7 +1006,7 @@ EXPORTS Main
       ; RTIO . PutText ( Wr . EOL )  
       ; RTIO . Flush ( ) 
       END (* TRY EXCEPT *) 
-    ; Failures . ExitAfterTerminate ( ) <* NORETURN *> 
+    ; Failures . ExitWFailure ( ) <* NORETURN *> 
     END (* IF *) 
   END LdlBatch 
 .
