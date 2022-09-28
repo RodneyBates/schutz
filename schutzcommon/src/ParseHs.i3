@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -30,7 +30,6 @@ INTERFACE ParseHs
 ; TYPE TempMarkTyp 
     = RECORD 
         TokMark : Marks . TokMarkTyp := Marks . TokMarkNull  
-      ; EstRef : LbeStd . EstRootTyp := NIL 
       ; LineNo : LbeStd . LineNoTyp := LbeStd . LineNoNull 
         (* ^1-origin when in a blank line mod or off EndOfImage.  
            Zero-valued otherwise. 
@@ -41,7 +40,7 @@ INTERFACE ParseHs
         (* ^ For debugging/tracing.  This is intended to identify a 
              TempMarkArrayRef (whose address could be changed by GC),
              so only the 0-th element of its array will have it maintained.
-             This is Mickey Mouse data structure design, but cleaner
+             This is Mickey-Mouse data structure design, but cleaner
              alternatives would be distressingly memory-hogging. *)
       END (* RECORD  TempMarkTyp *) 
 

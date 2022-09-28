@@ -105,7 +105,8 @@ INTERFACE Marks
      text mods, and comment mods.  It also includes interior 
      nonterminals in the Est. *) 
     = RECORD 
-        EstNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull 
+        TkmEstRef : LbeStd . EstRootTyp := NIL 
+      ; EstNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull 
       ; EstNodeCt : LbeStd . EstNodeNoTyp := 0 
       ; BlCharPos : LbeStd . CharNoTyp := LbeStd . CharNoUnknown 
         (* Maintained only when Kind = BlankLine.  The CharPos at the end of

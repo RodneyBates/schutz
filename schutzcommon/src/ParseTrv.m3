@@ -1103,7 +1103,7 @@ END
           DO 
             NpsNextTempMarkIsRelevant
               := WTempMark . TokMark . Kind IN Marks . MarkKindSetEstLeaf 
-                 AND LeafRef = WTempMark . EstRef 
+                 AND LeafRef = WTempMark . TokMark . TkmEstRef 
           END (* WITH *) 
         END (* IF *)  
       END NpsCheckNextTempMarkForEstLeaf 
@@ -1130,7 +1130,7 @@ END
               OF MarkKindTyp . LeftSibFmtNo  
               => NpsNextTempMarkIsRelevant 
                    := WTravInfo . EtiChildLeafElem . LeChildRef 
-                      = WTempMark . EstRef
+                      = WTempMark . TokMark . TkmEstRef
 
               | MarkKindTyp . RightSibFmtNo 
               => IF WTravInfo . EtiChildCt > 0 
@@ -1144,7 +1144,7 @@ END
                        , (* VAR *) ResultLeafElem := LLeafElem 
                        ) 
                    ; NpsNextTempMarkIsRelevant 
-                       := LLeafElem . LeChildRef = WTempMark . EstRef
+                       := LLeafElem . LeChildRef = WTempMark . TokMark . TkmEstRef
                    ELSIF WTravInfo . EtiChildLeafElem . LeChildRef = NIL 
                          AND WTravInfo . EtiChildNo > 0 
                    THEN 
@@ -1158,13 +1158,13 @@ END
                        , (* VAR *) ResultLeafElem := LLeafElem 
                        ) 
                    ; NpsNextTempMarkIsRelevant 
-                       := LLeafElem . LeChildRef =  WTempMark . EstRef
+                       := LLeafElem . LeChildRef =  WTempMark . TokMark . TkmEstRef
                    END (* IF *) 
                  END (* IF *) 
 
               | MarkKindTyp . ChildFmtNo 
               => NpsNextTempMarkIsRelevant 
-                   := WTravInfo . EtiParentRef = WTempMark . EstRef  
+                   := WTravInfo . EtiParentRef = WTempMark . TokMark . TkmEstRef  
 
               ELSE 
               END (* CASE *) 
@@ -1230,7 +1230,7 @@ END
           DO WITH 
                WTempMark 
                = ParseInfo . PiTravTempMarkListRef ^ [ RTempMarkSs ] 
-             DO WTempMark . EstRef := NodeRef 
+             DO WTempMark . TokMark . TkmEstRef := NodeRef 
              ; WTempMark . TokMark . Kind := Kind 
              END (* WITH *) 
           END (* WHILE *) 
@@ -1298,7 +1298,7 @@ END
                 WITH WTempMark 
                      = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
                 DO 
-                  IF NpsStmTLeafElem . LeChildRef # WTempMark . EstRef 
+                  IF NpsStmTLeafElem . LeChildRef # WTempMark . TokMark . TkmEstRef 
                   THEN 
                     EXIT 
                   ELSIF WTempMark .  TokMark . Kind 
@@ -1958,9 +1958,9 @@ END
                   , AFT . A_NpsDssIncludeTempMarks_kind_not_original 
                   ) 
               ; Assert
-                  ( WTempMark . EstRef 
+                  ( WTempMark . TokMark . TkmEstRef 
                     = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
-                      . EstRef
+                      . TokMark . TkmEstRef
                   , AFT . A_NpsDssIncludeTempMarks_estref_not_original 
                   ) 
               ; LAbsCharPos 
@@ -4905,7 +4905,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
                 DO IF W1stTempMark . TokMark . Kind = MarkKindTyp . ChildFmtNo  
                    THEN
                      Assert
-                       ( W1stTempMark . EstRef = ModTok 
+                       ( W1stTempMark . TokMark . TkmEstRef = ModTok 
                        , AFT . A_NpsRangeTempMarksForModTok_BadChildFmtNoOnModTok 
                        ) 
                    ; WPatchRange . From := LTempMarkSs 
@@ -4922,7 +4922,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
                               = MarkKindTyp . ChildFmtNo  
                            THEN 
                              Assert
-                               ( WLaterTempMark . EstRef = ModTok 
+                               ( WLaterTempMark . TokMark . TkmEstRef = ModTok 
                                , AFT . A_NpsRangeTempMarksForModTok_BadChildFmtNoOnModTok2 
                                ) 
                            ; INC ( LTempMarkSs )

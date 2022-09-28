@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -34,7 +34,12 @@ MODULE ParseHs
     ; Wr . PutText ( LWrT , Marks . MarkImage ( TempMark . TokMark ) )
     ; Wr . PutText ( LWrT , "},EstRef=" )
     ; Wr . PutText
-        ( LWrT , Fmt . Pad ( Misc . RefanyImage ( TempMark . EstRef ) , RefanyPad ) )
+        ( LWrT
+        , Fmt . Pad
+            ( Misc . RefanyImage ( TempMark . TokMark . TkmEstRef )
+            , RefanyPad
+            )
+        )
     ; Wr . PutText ( LWrT , ",LineNo=" )
     ; Wr . PutText ( LWrT , LbeStd . LineNoImage ( TempMark . LineNo ) ) 
     ; Wr . PutText ( LWrT , ",CharPos=" )

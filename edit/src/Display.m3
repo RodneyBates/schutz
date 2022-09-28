@@ -637,10 +637,10 @@ MODULE Display
                           ( LBolTokMark2 , TLinesRefMeat . LrBolTokMark ) 
                   THEN 
                     EXIT 
-                ; ELSE 
+                  ELSE 
                     TRY 
                       IF Marks . Compare 
-                           ( LBolTokMark2 ,  TLinesRefMeat . LrBolTokMark )
+                           ( LBolTokMark2 , TLinesRefMeat . LrBolTokMark )
                          # - 1 
                       THEN Assertions . CantHappenText 
                              ( "SecurePred passed starting mark." )
