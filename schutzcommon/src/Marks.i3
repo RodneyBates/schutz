@@ -95,7 +95,8 @@ INTERFACE Marks
    LineMarks and LinesRefs.
    CharPos and LineNo are used in TempMarks and LinesRefs and are duplicated
    fields, copied as necessary.
-   EstRef is used only in TempMarks.  
+   TkmEstRef is used to effect only in TempMarks, but is set in others
+   to agree with EstNodeNo, for debugging and consistency checks.  
    This breakdown of fields in records seems not a lot worse than any other.
 *) 
 

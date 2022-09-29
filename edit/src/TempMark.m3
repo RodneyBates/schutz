@@ -417,7 +417,7 @@ MODULE TempMark
                     ^ [ BtmTempMarkNextElemNo ] 
                 DO 
                   WTempMark . TokMark . EstNodeNo := BtmTmEstNodeNo
-                ; WTempMark . EstRef := BtmTmEstRef  
+                ; WTempMark . TokMark . TkmEstRef := BtmTmEstRef  
                 ; WTempMark . TokMark . Kind := BtmTmKind 
                 ; WTempMark . TokMark . FmtNo := BtmTmFmtNo 
                 ; IF LMarkCompare = - 1 
@@ -1848,7 +1848,7 @@ MODULE TempMark
           ; FOR RI := 0 TO NUMBER ( ParseInfo . PiOrigTempMarkListRef ^ ) - 1 
             DO 
               WITH WTempMark = ParseInfo . PiOrigTempMarkListRef ^ [ RI ] 
-              DO WTempMark . EstRef := NIL  
+              DO WTempMark . TokMark . TkmEstRef := NIL  
               ; WTempMark . TokMark . Kind := MarkKindTyp . Null 
               ; WTempMark . TokMark . FmtNo := EstHs . FmtNoNull 
               END 
@@ -2046,7 +2046,7 @@ MODULE TempMark
             THEN RETURN TRUE 
             ELSIF WNewTempMark . TokMark . FmtNo # WOldTempMark . TokMark . FmtNo 
             THEN RETURN TRUE 
-            ELSIF WNewTempMark . EstRef # CurrentMarkEstRef 
+            ELSIF WNewTempMark . TokMark . TkmEstRef # CurrentMarkEstRef 
 (* CHECK: Is there any remaining reason to use CurrentMarkEstRef, or can we
           just compare to WOldTempMark.EstRef? 
 *) 
@@ -2341,7 +2341,7 @@ MODULE TempMark
               WTempMark 
               = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
             DO 
-               IF CurrentEstRef = WTempMark . EstRef  
+               IF CurrentEstRef = WTempMark . TokMark . TkmEstRef  
                THEN 
                  IF WTempMark . TokMark . Kind = MarkKindTyp . Plain 
                  THEN 
@@ -2368,7 +2368,7 @@ MODULE TempMark
                Assert 
                  ( String 
                    = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
-                     . EstRef 
+                     . TokMark . TkmEstRef 
                  , AFT . A_RbmTeLeafString_DescendNoTempMark 
                  ) 
             ; RbmState := RbmStateBwdNl 
@@ -2778,7 +2778,7 @@ MODULE TempMark
               ; Assert 
                   ( ModBlankLine 
                     = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
-                      . EstRef 
+                      . TokMark . TkmEstRef 
                   , AFT . A_RbmTeTfsBlankLine_MarkedModMismatch 
                   ) 
               ; RbmCurrentLineTokMark 
@@ -2968,7 +2968,7 @@ MODULE TempMark
                   ( ModCmnt 
                     = ParseInfo . PiFinalTempMarkListRef ^ 
                       [ RbmTempMarkElemNo ] 
-                      . EstRef  
+                      . TokMark . TkmEstRef  
                   , AFT . A_RbmTeTfsLeadingModsNoDel_MarkedModMismatch 
                   ) 
               ; RbmTeTfsBolCmntIntoFwdNl ( ModCmnt ) 
@@ -3456,25 +3456,25 @@ MODULE TempMark
                     OF MarkKindTyp . RightSibFmtNo 
                     => 
                       Assert 
-                        ( RbmTeRMChildRef = WTempMark . EstRef 
+                        ( RbmTeRMChildRef = WTempMark . TokMark . TkmEstRef 
                         , AFT . A_RbmTeTfsInsTok_ListInsTokWOTempMark 
                         ) 
                          
                     | MarkKindTyp . LeftSibFmtNo 
                     => Assert 
                         ( RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
-                          = WTempMark . EstRef 
+                          = WTempMark . TokMark . TkmEstRef 
                         , AFT . A_RbmTeTfsInsTok_ListInsTokWOTempMark 
                         ) 
 
                     | MarkKindTyp . ChildFmtNo 
                     => Assert 
-                        ( RbmTeEstTravInfo . EtiParentRef = WTempMark . EstRef 
+                        ( RbmTeEstTravInfo . EtiParentRef = WTempMark . TokMark . TkmEstRef 
                         , AFT . A_RbmTeTfsInsTok_InsTokWOTempMark 
                         ) 
                     | MarkKindTyp . Plain 
                     => Assert 
-                        ( RbmTeEstTravInfo . EtiParentRef = WTempMark . EstRef 
+                        ( RbmTeEstTravInfo . EtiParentRef = WTempMark . TokMark . TkmEstRef 
                         , AFT . A_RbmTeTfsInsTok_DeletedInsTokWOTempMark 
                         ) 
                     END (* CASE *) 
@@ -3516,14 +3516,14 @@ MODULE TempMark
                      OF MarkKindTyp . LeftSibFmtNo 
                      => IF WTempMark . TokMark . FmtNo = FsNodeRef . FsFmtNo  
                            AND RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef
-                               = WTempMark . EstRef 
+                               = WTempMark . TokMark . TkmEstRef 
                         THEN 
                           RbmTeBuildSomeMarksForTok 
                             ( RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef )
                         END (* IF *) 
                      | MarkKindTyp . RightSibFmtNo 
                      => IF WTempMark . TokMark . FmtNo = FsNodeRef . FsFmtNo 
-                           AND RbmTeRMChildRef = WTempMark . EstRef
+                           AND RbmTeRMChildRef = WTempMark . TokMark . TkmEstRef
                         THEN 
                            Assert 
                              ( RbmTeRMChildRef # NIL 
@@ -3535,13 +3535,13 @@ MODULE TempMark
                      | MarkKindTyp . ChildFmtNo 
                      => IF WTempMark . TokMark . FmtNo = FsNodeRef . FsFmtNo 
                            AND RbmTeEstTravInfo . EtiParentRef 
-                               = WTempMark . EstRef 
+                               = WTempMark . TokMark . TkmEstRef 
                         THEN 
                           RbmTeBuildSomeMarksForTok 
                             ( RbmTeEstTravInfo . EtiParentRef ) 
                         END (* IF *) 
                      | MarkKindTyp . Plain  
-                     => IF RbmTeEstTravInfo . EtiParentRef = WTempMark . EstRef 
+                     => IF RbmTeEstTravInfo . EtiParentRef = WTempMark . TokMark . TkmEstRef 
                         THEN 
                           RbmTeBuildSomeMarksForTok 
                             ( RbmTeEstTravInfo . EtiParentRef ) 
@@ -3992,14 +3992,14 @@ MODULE TempMark
                  OR RbmTeEstTravInfo . EtiChildNo < 0 
               THEN RETURN WhatNextTyp . FsItem 
               ELSIF WTempMark . TokMark . Kind = MarkKindTyp . RightSibFmtNo 
-                    AND WTempMark . EstRef = RbmTeRMChildRef 
+                    AND WTempMark . TokMark . TkmEstRef = RbmTeRMChildRef 
               THEN RETURN WhatNextTyp . FsItem 
               ELSIF WTempMark . TokMark . Kind = MarkKindTyp . LeftSibFmtNo 
-                    AND WTempMark . EstRef 
+                    AND WTempMark . TokMark . TkmEstRef 
                         = RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef
               THEN RETURN WhatNextTyp . FsItem 
               ELSIF WTempMark . TokMark . Kind = MarkKindTyp . ChildFmtNo 
-                    AND WTempMark . EstRef 
+                    AND WTempMark . TokMark . TkmEstRef 
                         = RbmTeEstTravInfo . EtiParentRef
               THEN RETURN WhatNextTyp . FsItem 
               ELSE 
@@ -4252,7 +4252,7 @@ MODULE TempMark
               WTempMark 
               = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
             DO 
-              IF RbmTeEstTravInfo . EtiNodeRef = WTempMark . EstRef 
+              IF RbmTeEstTravInfo . EtiNodeRef = WTempMark . TokMark . TkmEstRef 
               THEN (* The next temp mark denotes the Est parent node. *) 
                 CASE WTempMark . TokMark . Kind 
                 OF MarkKindTyp . Plain 
@@ -4296,7 +4296,7 @@ MODULE TempMark
               ELSE (* Nonempy Est child list. *) 
                 IF ( RbmTeEstTravInfo . EtiChildNo 
                      >= RbmTeEstTravInfo . EtiChildCt
-                     AND WTempMark . EstRef = RbmTeRMChildRef 
+                     AND WTempMark . TokMark . TkmEstRef = RbmTeRMChildRef 
                    ) 
                 THEN (* We are off the right end, but there is a TempMark
                         pointing to the rightmost child.  It must be RightSib. 
@@ -4307,7 +4307,7 @@ MODULE TempMark
                     ) 
                 ; RbmTeFmtNo := WTempMark . TokMark . FmtNo 
                 ELSIF 
-FALSE AND             WTempMark . EstRef 
+FALSE AND             WTempMark . TokMark . TkmEstRef 
                       = RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                 THEN (* There is a TempMark pointing to the next elder child. 
                         It must be LeftSib and can only happen when truly
@@ -4325,7 +4325,7 @@ FALSE AND             WTempMark . EstRef
                     RbmTeDoneWEst := TRUE 
                   ELSE 
                     IF RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
-                       # WTempMark . EstRef  
+                       # WTempMark . TokMark . TkmEstRef  
                     THEN (* Arrange to descend into the marked child. *) 
                       RbmTeFmtNo := RbmTeEstTravInfo . EtiChildFmtNo 
                     ELSE 
@@ -4738,7 +4738,7 @@ FALSE AND             WTempMark . EstRef
           WTempMark . TokMark := LLineMarkMeat . LmTokMark 
         ; WTempMark . LineNo := LLineMarkMeat . LmLineNo  
         ; WTempMark . CharPos  := LLineMarkMeat . LmCharPos 
-        ; WTempMark . EstRef := NIL (* Dead. *) 
+        ; WTempMark . TokMark . TkmEstRef := NIL (* Dead. *) 
         ; INC ( LElemNo ) 
         ; IF LElemNo >= LElemCt 
           THEN 
