@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -10,6 +10,8 @@ MODULE Marks
 
 (* Marks that locate points within the text represented by an Est. *) 
 
+(* Library: *) 
+; IMPORT Fmt 
 ; IMPORT Integer 
 ; IMPORT Boolean  
 
@@ -17,6 +19,7 @@ MODULE Marks
 ; IMPORT LangUtil 
 ; IMPORT LbeStd 
 ; IMPORT Misc
+; FROM Misc IMPORT RefanyPad 
 
 (* EXPORTED: *) 
 ; PROCEDURE MarkKindImage ( Value : MarkKindTyp ) : TEXT 
@@ -68,7 +71,9 @@ MODULE Marks
       END (* IF*)
     ; RETURN
         LbeStd . EstNodeNoImage ( Mark . EstNodeNo ) 
-        & "(" & LbeStd . EstNodeNoImage ( Mark . EstNodeCt ) & ")" 
+        & "(" & LbeStd . EstNodeNoImage ( Mark . EstNodeCt ) & ")"
+        & Fmt . Pad ( Misc . RefanyImage ( Mark . TkmEstRef ) , RefanyPad )
+        & ","
         & MarkKindImageShort ( Mark . Kind ) 
         & EstHs . FmtNoImage ( Mark . FmtNo ) 
         & Misc . BooleanImageShort ( Mark . StartAtEnd ) 

@@ -32,15 +32,7 @@ MODULE ParseHs
       LWrT := TextWr . New ( ) 
     ; Wr . PutText ( LWrT , "TokMark={" )
     ; Wr . PutText ( LWrT , Marks . MarkImage ( TempMark . TokMark ) )
-    ; Wr . PutText ( LWrT , "},EstRef=" )
-    ; Wr . PutText
-        ( LWrT
-        , Fmt . Pad
-            ( Misc . RefanyImage ( TempMark . TokMark . TkmEstRef )
-            , RefanyPad
-            )
-        )
-    ; Wr . PutText ( LWrT , ",LineNo=" )
+    ; Wr . PutText ( LWrT , "},LineNo=" )
     ; Wr . PutText ( LWrT , LbeStd . LineNoImage ( TempMark . LineNo ) ) 
     ; Wr . PutText ( LWrT , ",CharPos=" )
     ; Wr . PutText ( LWrT , LbeStd . CharNoImage ( TempMark . CharPos ) ) 
