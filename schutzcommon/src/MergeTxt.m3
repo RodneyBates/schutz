@@ -83,7 +83,7 @@ MODULE MergeTxt
       (* ^This many lines from leading blank mods were incorporated into the 
          resulting set of tree children. *)  
     ; VAR TrailingBlankLinesIncluded : LbeStd . LineNoTyp  
-      (* ^Similarly, for trailing mods. *) 
+      (* ^Similarly, for trailing mods. *)
     ) 
     RAISES { Backout , Thread . Alerted } 
 
@@ -447,7 +447,9 @@ MODULE MergeTxt
           (* MteTeRightChildRelNodeNo temporally trails behind the current 
              child of the old Est node, when in state 
              MteStateBwdNl, and thus identifies the child to the right of 
-             the current one. It is used to construct TokMarks. *) 
+             the current one. It is used to construct TokMarks. *)
+    ; VAR MteTeRightChildRef : LbeStd . EstRootTyp
+          (* ^The child that has MteTeRightChildRelNodeNo. *) 
     ; VAR MteTeLMNewChildRef : LbeStd . EstRootTyp 
     ; VAR MteTeLMNewKindSet : EstHs . EstChildKindSetTyp 
           (* ^During backwards traversal, the currently leftmost child
@@ -534,8 +536,8 @@ MODULE MergeTxt
       RAISES { Backout } 
 
       = BEGIN (* MteTeDecEstChild *) 
-          MteTeRightChildRelNodeNo 
-            := MteTeEstTravInfo . EtiChildRelNodeNo 
+          MteTeRightChildRelNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo
+        ; MteTeRightChildRef := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
         ; TravUtil . DecEstChild ( MteTeEstTravInfo ) 
         END MteTeDecEstChild 
 
@@ -823,7 +825,8 @@ MODULE MergeTxt
           END (* IF *) 
         END MteTeFlushDels 
 
-    ; PROCEDURE MteTeFlushBlankLines ( ) RAISES { Backout } 
+    ; PROCEDURE MteTeFlushBlankLines ( ) : ModHs . ModBlankLineTyp
+      RAISES { Backout } 
 
       = VAR LExists : BOOLEAN 
       ; VAR LEstChildNo : LbeStd . EstChildNoTyp 
@@ -833,8 +836,9 @@ MODULE MergeTxt
       ; VAR LDoPatchLeftSibFmtNoMark : BOOLEAN 
 
       ; BEGIN (* MteTeFlushBlankLines *) 
-          IF MteNewBlankLineFmtNo # EstHs . FmtNoNull 
-          THEN (* Some unconstructed blank lines are waiting.
+          IF MteNewBlankLineFmtNo = EstHs . FmtNoNull
+          THEN RETURN NIL 
+          ELSE (* Some unconstructed blank lines are waiting.
                   Turn them into a new or reused ModBlankLine. *) 
             MteTeFindLeftSib (* Of the leftmost already waiting Est child. *) 
               ( LExists , LEstChildNo , LChildLeafElem , LFmtNo ) 
@@ -861,7 +865,7 @@ MODULE MergeTxt
                    END (* IF *) 
                  ; MteNewBlankLineFmtNo := EstHs . FmtNoNull 
                  ; MteNewBlankLineCt := 0 (* Defensive. *) 
-                 ; RETURN 
+                 ; RETURN TModBlankLine 
                  END (* IF *) 
               ELSE 
               END (* TYPECASE *) 
@@ -883,11 +887,11 @@ MODULE MergeTxt
           ; MteTeWaitingEdgeKind := EstHs . EdgeKindTyp . EdgeKindLeadingMod  
           ; MteTeInterestingChildrenExist := TRUE 
           ; IF LDoPatchLeftSibFmtNoMark 
-            THEN 
-              NewBolTokMark . EstNodeCt := 1  
+            THEN NewBolTokMark . EstNodeCt := 1  
             END (* IF *) 
           ; MteNewBlankLineFmtNo := EstHs . FmtNoNull 
-          ; MteNewBlankLineCt := 0 (* Defensive. *) 
+          ; MteNewBlankLineCt := 0 (* Defensive. *)
+          ; RETURN LModBlankLineRef 
           END (* IF *) 
         END MteTeFlushBlankLines 
 
@@ -903,7 +907,7 @@ MODULE MergeTxt
             MteTeFlushDels ( ) 
           ; IF MteNewBlankLineFmtNo # FmtNo 
             THEN 
-              MteTeFlushBlankLines ( ) 
+              EVAL MteTeFlushBlankLines ( ) 
             ; MteNewBlankLineCt := BlankLineCt 
             ; MteNewBlankLineFmtNo := FmtNo 
             ELSE 
@@ -931,7 +935,7 @@ MODULE MergeTxt
           END (* IF *) 
         ; IF MteNewDelThruFmtNo = EstHs . FmtNoNull 
           THEN (* No range is waiting, start one. *)  
-            MteTeFlushBlankLines ( ) 
+            EVAL MteTeFlushBlankLines ( ) 
           ; MteNewDelThruFmtNo := FmtNo 
           ; MteNewDelFromFmtNo := FmtNo 
           ; MteNewDelIsRepair := IsRepair 
@@ -964,7 +968,7 @@ MODULE MergeTxt
               ) 
           END (* IF *) 
         ; MteTeFlushDels ( ) 
-        ; MteTeFlushBlankLines ( ) 
+        ; EVAL MteTeFlushBlankLines ( ) 
         ; MteTeFlushSliceOrChild ( FmtNo , EdgeKind ) 
         ; MteTeWaitingRef := EstRef 
         ; MteTeChildIsWaiting := TRUE 
@@ -987,7 +991,7 @@ MODULE MergeTxt
              OR MteTeChildIsWaiting 
           THEN 
             MteTeFlushDels ( ) 
-          ; MteTeFlushBlankLines ( ) 
+          ; EVAL MteTeFlushBlankLines ( ) 
           ; MteTeFlushChild ( NewFmtNo , NewEdgeKind ) 
           END 
         END MteTeFlushExceptSlice 
@@ -1133,7 +1137,7 @@ MODULE MergeTxt
                   children to the left.  
                *) 
             MteTeFlushDels ( ) 
-          ; MteTeFlushBlankLines ( ) 
+          ; EVAL MteTeFlushBlankLines ( ) 
           ; MteTeFlushSliceOrChild  
               ( EstHs . FmtNoNull 
               , EstHs . EdgeKindTyp . EdgeKindLeadingMod (* Irrelevant. *) 
@@ -1306,7 +1310,9 @@ MODULE MergeTxt
         END MteTeNewModText 
 
     ; PROCEDURE MteTeMaybeFinishBwdEdit 
-        ( FmtNo : EstHs . FmtNoTyp ; MarkNodeNo : LbeStd . EstNodeNoTyp ) 
+        ( FmtNo : EstHs . FmtNoTyp
+        ; MarkNodeNo : LbeStd . EstNodeNoTyp
+        ) 
       RAISES { Backout } 
       (* If now is the time to do it, go out of MteStateBwdEdit, build
          and wait whatever new Mods are required, count NewLinesCt for
@@ -1316,9 +1322,10 @@ MODULE MergeTxt
       = VAR LNewToPos : LbeStd . LimitedCharNoTyp 
       ; VAR LLeftNewModRef : ModHs . ModTextTyp 
             (* ^Leftmost new text mod, NIL if it turned out a blank line. *) 
-      ; VAR LRightNewModRef : ModHs . ModTextTyp (* Rightmost. *) 
-      ; VAR LNewBlankLinesBefore : LbeStd . LineNoTyp 
-      ; VAR LNewBlankLinesAfter : LbeStd . LineNoTyp 
+      ; VAR LRightNewModRef : ModHs . ModTextTyp (* Rightmost. *)
+      ; VAR LBlankLineModRef : ModHs . ModBlankLineTyp 
+      ; VAR LNewBlankLinesBeforeCt : LbeStd . LineNoTyp 
+      ; VAR LNewBlankLinesAfterCt : LbeStd . LineNoTyp 
       ; VAR LTextLen : LbeStd . CharNoTyp 
 
       ; BEGIN (* MteTeMaybeFinishBwdEdit *) 
@@ -1340,7 +1347,7 @@ MODULE MergeTxt
           (* Build needed text modifiers. *) 
             IF InsNlPos = LbeStd . LimitedCharNoInfinity 
             THEN (* No inserted new line, only one ModText insertion. *) 
-              LLeftNewModRef (* NIL for an all blank line. *)  
+              LLeftNewModRef (* Will be NIL if it's all blanks. *)  
                 := MteTeNewModText 
                      ( FromPos := MteTouchedFromPos 
                      , ToPos := MteNewTextToPos 
@@ -1349,9 +1356,9 @@ MODULE MergeTxt
                      , Chars := MteNewChars1 
                      , TextLen := MteNewTextLen 
                      ) 
-            ; LNewBlankLinesBefore 
+            ; LNewBlankLinesBeforeCt 
                 := MteBlankLinesBefore + ORD ( LLeftNewModRef = NIL ) 
-            ; LNewBlankLinesAfter := MteBlankLinesAfter 
+            ; LNewBlankLinesAfterCt := MteBlankLinesAfter 
             ; LRightNewModRef := NIL 
             ; IF LLeftNewModRef = NIL 
                  AND DelNlShift # LbeStd . LimitedCharNoInfinity 
@@ -1380,8 +1387,9 @@ MODULE MergeTxt
                          + NlIndentPos 
                        ) 
               END (* IF *) 
+
             (* Build left new text mod. *) 
-            ; LNewBlankLinesBefore := MteBlankLinesBefore 
+            ; LNewBlankLinesBeforeCt := MteBlankLinesBefore 
             ; IF MteNewTextRelNlPos > 0 (* Nonempty text before the Nl *) 
               THEN (* A ModText is needed for the 1st line. *) 
                 LLeftNewModRef 
@@ -1395,22 +1403,24 @@ MODULE MergeTxt
                        , Chars := MteNewChars1 
                        , TextLen := MteNewTextRelNlPos 
                        )
-              ; INC ( LNewBlankLinesBefore , ORD ( LLeftNewModRef = NIL ) ) 
+              ; INC ( LNewBlankLinesBeforeCt , ORD ( LLeftNewModRef = NIL ) ) 
                 (* ^The left text was, however, all blank. *) 
               ELSE (* The added Nl is at the left of the edited region. *) 
-                INC ( LNewBlankLinesBefore , ORD ( MteNewTextLeftTokToPos = 0 ) ) 
+                INC ( LNewBlankLinesBeforeCt
+                    , ORD ( MteNewTextLeftTokToPos = 0 ) 
+                    ) 
               ; LLeftNewModRef := NIL 
               END (* IF *) 
-            ; LNewBlankLinesAfter := MteBlankLinesAfter 
+            ; LNewBlankLinesAfterCt := MteBlankLinesAfter 
          (* ; IF MteNewTextRelNlPos = MteNewTextLen 
                  (* Inserted Nl at end of region. *) 
                  AND LLeftNewModRef # NIL 
                      (* We did not fold the inserted Nl into 
-                        LNewBlankLinesBefore *) 
+                        LNewBlankLinesBeforeCt *) 
               THEN
                 IF LNewToPos = LbeStd . LimitedCharNoInfinity  
                 THEN (* Need an additional blank line after *) 
-                  INC ( LNewBlankLinesAfter ) 
+                  INC ( LNewBlankLinesAfterCt ) 
                 ELSE (* Change right new mod to have Nl after. *)  
                   LNewToPos := LbeStd . LimitedCharNoInfinity  
                 END 
@@ -1427,7 +1437,7 @@ MODULE MergeTxt
                      , Chars := MteNewChars2 
                      , TextLen := LTextLen 
                      ) 
-            ; INC ( LNewBlankLinesAfter , ORD ( LRightNewModRef = NIL ) ) 
+            ; INC ( LNewBlankLinesAfterCt , ORD ( LRightNewModRef = NIL ) ) 
             END (* IF *) 
 
           (* Insert new tree children and build a new mark. *) 
@@ -1435,23 +1445,25 @@ MODULE MergeTxt
             THEN (* Edited text consists of blank lines only.  At most, a 
                     single blank line mod is needed. 
                  *) 
-              IF LNewBlankLinesBefore + LNewBlankLinesAfter > 0 
+              IF LNewBlankLinesBeforeCt + LNewBlankLinesAfterCt > 0 
               THEN 
                 MteTeWaitBlankLines 
-                  ( LNewBlankLinesBefore + LNewBlankLinesAfter , FmtNo ) 
-              ; MteTeFlushBlankLines ( ) 
+                  ( LNewBlankLinesBeforeCt + LNewBlankLinesAfterCt , FmtNo ) 
+              ; LBlankLineModRef := MteTeFlushBlankLines ( ) 
               ; NewBolTokMark 
                   := Marks . TokMarkTyp 
                        { EstNodeNo := MarkNodeNo
                        , EstNodeCt := 1 
+                       , TkmEstRef := LBlankLineModRef 
                        , Kind := MarkKindTyp . BlankLine 
                        , FmtNo := FmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
                        , TmTok := LbeStd . Tok__BlankLine  
                        }
+              ; INC ( MteMarkCt) 
               ; INC ( NewLinesCt ) 
-              ; IF LNewBlankLinesBefore = 0 
+              ; IF LNewBlankLinesBeforeCt = 0 
                 THEN (* This mod starts at an inserted Nl. *)  
                   MteState := MteStateTyp . MteStateBwdNl  
                 ELSE (* This is the replacement for the start Nl. *)  
@@ -1463,10 +1475,10 @@ MODULE MergeTxt
             ELSE (* We have at least one ModText *) 
 
             (* If necessary, insert trailing blank line mod. *) 
-              IF LNewBlankLinesAfter # 0 
+              IF LNewBlankLinesAfterCt # 0 
               THEN 
-                MteTeWaitBlankLines ( LNewBlankLinesAfter , FmtNo ) 
-              ; MteTeFlushBlankLines ( ) 
+                MteTeWaitBlankLines ( LNewBlankLinesAfterCt , FmtNo ) 
+              ; EVAL MteTeFlushBlankLines ( ) 
               (* No need to build a mark.  There will always be another
                  Nl to the left. *) 
               ; INC ( NewLinesCt ) 
@@ -1482,22 +1494,24 @@ MODULE MergeTxt
                   , EstHs . EdgeKindTyp . EdgeKindLeadingMod  
                   )
               ; IF LRightNewModRef . ModTextLeftTokToPos = 0 (* Nl before *) 
-                THEN (* This Nl is inserted, not the starting one. *) 
+                THEN (* This Nl is user-inserted, not the starting one. *)
+                  INC ( NewLinesCt ) 
                (* NewBolTokMark (* Will always get overlaid. *) 
                     := Marks . TokMarkTyp 
                          { EstNodeNo := MarkNodeNo 
                            (* ^This could be the wrong value, but if
                                so, the whole mark will be overlaid. *) 
                          , EstNodeCt := 1   
+                         , TkmEstRef := LRightNewModRef  
                          , Kind := MarkKindTyp . Plain 
                          , FmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
                          , TmTok := LbeStd . Tok__ModText 
                          } 
-                ; *) 
-                  INC ( NewLinesCt ) 
-                END 
+                  ; INC ( MteMarkCt) 
+               *) 
+                END (* IF *) 
               ; MteState := MteStateTyp . MteStateBwdNl (* Could change. *)
               END (* IF *) 
 
@@ -1510,8 +1524,9 @@ MODULE MergeTxt
                   , FmtNo 
                   , EstHs . EdgeKindTyp . EdgeKindLeadingMod  
                   ) 
+              ; INC ( NewLinesCt ) 
               ; IF LLeftNewModRef . ModTextLeftTokToPos = 0 (* Nl before *)
-                   AND LNewBlankLinesBefore = 0
+                   AND LNewBlankLinesBeforeCt = 0
                 THEN (* This replaces the original starting Nl. *)
                   NewBolTokMark 
                     := Marks . TokMarkTyp 
@@ -1519,41 +1534,45 @@ MODULE MergeTxt
                            (* ^This could be the wrong value, but if
                                so, the whole mark will be overlaid. *) 
                          , EstNodeCt := 1 
+                         , TkmEstRef := LLeftNewModRef  
                          , Kind := MarkKindTyp . Plain 
                          , FmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
                          , TmTok := LbeStd . Tok__ModText 
                          } 
-                ; INC ( NewLinesCt ) 
+                ; INC ( MteMarkCt) 
                 ; MteState := MteStateTyp . MteStateDone 
-                ELSE  
-                  NewBolTokMark 
+                ELSE   
+               (* NewBolTokMark (* Will always get overlaid. *)
                     := Marks . TokMarkTyp 
                          { EstNodeNo := MarkNodeNo 
                            (* ^This could be the wrong value, but if
                                so, the whole mark will be overlaid. *) 
                          , EstNodeCt := 1 
+                         , TkmEstRef := LLeftNewModRef  
                          , Kind := MarkKindTyp . Plain 
                          , FmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
                          , TmTok := LbeStd . Tok__ModText 
-                         } 
-                ; INC ( NewLinesCt ) 
-                ; MteState := MteStateTyp . MteStateBwdNl (* Could change. *)
+                         }
+                ; INC ( MteMarkCt) 
+                *)
+                  MteState := MteStateTyp . MteStateBwdNl (* Could change. *)
                 END (* IF *) 
-              END 
+              END (* IF *) 
 
             (* If necessary, insert the leading blank line mod. *) 
-            ; IF LNewBlankLinesBefore # 0 
+            ; IF LNewBlankLinesBeforeCt # 0 
               THEN (* Insert leading blank line mod. *) 
-                MteTeWaitBlankLines ( LNewBlankLinesBefore , FmtNo ) 
-              ; MteTeFlushBlankLines ( ) 
+                MteTeWaitBlankLines ( LNewBlankLinesBeforeCt , FmtNo ) 
+              ; LBlankLineModRef := MteTeFlushBlankLines ( ) 
               ; NewBolTokMark 
                   := Marks . TokMarkTyp 
                        { EstNodeNo := MarkNodeNo 
                        , EstNodeCt := 1
+                       , TkmEstRef := LBlankLineModRef  
                        , Kind := MarkKindTyp . BlankLine 
                        , FmtNo := FmtNo 
                        , StartAtEnd := FALSE 
@@ -1565,7 +1584,7 @@ MODULE MergeTxt
               (* This is the replacement for the starting Nl. *) 
               END (* IF *) 
             END (* IF *) 
-          END 
+          END (* IF *) 
         END MteTeMaybeFinishBwdEdit 
 
     ; PROCEDURE MteTeFinishMerge ( ) RAISES { Backout } 
@@ -1801,16 +1820,14 @@ MODULE MergeTxt
           MteTeFwdBlanks ( DelToPos , ExtendTouchedRightward := TRUE )  
           (* ^Edited region can lie beyond right end of existing line. *)
         ; IF MteTouchedToPos = LbeStd . LimitedCharNoInfinity 
-          THEN 
-            MteTouchedToPos := MteCharPos 
+          THEN MteTouchedToPos := MteCharPos 
           END (* IF *) 
         ; MteTeFlushCondFmt ( )  
         ; LPrefixLen := DelFromPos - MteTouchedFromPos 
         ; LSuffixLen := MteTouchedToPos - DelToPos 
         ; MteNewTextLen := LPrefixLen + InsLen + LSuffixLen 
         ; IF InsNlPos # LbeStd . LimitedCharNoInfinity 
-          THEN 
-            MteNewTextRelNlPos := InsNlPos - MteTouchedFromPos 
+          THEN MteNewTextRelNlPos := InsNlPos - MteTouchedFromPos 
           END (* IF *) 
         ; MteTeMoveSubstring 
             ( Strings . Substring ( InsText , DelFromPos , InsLen ) 
@@ -1896,7 +1913,7 @@ MODULE MergeTxt
           ; MteTeReverse ( ) 
           (* No net change to EstChild, will revisit it in the new state. 
              But we have to go through Inc/Dec, just to get 
-             MteTeRightChildRelNodeNo set. 
+             MteTeRightChildRelNodeNo and MteTeRightChildRef set. 
           *) 
           ; MteTeIncEstChild ( ) 
           ; MteTeDecEstChild ( ) 
@@ -2276,7 +2293,7 @@ MODULE MergeTxt
           => MteTeReverse ( ) 
           (* Defer waiting children and MteTeMaybeFinishBwdEdit to next Est 
              level upward.  There are no EstChildren, so setting  
-             MteTeRightChildRelNodeNo is unnecessary. 
+             MteTeRightChildRelNodeNo and MteRightChildRef is unnecessary. 
           *) 
 
           | MteStateTyp . MteStateBwdEdit 
@@ -2412,7 +2429,7 @@ MODULE MergeTxt
             THEN (* Backward traverse ends at NlAfter of this ModBlankLine. *)
               MteTeMaybeFinishBwdEdit 
                 ( FsNodeRef . FsFmtNo 
-                , MarkNodeNo := MteTeRightChildRelNodeNo 
+                , MarkNodeNo := MteTeRightChildRelNodeNo
                 ) 
             ; IF MteState # MteStateTyp . MteStateDone  
               THEN (* Mark the NlAfter of this ModBlankLine. *) 
@@ -2420,6 +2437,8 @@ MODULE MergeTxt
                   := Marks . TokMarkTyp 
                        { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
                        , EstNodeCt := 1   
+                       , TkmEstRef
+                           := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , Kind := MarkKindTyp . BlankLine 
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := TRUE 
@@ -2443,10 +2462,10 @@ MODULE MergeTxt
             ; MteTeBwdBlanks ( ) (* Left of the deleted region. *) 
             ; DEC ( MteItemCt ) 
             ; IF MteItemCt <= MteFinishItemNo 
-              THEN (* Backward traverse could end at the NlBefore. *) 
+              THEN (* Finish could happen to the right of the NlBefore. *) 
                 MteTeMaybeFinishBwdEdit 
                   ( FsNodeRef . FsFmtNo 
-                  , MarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
+                  , MarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo
                   ) 
               ; IF MteState # MteStateTyp . MteStateDone  
                 THEN (* Mark the NlBefore of this ModBlankLine. *) 
@@ -2454,6 +2473,8 @@ MODULE MergeTxt
                   := Marks . TokMarkTyp 
                        { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
                        , EstNodeCt := 1   
+                       , TkmEstRef
+                           := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                        , Kind := MarkKindTyp . BlankLine 
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE  
@@ -2537,7 +2558,7 @@ MODULE MergeTxt
                      OR FsNodeRef . FsKind = FsKindTyp. FsKindInsTok 
               (* No net change to EstChild, will revisit it in the new state. 
                  But we have to go through Inc/Dec, just to get 
-                MteTeRightChildRelNodeNo set. 
+                MteTeRightChildRelNodeNo and MteTeRightChildRef set. 
               *) 
               ; MteTeIncEstChild ( ) 
               ; MteTeDecEstChild ( ) 
@@ -2771,7 +2792,12 @@ MODULE MergeTxt
                 , MarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
                 ) 
             ; IF MteState # MteStateTyp . MteStateDone  
-              THEN (* Mark the Nl at beginning of comment. *) 
+              THEN (* Mark the beginning of comment. *)
+                (* It is possible that the comment is trailing and fixed, 
+                   and NOT ModCmntNlBefore, but have a fixed start position.
+                   In this case, there could still be a Nl here, not denoted
+                   by ModCmnt, but implied by the character position to its
+                   left.  Mark even it, just in case. *) 
                 IF ModCmnt . ModCmntNlAfter 
                 THEN LTok := LbeStd . Tok__CmntAtEndOfLine 
                 ELSE LTok := LbeStd . Tok__Cmnt 
@@ -2780,6 +2806,8 @@ MODULE MergeTxt
                 := Marks . TokMarkTyp 
                      { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt := 1   
+                     , TkmEstRef
+                         := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                      , Kind := MarkKindTyp . Plain 
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE
@@ -3028,26 +3056,28 @@ MODULE MergeTxt
                ; IF MteItemCt = MteNlItemNo THEN MteLineShift := 0 END  
                ; IF MteItemCt <= 0 
                  THEN (* End backward traverse at the Nl after. *) 
-                     MteTeMaybeFinishBwdEdit 
-                       ( FsNodeRef . FsFmtNo 
-                       , MarkNodeNo := MteTeRightChildRelNodeNo 
-                       ) 
-                   ; IF MteState # MteStateTyp . MteStateDone  
-                     THEN (* Mark the Nl at end of comment. *) 
-                       NewBolTokMark 
-                         := Marks . TokMarkTyp 
-                              { EstNodeNo
-                                  := MteTeEstTravInfo . EtiChildRelNodeNo 
-                              , EstNodeCt := 1   
-                              , Kind := MarkKindTyp . Plain 
-                              , FmtNo := FsNodeRef . FsFmtNo 
-                              , StartAtEnd := TRUE 
-                              , IsImpliedNewLine := FALSE 
-                              , TmTok := LbeStd . Tok__CmntAtEndOfLine 
-                              } 
-                     ; INC ( MteMarkCt ) 
-                     ; MteState := MteStateTyp . MteStateDone 
-                     END 
+                   MteTeMaybeFinishBwdEdit 
+                     ( FsNodeRef . FsFmtNo 
+                     , MarkNodeNo := MteTeRightChildRelNodeNo 
+                     ) 
+                 ; IF MteState # MteStateTyp . MteStateDone  
+                   THEN (* Mark the Nl at end of comment. *) 
+                     NewBolTokMark 
+                       := Marks . TokMarkTyp 
+                            { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
+                            , EstNodeCt := 1   
+                            , TkmEstRef
+                                := MteTeEstTravInfo . EtiChildLeafElem
+                                     . LeChildRef
+                            , Kind := MarkKindTyp . Plain 
+                            , FmtNo := FsNodeRef . FsFmtNo 
+                            , StartAtEnd := TRUE 
+                            , IsImpliedNewLine := FALSE 
+                            , TmTok := LbeStd . Tok__CmntAtEndOfLine 
+                            } 
+                   ; INC ( MteMarkCt ) 
+                   ; MteState := MteStateTyp . MteStateDone 
+                   END 
                  ELSE 
                    MteTeTfsModCmntBwd ( ModCmnt ) 
                  END (* IF *) 
@@ -3159,12 +3189,15 @@ MODULE MergeTxt
                 , MarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
                 ) 
          *) 
-            ; IF MteState # MteStateTyp . MteStateDone  
-              THEN 
+            ; IF MteState # MteStateTyp . MteStateDone
+                 AND ModText . ModTextLeftTokToPos = 0 (* Nl before. *) 
+              THEN (* Mark the Nl at beginning of the text mod. *) 
                 NewBolTokMark 
                   := Marks . TokMarkTyp 
                        { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
-                       , EstNodeCt := 1   
+                       , EstNodeCt := 1
+                       , TkmEstRef
+                           := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , Kind := MarkKindTyp . Plain 
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE 
@@ -3323,13 +3356,18 @@ MODULE MergeTxt
                        ( FsNodeRef . FsFmtNo 
                        , MarkNodeNo := MteTeRightChildRelNodeNo 
                        ) 
-                   ; IF MteState # MteStateTyp . MteStateDone  
+                   ; IF MteState # MteStateTyp . MteStateDone
+                        AND ModText . ModTextToPos
+                            =  LbeStd . LimitedCharNoInfinity (* Nl after. *) 
                      THEN (* Mark the Nl at end of this ModText. *)
                        NewBolTokMark 
                          := Marks . TokMarkTyp 
                               { EstNodeNo
                                   := MteTeEstTravInfo . EtiChildRelNodeNo 
                               , EstNodeCt := 1  
+                              , TkmEstRef
+                                  := MteTeEstTravInfo . EtiChildLeafElem
+                                     . LeChildRef 
                               , Kind := MarkKindTyp . Plain 
                               , FmtNo := FsNodeRef . FsFmtNo 
                               , StartAtEnd := TRUE 
@@ -3370,32 +3408,34 @@ MODULE MergeTxt
             CASE MteState 
             OF MteStateTyp . MteStateStartAtBeg 
             , MteStateTyp . MteStateStartAtEnd 
-            => MteTeSetIndentInfo ( )  
-            ; IF StartTokMark . EstNodeNo 
+            => MteTeSetIndentInfo ( )
+               (* Stay in the start state, to reach Nl before of the leftmost
+                  child of EstRef.  Will come back in MteStateDone. *)
+         (* ; IF StartTokMark . EstNodeNo 
                  = EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo
                  AND StartTokMark . Kind = MarkKindTyp . Plain 
-              THEN (* StartTokMark denotes this ModTok.  This means we are
-                      starting at an implied Nl for the ModTok. *)  
+              THEN (* StartTokMark denotes this ModTok.  This would mean 
+                      starting at an implied Nl for the ModTok, which can't
+                      happen. *)  
                 MteCharPos := MteTeIndentPos 
               ; MteState := MteStateTyp . MteStatePassingNl 
-              ; INC ( MteItemCt ) (* Count the ModTok. *)
+              ; INC ( MteItemCt ) (* Count the ModTok node itself. *)
               ; MteFinishItemNo := 1 
-                (* ^Make the first thing to the right to take care of
+                (* ^Note the first thing to the right to take care of
                    FinishBwdEdit. *) 
               ELSE (* Descend through the ModTok, without counting it. *)      
-              END (* IF *) 
+              END (* IF *)
+         *)
 
             | MteStateTyp . MteStatePassingNl 
-            => MteTeSetIndentInfo ( )  
-            ; INC ( MteItemCt ) (* Count the ModTok. *)
-
-            | MteStateTyp . MteStateFwd 
+            , MteStateTyp . MteStateFwd 
             => MteTeSetIndentInfo ( )  
             ; INC ( MteItemCt ) 
-              (* ^This is unusual in counting a non-leaf item.  We need this
-                 to detect when we reach the ModTok going backwards, to see
-                 if it is the middle Nl. *)  
-            ; IF EstUtil . CharPosPlusWidthInfo 
+              (* ^This is unusual in counting a non-leaf node.  We will need
+                 this to detect when we reach the ModTok node going backwards,
+                 to see if it is the middle Nl. *)
+            ; MteState := MteStateTyp . MteStateFwd 
+         (* ; IF EstUtil . CharPosPlusWidthInfo 
                     ( MteCharPos , EstRef . KTreeWidthInfo ) 
                   > Options . RightMargin 
               THEN (* Implied Nl before the ModTok, which ends this line. *) 
@@ -3408,7 +3448,8 @@ MODULE MergeTxt
                   END (* IF *) 
                 ; RETURN 
                 END (* IF *) 
-              END (* IF *)  
+              END (* IF *)
+         *)
 
             | MteStateTyp . MteStateRightNlFound 
             => (* Reverse short of this ModTok. *) 
@@ -3420,13 +3461,16 @@ MODULE MergeTxt
             | MteStateTyp . MteStateBwdEdit 
             , MteStateTyp . MteStateBwdNl 
             , MteStateTyp . MteStateDone  
-            => 
-            END (* CASE MteState *) 
+            => MteTeSetIndentInfo ( ) 
+            END (* CASE MteState *)
+
+          (* Recurse: *) 
           ; MteTeTfsEstSubtree 
-              ( IsModTok := TRUE  
+              ( IsModTok := TRUE
               , (* VAR *) LMCharPos := LLMCharPos (* Dead. *) 
-              ) 
-          ; CASE MteState 
+              )
+              
+          ; CASE MteState
             OF MteStateTyp . MteStateStartAtBeg 
             , MteStateTyp . MteStateStartAtEnd 
             => CantHappen ( AFT . A_MteTeTfsModTok__Bad_state_after ) 
@@ -3434,13 +3478,26 @@ MODULE MergeTxt
             | MteStateTyp . MteStatePassingNl 
             , MteStateTyp . MteStateFwd 
             , MteStateTyp . MteStateRightNlFound 
-            => 
+            => (* Keep on traversing forwards. *) 
 
+            | MteStateTyp . MteStateDone
+            => Assert
+                 ( MteItemCt <= 0 , AFT . A_MergeTxtEdit__ModTok_excess_count )
+              (* Keep on traversing backwards (& up). *) 
+            
+            | MteStateTyp . MteStateBwdNl
+            => Assert
+                 ( MteItemCt >= 1 , AFT . A_MergeTxtEdit__ModTok_lost_count )
+            ; DEC ( MteItemCt ) 
+               (* And keep on traversing backwards (& up). *)
+               
             | MteStateTyp . MteStateBwdEdit 
-            , MteStateTyp . MteStateBwdNl 
-            , MteStateTyp . MteStateDone  
-            => IF MteItemCt <= 0 
-              THEN (* This was the starting Nl. *) 
+            => MteTeSetIndentInfo ( )
+            ; IF MteItemCt = 1  
+              THEN (* The starting Nl was to the right of the ModTok
+                      subtree.  Keep on traversing backwards (& up). *)
+              ELSE
+(* 
                 Assert
                   ( MteState IN MteStateSetBwdFinished  
                   , AFT . A_MteTeTfsModTok__Bad_state  
@@ -3449,10 +3506,14 @@ MODULE MergeTxt
                 THEN  
                   NewBolTokMark 
                     := Marks . TokMarkTyp 
-                         { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
+                         { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo
                          , EstNodeCt 
                              := EstUtil . EstNodeCt 
-                                  ( MteTeEstTravInfo . EtiNodeRef ) 
+                                  ( MteTeEstTravInfo . EtiChildLeafElem
+                                    . LeChildRef
+                                  ) 
+                         , TkmEstRef
+                             := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                          , Kind := MarkKindTyp . Plain
                          , FmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
@@ -3469,13 +3530,17 @@ MODULE MergeTxt
               ; IF MteItemCt = MteNlItemNo THEN MteLineShift := 0 END  
               ; DEC ( MteItemCt )
               ; IF MteItemCt <= 0
-                THEN
+                THEN (* Started at the ModTok node itself. *) 
                   NewBolTokMark 
                     := Marks . TokMarkTyp 
-                         { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
+                         { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo
                          , EstNodeCt 
                              := EstUtil . EstNodeCt 
-                                  ( MteTeEstTravInfo . EtiNodeRef ) 
+                                  ( MteTeEstTravInfo . EtiChildLeafElem
+                                    . LeChildRef
+                                  ) 
+                         , TkmEstRef
+                             := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                          , Kind := MarkKindTyp . Plain
                          , FmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
@@ -3484,16 +3549,15 @@ MODULE MergeTxt
                          } 
                 ; MteState := MteStateTyp . MteStateDone 
                 END (* IF *) 
-              END (* IF *) 
+*)
+              END (* IF *)
             END (* CASE MteState *) 
           END MteTeTfsModTok
 
       ; PROCEDURE MteTeTfsLexErrChars ( String : SharedStrings . T ) 
         RAISES { Backout } 
 
-        = VAR LMarkNodeNo : LbeStd . EstNodeNoTyp  
-        ; VAR LDoExcludeIfBwd : BOOLEAN 
-        ; VAR LTok : LbeStd . TokTyp 
+        = VAR LDoExcludeIfBwd : BOOLEAN 
  
         ; BEGIN (* MteTeTfsLexErrChars *) 
             CASE MteState <* NOWARN *> 
@@ -3504,7 +3568,7 @@ MODULE MergeTxt
                  , String 
                  , FsNodeRef 
                  , FsFmtKind 
-                 , (* VAR *) DoExcludeIfBwd := LDoExcludeIfBwd 
+                 , (* VAR *) DoExcludeIfBwd := LDoExcludeIfBwd (* Dead. *)
                  )  
             ; MteState := MteStateTyp . MteStateFwd 
             ; MteFwdPrevItemCouldHaveCondNlAfter := FALSE 
@@ -3522,14 +3586,13 @@ MODULE MergeTxt
             ; MteTeMaybeFinishBwdEdit 
                 ( FsNodeRef . FsFmtNo 
                 , MarkNodeNo := MteTeRightChildRelNodeNo 
-                ) 
+                )
 
             | MteStateTyp . MteStateBwdEdit 
             , MteStateTyp . MteStateBwdNl 
             , MteStateTyp . MteStateDone (* Shouldn't happen. *)  
-            => LTok := SharedStrings . Tok ( String ) 
-            ; MteTeTok 
-                 ( LTok 
+            => MteTeTok 
+                 ( SharedStrings . Tok ( String ) 
                  , String 
                  , FsNodeRef 
                  , FsFmtKind 
@@ -3537,51 +3600,30 @@ MODULE MergeTxt
                  )  
             ; IF NOT LDoExcludeIfBwd 
               THEN (* Keep the LexErrChars mod. *)  
-                 MteTeWaitExistingEstChild 
-                   ( EstHs . EdgeKindTyp . EdgeKindEstChild  
-                   , IsInteresting := TRUE 
-                   ) 
-               ; LMarkNodeNo := MteTeRightChildRelNodeNo 
-               ELSE 
-                 LMarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
-               END (* IF *) 
+                MteTeWaitExistingEstChild 
+                  ( EstHs . EdgeKindTyp . EdgeKindEstChild
+                  , IsInteresting := TRUE 
+                  ) 
+              END (* IF *) 
             ; DEC ( MteItemCt ) 
             ; MteTeMaybeFinishBwdEdit 
                 ( FsNodeRef . FsFmtNo
                 , MarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo
                 ) 
-            ; IF MteItemCt <= 0 
-(* CHECK ^In case LexErrChars could be implicitly the first item on a line. 
-          Can this happen? *) 
-              THEN
-                IF MteState # MteStateTyp . MteStateDone  
-                THEN 
-                  NewBolTokMark 
-                    := Marks . TokMarkTyp 
-                         { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo  
-                         , EstNodeCt := 1   
-                         , Kind := MarkKindTyp . Plain 
-                         , FmtNo := FsNodeRef . FsFmtNo 
-                         , StartAtEnd := FALSE 
-                         , IsImpliedNewLine := TRUE  
-                         , TmTok := LTok 
-                         }
-                ; INC ( MteMarkCt ) 
-                ; MteState := MteStateTyp . MteStateDone 
-                END
-              END (* IF *) 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
                        , EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
-            ; MteTeDecEstChild ( ) 
+            ; MteTeDecEstChild ( )
+         (* ELSE Can't happen. *) 
             END (* CASE MteState *) 
           END MteTeTfsLexErrChars  
 
       ; PROCEDURE MteTeTfsModErr ( <* UNUSED *> ModErr : ModHs . ModErrTyp ) 
         RAISES { Backout } 
 
-        = VAR LMarkNodeNo : LbeStd . EstNodeNoTyp  
+        = VAR LMarkNodeNo : LbeStd . EstNodeNoTyp
+        ; VAR LMarkEstRef : LbeStd . EstRootTyp 
 
         ; BEGIN (* MteTeTfsModErr *) 
             CASE MteState 
@@ -3608,7 +3650,7 @@ MODULE MergeTxt
                    OR FsNodeRef . FsKind = FsKindTyp. FsKindInsTok 
             ; MteTeMaybeFinishBwdEdit 
                 ( FsNodeRef . FsFmtNo 
-                , MarkNodeNo := MteTeRightChildRelNodeNo 
+                , MarkNodeNo := MteTeRightChildRelNodeNo
                 ) 
 
             | MteStateTyp . MteStateBwdEdit 
@@ -3623,8 +3665,12 @@ MODULE MergeTxt
                    ) 
                  (* ^Keep the error mod. *) 
                ; LMarkNodeNo := MteTeRightChildRelNodeNo 
+               ; LMarkEstRef := MteTeRightChildRef 
+(* FIXME:        ^ *) 
                ELSE 
                  LMarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
+               ; LMarkEstRef
+                   := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                END (* IF *) 
             ; DEC ( MteItemCt ) 
             ; MteTeMaybeFinishBwdEdit 
@@ -3635,15 +3681,17 @@ MODULE MergeTxt
 (* CHECK ^In case error could be implicitly the first item on a line. 
           Can this happen? *) 
               THEN
-                IF MteState # MteStateTyp . MteStateDone  
+                IF FALSE (* Should never be an implied Nl. *) 
+                   AND MteState # MteStateTyp . MteStateDone  
                 THEN 
                   NewBolTokMark 
                     := Marks . TokMarkTyp 
                          { EstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo  
                          , EstNodeCt := 1   
+                         , TkmEstRef
+                             := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                          , Kind := MarkKindTyp . Plain 
-                         , FmtNo := FsNodeRef . FsFmtNo 
-                         , StartAtEnd := FALSE 
+                         , FmtNo := FsNodeRef . FsFmtNo , StartAtEnd := FALSE 
                          , IsImpliedNewLine := TRUE  
                          , TmTok := LbeStd . Tok__Null  
                          } 
@@ -3760,7 +3808,7 @@ MODULE MergeTxt
                   separator, which is right for this case. 
                *) 
               MteTeFlushDels ( ) 
-            ; MteTeFlushBlankLines ( ) 
+            ; EVAL MteTeFlushBlankLines ( ) 
               (* Waiting things not yet closed will be safe because they 
                  use variables local to MergeTextEdit *) 
 (* CHECK:        ^Huh? *) 
@@ -3770,8 +3818,6 @@ MODULE MergeTxt
             ; LChildIndentPosN := LbeStd . LimitedCharNoUnknown 
 
             END (* CASE *)
-
-          ; MteMarkCt := 0 
 
           ; MteTraverseEst 
               ( MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
@@ -4091,13 +4137,15 @@ MODULE MergeTxt
 
       ; PROCEDURE MteTeTfsBuildFmtNoMark ( ) 
 
-        = VAR LMarkKind : MarkKindTyp 
+        = VAR LMarkKind : MarkKindTyp
+        ; VAR LMarkEstRef : LbeStd . EstRootTyp 
         ; VAR LEstNodeNo : LbeStd . EstNodeNoTyp 
         ; VAR LEstNodeCt : LbeStd . EstNodeNoTyp 
 
         ; BEGIN 
             IF MteTeEstChildrenAreToRightInNewEst ( ) 
-            THEN (* There will be an Est child to the right. *) 
+            THEN (* There will be an Est child to the right, which
+                    the mark will point to. *) 
               LMarkKind := MarkKindTyp . LeftSibFmtNo 
             ; LEstNodeNo := MteTeRightChildRelNodeNo 
               (* ^Tricky.  This will also be the correct relative node no in 
@@ -4108,33 +4156,39 @@ MODULE MergeTxt
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeLMNewKindSet 
                          ) 
+            ; LMarkEstRef := MteTeLMNewChildRef 
             ; MteTeDoPatchLeftSibFmtNoMark := TRUE 
             ; MteTeSibFmtNoMarkExists := TRUE 
             ELSIF 0 <= MteTeEstTravInfo . EtiChildNo  
                   AND MteTeEstTravInfo . EtiChildNo 
                       < MteTeEstTravInfo . EtiChildCt 
-            THEN (* There will be an Est child to the left. *) 
+            THEN (* There will be an Est child to the left only. *) 
 (* CHECK: Is this really true? *) 
               LMarkKind := MarkKindTyp . RightSibFmtNo 
             ; LEstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
               (* ^Tricky.  This will also be the correct relative node no in 
                  the yet-to-be-constructed new Est node. 
-              *)  
+              *)
             ; LEstNodeCt 
                 := EstUtil . EstNodeCt
                      ( MteTeEstTravInfo . EtiChildLeafElem . LeChildRef ) 
               (* ^This is tricky too.  This child will be rightmost in the 
-                  yet-to-be-constructed new EstNode. *)  
+                  yet-to-be-constructed new EstNode. *)
+(* REVIEW this. *) 
+            ; LMarkEstRef := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
             ; MteTeSibFmtNoMarkExists := TRUE 
             ELSE 
               LMarkKind := MarkKindTyp . ChildFmtNo 
             ; LEstNodeNo := 0 
             ; LEstNodeCt := 1 
+            ; LMarkEstRef := MteTeEstTravInfo . EtiNodeRef 
+(* REVIEW this. ^ The old node seems doubtful. *) 
             END (* IF *) 
           ; NewBolTokMark 
               := Marks . TokMarkTyp 
                    { EstNodeNo := LEstNodeNo 
-                   , EstNodeCt := LEstNodeCt 
+                   , EstNodeCt := LEstNodeCt
+                   , TkmEstRef := LMarkEstRef 
                    (* ^May be overlaid. *) 
                    , Kind := LMarkKind
                    , FmtNo := FsNodeRef . FsFmtNo 
@@ -4187,7 +4241,7 @@ MODULE MergeTxt
                   ) 
               ; MteTeMaybeFinishBwdEdit 
                   ( FsNodeRef . FsFmtNo 
-                  , MarkNodeNo := MteTeRightChildRelNodeNo 
+                  , MarkNodeNo := MteTeRightChildRelNodeNo
                   ) 
               ; IF MteState # MteStateTyp . MteStateDone 
                 THEN
@@ -4239,7 +4293,7 @@ MODULE MergeTxt
             ; MteTeMaybeFinishBwdEdit 
                 ( FmtNo := FsNodeRef . FsFmtNo 
                 , MarkNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
-                )
+                ) 
             ; Assert
                 ( MteState = MteStateTyp . MteStateDone 
                 , AFT . A_MteTeTfsEndOfImageNotDone  
@@ -4994,7 +5048,8 @@ MODULE MergeTxt
           ; MteTeWaitingEdgeKind := EstHs . EdgeKindTyp . EdgeKindEstChild  
           ; MteTeRMChildRef := NIL 
           ; MteTeRMChildRelNodeNo := LbeStd . EstNodeNoNull 
-          ; MteTeRightChildRelNodeNo := LbeStd . EstNodeNoNull 
+          ; MteTeRightChildRelNodeNo := LbeStd . EstNodeNoNull
+          ; MteTeRightChildRef := NIL 
           ; MteTeLMNewChildRef := NIL (* Dead. Defensive. *) 
           ; MteTeLMNewKindSet := EstHs . EstChildKindSetEmpty 
             (* Dead. Defensive. *)  
@@ -5243,8 +5298,11 @@ MODULE MergeTxt
   ; BEGIN (* MergeTextEdit *) 
 
       VAR LLMCharPos : LbeStd . LimitedCharNoTyp 
-    ; VAR LNewEstRootRef : LbeStd . EstRootTyp 
+    ; VAR LNewEstRootRef : LbeStd . EstRootTyp
+    ; VAR LNewMarkedEstRef : LbeStd . EstRootTyp 
     ; VAR LNewSingletonOptKindSet : EstHs . EstChildKindSetTyp 
+    ; VAR LKindSet : EstHs . EstChildKindSetTyp 
+    ; VAR LIsOptSingletonList : BOOLEAN 
 
     ; BEGIN (* Block  MergeTextEdit body. *) 
         Assert 
@@ -5302,6 +5360,7 @@ MODULE MergeTxt
                 (* Can see through changed region after the change. *) 
       ; MteEstNodeCt := EstUtil . EstNodeCt ( EstRootRef ) 
       ; NewBolTokMark := Marks . TokMarkNull 
+      ; MteMarkCt := 0 
       ; NewLinesCt := 0 
       ; MaxTouchedNodeNo := LbeStd . EstNodeNoNull  
       ; LeadingBlankLinesIncluded := 0
@@ -5329,33 +5388,42 @@ MODULE MergeTxt
                         := LNewSingletonOptKindSet (* Dead. *) 
           , (* VAR *) LMCharPos := LLMCharPos (* Ignore. *) 
           ) 
-      ; Assert
-          ( MteState = MteStateTyp . MteStateDone 
-          , AFT . A_MergeTextEdit_NotDone 
-          )
-      ; Assert 
-          ( MaxTouchedNodeNo # LbeStd . EstNodeNoNull  
-          , AFT . A_MergeTextEdit_No_MaxTouchedNodeNo  
-          )
-      ; NewEstRootRef := LNewEstRootRef 
-      ; Assert 
-          ( NewBolTokMark . EstNodeCt 
-              = TravUtil . NodeCtOfDescendantWithNodeNo 
-                  ( NewEstRootRef , NewBolTokMark . EstNodeNo ) 
-          , AFT . A_MergeTextEdit_BadMarkEstNodeCt  
-          ) 
-(* TODO ^Since this is a bit time-comsuming, do it only if the debug level
-          is elevated.
-*) 
+      ; NewEstRootRef := LNewEstRootRef
       ; NodeNoChange 
           := EstUtil . EstNodeCt ( NewEstRootRef ) - MteEstNodeCt 
         (* All the changes we make to the Est are in one or two lines. 
            Those lines following the changes, to which NodeNoChange applies,
            all will have the same change, and it will also be the change 
            in the node count for the entire Est. *) 
+
+      ; Assert
+          ( MteState = MteStateTyp . MteStateDone 
+          , AFT . A_MergeTextEdit_NotDone 
+          )
+      ; Assert ( MteBlankSs = 0 , AFT . A_MergeTextEditNotZeroBlankSs ) 
       ; Assert 
-          ( MteBlankSs = 0 
-          , AFT . A_MergeTextEditNotZeroBlankSs 
+          ( MaxTouchedNodeNo # LbeStd . EstNodeNoNull  
+          , AFT . A_MergeTextEdit_No_MaxTouchedNodeNo  
+          )
+      ; Assert ( MteMarkCt > 0 , AFT . A_MergeTextEdit_NoNewMark ) 
+
+(* TODO: Since the following two assertions are a bit time-consuming, do them
+        only if the debug level is elevated or there is a failure.
+*) 
+      ; TravUtil .  GetDescendantWithNodeNo
+          ( NewEstRootRef
+          , NewBolTokMark . EstNodeNo
+          , (* VAR *) LNewMarkedEstRef 
+          , (* VAR *) LKindSet 
+          , (* VAR *) LIsOptSingletonList 
+          ) 
+      ; Assert 
+          ( NewBolTokMark . EstNodeCt = EstUtil . EstNodeCt ( LNewMarkedEstRef )
+          , AFT . A_MergeTextEdit_BadMarkEstNodeCt  
+          ) 
+      ; Assert 
+          ( NewBolTokMark . TkmEstRef = LNewMarkedEstRef
+          , AFT . A_MergeTextEdit_BadTkmEstRef   
           ) 
       ; MteCheckTokMarks ( ) 
       END (* Block *) 
