@@ -2787,6 +2787,8 @@ MODULE TempMark
                            := EstAbsNodeNo 
                               + RbmTeEstTravInfo . EtiChildRelNodeNo 
                        , EstNodeCt := 1 
+                       , TkmEstRef
+                           := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , Kind := MarkKindTyp . BlankLine 
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE 
@@ -2828,6 +2830,8 @@ MODULE TempMark
                            := EstAbsNodeNo 
                               + RbmTeEstTravInfo . EtiChildRelNodeNo 
                        , EstNodeCt := 1 
+                       , TkmEstRef
+                           := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , Kind := MarkKindTyp . BlankLine 
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := TRUE 
@@ -2881,6 +2885,8 @@ MODULE TempMark
                          := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt := 1 
+                     , TkmEstRef
+                         := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , Kind := MarkKindTyp . Plain 
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := TRUE 
@@ -2917,6 +2923,8 @@ MODULE TempMark
                        := EstAbsNodeNo 
                           + RbmTeEstTravInfo . EtiChildRelNodeNo 
                    , EstNodeCt := 1 
+                   , TkmEstRef
+                       := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                    , Kind := MarkKindTyp . Plain 
                    , FmtNo := FsNodeRef . FsFmtNo 
                    , StartAtEnd := FALSE 
@@ -3218,6 +3226,8 @@ MODULE TempMark
                          := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt := 1 
+                     , TkmEstRef
+                         := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , Kind := MarkKindTyp . Plain 
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
@@ -3269,6 +3279,8 @@ MODULE TempMark
                          := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt := 1 
+                     , TkmEstRef
+                         := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , Kind := MarkKindTyp . Plain 
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := TRUE 
@@ -3654,7 +3666,8 @@ MODULE TempMark
                      { EstNodeNo := EstAbsNodeNo 
                      , EstNodeCt
                          := EstUtil . EstNodeCt
-                              ( RbmTeEstTravInfo . EtiNodeRef ) 
+                              ( RbmTeEstTravInfo . EtiNodeRef )
+                     , TkmEstRef := RbmTeEstTravInfo . EtiNodeRef 
                      , Kind := MarkKindTyp . ChildFmtNo 
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
@@ -3679,7 +3692,9 @@ MODULE TempMark
                             + ORD ( EstHs . EstChildKindOptSingletonList 
                                     IN RbmTeEstTravInfo . EtiChildLeafElem 
                                        . LeKindSet 
-                                  ) 
+                                  )
+                     , TkmEstRef
+                         := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , Kind := MarkKindTyp . LeftSibFmtNo 
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
@@ -3694,7 +3709,8 @@ MODULE TempMark
                          := EstUtil . EstNodeCt ( RbmTeRMChildRef )
                             + ORD ( EstHs . EstChildKindOptSingletonList 
                                     IN RbmTeRMChildKindSet 
-                                  ) 
+                                  )
+                     , TkmEstRef := RbmTeRMChildRef
                      , Kind := MarkKindTyp . RightSibFmtNo 
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
