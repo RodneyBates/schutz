@@ -908,7 +908,7 @@ MODULE TravUtil
             LIsInFirstLine := TRUE 
           ELSE 
             IF FsNodeRef . FsKind 
-                  = FsKindTyp . FsKindEstChildOfList 
+               = FsKindTyp . FsKindEstChildOfList 
             THEN (* Fs node is for an Est list child. *) 
               IF EstTravInfo . EtiChildFmtNo = FsNodeRef . FsFmtNo 
               THEN (* Est child is the EstChildOfList or a mod thereon. *)  

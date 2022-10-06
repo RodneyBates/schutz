@@ -453,7 +453,8 @@ MODULE MergeTxt
     ; VAR MteTeLMNewChildRef : LbeStd . EstRootTyp 
     ; VAR MteTeLMNewKindSet : EstHs . EstChildKindSetTyp 
           (* ^During backwards traversal, the currently leftmost child
-             already merged into the being-constructed new Est node. 
+             and its kind set, already merged into the being-constructed
+             new Est node. 
           *) 
     ; VAR MteTeContainsFill : BOOLEAN 
     ; VAR MteTeInterestingChildrenExist : BOOLEAN 
@@ -609,6 +610,7 @@ MODULE MergeTxt
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeWaitingKindSet 
                          ) 
+            ; NewBolTokMark . TkmEstRef := MteTeWaitingRef  
             ; MteTeDoPatchLeftSibFmtNoMark := FALSE 
             END (* IF *) 
           ; MteTeWaitingRef := NIL (* Defensive *)  
@@ -678,7 +680,8 @@ MODULE MergeTxt
                 := EstUtil . EstNodeCt ( MteTeLMNewChildRef ) 
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeLMNewKindSet 
-                         ) 
+                         )
+            ; NewBolTokMark . TkmEstRef := MteTeLMNewChildRef  
             ; MteTeDoPatchLeftSibFmtNoMark := FALSE 
             END (* IF *) 
           ; MteTeWaitingFromChildNo := LbeStd . EstChildNoNull 
@@ -782,6 +785,7 @@ MODULE MergeTxt
                  ; IF MteTeDoPatchLeftSibFmtNoMark 
                    THEN 
                      NewBolTokMark . EstNodeCt := 1  
+                   ; NewBolTokMark . TkmEstRef := TModDel  
                    ; MteTeDoPatchLeftSibFmtNoMark := FALSE 
                    END (* IF *) 
                  ; MteNewDelIsRepair := FALSE (* Defensive *) 
@@ -817,6 +821,7 @@ MODULE MergeTxt
           ; IF LDoPatchLeftSibFmtNoMark 
             THEN 
               NewBolTokMark . EstNodeCt := 1  
+            ; NewBolTokMark . TkmEstRef := LModDelRef 
             END (* IF *) 
           ; MteNewDelThruFmtNo := EstHs . FmtNoNull 
           ; MteNewDelFromFmtNo := EstHs . FmtNoNull (* Defensive *) 
@@ -860,7 +865,8 @@ MODULE MergeTxt
                      := EstHs . EdgeKindTyp . EdgeKindLeadingMod  
                  ; IF MteTeDoPatchLeftSibFmtNoMark 
                    THEN 
-                     NewBolTokMark . EstNodeCt := 1  
+                     NewBolTokMark . EstNodeCt := 1
+                   ; NewBolTokMark . TkmEstRef := TModBlankLine 
                    ; MteTeDoPatchLeftSibFmtNoMark := FALSE 
                    END (* IF *) 
                  ; MteNewBlankLineFmtNo := EstHs . FmtNoNull 
@@ -887,7 +893,9 @@ MODULE MergeTxt
           ; MteTeWaitingEdgeKind := EstHs . EdgeKindTyp . EdgeKindLeadingMod  
           ; MteTeInterestingChildrenExist := TRUE 
           ; IF LDoPatchLeftSibFmtNoMark 
-            THEN NewBolTokMark . EstNodeCt := 1  
+            THEN
+              NewBolTokMark . EstNodeCt := 1
+            ; NewBolTokMark . TkmEstRef := LModBlankLineRef 
             END (* IF *) 
           ; MteNewBlankLineFmtNo := EstHs . FmtNoNull 
           ; MteNewBlankLineCt := 0 (* Defensive. *)
@@ -1037,12 +1045,12 @@ MODULE MergeTxt
                 ( MteTeEstTravInfo . EtiChildFmtNo , LNewEdgeKind ) 
             ; MteTeWaitingToChildNo := MteTeEstTravInfo . EtiChildNo + 1 
             ELSIF MteTeDoPatchLeftSibFmtNoMark 
-            THEN 
-              NewBolTokMark . EstNodeCt 
-                := EstUtil . EstNodeCt 
-                     ( EstUtil . IthChildRef 
-                         ( MteTeWaitingRef , MteTeWaitingFromChildNo ) 
-                     ) 
+            THEN
+              NewBolTokMark . TkmEstRef 
+                := EstUtil . IthChildRef 
+                     ( MteTeWaitingRef , MteTeWaitingFromChildNo ) 
+            ; NewBolTokMark . EstNodeCt 
+                := EstUtil . EstNodeCt ( NewBolTokMark . TkmEstRef )  
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeWaitingKindSet 
                          ) 
@@ -1101,14 +1109,14 @@ MODULE MergeTxt
             ; MteTeWaitingToChildNo := MteTeEstTravInfo . EtiChildNo + 1 
             ELSIF MteTeDoPatchLeftSibFmtNoMark 
             THEN 
-              NewBolTokMark . EstNodeCt 
-                := EstUtil . EstNodeCt 
-                     ( EstUtil . IthChildRef 
-                         ( MteTeWaitingRef , MteTeWaitingFromChildNo) 
-                     ) 
+              NewBolTokMark . TkmEstRef 
+                := EstUtil . IthChildRef 
+                     ( MteTeWaitingRef , MteTeWaitingFromChildNo ) 
+            ; NewBolTokMark . EstNodeCt 
+                := EstUtil . EstNodeCt ( NewBolTokMark . TkmEstRef ) 
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeWaitingKindSet 
-                         ) 
+                         )
             ; MteTeDoPatchLeftSibFmtNoMark := FALSE 
             END (* IF *) 
           ; MteTeWaitingFromChildNo := 0 
@@ -1604,12 +1612,12 @@ MODULE MergeTxt
               ( EstHs . FmtNoNull , EstHs . EdgeKindTyp . EdgeKindEstChild )
           ; IF MteTeWaitingFromChildNo # LbeStd . EstChildNoNull  
                AND MteTeDoPatchLeftSibFmtNoMark 
-            THEN 
-              NewBolTokMark . EstNodeCt 
-                := EstUtil . EstNodeCt 
-                     ( EstUtil . IthChildRef 
-                         ( MteTeWaitingRef , MteTeWaitingFromChildNo )  
-                     ) 
+            THEN
+              NewBolTokMark . TkmEstRef
+                := EstUtil . IthChildRef 
+                     ( MteTeWaitingRef , MteTeWaitingFromChildNo )  
+            ; NewBolTokMark . EstNodeCt 
+                := EstUtil . EstNodeCt ( NewBolTokMark . TkmEstRef )  
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeWaitingKindSet 
                          ) 
@@ -4150,13 +4158,18 @@ MODULE MergeTxt
             ; LEstNodeNo := MteTeRightChildRelNodeNo 
               (* ^Tricky.  This will also be the correct relative node no in 
                  the yet-to-be-constructed new Est node. 
-              *)  
+              *)
+(* We don't have the needed value of  MteTeLMNewChildRef yet, so note to
+   patch these two values later: 
             ; LEstNodeCt 
                 := EstUtil . EstNodeCt ( MteTeLMNewChildRef ) 
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeLMNewKindSet 
                          ) 
-            ; LMarkEstRef := MteTeLMNewChildRef 
+            ; LMarkEstRef := MteTeLMNewChildRef
+*)
+            ; LEstNodeCt := - 1
+            ; LMarkEstRef := NIL 
             ; MteTeDoPatchLeftSibFmtNoMark := TRUE 
             ; MteTeSibFmtNoMarkExists := TRUE 
             ELSIF 0 <= MteTeEstTravInfo . EtiChildNo  
@@ -5143,7 +5156,8 @@ MODULE MergeTxt
             ; MteTeRMChildRef 
                 := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
             ; MteTeRMChildRelNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
-            ; MteTeRightChildRelNodeNo := EstUtil . EstNodeCt ( EstRef ) 
+            ; MteTeRightChildRelNodeNo := EstUtil . EstNodeCt ( EstRef )
+            ; MteTeRightChildRef := NIL 
             ; MteTeStartFmtNo := EstHs . FmtNoNull 
             ELSE 
               CantHappen ( AFT . A_MteTraverseEstBadStateBefore ) 
