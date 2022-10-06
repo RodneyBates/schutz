@@ -136,12 +136,11 @@ INTERFACE TravUtil
      and ChildFmtNo. 
   *) 
 
-; PROCEDURE SetToChildContainingNodeNo 
-    ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
-    ; EstRelNodeNo : LbeStd . EstNodeNoTyp 
-      (* ^Node number relative to the parent of EstTravInfo. *) 
-    ) 
-  RAISES { Backout } 
+; PROCEDURE SetToChildWGreaterFmtNo 
+    ( VAR EstTravInfo : EstTravInfoTyp ; FmtNo : EstHs . FmtNoTyp ) 
+  RAISES { Backout }
+  (* Leftmost Est child whose format no is > FmtNo. *)
+  (* PRE: EstTravInfo is for a nonlist Est node. *) 
 
 ; PROCEDURE IncEstChild 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp ) 

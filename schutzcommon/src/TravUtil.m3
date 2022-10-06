@@ -300,7 +300,27 @@ MODULE TravUtil
           ( (* VAR *) EstTravInfo , EstNodeRef , ParentAbsNodeNo ) 
       ; SetToChildContainingNodeNo ( (* IN OUT *) EstTravInfo , EstRelNodeNo ) 
       END (* IF *) 
-    END InitToChildContainingNodeNo 
+    END InitToChildContainingNodeNo
+
+(* EXPORTED: *) 
+; PROCEDURE SetToChildWGreaterFmtNo 
+    ( VAR EstTravInfo : EstTravInfoTyp ; FmtNo : EstHs . FmtNoTyp ) 
+  RAISES { Backout }
+  (* Leftmost Est child whose format no is > FmtNo. *)
+  (* PRE: EstTravInfo is for a nonlist Est node. *) 
+
+  = BEGIN
+      GetLMEstChild ( EstTravInfo ) 
+    ; LOOP
+        IF EstTravInfo . EtiChildNo >= EstTravInfo . EtiChildCt
+        THEN (* Off right end. *)
+          RETURN 
+        ELSIF EstTravInfo . EtiChildLeafElem . LeFmtNo > FmtNo
+        THEN (* Found it. *) RETURN
+        ELSE IncEstChild ( EstTravInfo ) 
+        END (* IF *) 
+      END (* LOOP *) 
+    END SetToChildWGreaterFmtNo 
 
 (* EXPORTED: *) 
 ; PROCEDURE GetLMEstChild ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp )
@@ -493,7 +513,6 @@ MODULE TravUtil
       END (* IF *) 
     END SetToIthChild 
 
-(* EXPORTED: *) 
 ; PROCEDURE SetToChildContainingNodeNo 
     ( VAR (* IN OUT *) EstTravInfo : EstTravInfoTyp 
     ; EstRelNodeNo : LbeStd . EstNodeNoTyp 

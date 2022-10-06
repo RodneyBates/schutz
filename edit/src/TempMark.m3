@@ -1940,8 +1940,8 @@ MODULE TempMark
      (RbmCurrentLineTokMark) to the beginning of line and switches to
      RbmStateFwdNl, where it traverses forward through every node on
      the line, converting any temp marks to their normal,
-     beginning-of-line-relative form, using the newly built TokMark to
-     the beginning of the line.
+     beginning-of-line-relative form, using the newly built
+     RbmCurrentLineTokMark to the beginning of the line.
  
      When it reaches the end of the line, it goes back to
      RbmStateDescend, where it first returns to RbmTraverseEst, then
@@ -1952,8 +1952,8 @@ MODULE TempMark
      only forms of new line where we can reverse (backward to forward)
      and be sure that FmtKind can be computed for all nodes on the
      path to the TokMark.  Other possible new lines are passed over
-     when going backwards.  When going forwards, when one of these
-     passed over new lines occurs, traversing continues into the next
+     when going backwards.  Later, when going forwards, when one of these
+     passed-over new lines occurs, traversing continues into the next
      line, with a new TokMark constructed.  This could waste some
      traversal time, or it could get lucky and pick up some marks on
      the next line.
@@ -2096,7 +2096,7 @@ MODULE TempMark
       ; EstRecomputeFmtKindProc : ProcTyp 
         (* ^A procedure to compute FmtKind for this Est, helpful whenever we
            discover Either EstApproxFmtKind = FmtKindVert, or we are in
-           StateFwdNl. *) 
+           RbmStateFwdNl. *) 
       ; EstIndentPos1 : LbeStd . LimitedCharNoTyp 
       ; EstIndentPosN : LbeStd . LimitedCharNoTyp 
         (* ^EstIndentPos1 and EstIndentPosN are maintained assuming
@@ -2131,7 +2131,7 @@ MODULE TempMark
     ; VAR RbmTeIndentPos : LbeStd . LimitedCharNoTyp 
     ; VAR RbmTeIsFirstLine : BOOLEAN := TRUE  
     (* RbmTeIsFirstLine and RbmTeIndentPos are maintained as we go, only in
-       StateFwdNl, but can be computed at any time by RbmTeTfsSetIndentInfo.
+       RbmStateFwdNl, but can be computed at any time by RbmTeTfsSetIndentInfo.
        They are maintained as if the Est subtree is formatted vertically.
     *) 
     ; VAR RbmTeDoneWEst : BOOLEAN 
@@ -2152,7 +2152,7 @@ MODULE TempMark
           END (* IF *) 
         END RbmTeInitNodeToPatch 
 
-    ; PROCEDURE RbmTeSetToNextTempMark ( )
+    ; PROCEDURE RbmTeSetToNextTempMarkedChild ( )
       RAISES { Backout } 
 
       = BEGIN 
@@ -2165,7 +2165,7 @@ MODULE TempMark
           THEN 
             RbmTeCurrentChildNoToPatch := RbmTeEstTravInfo . EtiChildNo
           END (* IF *) 
-        END RbmTeSetToNextTempMark 
+        END RbmTeSetToNextTempMarkedChild 
 
     ; PROCEDURE RbmTeInitEstTravInfoFwd 
         ( EstNodeRef : LbeStd . EstRootTyp 
@@ -2414,7 +2414,7 @@ MODULE TempMark
         ; RecomputeFmtKindProc : ProcTyp 
           (* ^A procedure to compute FmtKind for this list of Fs children, 
              helpful whenever we discover Either ApproxFmtKind = FmtKindVert, 
-             or we are in StateFwdNl. *) 
+             or we are in RbmStateFwdNl. *) 
         ; FsChildCt : LangUtil . FsChildNoTyp 
         ; InitialFsChildNo : LangUtil . FsChildNoSignedTyp 
         ) 
@@ -2464,7 +2464,7 @@ MODULE TempMark
         ; RecomputeFmtKindProc : ProcTyp 
           (* ^A procedure to compute FmtKind for this list of Fs children, 
              helpful whenever we discover Either ApproxFmtKind = FmtKindVert, 
-             or we are in StateFwdNl. *) 
+             or we are in RbmStateFwdNl. *) 
         ; FsChildCt : LangUtil . FsChildNoTyp 
         ; InitialFsChildNo : LangUtil . FsChildNoTyp 
         ) 
@@ -2520,7 +2520,7 @@ MODULE TempMark
         ; FsRecomputeFmtKindProc : ProcTyp 
           (* ^A procedure to compute FmtKind for this Fs tree, helpful whenever
              we discover Either ApproxFmtKind = FmtKindVert, or we are in
-             StateFwdNl. *) 
+             RbmStateFwdNl. *) 
         ) 
       RAISES { Backout , Thread . Alerted } 
 
@@ -2543,8 +2543,8 @@ MODULE TempMark
           END RbmTeTfsSetIndentInfo 
 
       ; PROCEDURE RbmTeTfsEnterStateFwdNl ( ) 
-        (* PRE: RbmCurrentLineTokMark is initialized for the line we are 
-                entering. 
+        (* PRE: RbmCurrentLineTokMark identifies the rightmost new line at
+                beginnint of the line we are entering. 
         *) 
 
         = BEGIN (* RbmTeTfsEnterStateFwdNl  *)  
@@ -2839,8 +2839,8 @@ MODULE TempMark
                        , TmTok := LbeStd . Tok__BlankLine 
                        }
               ; RbmTeTfsSetIndentInfo ( Bwd := TRUE )  
-              ; RbmTeTfsEnterStateFwdNl ( ) 
               ; RbmTeIncEstChild ( ) 
+              ; RbmTeTfsEnterStateFwdNl ( ) 
 
               | RbmStateFwdNl 
               (* We have hit the end of the current line. 
@@ -2916,7 +2916,7 @@ MODULE TempMark
             THEN LTok := LbeStd . Tok__CmntAtEndOfLine 
             ELSE LTok := LbeStd . Tok__Cmnt 
             END (* IF *) 
-          ; RbmTeTfsSetIndentInfo ( Bwd := FALSE )  
+          ; RbmTeTfsSetIndentInfo ( Bwd := TRUE )  
           ; RbmCurrentLineTokMark 
               := Marks . TokMarkTyp 
                    { EstNodeNo 
@@ -2952,7 +2952,7 @@ MODULE TempMark
               CantHappen ( AFT . A_RbmTeTfsBolCmntIntoFwdNl_BadCommentType ) 
             END (* TYPECASE *) 
           ; RbmTeTfsCmntFwdNl ( ModCmnt ) 
-          ; RbmTeTfsSetIndentInfo ( Bwd := TRUE )  
+          ; RbmTeTfsSetIndentInfo ( Bwd := FALSE)  
           ; RbmTeIncEstChild ( ) 
           END RbmTeTfsBolCmntIntoFwdNl 
 
@@ -3481,12 +3481,14 @@ MODULE TempMark
 
                     | MarkKindTyp . ChildFmtNo 
                     => Assert 
-                        ( RbmTeEstTravInfo . EtiParentRef = WTempMark . TokMark . TkmEstRef 
+                        ( RbmTeEstTravInfo . EtiParentRef
+                          = WTempMark . TokMark . TkmEstRef 
                         , AFT . A_RbmTeTfsInsTok_InsTokWOTempMark 
                         ) 
                     | MarkKindTyp . Plain 
                     => Assert 
-                        ( RbmTeEstTravInfo . EtiParentRef = WTempMark . TokMark . TkmEstRef 
+                        ( RbmTeEstTravInfo . EtiParentRef
+                          = WTempMark . TokMark . TkmEstRef 
                         , AFT . A_RbmTeTfsInsTok_DeletedInsTokWOTempMark 
                         ) 
                     END (* CASE *) 
@@ -3610,7 +3612,8 @@ MODULE TempMark
 
                 TYPECASE RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                 OF NULL 
-                => RbmTeIncEstChild ( ) 
+                => RbmTeIncEstChild ( )
+                
                 | ModHs . EstDummyTempMarkTyp 
                 => IF RbmTeEstTravInfo . EtiChildNo + 1 
                       < RbmTeEstTravInfo . EtiChildCt 
@@ -3629,7 +3632,8 @@ MODULE TempMark
                             ( RbmTeEstTravInfo . EtiChildCt - 1 ) 
                       ) 
                   END (* IF *)  
-                ; RbmTeIncEstChild ( ) 
+                ; RbmTeIncEstChild ( )
+                
                 | ModHs . EstDummyTyp 
                 => RbmTeIncEstChild ( ) 
                 ELSE 
@@ -3676,8 +3680,8 @@ MODULE TempMark
                      } 
             ELSIF RbmTeEstTravInfo . EtiChildNo 
                   < RbmTeEstTravInfo . EtiChildCt 
-            THEN (* There is an Est child to the right of the FmtNo item, 
-                    which is a LeftSib of the EstChild. 
+            THEN (* There is an Est child to the right of the FmtNo item. 
+                    The FmtNo item is a LeftSib of the EstChild. 
                  *) 
               RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
@@ -3741,9 +3745,9 @@ MODULE TempMark
                ; RbmEstListChildrenToPass := 0 (* Dead *) 
                ; RbmTeTfsSetIndentInfo ( Bwd := TRUE )  
                ; RbmTeIncEstChild ( ) 
-               ; RbmTeTfsBuildFmtNoMark ( )
                ; FsApproxFmtKind := FmtKindVert 
                ; RbmTeTfsEnterStateFwdNl ( ) 
+               ; RbmTeTfsBuildFmtNoMark ( )
                ELSE INC ( RbmLineBreakCt ) 
                END (* IF *) 
 
@@ -3775,7 +3779,7 @@ MODULE TempMark
                       , (* IN OUT *) EstListChildrenToPass 
                           := RbmEstListChildrenToPass 
                       ) 
-                 THEN (* Stay in State RbmFwdNl, but otherwise treat the 
+                 THEN (* Stay in State RbmStateFwdNl, but otherwise treat the 
                          line break as taken. *) 
                    IF RbmPrevTok # LbeStd . Tok__BegOfLine 
                    THEN 
@@ -4130,10 +4134,7 @@ MODULE TempMark
                         ) 
                    ; Assert 
                        ( RbmState 
-                         IN RbmStateSetTyp 
-                              { RbmStateBwdNl 
-                              , RbmStateDescend 
-                               } 
+                         IN RbmStateSetTyp { RbmStateBwdNl , RbmStateDescend } 
                        , AFT . A_RbmTeTraverseFs_BOIBadState 
                        ) 
                    ; RbmEstRefForTrailingMarks := NIL 
@@ -4146,12 +4147,13 @@ MODULE TempMark
                    ; RbmTeIsFirstLine := TRUE  
                    ; RbmTeIndentPos := EstIndentPos1 
                    ; CASE RbmState <* NOWARN *> 
-                     OF RbmStateDescend => 
+                     OF RbmStateDescend
+                     => 
                      | RbmStateBwdNl 
                      => RbmTeIncEstChild ( ) 
                      END (* CASE *) 
-                   ; RbmTeTfsBuildFmtNoMark ( ) 
                    ; RbmTeTfsEnterStateFwdNl ( ) 
+                   ; RbmTeTfsBuildFmtNoMark ( ) 
 
                    (* End of Image. *) 
                    | FsKindTyp . FsKindEndOfImage 
@@ -4269,7 +4271,7 @@ MODULE TempMark
               = ParseInfo . PiFinalTempMarkListRef ^ [ RbmTempMarkElemNo ] 
             DO 
               IF RbmTeEstTravInfo . EtiNodeRef = WTempMark . TokMark . TkmEstRef 
-              THEN (* The next temp mark denotes the Est parent node. *) 
+              THEN (* The current temp mark denotes the Est parent node. *) 
                 CASE WTempMark . TokMark . Kind 
                 OF MarkKindTyp . Plain 
                 , MarkKindTyp . BlankLine 
@@ -4297,14 +4299,15 @@ MODULE TempMark
                   RbmTeDoneWEst := TRUE 
 
                 | MarkKindTyp . ChildFmtNo 
-                => RbmTeFmtNo := WTempMark . TokMark . FmtNo 
-                   (* ^Arrange to visit the insertion token.  Could be a ModTok. *) 
+                => TravUtil . GetLMEstChild ( RbmTeEstTravInfo ) 
+                ; TravUtil . SetToChildWGreaterFmtNo
+                    ( RbmTeEstTravInfo , WTempMark . TokMark . FmtNo ) 
+                ; RbmTeFmtNo := WTempMark . TokMark . FmtNo 
+                  (* ^Arrange to visit the insertion token. *)
                 ELSE 
                   CantHappen 
-                    ( AFT . A_RbmTeComputeEstAndFmtNoForDescend_BadMarkKind 
-                    ) 
-                  (* ^For a LeftSib mark, we will not descend into its tree. 
-                  *) 
+                    ( AFT . A_RbmTeComputeEstAndFmtNoForDescend_BadMarkKind ) 
+                  (* ^For a LeftSib mark, we would not descend into its tree. *) 
                 END (* CASE *) 
               ELSIF RbmTeEstTravInfo . EtiChildCt <= 0 
               THEN 
@@ -4314,27 +4317,22 @@ MODULE TempMark
                      >= RbmTeEstTravInfo . EtiChildCt
                      AND WTempMark . TokMark . TkmEstRef = RbmTeRMChildRef 
                    ) 
-                THEN (* We are off the right end, but there is a TempMark
-                        pointing to the rightmost child.  It must be RightSib. 
+                THEN (* We are off the right end, but WTempMark points
+                        to the rightmost child.  It must be RightSib. 
                         If we are ascending, it may already be unmarked. *)
                   Assert 
                     ( WTempMark . TokMark . Kind = MarkKindTyp . RightSibFmtNo
                     , AFT . A_RbmTeComputeEstAndFmtNoForDescend_Youngest_not_RightSib 
                     ) 
                 ; RbmTeFmtNo := WTempMark . TokMark . FmtNo 
-                ELSIF 
-FALSE AND             WTempMark . TokMark . TkmEstRef 
-                      = RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
-                THEN (* There is a TempMark pointing to the next elder child. 
-                        It must be LeftSib and can only happen when truly
-                        descending. *)   
-                  Assert 
-                    ( WTempMark . TokMark . Kind = MarkKindTyp . LeftSibFmtNo
-                    , AFT . A_RbmTeComputeEstAndFmtNoForDescend_Elder_not_LeftSib
-                    ) 
-                ; RbmTeFmtNo := WTempMark . TokMark . FmtNo 
+                ELSIF WTempMark . TokMark . TkmEstRef 
+                      = RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef
+                      AND WTempMark . TokMark . Kind = MarkKindTyp . LeftSibFmtNo
+                THEN (* WTempMark points to the next elder child and is
+                        LeftSib.  This can only happen when descending. *)   
+                  RbmTeFmtNo := WTempMark . TokMark . FmtNo 
                 ELSE 
-                  RbmTeSetToNextTempMark ( )
+                  RbmTeSetToNextTempMarkedChild ( )
                 ; IF RbmTeEstTravInfo . EtiChildNo 
                      >= RbmTeEstTravInfo . EtiChildCt 
                   THEN 
