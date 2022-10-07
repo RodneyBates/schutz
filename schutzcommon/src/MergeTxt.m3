@@ -5340,12 +5340,12 @@ MODULE MergeTxt
     ; VAR LIsOptSingletonList : BOOLEAN 
 
     ; BEGIN (* Block  MergeTextEdit body. *)
-        IF DelFromPos = LbeStd . NodeNoNull 
+        IF DelFromPos = LbeStd . EstNodeNoNull 
            OR ( DelToPos = DelFromPos AND InsLen = 0 ) 
         THEN (* No changes. *)
           NewEstRootRef := EstRootRef
         ; NodeNoChange := 0
-        ; MaxTouchedNodeNo := LbeStd . NodeNoNull
+        ; MaxTouchedNodeNo := LbeStd . EstNodeNoNull
         ; NewBolTokMark := StartTokMark
         ; NewLinesCt := 0
         ; LeadingBlankLinesIncluded := 0 
