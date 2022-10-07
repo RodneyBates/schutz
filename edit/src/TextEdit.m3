@@ -1563,7 +1563,18 @@ MODULE TextEdit
               ( IfteOldEstRoot , IfteImagePers . IpLang 
               , "Before MergeTextEdit " 
               ) 
+          END (* IF *)
+
+        ; IF DelNlShift = LbeStd . LimitedCharNoInfinity
+           AND InsNlPos = LbeStd . LimitedCharNoInfinity
+           AND ( TempEditRef . TeDelFromPos = LbeStd . LimitedCharNoInfinity 
+                 OR TempEditRef . TeDelToPos = TempEditRef . TeDelFromPos
+                    AND InsLen = 0
+               )
+(* TODO: Check how this ever happened.  test14_142, in Edit_Cut. *)  
+          THEN RETURN
           END (* IF *) 
+
         ; MergeTxt . MergeTextEdit 
             ( Lang := IfteImagePers . IpLang 
             , EstRootRef := IfteOldEstRoot 

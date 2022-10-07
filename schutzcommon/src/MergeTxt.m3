@@ -508,10 +508,10 @@ MODULE MergeTxt
          do the expand.  Waiting as long as possible avoids some cases
          of expanding unnecessarily, by giving a chance for MteTouchedToPos
          to be set by blanks, after the end of the last conditional
-         format insertion token.  MteTeCfInsTokFromPos=CharNoInfinity
+         format insertion token.  MteTeCfInsTokFromPos=LimitedCharNoInfinity
          means this mechanism is not being used.  It is not used for
          conditional format subtrees that do not insert their tokens. 
-         MteTeCfInsTokFromPos=CharNoUnknown means we are waiting to
+         MteTeCfInsTokFromPos=LimitedCharNoUnknown means we are waiting to
          forward scan the leading blanks of the LM conditional insertion. *)   
     ; VAR MteTeRMFsChildNo : LangUtil . FsChildNoSignedTyp 
           (* ^Only used when we have an FsList rule. *) 
@@ -2493,13 +2493,12 @@ MODULE MergeTxt
               ELSE 
                 CantHappen ( AFT . A_MteTeTfsModBlankLine1stBwd_NotDone ) 
               END 
-            ; MaxTouchedNodeNo 
-                := MAX ( MaxTouchedNodeNo 
-                       , EstAbsNodeNo 
-                         + MteTeEstTravInfo . EtiChildRelNodeNo 
-                       ) 
-            ; MteTeDecEstChild ( ) 
             END (* IF *) 
+          ; MaxTouchedNodeNo 
+              := MAX ( MaxTouchedNodeNo 
+                     , EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
+                     ) 
+          ; MteTeDecEstChild ( ) 
           END MteTeTfsModBlankLine1stBwd 
 
       ; PROCEDURE MteTeTfsModBlankLine1stFwd 
@@ -5340,8 +5339,11 @@ MODULE MergeTxt
     ; VAR LIsOptSingletonList : BOOLEAN 
 
     ; BEGIN (* Block  MergeTextEdit body. *)
-        IF DelFromPos = LbeStd . EstNodeNoNull 
-           OR ( DelToPos = DelFromPos AND InsLen = 0 ) 
+        IF DelNlShift = LbeStd . LimitedCharNoInfinity
+           AND InsNlPos = LbeStd . LimitedCharNoInfinity
+           AND ( DelFromPos = LbeStd . LimitedCharNoInfinity 
+                 OR ( DelToPos = DelFromPos AND InsLen = 0 )
+               ) 
         THEN (* No changes. *)
           NewEstRootRef := EstRootRef
         ; NodeNoChange := 0
@@ -5421,6 +5423,7 @@ MODULE MergeTxt
         ; MteFinishItemNo := 0 
           (* Will be reassigned later, mostly same value. *)  
         END (* IF *) 
+
       ; MteTraverseEst 
           ( EstRef := EstRootRef 
           , KindSet := EstHs . EstChildKindSetEmpty  

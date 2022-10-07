@@ -747,7 +747,7 @@ MODULE Display
 
   ; BEGIN 
       Info . HiIsIn := FALSE 
-    ; Info . HiFirstCharPos := LbeStd . CharNoInfinity 
+    ; Info . HiFirstCharPos := LbeStd . CharNoInfinity
     ; Info . HiSecondCharPos := LbeStd . CharNoInfinity 
     ; IF LeftMark # NIL 
          AND RightMark # NIL 
