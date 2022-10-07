@@ -70,9 +70,9 @@ MODULE MergeTxt
     ; VAR NewEstRootRef : EstHs . EstRefTyp 
     ; VAR NodeNoChange : LbeStd . EstNodeNoTyp   
     ; VAR MaxTouchedNodeNo : LbeStd . EstNodeNoTyp
-      (* ^Est nodes with old node numbers > MaxTouchedNodeNo will have node
-          numbers in the new tree that differ by NodeNoChange, which can be
-          negative or positive.  Any references to them need to be adjusted
+      (* ^Nodes in the old Est with node numbers > MaxTouchedNodeNo will have
+          node numbers in the new tree that differ by NodeNoChange, which can
+          be negative or positive.  Any references to them need to be adjusted
           to match.  MergeTextEdit doesn't know where they are, so caller
           must do it.  OTOH, MergeTextEdit does adjust node numbers in
           marks it produces.
@@ -1587,6 +1587,7 @@ MODULE MergeTxt
                        , IsImpliedNewLine := FALSE 
                        , TmTok := LbeStd . Tok__BlankLine 
                        } 
+              ; INC ( MteMarkCt) 
               ; INC ( NewLinesCt ) 
               ; MteState := MteStateTyp . MteStateDone 
               (* This is the replacement for the starting Nl. *) 
@@ -2461,10 +2462,7 @@ MODULE MergeTxt
                        , EstAbsNodeNo 
                          + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
-            ; IF MteItemCt > 0 
-              THEN
-                MteTeDecEstChild ( ) 
-              END 
+            ; IF MteItemCt > 0 THEN MteTeDecEstChild ( ) END (* IF *) 
             ELSE (* Traverse backward into the blank line. *) 
               MteTeBwdBlanks ( ) (* Inside the deleted region. *)  
             ; MteTeBwdBlanks ( ) (* Left of the deleted region. *) 
@@ -2906,9 +2904,9 @@ MODULE MergeTxt
                            relative to the preceeding item, instead of
                            relative to the indent position.  But,
                            alas, the relativity is different for a
-                           preceeding comment (intervening blanks have
+                           preceding comment (intervening blanks have
                            to be counted in the relative position) and
-                           a preceeding ModText (intervening blanks
+                           a preceding ModText (intervening blanks
                            are already provided for by the ModText).
                            Since the one can change to the other, this
                            would have entailed even more complexity and
@@ -3086,6 +3084,11 @@ MODULE MergeTxt
                    ; INC ( MteMarkCt ) 
                    ; MteState := MteStateTyp . MteStateDone 
                    END 
+                 ; MaxTouchedNodeNo 
+                     := MAX ( MaxTouchedNodeNo 
+                            , EstAbsNodeNo 
+                              + MteTeEstTravInfo . EtiChildRelNodeNo 
+                            ) 
                  ELSE 
                    MteTeTfsModCmntBwd ( ModCmnt ) 
                  END (* IF *) 
@@ -3394,6 +3397,11 @@ MODULE MergeTxt
 (* FIXME: May have to adjust ModTextToPos. *) 
                  ; MteTeTfsModTextBwd ( ModText ) 
                  END (* IF *) 
+               ; MaxTouchedNodeNo 
+                   := MAX ( MaxTouchedNodeNo 
+                          , EstAbsNodeNo 
+                            + MteTeEstTravInfo . EtiChildRelNodeNo 
+                          ) 
                ELSE (* Handle the trailing blanks here. *) 
                  MteTeBwdBlanks ( ) 
                ; MteTeMaybeFinishBwdEdit 
@@ -3470,6 +3478,11 @@ MODULE MergeTxt
             , MteStateTyp . MteStateBwdNl 
             , MteStateTyp . MteStateDone  
             => MteTeSetIndentInfo ( ) 
+            ; MaxTouchedNodeNo 
+                := MAX ( MaxTouchedNodeNo 
+                       , EstAbsNodeNo 
+                         + MteTeEstTravInfo . EtiChildRelNodeNo 
+                       ) 
             END (* CASE MteState *)
 
           (* Recurse: *) 
@@ -3528,6 +3541,7 @@ MODULE MergeTxt
                          , IsImpliedNewLine := FALSE 
                          , TmTok := EstRef . EstTok  
                          } 
+                ; INC ( MteMarkCt) 
                 ; MteState := MteStateTyp . MteStateDone 
                 END
               ELSE
@@ -3555,6 +3569,7 @@ MODULE MergeTxt
                          , IsImpliedNewLine := FALSE 
                          , TmTok := EstRef . EstTok  
                          } 
+                ; INC ( MteMarkCt) 
                 ; MteState := MteStateTyp . MteStateDone 
                 END (* IF *) 
 *)
@@ -4128,7 +4143,15 @@ MODULE MergeTxt
                   ) 
               ; IF FsNodeRef . FsFmtNo <= TModDel . ModDelThruFmtNo 
                 THEN (* The delete mod applies to this token. *) 
-                  Delete := TRUE 
+                  Delete := TRUE
+                ; IF MteCharPos < MteTouchedToPos 
+                  THEN
+                    MaxTouchedNodeNo 
+                      := MAX ( MaxTouchedNodeNo 
+                             , EstAbsNodeNo 
+                               + MteTeEstTravInfo . EtiChildRelNodeNo 
+                             ) 
+                  END (* IF *) 
                 ; IsRepair 
                     := EstHs . EstChildKindContainsInsertionRepair 
                        IN MteTeEstTravInfo . EtiChildLeafElem . LeKindSet
@@ -4208,7 +4231,7 @@ MODULE MergeTxt
                    , StartAtEnd := FALSE 
                    , IsImpliedNewLine := FALSE 
                    , TmTok := MteTeEstTravInfo . EtiParentRef . EstTok 
-(* TODO: ^This probably needs a case for OptSingletonList, but this field
+(* TODO: ^This probably needs a case for OptSingletonList, but that field
           is not being used anyway.
 *) 
                    } 
@@ -4314,8 +4337,7 @@ MODULE MergeTxt
             ; MteTeDecEstChild ( ) 
             ; MaxTouchedNodeNo 
                 := MAX ( MaxTouchedNodeNo 
-                       , EstAbsNodeNo 
-                         + MteTeEstTravInfo . EtiChildRelNodeNo 
+                       , EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
                        ) 
 
             | MteStateTyp . MteStateFwd 
@@ -4649,7 +4671,7 @@ MODULE MergeTxt
                 THEN 
                   MaxTouchedNodeNo 
                     := MAX ( MaxTouchedNodeNo 
-                           , EstAbsNodeNo 
+                           , EstAbsNodeNo
                              + MteTeEstTravInfo . EtiChildRelNodeNo 
                            ) 
                 END 
@@ -5256,8 +5278,7 @@ MODULE MergeTxt
             END (* CASE MteState *) 
           END (* IF *) 
         ; IF MteTeParentIsTouched  
-          THEN 
-            MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , EstAbsNodeNo ) 
+          THEN MaxTouchedNodeNo := MAX ( MaxTouchedNodeNo , EstAbsNodeNo ) 
           END 
         ; NewEstRef := MteTeNewEstRef 
         ; EVAL MteTeNewEstRef (* For breakpoint. *)  
@@ -5318,8 +5339,20 @@ MODULE MergeTxt
     ; VAR LKindSet : EstHs . EstChildKindSetTyp 
     ; VAR LIsOptSingletonList : BOOLEAN 
 
-    ; BEGIN (* Block  MergeTextEdit body. *) 
-        Assert 
+    ; BEGIN (* Block  MergeTextEdit body. *)
+        IF DelFromPos = LbeStd . NodeNoNull 
+           OR ( DelToPos = DelFromPos AND InsLen = 0 ) 
+        THEN (* No changes. *)
+          NewEstRootRef := EstRootRef
+        ; NodeNoChange := 0
+        ; MaxTouchedNodeNo := LbeStd . NodeNoNull
+        ; NewBolTokMark := StartTokMark
+        ; NewLinesCt := 0
+        ; LeadingBlankLinesIncluded := 0 
+        ; TrailingBlankLinesIncluded := 0
+        ; RETURN 
+        END (* IF *) 
+      ; Assert 
           ( InsNlPos = LbeStd . LimitedCharNoInfinity 
             OR DelNlShift = LbeStd . LimitedCharNoInfinity 
           , AFT . A_MteBothInsAndDelNl 

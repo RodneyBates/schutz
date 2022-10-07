@@ -3441,7 +3441,7 @@ MODULE TextEdit
                                  + 1 
                                , 0 
                                ) 
-                      (* No of affected chars to left of previosly edited. *)
+                      (* ^No of affected chars to left of previosly edited. *)
                     ; LTempEditRef . TeDelToPos 
                         := MIN ( LTempEditRef . TeDelToPos + LRightCharCt 
                                , LLength
