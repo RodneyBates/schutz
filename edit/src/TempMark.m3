@@ -2793,7 +2793,7 @@ MODULE TempMark
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
-                       , TmTok := LbeStd . Tok__BlankLine 
+                       , TkmTok := LbeStd . Tok__BlankLine 
                        } 
               ; LOOP (* Thru temp marks in this blank line *) 
                   WITH 
@@ -2836,7 +2836,7 @@ MODULE TempMark
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := TRUE 
                        , IsImpliedNewLine := FALSE 
-                       , TmTok := LbeStd . Tok__BlankLine 
+                       , TkmTok := LbeStd . Tok__BlankLine 
                        }
               ; RbmTeTfsSetIndentInfo ( Bwd := TRUE )  
               ; RbmTeIncEstChild ( ) 
@@ -2891,7 +2891,7 @@ MODULE TempMark
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := TRUE 
                      , IsImpliedNewLine := FALSE 
-                     , TmTok := LbeStd . Tok__CmntAtEndOfLine 
+                     , TkmTok := LbeStd . Tok__CmntAtEndOfLine 
                      } 
             ELSE 
               RbmPrevTok := LbeStd . Tok__Cmnt 
@@ -2929,7 +2929,7 @@ MODULE TempMark
                    , FmtNo := FsNodeRef . FsFmtNo 
                    , StartAtEnd := FALSE 
                    , IsImpliedNewLine := FALSE 
-                   , TmTok := LTok 
+                   , TkmTok := LTok 
                    } 
 
           ; RbmTeTfsEnterStateFwdNl ( ) 
@@ -3232,7 +3232,7 @@ MODULE TempMark
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := TRUE 
-                     , TmTok := LTok 
+                     , TkmTok := LTok 
                      } 
             ELSE (* No implicit new line *) 
               RbmPrevTokToPos := RbmCharPos 
@@ -3285,7 +3285,7 @@ MODULE TempMark
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := TRUE 
                      , IsImpliedNewLine := FALSE 
-                     , TmTok := LbeStd . Tok__CmntAtEndOfLine 
+                     , TkmTok := LbeStd . Tok__CmntAtEndOfLine 
                      } 
             ELSE 
               RbmPrevTok := LbeStd . Tok__Cmnt 
@@ -3676,7 +3676,7 @@ MODULE TempMark
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
-                     , TmTok := LTok 
+                     , TkmTok := LTok 
                      } 
             ELSIF RbmTeEstTravInfo . EtiChildNo 
                   < RbmTeEstTravInfo . EtiChildCt 
@@ -3703,7 +3703,7 @@ MODULE TempMark
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
-                     , TmTok := LTok 
+                     , TkmTok := LTok 
                      } 
             ELSE (* There is an Est child to the left but not to the right. *)
               RbmCurrentLineTokMark 
@@ -3719,7 +3719,7 @@ MODULE TempMark
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
-                     , TmTok := LTok 
+                     , TkmTok := LTok 
                      } 
             END (* IF *) 
           END RbmTeTfsBuildFmtNoMark 

@@ -1467,7 +1467,7 @@ MODULE MergeTxt
                        , FmtNo := FmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
-                       , TmTok := LbeStd . Tok__BlankLine  
+                       , TkmTok := LbeStd . Tok__BlankLine  
                        }
               ; INC ( MteMarkCt) 
               ; INC ( NewLinesCt ) 
@@ -1515,7 +1515,7 @@ MODULE MergeTxt
                          , FmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
-                         , TmTok := LbeStd . Tok__ModText 
+                         , TkmTok := LbeStd . Tok__ModText 
                          } 
                   ; INC ( MteMarkCt) 
                *) 
@@ -1547,7 +1547,7 @@ MODULE MergeTxt
                          , FmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
-                         , TmTok := LbeStd . Tok__ModText 
+                         , TkmTok := LbeStd . Tok__ModText 
                          } 
                 ; INC ( MteMarkCt) 
                 ; MteState := MteStateTyp . MteStateDone 
@@ -1563,7 +1563,7 @@ MODULE MergeTxt
                          , FmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
-                         , TmTok := LbeStd . Tok__ModText 
+                         , TkmTok := LbeStd . Tok__ModText 
                          }
                 ; INC ( MteMarkCt) 
                 *)
@@ -1585,7 +1585,7 @@ MODULE MergeTxt
                        , FmtNo := FmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
-                       , TmTok := LbeStd . Tok__BlankLine 
+                       , TkmTok := LbeStd . Tok__BlankLine 
                        } 
               ; INC ( MteMarkCt) 
               ; INC ( NewLinesCt ) 
@@ -2452,7 +2452,7 @@ MODULE MergeTxt
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := TRUE 
                        , IsImpliedNewLine := FALSE 
-                       , TmTok := LbeStd . Tok__BlankLine 
+                       , TkmTok := LbeStd . Tok__BlankLine 
                        } 
               ; INC ( MteMarkCt ) (* For the Nl at the end. *) 
               ; MteState := MteStateTyp . MteStateDone 
@@ -2485,7 +2485,7 @@ MODULE MergeTxt
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE  
                        , IsImpliedNewLine := FALSE 
-                       , TmTok := LbeStd . Tok__BlankLine 
+                       , TkmTok := LbeStd . Tok__BlankLine 
                        } 
                 ; INC ( MteMarkCt ) (* For the Nl at the end. *) 
                 ; MteState := MteStateTyp . MteStateDone 
@@ -2817,7 +2817,7 @@ MODULE MergeTxt
                      , FmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE
                      , IsImpliedNewLine := NOT ModCmnt . ModCmntNlBefore 
-                     , TmTok := LTok  
+                     , TkmTok := LTok  
                      } 
               ; INC ( MteMarkCt ) 
               ; MteState := MteStateTyp . MteStateDone 
@@ -3078,7 +3078,7 @@ MODULE MergeTxt
                             , FmtNo := FsNodeRef . FsFmtNo 
                             , StartAtEnd := TRUE 
                             , IsImpliedNewLine := FALSE 
-                            , TmTok := LbeStd . Tok__CmntAtEndOfLine 
+                            , TkmTok := LbeStd . Tok__CmntAtEndOfLine 
                             } 
                    ; INC ( MteMarkCt ) 
                    ; MteState := MteStateTyp . MteStateDone 
@@ -3212,7 +3212,7 @@ MODULE MergeTxt
                        , FmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
-                       , TmTok := LbeStd . Tok__ModText 
+                       , TkmTok := LbeStd . Tok__ModText 
                        } 
               ; INC ( MteMarkCt ) 
               ; MteState := MteStateTyp . MteStateDone 
@@ -3382,7 +3382,7 @@ MODULE MergeTxt
                               , FmtNo := FsNodeRef . FsFmtNo 
                               , StartAtEnd := TRUE 
                               , IsImpliedNewLine := FALSE 
-                              , TmTok := LbeStd . Tok__ModText 
+                              , TkmTok := LbeStd . Tok__ModText 
                               } 
                      ; INC ( MteMarkCt ) 
                      ; MteState := MteStateTyp . MteStateDone 
@@ -3538,7 +3538,7 @@ MODULE MergeTxt
                          , FmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
-                         , TmTok := EstRef . EstTok  
+                         , TkmTok := EstRef . EstTok  
                          } 
                 ; INC ( MteMarkCt) 
                 ; MteState := MteStateTyp . MteStateDone 
@@ -3566,7 +3566,7 @@ MODULE MergeTxt
                          , FmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
-                         , TmTok := EstRef . EstTok  
+                         , TkmTok := EstRef . EstTok  
                          } 
                 ; INC ( MteMarkCt) 
                 ; MteState := MteStateTyp . MteStateDone 
@@ -3715,7 +3715,7 @@ MODULE MergeTxt
                          , Kind := MarkKindTyp . Plain 
                          , FmtNo := FsNodeRef . FsFmtNo , StartAtEnd := FALSE 
                          , IsImpliedNewLine := TRUE  
-                         , TmTok := LbeStd . Tok__Null  
+                         , TkmTok := LbeStd . Tok__Null  
                          } 
                 ; INC ( MteMarkCt ) 
                 ; MteState := MteStateTyp . MteStateDone   
@@ -4229,7 +4229,7 @@ MODULE MergeTxt
                    , FmtNo := FsNodeRef . FsFmtNo 
                    , StartAtEnd := FALSE 
                    , IsImpliedNewLine := FALSE 
-                   , TmTok := MteTeEstTravInfo . EtiParentRef . EstTok 
+                   , TkmTok := MteTeEstTravInfo . EtiParentRef . EstTok 
 (* TODO: ^This probably needs a case for OptSingletonList, but that field
           is not being used anyway.
 *) 
