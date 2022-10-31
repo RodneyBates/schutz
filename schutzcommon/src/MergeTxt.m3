@@ -605,7 +605,7 @@ MODULE MergeTxt
           ; MteTeLMNewKindSet := MteTeWaitingKindSet 
           ; IF MteTeDoPatchLeftSibFmtNoMark 
             THEN 
-              NewBolTokMark . EstNodeCt 
+              NewBolTokMark . TkmEstNodeCt 
                 := EstUtil . EstNodeCt ( MteTeWaitingRef ) 
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeWaitingKindSet 
@@ -676,7 +676,7 @@ MODULE MergeTxt
             END (* IF *) 
           ; IF MteTeDoPatchLeftSibFmtNoMark 
             THEN 
-              NewBolTokMark . EstNodeCt 
+              NewBolTokMark . TkmEstNodeCt 
                 := EstUtil . EstNodeCt ( MteTeLMNewChildRef ) 
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeLMNewKindSet 
@@ -784,7 +784,7 @@ MODULE MergeTxt
                      := EstHs . FmtNoNull (* Defensive *) 
                  ; IF MteTeDoPatchLeftSibFmtNoMark 
                    THEN 
-                     NewBolTokMark . EstNodeCt := 1  
+                     NewBolTokMark . TkmEstNodeCt := 1  
                    ; NewBolTokMark . TkmEstRef := TModDel  
                    ; MteTeDoPatchLeftSibFmtNoMark := FALSE 
                    END (* IF *) 
@@ -820,7 +820,7 @@ MODULE MergeTxt
           ; MteTeWaitingEdgeKind := EstHs . EdgeKindTyp . EdgeKindLeadingMod  
           ; IF LDoPatchLeftSibFmtNoMark 
             THEN 
-              NewBolTokMark . EstNodeCt := 1  
+              NewBolTokMark . TkmEstNodeCt := 1  
             ; NewBolTokMark . TkmEstRef := LModDelRef 
             END (* IF *) 
           ; MteNewDelThruFmtNo := EstHs . FmtNoNull 
@@ -865,7 +865,7 @@ MODULE MergeTxt
                      := EstHs . EdgeKindTyp . EdgeKindLeadingMod  
                  ; IF MteTeDoPatchLeftSibFmtNoMark 
                    THEN 
-                     NewBolTokMark . EstNodeCt := 1
+                     NewBolTokMark . TkmEstNodeCt := 1
                    ; NewBolTokMark . TkmEstRef := TModBlankLine 
                    ; MteTeDoPatchLeftSibFmtNoMark := FALSE 
                    END (* IF *) 
@@ -894,7 +894,7 @@ MODULE MergeTxt
           ; MteTeInterestingChildrenExist := TRUE 
           ; IF LDoPatchLeftSibFmtNoMark 
             THEN
-              NewBolTokMark . EstNodeCt := 1
+              NewBolTokMark . TkmEstNodeCt := 1
             ; NewBolTokMark . TkmEstRef := LModBlankLineRef 
             END (* IF *) 
           ; MteNewBlankLineFmtNo := EstHs . FmtNoNull 
@@ -1049,7 +1049,7 @@ MODULE MergeTxt
               NewBolTokMark . TkmEstRef 
                 := EstUtil . IthChildRef 
                      ( MteTeWaitingRef , MteTeWaitingFromChildNo ) 
-            ; NewBolTokMark . EstNodeCt 
+            ; NewBolTokMark . TkmEstNodeCt 
                 := EstUtil . EstNodeCt ( NewBolTokMark . TkmEstRef )  
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeWaitingKindSet 
@@ -1112,7 +1112,7 @@ MODULE MergeTxt
               NewBolTokMark . TkmEstRef 
                 := EstUtil . IthChildRef 
                      ( MteTeWaitingRef , MteTeWaitingFromChildNo ) 
-            ; NewBolTokMark . EstNodeCt 
+            ; NewBolTokMark . TkmEstNodeCt 
                 := EstUtil . EstNodeCt ( NewBolTokMark . TkmEstRef ) 
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeWaitingKindSet 
@@ -1461,7 +1461,7 @@ MODULE MergeTxt
               ; NewBolTokMark 
                   := Marks . TokMarkTyp 
                        { TkmEstNodeNo := MarkNodeNo
-                       , EstNodeCt := 1 
+                       , TkmEstNodeCt := 1 
                        , TkmEstRef := LBlankLineModRef 
                        , Kind := MarkKindTyp . BlankLine 
                        , FmtNo := FmtNo 
@@ -1509,7 +1509,7 @@ MODULE MergeTxt
                          { TkmEstNodeNo := MarkNodeNo 
                            (* ^This could be the wrong value, but if
                                so, the whole mark will be overlaid. *) 
-                         , EstNodeCt := 1   
+                         , TkmEstNodeCt := 1   
                          , TkmEstRef := LRightNewModRef  
                          , Kind := MarkKindTyp . Plain 
                          , FmtNo := FmtNo 
@@ -1541,7 +1541,7 @@ MODULE MergeTxt
                          { TkmEstNodeNo := MarkNodeNo 
                            (* ^This could be the wrong value, but if
                                so, the whole mark will be overlaid. *) 
-                         , EstNodeCt := 1 
+                         , TkmEstNodeCt := 1 
                          , TkmEstRef := LLeftNewModRef  
                          , Kind := MarkKindTyp . Plain 
                          , FmtNo := FmtNo 
@@ -1557,7 +1557,7 @@ MODULE MergeTxt
                          { TkmEstNodeNo := MarkNodeNo 
                            (* ^This could be the wrong value, but if
                                so, the whole mark will be overlaid. *) 
-                         , EstNodeCt := 1 
+                         , TkmEstNodeCt := 1 
                          , TkmEstRef := LLeftNewModRef  
                          , Kind := MarkKindTyp . Plain 
                          , FmtNo := FmtNo 
@@ -1579,7 +1579,7 @@ MODULE MergeTxt
               ; NewBolTokMark 
                   := Marks . TokMarkTyp 
                        { TkmEstNodeNo := MarkNodeNo 
-                       , EstNodeCt := 1
+                       , TkmEstNodeCt := 1
                        , TkmEstRef := LBlankLineModRef  
                        , Kind := MarkKindTyp . BlankLine 
                        , FmtNo := FmtNo 
@@ -1617,7 +1617,7 @@ MODULE MergeTxt
               NewBolTokMark . TkmEstRef
                 := EstUtil . IthChildRef 
                      ( MteTeWaitingRef , MteTeWaitingFromChildNo )  
-            ; NewBolTokMark . EstNodeCt 
+            ; NewBolTokMark . TkmEstNodeCt 
                 := EstUtil . EstNodeCt ( NewBolTokMark . TkmEstRef )  
                    + ORD ( EstHs . EstChildKindOptSingletonList 
                            IN MteTeWaitingKindSet 
@@ -2445,7 +2445,7 @@ MODULE MergeTxt
                 NewBolTokMark 
                   := Marks . TokMarkTyp 
                        { TkmEstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
-                       , EstNodeCt := 1   
+                       , TkmEstNodeCt := 1   
                        , TkmEstRef
                            := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , Kind := MarkKindTyp . BlankLine 
@@ -2478,7 +2478,7 @@ MODULE MergeTxt
                   NewBolTokMark 
                   := Marks . TokMarkTyp 
                        { TkmEstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
-                       , EstNodeCt := 1   
+                       , TkmEstNodeCt := 1   
                        , TkmEstRef
                            := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                        , Kind := MarkKindTyp . BlankLine 
@@ -2810,7 +2810,7 @@ MODULE MergeTxt
               ; NewBolTokMark 
                 := Marks . TokMarkTyp 
                      { TkmEstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
-                     , EstNodeCt := 1   
+                     , TkmEstNodeCt := 1   
                      , TkmEstRef
                          := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                      , Kind := MarkKindTyp . Plain 
@@ -3070,7 +3070,7 @@ MODULE MergeTxt
                      NewBolTokMark 
                        := Marks . TokMarkTyp 
                             { TkmEstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
-                            , EstNodeCt := 1   
+                            , TkmEstNodeCt := 1   
                             , TkmEstRef
                                 := MteTeEstTravInfo . EtiChildLeafElem
                                      . LeChildRef
@@ -3205,7 +3205,7 @@ MODULE MergeTxt
                 NewBolTokMark 
                   := Marks . TokMarkTyp 
                        { TkmEstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo 
-                       , EstNodeCt := 1
+                       , TkmEstNodeCt := 1
                        , TkmEstRef
                            := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , Kind := MarkKindTyp . Plain 
@@ -3374,7 +3374,7 @@ MODULE MergeTxt
                          := Marks . TokMarkTyp 
                               { TkmEstNodeNo 
                                   := MteTeEstTravInfo . EtiChildRelNodeNo 
-                              , EstNodeCt := 1  
+                              , TkmEstNodeCt := 1  
                               , TkmEstRef
                                   := MteTeEstTravInfo . EtiChildLeafElem
                                      . LeChildRef 
@@ -3527,7 +3527,7 @@ MODULE MergeTxt
                   NewBolTokMark 
                     := Marks . TokMarkTyp 
                          { TkmEstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo
-                         , EstNodeCt 
+                         , TkmEstNodeCt 
                              := EstUtil . EstNodeCt 
                                   ( MteTeEstTravInfo . EtiChildLeafElem
                                     . LeChildRef
@@ -3555,7 +3555,7 @@ MODULE MergeTxt
                   NewBolTokMark 
                     := Marks . TokMarkTyp 
                          { TkmEstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo
-                         , EstNodeCt 
+                         , TkmEstNodeCt 
                              := EstUtil . EstNodeCt 
                                   ( MteTeEstTravInfo . EtiChildLeafElem
                                     . LeChildRef
@@ -3709,7 +3709,7 @@ MODULE MergeTxt
                   NewBolTokMark 
                     := Marks . TokMarkTyp 
                          { TkmEstNodeNo := MteTeEstTravInfo . EtiChildRelNodeNo  
-                         , EstNodeCt := 1   
+                         , TkmEstNodeCt := 1   
                          , TkmEstRef
                              := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                          , Kind := MarkKindTyp . Plain 
@@ -4222,7 +4222,7 @@ MODULE MergeTxt
           ; NewBolTokMark 
               := Marks . TokMarkTyp 
                    { TkmEstNodeNo := LEstNodeNo 
-                   , EstNodeCt := LEstNodeCt
+                   , TkmEstNodeCt := LEstNodeCt
                    , TkmEstRef := LMarkEstRef 
                    (* ^May be overlaid. *) 
                    , Kind := LMarkKind
@@ -5468,7 +5468,7 @@ MODULE MergeTxt
           , (* VAR *) LIsOptSingletonList 
           ) 
       ; Assert 
-          ( NewBolTokMark . EstNodeCt = EstUtil . EstNodeCt ( LNewMarkedEstRef )
+          ( NewBolTokMark . TkmEstNodeCt = EstUtil . EstNodeCt ( LNewMarkedEstRef )
           , AFT . A_MergeTextEdit_BadMarkEstNodeCt  
           ) 
       ; Assert 

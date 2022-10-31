@@ -71,7 +71,7 @@ MODULE Marks
       END (* IF*)
     ; RETURN
         LbeStd . EstNodeNoImage ( Mark . TkmEstNodeNo ) 
-        & "(" & LbeStd . EstNodeNoImage ( Mark . EstNodeCt ) & ")"
+        & "(" & LbeStd . EstNodeNoImage ( Mark . TkmEstNodeCt ) & ")"
         & Fmt . Pad ( Misc . RefanyImage ( Mark . TkmEstRef ) , RefanyPad )
         & ","
         & MarkKindImageShort ( Mark . Kind ) 
@@ -88,7 +88,7 @@ MODULE Marks
 
   = BEGIN (* Equal *) 
       IF Left . TkmEstNodeNo # Right . TkmEstNodeNo 
-         OR Left . EstNodeCt # Right . EstNodeCt  
+         OR Left . TkmEstNodeCt # Right . TkmEstNodeCt  
             (* Don't check this.  If things are properly formed, it is
                redundant, and if not, because it didn't get patched right
                after changes, we want compares to be equal anyway. 
@@ -157,7 +157,7 @@ MODULE Marks
            LResult 
              := Integer . Compare 
                   ( Left . TkmEstNodeNo 
-                  , Right . TkmEstNodeNo + Right . EstNodeCt - 1 
+                  , Right . TkmEstNodeNo + Right . TkmEstNodeCt - 1 
                   ) 
          ; IF LResult = 0 
            THEN RETURN - 1 
@@ -208,7 +208,7 @@ MODULE Marks
            LResult 
              := Integer . Compare 
                   ( Left . TkmEstNodeNo 
-                  , Right . TkmEstNodeNo + Right . EstNodeCt - 1 
+                  , Right . TkmEstNodeNo + Right . TkmEstNodeCt - 1 
                   ) 
          ; IF LResult = 0 
            THEN RETURN - 1 
@@ -228,7 +228,7 @@ MODULE Marks
          => (* RightSib, (LeftSib or Center). *)  
            LResult 
              := Integer . Compare 
-                  ( Left . TkmEstNodeNo + Left . EstNodeCt - 1  
+                  ( Left . TkmEstNodeNo + Left . TkmEstNodeCt - 1  
                   , Right . TkmEstNodeNo  
                   ) 
          ; IF LResult = 0 
@@ -240,8 +240,8 @@ MODULE Marks
          => (* RightSib, RightSib *) 
            LResult 
              := Integer . Compare 
-                  ( Left . TkmEstNodeNo + Left . EstNodeCt - 1  
-                  , Right . TkmEstNodeNo + Right . EstNodeCt - 1  
+                  ( Left . TkmEstNodeNo + Left . TkmEstNodeCt - 1  
+                  , Right . TkmEstNodeNo + Right . TkmEstNodeCt - 1  
                   ) 
          ; IF LResult = 0 
            THEN (* Because we don't count a node a second time in the node

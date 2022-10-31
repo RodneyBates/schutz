@@ -108,7 +108,7 @@ INTERFACE Marks
     = RECORD 
         TkmEstRef : LbeStd . EstRootTyp := NIL 
       ; TkmEstNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull 
-      ; EstNodeCt : LbeStd . EstNodeNoTyp := 0 
+      ; TkmEstNodeCt : LbeStd . EstNodeNoTyp := 0 
       ; BlCharPos : LbeStd . CharNoTyp := LbeStd . CharNoUnknown 
         (* Maintained only when Kind = BlankLine.  The CharPos at the end of
            the line before the blank lines. *)  
@@ -154,7 +154,7 @@ INTERFACE Marks
     = TokMarkTyp 
         { TkmEstRef := NIL
         , TkmEstNodeNo := LbeStd . EstNodeNoNull 
-        , EstNodeCt := 0 
+        , TkmEstNodeCt := 0 
         , BlCharPos := LbeStd . CharNoUnknown 
         , TmTok := LbeStd . Tok__Null
         , Kind := MarkKindTyp . Null 

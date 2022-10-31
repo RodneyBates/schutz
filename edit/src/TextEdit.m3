@@ -320,13 +320,13 @@ MODULE TextEdit
 ; LCTF := CTF ( ) 
 ; LCTL := CTL ( )
 
-; IF LLinesRef . LrBolTokMark . EstNodeCt # LNewEstNodeCt
+; IF LLinesRef . LrBolTokMark . TkmEstNodeCt # LNewEstNodeCt
   THEN LDebug := 13
   END 
 
       ;
 
-        (* <* ASSERT LLinesRef . LrBolTokMark . EstNodeCt = LEstNodeCt 
+        (* <* ASSERT LLinesRef . LrBolTokMark . TkmEstNodeCt = LEstNodeCt 
                   , CTF ( ) & ":" & Fmt . Int ( CTL ( ) ) & " Mismatched node counts." 
         *> *)
         IF LLinesRef . LrRightLink = ImageRef . ItPers . IpLineHeaderRef 
@@ -364,11 +364,11 @@ MODULE TextEdit
         END (* IF *)  
       ; IF IsAncestorMark 
              ( LLinesRef . LrBolTokMark . TkmEstNodeNo  
-             , LLinesRef . LrBolTokMark . EstNodeCt 
+             , LLinesRef . LrBolTokMark . TkmEstNodeCt 
              , MinNodeNoToAdjust 
              ) 
         THEN 
-          INC ( LLinesRef . LrBolTokMark . EstNodeCt , Bias ) 
+          INC ( LLinesRef . LrBolTokMark . TkmEstNodeCt , Bias ) 
         END (* IF *)   
       ; IF LLinesRef . LrBolTokMark . TkmEstNodeNo >= MinNodeNoToAdjust 
         THEN 
@@ -417,11 +417,11 @@ MODULE TextEdit
         END (* IF *) 
       ; IF IsAncestorMark 
              ( LLinesRef . LrBolTokMark . TkmEstNodeNo (* Already unadjusted. *) 
-             , LLinesRef . LrBolTokMark . EstNodeCt 
+             , LLinesRef . LrBolTokMark . TkmEstNodeCt 
              , MinNodeNoToAdjust  
              ) 
         THEN 
-          DEC ( LLinesRef . LrBolTokMark . EstNodeCt , Bias ) 
+          DEC ( LLinesRef . LrBolTokMark . TkmEstNodeCt , Bias ) 
         END (* IF *)   
       ; IF LLinesRef . LrRightLink = ImageRef . ItPers . IpLineHeaderRef 
         THEN 
@@ -457,11 +457,11 @@ MODULE TextEdit
           ELSE 
             IF IsAncestorMark 
                  ( LMark . LmTokMark . TkmEstNodeNo  
-                 , LMark . LmTokMark . EstNodeCt 
+                 , LMark . LmTokMark . TkmEstNodeCt 
                  , MinNodeNoToAdjust  
                  ) 
             THEN 
-              DEC ( LMark . LmTokMark . EstNodeCt , Bias ) 
+              DEC ( LMark . LmTokMark . TkmEstNodeCt , Bias ) 
             END (* IF *)   
           ; IF LMark . LmTokMark . TkmEstNodeNo >= MinNodeNoToAdjust + Bias  
             THEN 
@@ -497,8 +497,8 @@ MODULE TextEdit
                          ( LMark . LmTokMark 
                          , LMark . LmLinesRef . LrBolTokMark 
                         ) 
-                   OR LMark . LmTokMark . EstNodeCt 
-                      # LMark . LmLinesRef . LrBolTokMark . EstNodeCt 
+                   OR LMark . LmTokMark . TkmEstNodeCt 
+                      # LMark . LmLinesRef . LrBolTokMark . TkmEstNodeCt 
                       (* Marks . Equal doesn't check EstNodeCt field, because
                          it is redundant, if properly set, and if not, due
                          to incomplete updating, we want other compares to
@@ -627,8 +627,8 @@ MODULE TextEdit
                     => LLinesRef := TRightLinesRef 
                     ; IF NOT Marks . Equal 
                                ( LLinesRef . LrBolTokMark , LNextMark ) 
-                         OR LLinesRef . LrBolTokMark . EstNodeCt 
-                            # LNextMark . EstNodeCt 
+                         OR LLinesRef . LrBolTokMark . TkmEstNodeCt 
+                            # LNextMark . TkmEstNodeCt 
                          (* Marks . Equal doesn't check EstNodeCt field, because
                             it is redundant, if properly set, and if not, due
                             to incomplete updating, we want other compares to
@@ -1041,11 +1041,11 @@ MODULE TextEdit
             THEN (* Doesn't point to a LinesRef at all.  Adjust numerically *) 
               IF IsAncestorMark 
                    ( LMark . LmTokMark . TkmEstNodeNo  
-                   , LMark . LmTokMark . EstNodeCt 
+                   , LMark . LmTokMark . TkmEstNodeCt 
                    , MinNodeNoToAdjust 
                    ) 
               THEN 
-                INC ( LMark . LmTokMark . EstNodeCt , Bias ) 
+                INC ( LMark . LmTokMark . TkmEstNodeCt , Bias ) 
               END (* IF *)   
             ; IF LMark . LmTokMark . TkmEstNodeNo >= MinNodeNoToAdjust 
               THEN 

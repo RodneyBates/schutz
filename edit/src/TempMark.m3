@@ -2786,7 +2786,7 @@ MODULE TempMark
                        { TkmEstNodeNo  
                            := EstAbsNodeNo 
                               + RbmTeEstTravInfo . EtiChildRelNodeNo 
-                       , EstNodeCt := 1 
+                       , TkmEstNodeCt := 1 
                        , TkmEstRef
                            := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , Kind := MarkKindTyp . BlankLine 
@@ -2829,7 +2829,7 @@ MODULE TempMark
                        { TkmEstNodeNo  
                            := EstAbsNodeNo 
                               + RbmTeEstTravInfo . EtiChildRelNodeNo 
-                       , EstNodeCt := 1 
+                       , TkmEstNodeCt := 1 
                        , TkmEstRef
                            := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , Kind := MarkKindTyp . BlankLine 
@@ -2884,7 +2884,7 @@ MODULE TempMark
                      { TkmEstNodeNo  
                          := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
-                     , EstNodeCt := 1 
+                     , TkmEstNodeCt := 1 
                      , TkmEstRef
                          := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , Kind := MarkKindTyp . Plain 
@@ -2922,7 +2922,7 @@ MODULE TempMark
                    { TkmEstNodeNo  
                        := EstAbsNodeNo 
                           + RbmTeEstTravInfo . EtiChildRelNodeNo 
-                   , EstNodeCt := 1 
+                   , TkmEstNodeCt := 1 
                    , TkmEstRef
                        := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                    , Kind := MarkKindTyp . Plain 
@@ -3225,7 +3225,7 @@ MODULE TempMark
                      { TkmEstNodeNo  
                          := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
-                     , EstNodeCt := 1 
+                     , TkmEstNodeCt := 1 
                      , TkmEstRef
                          := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , Kind := MarkKindTyp . Plain 
@@ -3278,7 +3278,7 @@ MODULE TempMark
                      { TkmEstNodeNo  
                          := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
-                     , EstNodeCt := 1 
+                     , TkmEstNodeCt := 1 
                      , TkmEstRef
                          := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , Kind := MarkKindTyp . Plain 
@@ -3668,7 +3668,7 @@ MODULE TempMark
               RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
                      { TkmEstNodeNo  := EstAbsNodeNo 
-                     , EstNodeCt
+                     , TkmEstNodeCt 
                          := EstUtil . EstNodeCt
                               ( RbmTeEstTravInfo . EtiNodeRef )
                      , TkmEstRef := RbmTeEstTravInfo . EtiNodeRef 
@@ -3688,7 +3688,7 @@ MODULE TempMark
                      { TkmEstNodeNo  
                          := EstAbsNodeNo 
                             + RbmTeEstTravInfo . EtiChildRelNodeNo 
-                     , EstNodeCt 
+                     , TkmEstNodeCt 
                          := EstUtil . EstNodeCt 
                               ( RbmTeEstTravInfo . EtiChildLeafElem 
                                 . LeChildRef 
@@ -3709,7 +3709,7 @@ MODULE TempMark
               RbmCurrentLineTokMark 
                 := Marks . TokMarkTyp 
                      { TkmEstNodeNo  := EstAbsNodeNo + RbmTeRMChildRelNodeNo 
-                     , EstNodeCt 
+                     , TkmEstNodeCt 
                          := EstUtil . EstNodeCt ( RbmTeRMChildRef )
                             + ORD ( EstHs . EstChildKindOptSingletonList 
                                     IN RbmTeRMChildKindSet 
