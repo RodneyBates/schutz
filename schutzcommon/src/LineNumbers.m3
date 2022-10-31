@@ -203,30 +203,30 @@ MODULE LineNumbers
 
       | MarkKindTyp . Plain 
       => LNodeNo 
-           := LineMark . LmTokMark . EstNodeNo 
+           := LineMark . LmTokMark . TkmEstNodeNo 
               + 4 * ORD ( LineMark . LmTokMark . StartAtEnd )  
                 (* Estimate 4 nodes per line, average. *) 
 
       | MarkKindTyp . BlankLine 
       => LNodeNo 
-           := LineMark . LmTokMark . EstNodeNo 
+           := LineMark . LmTokMark . TkmEstNodeNo 
               + LineMark . LmLineNo  
               + 4 * ORD ( LineMark . LmTokMark . StartAtEnd )  
                 (* Estimate 4 nodes per line, average. *) 
 
       | MarkKindTyp . LeftSibFmtNo 
-      => LNodeNo := LineMark . LmTokMark . EstNodeNo 
+      => LNodeNo := LineMark . LmTokMark . TkmEstNodeNo 
 
       | MarkKindTyp . RightSibFmtNo 
       => LNodeNo 
-          := LineMark . LmTokMark . EstNodeNo 
+          := LineMark . LmTokMark . TkmEstNodeNo 
              + TravUtil . NodeCtOfDescendantWithNodeNo 
                  ( ImageRef . ItPers . IpEstRoot 
-                 , LineMark . LmTokMark . EstNodeNo 
+                 , LineMark . LmTokMark . TkmEstNodeNo 
                  ) 
 
       | MarkKindTyp . ChildFmtNo  
-      => LNodeNo := LineMark . LmTokMark . EstNodeNo 
+      => LNodeNo := LineMark . LmTokMark . TkmEstNodeNo 
       END (* CASE *) 
     ; LineNo 
         := ( ImageRef . ItPers . IpLineCtDisplay * LNodeNo ) 

@@ -70,7 +70,7 @@ MODULE Marks
       ELSE LBlCharPosImage := ""
       END (* IF*)
     ; RETURN
-        LbeStd . EstNodeNoImage ( Mark . EstNodeNo ) 
+        LbeStd . EstNodeNoImage ( Mark . TkmEstNodeNo ) 
         & "(" & LbeStd . EstNodeNoImage ( Mark . EstNodeCt ) & ")"
         & Fmt . Pad ( Misc . RefanyImage ( Mark . TkmEstRef ) , RefanyPad )
         & ","
@@ -87,7 +87,7 @@ MODULE Marks
   (* Returns FALSE if unordered. *) 
 
   = BEGIN (* Equal *) 
-      IF Left . EstNodeNo # Right . EstNodeNo 
+      IF Left . TkmEstNodeNo # Right . TkmEstNodeNo 
          OR Left . EstNodeCt # Right . EstNodeCt  
             (* Don't check this.  If things are properly formed, it is
                redundant, and if not, because it didn't get patched right
@@ -135,7 +135,7 @@ MODULE Marks
          | MarkKindTyp . LeftSibFmtNo  
          => (* LeftSib, LeftSib *)  
            LResult 
-             := Integer . Compare ( Left . EstNodeNo , Right . EstNodeNo ) 
+             := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
          ; IF LResult = 0 
            THEN RETURN Integer . Compare ( Left . FmtNo , Right . FmtNo )  
            ELSE RETURN LResult 
@@ -146,7 +146,7 @@ MODULE Marks
          , MarkKindTyp . ChildFmtNo 
          => (* LeftSib, Center. *)  
            LResult 
-             := Integer . Compare ( Left . EstNodeNo , Right . EstNodeNo ) 
+             := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
          ; IF LResult = 0 
            THEN RETURN - 1 
            ELSE RETURN LResult 
@@ -156,8 +156,8 @@ MODULE Marks
          => (* LeftSib, RightSib *)  
            LResult 
              := Integer . Compare 
-                  ( Left . EstNodeNo 
-                  , Right . EstNodeNo + Right . EstNodeCt - 1 
+                  ( Left . TkmEstNodeNo 
+                  , Right . TkmEstNodeNo + Right . EstNodeCt - 1 
                   ) 
          ; IF LResult = 0 
            THEN RETURN - 1 
@@ -176,7 +176,7 @@ MODULE Marks
          | MarkKindTyp . LeftSibFmtNo  
          => (* Center, LeftSib *)  
            LResult 
-             := Integer . Compare ( Left . EstNodeNo , Right . EstNodeNo ) 
+             := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
          ; IF LResult = 0 
            THEN RETURN 1 
            ELSE RETURN LResult 
@@ -187,7 +187,7 @@ MODULE Marks
          , MarkKindTyp . ChildFmtNo 
          => (* Center, Center *) 
            LResult 
-             := Integer . Compare ( Left . EstNodeNo , Right . EstNodeNo ) 
+             := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
          ; IF LResult = 0 
            THEN (* I could avoid retesting Kind fields, but it would be a
                    cartesian explosion of code.
@@ -207,8 +207,8 @@ MODULE Marks
          => (* Center, RightSib *)  
            LResult 
              := Integer . Compare 
-                  ( Left . EstNodeNo 
-                  , Right . EstNodeNo + Right . EstNodeCt - 1 
+                  ( Left . TkmEstNodeNo 
+                  , Right . TkmEstNodeNo + Right . EstNodeCt - 1 
                   ) 
          ; IF LResult = 0 
            THEN RETURN - 1 
@@ -228,8 +228,8 @@ MODULE Marks
          => (* RightSib, (LeftSib or Center). *)  
            LResult 
              := Integer . Compare 
-                  ( Left . EstNodeNo + Left . EstNodeCt - 1  
-                  , Right . EstNodeNo  
+                  ( Left . TkmEstNodeNo + Left . EstNodeCt - 1  
+                  , Right . TkmEstNodeNo  
                   ) 
          ; IF LResult = 0 
            THEN RETURN 1 
@@ -240,8 +240,8 @@ MODULE Marks
          => (* RightSib, RightSib *) 
            LResult 
              := Integer . Compare 
-                  ( Left . EstNodeNo + Left . EstNodeCt - 1  
-                  , Right . EstNodeNo + Right . EstNodeCt - 1  
+                  ( Left . TkmEstNodeNo + Left . EstNodeCt - 1  
+                  , Right . TkmEstNodeNo + Right . EstNodeCt - 1  
                   ) 
          ; IF LResult = 0 
            THEN (* Because we don't count a node a second time in the node
@@ -253,7 +253,7 @@ MODULE Marks
                    Two LeftSib marks is the only case where this matters.
                 *) 
              LResult 
-               := Integer . Compare ( Left . EstNodeNo , Right . EstNodeNo )  
+               := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo )  
            ; IF LResult = 0 
              THEN (* It's really the same node. *) 
                RETURN Integer . Compare ( Left . FmtNo , Right . FmtNo )  

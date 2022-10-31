@@ -107,7 +107,7 @@ INTERFACE Marks
      nonterminals in the Est. *) 
     = RECORD 
         TkmEstRef : LbeStd . EstRootTyp := NIL 
-      ; EstNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull 
+      ; TkmEstNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull 
       ; EstNodeCt : LbeStd . EstNodeNoTyp := 0 
       ; BlCharPos : LbeStd . CharNoTyp := LbeStd . CharNoUnknown 
         (* Maintained only when Kind = BlankLine.  The CharPos at the end of
@@ -152,9 +152,11 @@ INTERFACE Marks
 
 ; CONST TokMarkNull 
     = TokMarkTyp 
-        { EstNodeNo := LbeStd . EstNodeNoNull 
+        { TkmEstRef := NIL
+        , TkmEstNodeNo := LbeStd . EstNodeNoNull 
         , EstNodeCt := 0 
         , BlCharPos := LbeStd . CharNoUnknown 
+        , TmTok := LbeStd . Tok__Null
         , Kind := MarkKindTyp . Null 
         , FmtNo := EstHs . FmtNoNull  
         , StartAtEnd := FALSE 

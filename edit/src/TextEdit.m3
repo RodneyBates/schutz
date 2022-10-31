@@ -10,6 +10,7 @@
 
 MODULE TextEdit 
 
+; IMPORT Compiler 
 ; IMPORT Fmt 
 ; IMPORT Text 
 ; IMPORT Thread 
@@ -23,6 +24,7 @@ MODULE TextEdit
 ; IMPORT EditWindow 
 ; IMPORT Errors 
 ; IMPORT EstHs 
+; IMPORT EstUtil 
 ; IMPORT LbeStd 
 ; IMPORT LineMarks 
 ; IMPORT Marks 
@@ -37,7 +39,10 @@ MODULE TextEdit
 ; IMPORT TreeBrowse 
 
 ; TYPE AFT = MessageCodes . T 
-; TYPE MarkKindTyp = Marks . MarkKindTyp 
+; TYPE MarkKindTyp = Marks . MarkKindTyp
+
+; CONST CTF = Compiler . ThisFile
+; CONST CTL = Compiler . ThisLine 
 
 ; PROCEDURE PaintTempEditedLineInAllWindows 
     ( ImageTrans : PaintHs . ImageTransientTyp 
@@ -268,6 +273,72 @@ MODULE TextEdit
     END IsAncestorMark 
 
 ; PROCEDURE AdjustLinesRefsNodeNos 
+    ( ImageRef : PaintHs . ImageTransientTyp
+    ; OldEstRoot , NewEstRoot : EstHs . EstRefTyp 
+    ; FirstLinesRefToAdjust : PaintHs . LinesRefTyp 
+    ; Bias : LbeStd . EstNodeNoTyp 
+    ) 
+  RAISES { Backout } 
+
+  = VAR LLinesRef : PaintHs . LinesRefMeatTyp
+  ; VAR LNewEstRef : LbeStd . EstRootTyp 
+  ; VAR LNewKindSet : EstHs . EstChildKindSetTyp 
+  ; VAR LNewIsOptSingletonList : BOOLEAN
+  ; VAR LNewEstNodeCt : INTEGER
+; VAR LOldEstRef : LbeStd . EstRootTyp 
+; VAR LOldKindSet : EstHs . EstChildKindSetTyp 
+; VAR LOldIsOptSingletonList : BOOLEAN
+; VAR LOldEstNodeCt : INTEGER
+; VAR LDebug : INTEGER := 17 
+; VAR LCTF  : TEXT 
+; VAR LCTL : CARDINAL  
+
+  ; BEGIN (* AdjustLinesRefsNodeNos *) 
+      LLinesRef := FirstLinesRefToAdjust 
+    ; LOOP
+        TravUtil . GetDescendantWithNodeNo
+          ( OldEstRoot
+          , LLinesRef . LrBolTokMark . TkmEstNodeNo 
+          , LOldEstRef 
+          , LOldKindSet 
+          , LOldIsOptSingletonList
+          )
+      ; INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias )
+      ; TravUtil . GetDescendantWithNodeNo
+          ( NewEstRoot
+          , LLinesRef . LrBolTokMark . TkmEstNodeNo 
+          , LNewEstRef 
+          , LNewKindSet 
+          , LNewIsOptSingletonList
+          )
+; IF LOldEstRef # LNewEstRef
+  THEN
+    LDebug := 11
+  END 
+      ; LNewEstNodeCt := EstUtil . EstNodeCt ( LNewEstRef ) 
+
+; LCTF := CTF ( ) 
+; LCTL := CTL ( )
+
+; IF LLinesRef . LrBolTokMark . EstNodeCt # LNewEstNodeCt
+  THEN LDebug := 13
+  END 
+
+      ;
+
+        (* <* ASSERT LLinesRef . LrBolTokMark . EstNodeCt = LEstNodeCt 
+                  , CTF ( ) & ":" & Fmt . Int ( CTL ( ) ) & " Mismatched node counts." 
+        *> *)
+        IF LLinesRef . LrRightLink = ImageRef . ItPers . IpLineHeaderRef 
+        THEN EXIT 
+        ELSE LLinesRef := LLinesRef . LrRightLink 
+        END (* IF *) 
+      END (* LOOP *) 
+    END AdjustLinesRefsNodeNos 
+
+(* Old version: 
+
+; PROCEDURE AdjustLinesRefsNodeNos 
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; FirstLinesRefToAdjust : PaintHs . LinesRefTyp 
     ; MinNodeNoToAdjust : LbeStd . EstNodeNoTyp 
@@ -292,20 +363,20 @@ MODULE TextEdit
         THEN LPastFirstLinesRef := TRUE 
         END (* IF *)  
       ; IF IsAncestorMark 
-             ( LLinesRef . LrBolTokMark . EstNodeNo  
+             ( LLinesRef . LrBolTokMark . TkmEstNodeNo  
              , LLinesRef . LrBolTokMark . EstNodeCt 
              , MinNodeNoToAdjust 
              ) 
         THEN 
           INC ( LLinesRef . LrBolTokMark . EstNodeCt , Bias ) 
         END (* IF *)   
-      ; IF LLinesRef . LrBolTokMark . EstNodeNo >= MinNodeNoToAdjust 
+      ; IF LLinesRef . LrBolTokMark . TkmEstNodeNo >= MinNodeNoToAdjust 
         THEN 
           Assert 
             ( LPastFirstLinesRef 
             , AFT . A_AdjustLinesRefsNodeNos_Adjusting_too_early 
             ) 
-        ; INC ( LLinesRef . LrBolTokMark . EstNodeNo , Bias ) 
+        ; INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias ) 
         END (* IF *)
       ; IF LLinesRef . LrRightLink = ImageRef . ItPers . IpLineHeaderRef 
         THEN 
@@ -315,7 +386,7 @@ MODULE TextEdit
         END (* IF *) 
       END (* LOOP *) 
     END AdjustLinesRefsNodeNos 
-
+*)
 ; PROCEDURE UnadjustLinesRefsNodeNos 
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; FirstLinesRefToAdjust : PaintHs . LinesRefTyp 
@@ -339,13 +410,13 @@ MODULE TextEdit
         IF LLinesRef = FirstLinesRefToAdjust 
         THEN LPastFirstLinesRef := TRUE 
         END (* IF *)  
-      ; IF LLinesRef . LrBolTokMark . EstNodeNo - Bias  
+      ; IF LLinesRef . LrBolTokMark . TkmEstNodeNo - Bias  
            >= MinNodeNoToAdjust 
         THEN 
-          DEC ( LLinesRef . LrBolTokMark . EstNodeNo , Bias ) 
+          DEC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias ) 
         END (* IF *) 
       ; IF IsAncestorMark 
-             ( LLinesRef . LrBolTokMark . EstNodeNo (* Already unadjusted. *) 
+             ( LLinesRef . LrBolTokMark . TkmEstNodeNo (* Already unadjusted. *) 
              , LLinesRef . LrBolTokMark . EstNodeCt 
              , MinNodeNoToAdjust  
              ) 
@@ -385,16 +456,16 @@ MODULE TextEdit
           THEN LMark . LmTokMark := LMark . LmLinesRef . LrBolTokMark 
           ELSE 
             IF IsAncestorMark 
-                 ( LMark . LmTokMark . EstNodeNo  
+                 ( LMark . LmTokMark . TkmEstNodeNo  
                  , LMark . LmTokMark . EstNodeCt 
                  , MinNodeNoToAdjust  
                  ) 
             THEN 
               DEC ( LMark . LmTokMark . EstNodeCt , Bias ) 
             END (* IF *)   
-          ; IF LMark . LmTokMark . EstNodeNo >= MinNodeNoToAdjust + Bias  
+          ; IF LMark . LmTokMark . TkmEstNodeNo >= MinNodeNoToAdjust + Bias  
             THEN 
-              DEC ( LMark . LmTokMark . EstNodeNo , Bias ) 
+              DEC ( LMark . LmTokMark . TkmEstNodeNo , Bias ) 
             END (* IF *) 
           END (* IF *) 
         ; IF LMark . LmRightLink = LImagePers . IpMarkHeader 
@@ -969,16 +1040,16 @@ MODULE TextEdit
             IF LMark . LmLinesRef = NIL 
             THEN (* Doesn't point to a LinesRef at all.  Adjust numerically *) 
               IF IsAncestorMark 
-                   ( LMark . LmTokMark . EstNodeNo  
+                   ( LMark . LmTokMark . TkmEstNodeNo  
                    , LMark . LmTokMark . EstNodeCt 
                    , MinNodeNoToAdjust 
                    ) 
               THEN 
                 INC ( LMark . LmTokMark . EstNodeCt , Bias ) 
               END (* IF *)   
-            ; IF LMark . LmTokMark . EstNodeNo >= MinNodeNoToAdjust 
+            ; IF LMark . LmTokMark . TkmEstNodeNo >= MinNodeNoToAdjust 
               THEN 
-                INC ( LMark . LmTokMark . EstNodeNo , Bias ) 
+                INC ( LMark . LmTokMark . TkmEstNodeNo , Bias ) 
               END (* IF *) 
             ELSE (* Just copy the mark from the LinesRef (where it could 
                     have changed). 
@@ -1027,9 +1098,10 @@ MODULE TextEdit
         Do something about it. 
 *) 
       ; AdjustLinesRefsNodeNos 
-          ( ImageRef 
+          ( ImageRef
+          , IfteOldEstRoot 
+          , IfteNewEstRoot 
           , IfteSuccLinesRefMeat 
-          , IfteMaxTouchedNodeNo + 1  
           , IfteNodeNoChange 
           ) 
 
@@ -1569,7 +1641,7 @@ MODULE TextEdit
            AND InsNlPos = LbeStd . LimitedCharNoInfinity
            AND ( TempEditRef . TeDelFromPos = LbeStd . LimitedCharNoInfinity 
                  OR TempEditRef . TeDelToPos = TempEditRef . TeDelFromPos
-                    AND InsLen = 0
+                    AND TempEditRef . TeInsLen = 0
                )
 (* TODO: Check how this ever happened.  test14_142, in Edit_Cut. *)  
           THEN RETURN
@@ -1726,10 +1798,12 @@ MODULE TextEdit
         ; IF IfteOldThruLinesRef # NIL 
           THEN 
             IfteSuccLinesRef := IfteOldThruLinesRef . LrRightLink 
+          ; IfteSuccLinesRefMeat := NIL 
           ; TYPECASE IfteSuccLinesRef 
-            OF PaintHs . LinesRefMeatTyp ( TSuccLinesRefMeat ) 
+            OF NULL =>
+            | PaintHs . LinesRefMeatTyp ( TSuccLinesRefMeat ) 
             => IfteSuccLinesRefMeat := TSuccLinesRefMeat
-            ELSE IfteSuccLinesRefMeat := NIL 
+            ELSE 
             END (* TYPECASE *) 
           END (* IF *) 
 
@@ -1946,8 +2020,7 @@ MODULE TextEdit
                       THEN (* We know NOT PaintHs.LrGapAfter( LLinesRef ), 
                               so this means LLinesRef is to EndOfImage. *) 
                         WHILE LLineNoInWindow 
-                              < EditWindow . SouthEastToCorner ( LWindowRef )
-                                . v 
+                              < EditWindow . SouthEastToCorner ( LWindowRef ) . v 
                         DO EditWindow . PaintBackground  
                              ( Window := LWindowRef 
                              , LineNoInWindow := LLineNoInWindow 

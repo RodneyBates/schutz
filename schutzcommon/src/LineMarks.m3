@@ -635,7 +635,7 @@ MODULE LineMarks
         = BEGIN (* GnlTeTfsModBlankLineInterior *) 
             NewMark 
               := Marks . TokMarkTyp 
-                   { EstNodeNo 
+                   { TkmEstNodeNo 
                        := EstAbsNodeNo 
                           + GnlTeEstTravInfo . EtiChildRelNodeNo 
                    , EstNodeCt := 1
@@ -686,7 +686,7 @@ MODULE LineMarks
             | GnlStateTyp . GnlStateInLine 
             => NewMark 
                  := Marks . TokMarkTyp 
-                      { EstNodeNo 
+                      { TkmEstNodeNo 
                           := EstAbsNodeNo 
                              + GnlTeEstTravInfo . EtiChildRelNodeNo 
                       , EstNodeCt := 1
@@ -708,7 +708,7 @@ MODULE LineMarks
             | GnlStateTyp . GnlStateRightNlFound 
             => NewMark 
                  := Marks . TokMarkTyp 
-                      { EstNodeNo 
+                      { TkmEstNodeNo 
                           := EstAbsNodeNo 
                              + GnlTeEstTravInfo . EtiChildRelNodeNo 
                       , EstNodeCt := 1
@@ -766,7 +766,7 @@ MODULE LineMarks
             THEN 
               NewMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo 
+                     { TkmEstNodeNo 
                          := EstAbsNodeNo 
                             + GnlTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt := 1
@@ -847,7 +847,7 @@ MODULE LineMarks
                 , GnlStateTyp . GnlStateRightNlFound 
                 => NewMark 
                      := Marks . TokMarkTyp 
-                          { EstNodeNo 
+                          { TkmEstNodeNo 
                               := EstAbsNodeNo 
                                  + GnlTeEstTravInfo . EtiChildRelNodeNo 
                           , EstNodeCt := 1
@@ -900,7 +900,7 @@ MODULE LineMarks
             THEN (* New line after. *) 
               NewMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo 
+                     { TkmEstNodeNo 
                          := EstAbsNodeNo 
                             + GnlTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt := 1
@@ -966,7 +966,7 @@ MODULE LineMarks
               => (* We are at the end of the line. *) 
                  NewMark 
                    := Marks . TokMarkTyp 
-                        { EstNodeNo 
+                        { TkmEstNodeNo 
                             := EstAbsNodeNo 
                                + GnlTeEstTravInfo . EtiChildRelNodeNo 
                         , EstNodeCt := 1
@@ -1022,7 +1022,7 @@ MODULE LineMarks
             CASE GnlState <* NOWARN *> 
             OF GnlStateTyp . GnlStateStartAtBeg 
             , GnlStateTyp . GnlStateStartAtEnd 
-            => IF StartMark . EstNodeNo 
+            => IF StartMark . TkmEstNodeNo 
                   = EstAbsNodeNo + GnlTeEstTravInfo . EtiChildRelNodeNo 
                   AND StartMark . Kind = MarkKindTyp . Plain 
               THEN (* StartMark denotes this ModTok.  This means we are
@@ -1045,7 +1045,7 @@ MODULE LineMarks
                       keep traversing. *)
                 NewMark 
                   := Marks . TokMarkTyp 
-                       { EstNodeNo 
+                       { TkmEstNodeNo 
                            := EstAbsNodeNo 
                               + GnlTeEstTravInfo . EtiChildRelNodeNo 
                        , EstNodeCt := EstUtil . EstNodeCt ( EstRef )
@@ -1306,7 +1306,7 @@ MODULE LineMarks
             THEN (* No Est children, build ChildFmtNo mark. *) 
               NewMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo := EstAbsNodeNo  
+                     { TkmEstNodeNo := EstAbsNodeNo  
                      , EstNodeCt := 1
                      , TkmEstRef := GnlTeEstTravInfo . EtiNodeRef 
                      , Kind := MarkKindTyp . ChildFmtNo 
@@ -1321,7 +1321,7 @@ MODULE LineMarks
                     LeftSib of the that Est child. *) 
               NewMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo 
+                     { TkmEstNodeNo 
                          := EstAbsNodeNo 
                             + GnlTeEstTravInfo . EtiChildRelNodeNo  
                      , EstNodeCt 
@@ -1345,7 +1345,7 @@ MODULE LineMarks
                     Build a RightSibFmtNo mark. *) 
               NewMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo := EstAbsNodeNo + GnlTeRMChildRelNodeNo 
+                     { TkmEstNodeNo := EstAbsNodeNo + GnlTeRMChildRelNodeNo 
                      , EstNodeCt 
                          := EstUtil . EstNodeCt ( GnlTeRMChildRef ) 
                             + ORD ( EstHs . EstChildKindOptSingletonList 
@@ -1461,7 +1461,7 @@ MODULE LineMarks
             => IF EstAbsNodeNo 
                   + EstUtil . EstNodeCt ( GnlTeEstTravInfo . EtiNodeRef ) 
                   + ORD ( GnlTeEstTravInfo . EtiIsOptSingletonList )  
-                  <= StartMark . EstNodeNo 
+                  <= StartMark . TkmEstNodeNo 
                THEN (* Marked node is outside this Est subtree. *) 
 (* CHECK: How can this happen? Check other traversers too.  
           Shouldn't we be checking for beyond the end of the current
@@ -1716,7 +1716,7 @@ MODULE LineMarks
             OF GnlStateTyp . GnlStateStartAtBeg 
             , GnlStateTyp . GnlStateStartAtEnd 
             => (* Choose the Est child to descend to. *) 
-               IF EstAbsNodeNo = StartMark . EstNodeNo 
+               IF EstAbsNodeNo = StartMark . TkmEstNodeNo 
                THEN (* Mark denotes the Est root. *)  
                  TravUtil . InitEstTravInfoFwd 
                    ( (* VAR *) GnlTeEstTravInfo
@@ -1747,7 +1747,7 @@ MODULE LineMarks
                  TravUtil . InitToChildContainingNodeNo 
                    ( (* VAR *) GnlTeEstTravInfo 
                    , EstRef 
-                   , StartMark . EstNodeNo - EstAbsNodeNo 
+                   , StartMark . TkmEstNodeNo - EstAbsNodeNo 
                    , KindSet 
                    , EstAbsNodeNo 
                    ) 
@@ -1757,7 +1757,7 @@ MODULE LineMarks
                    ) 
                ; IF StartMark . Kind = MarkKindTyp . RightSibFmtNo 
                     AND EstAbsNodeNo + GnlTeEstTravInfo . EtiChildRelNodeNo 
-                        = StartMark . EstNodeNo 
+                        = StartMark . TkmEstNodeNo 
                  THEN 
                    Assert 
                      ( GnlTeEstTravInfo . EtiChildNo + 1 
@@ -1774,13 +1774,13 @@ MODULE LineMarks
             ; GnlTeStartFmtNo := GnlTeEstTravInfo . EtiChildFmtNo (* default *)
             ; CASE StartMark . Kind 
               OF MarkKindTyp . ChildFmtNo 
-              => IF EstAbsNodeNo = StartMark . EstNodeNo 
+              => IF EstAbsNodeNo = StartMark . TkmEstNodeNo 
                  THEN GnlTeStartFmtNo := StartMark . FmtNo 
                  END (* IF *)
                  
               | MarkKindTyp . LeftSibFmtNo 
               => IF EstAbsNodeNo + GnlTeEstTravInfo . EtiChildRelNodeNo 
-                    = StartMark . EstNodeNo 
+                    = StartMark . TkmEstNodeNo 
                  THEN GnlTeStartFmtNo := StartMark . FmtNo 
                  END (* IF *) 
 
@@ -1788,7 +1788,7 @@ MODULE LineMarks
               => IF GnlTeEstTravInfo . EtiChildNo 
                     >= GnlTeEstTravInfo . EtiChildCt 
                     AND EstAbsNodeNo + GnlTeRMChildRelNodeNo 
-                        = StartMark . EstNodeNo 
+                        = StartMark . TkmEstNodeNo 
                  THEN GnlTeStartFmtNo := StartMark . FmtNo 
                  END (* IF *) 
 
@@ -2109,7 +2109,7 @@ MODULE LineMarks
             , GplStateTyp . GplStatePassingNl 
             => NewMark 
                  := Marks . TokMarkTyp 
-                      { EstNodeNo 
+                      { TkmEstNodeNo 
                           := EstAbsNodeNo 
                              + GplTeEstTravInfo . EtiChildRelNodeNo 
                       , EstNodeCt := 1 
@@ -2130,7 +2130,7 @@ MODULE LineMarks
 (* FIXME: I don't think so.  Bl is viewed as zero-width by the containing text. *)
                NewMark 
                  := Marks . TokMarkTyp 
-                      { EstNodeNo 
+                      { TkmEstNodeNo 
                           := EstAbsNodeNo 
                              + GplTeEstTravInfo . EtiChildRelNodeNo 
                       , EstNodeCt := 1
@@ -2157,7 +2157,7 @@ MODULE LineMarks
             RETURN 
               ExistingMark . Kind = MarkKindTyp . Plain 
               AND EstAbsNodeNo + GplTeEstTravInfo . EtiChildRelNodeNo 
-                  = ExistingMark . EstNodeNo 
+                  = ExistingMark . TkmEstNodeNo 
               AND StartAtEnd = ExistingMark . StartAtEnd 
           END GplTeTfsStringModAtEndingMark 
 
@@ -2183,7 +2183,7 @@ MODULE LineMarks
                THEN (* Stop at the beginning of the mod. *) 
                  NewMark 
                    := Marks . TokMarkTyp 
-                        { EstNodeNo 
+                        { TkmEstNodeNo 
                             := EstAbsNodeNo 
                                + GplTeEstTravInfo . EtiChildRelNodeNo 
                         , EstNodeCt := 1
@@ -2217,7 +2217,7 @@ MODULE LineMarks
                THEN (* Stop at the end of the mod. *) 
                  NewMark 
                    := Marks . TokMarkTyp 
-                        { EstNodeNo 
+                        { TkmEstNodeNo 
                             := EstAbsNodeNo 
                                + GplTeEstTravInfo . EtiChildRelNodeNo 
                         , EstNodeCt := 1 
@@ -2237,7 +2237,7 @@ MODULE LineMarks
                THEN (* Stop at the beginning of the mod. *) 
                  NewMark 
                    := Marks . TokMarkTyp 
-                        { EstNodeNo 
+                        { TkmEstNodeNo 
                             := EstAbsNodeNo 
                                + GplTeEstTravInfo . EtiChildRelNodeNo 
                         , EstNodeCt := 1
@@ -2452,19 +2452,19 @@ MODULE LineMarks
             CASE ExistingMark . Kind 
             OF MarkKindTyp . ChildFmtNo 
             => RETURN 
-                 EstAbsNodeNo = ExistingMark . EstNodeNo 
+                 EstAbsNodeNo = ExistingMark . TkmEstNodeNo 
                  AND FsNodeRef . FsFmtNo = ExistingMark . FmtNo 
             | MarkKindTyp . LeftSibFmtNo 
             => RETURN 
                  GplTeEstTravInfo . EtiChildNo + 1 
                  < GplTeEstTravInfo . EtiChildCt 
                  AND EstAbsNodeNo + GplTeRightwardChildRelNodeNo 
-                     = ExistingMark . EstNodeNo 
+                     = ExistingMark . TkmEstNodeNo 
                  AND FsNodeRef . FsFmtNo = ExistingMark . FmtNo 
             | MarkKindTyp . RightSibFmtNo 
             => RETURN 
                  EstAbsNodeNo + GplTeEstTravInfo . EtiChildRelNodeNo 
-                 = ExistingMark . EstNodeNo 
+                 = ExistingMark . TkmEstNodeNo 
                  AND FsNodeRef . FsFmtNo = ExistingMark . FmtNo 
             ELSE 
               RETURN FALSE 
@@ -2485,7 +2485,7 @@ MODULE LineMarks
             THEN (* No children, make it ChildFmtNo *) 
               NewMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo := EstAbsNodeNo 
+                     { TkmEstNodeNo := EstAbsNodeNo 
                      , EstNodeCt := 1
                      , TkmEstRef := GplTeEstTravInfo . EtiNodeRef 
                      , Kind := MarkKindTyp . ChildFmtNo 
@@ -2499,7 +2499,7 @@ MODULE LineMarks
             THEN (* We are right of RM Est child.  Make it RightSibFmtNo *)
               NewMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo 
+                     { TkmEstNodeNo 
                          := EstAbsNodeNo 
                             + GplTeEstTravInfo . EtiChildRelNodeNo 
                      , EstNodeCt 
@@ -2522,7 +2522,7 @@ MODULE LineMarks
             ELSE (* Make it LeftSibFmtNo *) 
               NewMark 
                 := Marks . TokMarkTyp 
-                     { EstNodeNo 
+                     { TkmEstNodeNo 
                          := EstAbsNodeNo + GplTeRightwardChildRelNodeNo 
                      , EstNodeCt 
                           := EstUtil . EstNodeCt ( GplTeRightwardChildRef )  
@@ -2607,7 +2607,7 @@ MODULE LineMarks
           ; CASE GplState 
             OF GplStateTyp . GplStateStartAtBeg 
             , GplStateTyp . GplStateStartAtEnd 
-            => IF EstAbsNodeNo > StartMark . EstNodeNo 
+            => IF EstAbsNodeNo > StartMark . TkmEstNodeNo 
                THEN (* Marked node is outside this Est subtree. *) 
 (* CHECK: How can this happen? (and in Gnl too.) *) 
                  GplTeDecEstChild ( ) 
@@ -2925,7 +2925,7 @@ MODULE LineMarks
           OF GplStateTyp . GplStateStartAtBeg 
           , GplStateTyp . GplStateStartAtEnd 
           => (* Choose the Est child to descend to. *) 
-            IF EstAbsNodeNo = StartMark . EstNodeNo 
+            IF EstAbsNodeNo = StartMark . TkmEstNodeNo 
             THEN (* The mark denotes the root of this Est and an fs child
                     thereof.  This can only be a line break, and those don't
                     have trailing mods.  Also, there are no Est children. *) 
@@ -2954,7 +2954,7 @@ MODULE LineMarks
               TravUtil . InitToChildContainingNodeNo 
                 ( (* VAR *) GplTeEstTravInfo 
                 , EstRef 
-                , StartMark . EstNodeNo - EstAbsNodeNo 
+                , StartMark . TkmEstNodeNo - EstAbsNodeNo 
                 , KindSet 
                 , EstAbsNodeNo 
                 )
@@ -2963,7 +2963,7 @@ MODULE LineMarks
                   , AFT . AF_GplTraverseEst_descend_thru_empty_node 
                   ) 
             ; IF EstAbsNodeNo + GplTeEstTravInfo . EtiChildRelNodeNo 
-                 = StartMark . EstNodeNo 
+                 = StartMark . TkmEstNodeNo 
               THEN 
                 CASE StartMark . Kind 
                 OF MarkKindTyp . LeftSibFmtNo
@@ -2983,7 +2983,7 @@ MODULE LineMarks
           ; GplTeStartFmtNo := GplTeEstTravInfo . EtiChildFmtNo (* default *)
           ; CASE StartMark . Kind 
             OF MarkKindTyp . ChildFmtNo 
-            => IF EstAbsNodeNo = StartMark . EstNodeNo 
+            => IF EstAbsNodeNo = StartMark . TkmEstNodeNo 
                THEN GplTeStartFmtNo := StartMark . FmtNo 
                END (* IF *) 
 
@@ -2991,14 +2991,14 @@ MODULE LineMarks
             => IF GplTeEstTravInfo . EtiChildNo + 1 
                   < GplTeEstTravInfo . EtiChildCt 
                   AND EstAbsNodeNo + GplTeRightwardChildRelNodeNo 
-                      = StartMark . EstNodeNo 
+                      = StartMark . TkmEstNodeNo 
                THEN 
                  GplTeStartFmtNo := StartMark . FmtNo 
                END (* IF *) 
 
             | MarkKindTyp . RightSibFmtNo 
             => IF EstAbsNodeNo + GplTeEstTravInfo . EtiChildRelNodeNo 
-                  = StartMark . EstNodeNo 
+                  = StartMark . TkmEstNodeNo 
                THEN 
                  GplTeStartFmtNo := StartMark . FmtNo 
                END (* IF *) 
@@ -3084,7 +3084,7 @@ MODULE LineMarks
         THEN
           NewMark 
             := Marks . TokMarkTyp 
-                 { EstNodeNo := 0
+                 { TkmEstNodeNo := 0
                  , EstNodeCt := EstUtil . EstNodeCt ( RootEstRef )
                  , TkmEstRef := RootEstRef 
                  , Kind := MarkKindTyp . ChildFmtNo 
@@ -3096,7 +3096,7 @@ MODULE LineMarks
         ELSE 
           NewMark 
             := Marks . TokMarkTyp 
-                 { EstNodeNo := LEstTravInfo . EtiChildRelNodeNo 
+                 { TkmEstNodeNo := LEstTravInfo . EtiChildRelNodeNo 
                  , EstNodeCt 
                      := EstUtil . EstNodeCt 
                           ( LEstTravInfo . EtiChildLeafElem . LeChildRef )  
@@ -3116,7 +3116,7 @@ MODULE LineMarks
       ELSE 
         NewMark 
           := Marks . TokMarkTyp 
-               { EstNodeNo := 0 
+               { TkmEstNodeNo := 0 
                , EstNodeCt := 1
                , TkmEstRef := RootEstRef 
                , Kind := MarkKindTyp . ChildFmtNo 
@@ -3217,7 +3217,7 @@ MODULE LineMarks
           ) 
       ; NewMark 
           := Marks . TokMarkTyp 
-               { EstNodeNo := LEstTravInfo . EtiChildRelNodeNo 
+               { TkmEstNodeNo := LEstTravInfo . EtiChildRelNodeNo 
                , EstNodeCt 
                    := EstUtil . EstNodeCt 
                         ( LEstTravInfo . EtiChildLeafElem . LeChildRef )  
@@ -3236,7 +3236,7 @@ MODULE LineMarks
       ELSE 
         NewMark 
           := Marks . TokMarkTyp 
-               { EstNodeNo := 0 
+               { TkmEstNodeNo := 0 
                , EstNodeCt := 1
                , TkmEstRef := RootEstRef 
                , Kind := MarkKindTyp . ChildFmtNo 

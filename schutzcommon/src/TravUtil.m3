@@ -1512,7 +1512,7 @@ MODULE TravUtil
   ; VAR LIsFirstLine : BOOLEAN 
 
   ; BEGIN (* GetNodeInfo *) 
-      IF EstRoot = NIL OR StartMark . EstNodeNo = 0 
+      IF EstRoot = NIL OR StartMark . TkmEstNodeNo = 0 
       THEN
         EstTravInfo . EtiNodeRef := NIL  
       ; EstTravInfo . EtiParentRef := NIL  
@@ -1539,7 +1539,7 @@ MODULE TravUtil
       ; LParentIndentPos1 := Options . InitialIndentPos    
       ; LParentIndentPosN := Options . InitialIndentPos    
       ; ParentIndentPos := LParentIndentPos1 
-      ; LRelNodeNo := StartMark . EstNodeNo 
+      ; LRelNodeNo := StartMark . TkmEstNodeNo 
       ; LOOP (* INVARIANT: the following are set for the parent node: 
                     EstTravInfo . EtiNodeRef 
                     LParentFsNodeRef 

@@ -112,7 +112,7 @@ MODULE Display
          ELSE 
            TravUtil . GetDescendantWithNodeNo 
              ( EstRoot 
-             , TokMark . EstNodeNo 
+             , TokMark . TkmEstNodeNo 
              , (* VAR *) LNode 
              , (* VAR *) LKindSet (* Dead. *) 
              , (* VAR *) LIsOptSingletonList (* Dead, always FALSE. *)  
