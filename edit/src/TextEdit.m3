@@ -3075,7 +3075,7 @@ MODULE TextEdit
                   OR NewChar = LbeStd . CharReturn  
                THEN (* Inserted new line. *) 
                  LDoInBlankLineBefore := FALSE 
-               ; IF WCursorMark . LmLinesRef . LrBolTokMark . Kind 
+               ; IF WCursorMark . LmLinesRef . LrBolTokMark . TkmKind 
                     # MarkKindTyp . BlankLine 
                     AND WCursorMark . LmCharPos 
                         <= WCursorMark . LmLinesRef . LrFromPos 
@@ -3083,7 +3083,7 @@ MODULE TextEdit
                    TYPECASE WCursorMark . LmLinesRef . LrLeftLink 
                    OF PaintHs . LinesRefMeatTyp ( TPredLinesRef ) 
                    => IF NOT TPredLinesRef . LrGapAfter 
-                         AND TPredLinesRef . LrBolTokMark . Kind 
+                         AND TPredLinesRef . LrBolTokMark . TkmKind 
                              = MarkKindTyp . BlankLine 
                          AND NOT TPredLinesRef . LrBolTokMark . StartAtEnd 
                       THEN 
@@ -3157,7 +3157,7 @@ MODULE TextEdit
                         <= WCursorMark . LmLinesRef . LrFromPos 
                      THEN (* Cursor in white space on left of line. *)  
                        LIndentPos := WCursorMark . LmCharPos 
-                     ELSIF WCursorMark . LmLinesRef . LrBolTokMark . Kind 
+                     ELSIF WCursorMark . LmLinesRef . LrBolTokMark . TkmKind 
                            = MarkKindTyp . BlankLine 
                            AND NOT WCursorMark . LmLinesRef . LrBolTokMark 
                                    . StartAtEnd 

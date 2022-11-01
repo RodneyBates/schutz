@@ -197,7 +197,7 @@ MODULE LineNumbers
   = VAR LNodeNo : LbeStd . EstNodeNoTyp 
 
   ; BEGIN 
-      CASE LineMark . LmTokMark . Kind <* NOWARN *>
+      CASE LineMark . LmTokMark . TkmKind <* NOWARN *>
       OF MarkKindTyp . Null 
       => LNodeNo := 0 
 

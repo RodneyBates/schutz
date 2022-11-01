@@ -574,9 +574,9 @@ MODULE Parser
 
   = BEGIN 
       RETURN
-        ParseMark . TokMark . Kind # MarkKindTyp . Null
-        AND ( ParseMark . TokMark . Kind 
-              # OrigMark. TokMark . Kind 
+        ParseMark . TokMark . TkmKind # MarkKindTyp . Null
+        AND ( ParseMark . TokMark . TkmKind 
+              # OrigMark. TokMark . TkmKind 
               OR ParseMark . TokMark . TkmFmtNo 
                  # OrigMark. TokMark . TkmFmtNo  
               OR ParseMark . TokMark . TkmEstRef 
@@ -769,7 +769,7 @@ MODULE Parser
       ; FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
         DO WITH WTempMarkRec = TempMarkListRef ^ [ RTempMarkSs ] 
            DO
-             WTempMarkRec . TokMark . Kind := MarkKind    
+             WTempMarkRec . TokMark . TkmKind := MarkKind    
            ; WTempMarkRec . TokMark . TkmEstRef := EstRef
            END (* WITH *) 
         END (* FOR *)
@@ -795,7 +795,7 @@ MODULE Parser
     = BEGIN
         WITH WTempMarkRec = TempMarkListRef ^ [ TempMarkSs ] 
         DO
-          WTempMarkRec . TokMark . Kind := MarkKind    
+          WTempMarkRec . TokMark . TkmKind := MarkKind    
         ; WTempMarkRec . TokMark . TkmEstRef := EstRef
         END (* WITH *) 
       END PtmVisit 

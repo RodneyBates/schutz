@@ -38,7 +38,7 @@ INTERFACE Marks
            or a mod. *) 
       , BlankLine 
         (* A BlankLine mark works like Plain, except that it uses the 
-           BlankLineNo and BlCharPos fields. *) 
+           BlankLineNo and TkmBlCharPos fields. *) 
       , ChildFmtNo 
         (* A ChildFmtNo mark is used to indicate a point in an InsTok 
            that belongs to the format syntax tree for an Est node that
@@ -109,7 +109,7 @@ INTERFACE Marks
         TkmEstRef : LbeStd . EstRootTyp := NIL 
       ; TkmEstNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull 
       ; TkmEstNodeCt : LbeStd . EstNodeNoTyp := 0 
-      ; BlCharPos : LbeStd . CharNoTyp := LbeStd . CharNoUnknown 
+      ; TkmBlCharPos : LbeStd . CharNoTyp := LbeStd . CharNoUnknown 
         (* Maintained only when Kind = BlankLine.  The CharPos at the end of
            the line before the blank lines. *)  
       ; TkmTok : LbeStd . TokTyp := LbeStd . Tok__Null  
@@ -125,7 +125,7 @@ INTERFACE Marks
           (* ^Meaningful IFF 
               Kind 
               IN MarkKindTyp { LeftSibFmtNo , RightSibFmtNo , ChildFmtNo } *) 
-      ; Kind : MarkKindTyp := MarkKindTyp . Null 
+      ; TkmKind : MarkKindTyp := MarkKindTyp . Null 
       ; StartAtEnd : BOOLEAN := FALSE 
         (* Allows denoting the new line at the end of the token. 
            This happens only for blankline, text, and comment mods. Must be
@@ -155,9 +155,9 @@ INTERFACE Marks
         { TkmEstRef := NIL
         , TkmEstNodeNo := LbeStd . EstNodeNoNull 
         , TkmEstNodeCt := 0 
-        , BlCharPos := LbeStd . CharNoUnknown 
+        , TkmBlCharPos := LbeStd . CharNoUnknown 
         , TkmTok := LbeStd . Tok__Null
-        , Kind := MarkKindTyp . Null 
+        , TkmKind := MarkKindTyp . Null 
         , TkmFmtNo := EstHs . FmtNoNull  
         , StartAtEnd := FALSE 
         , IsImpliedNewLine := FALSE 

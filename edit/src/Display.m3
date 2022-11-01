@@ -98,7 +98,7 @@ MODULE Display
   ; VAR LIsOptSingletonList : BOOLEAN 
 
   ; BEGIN (* LineCtOfBolTokMark *) 
-      CASE TokMark . Kind 
+      CASE TokMark . TkmKind 
       OF MarkKindTyp . Plain 
       , MarkKindTyp . ChildFmtNo 
       , MarkKindTyp . LeftSibFmtNo 

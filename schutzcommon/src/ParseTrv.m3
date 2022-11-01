@@ -1102,7 +1102,7 @@ END
                = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
           DO 
             NpsNextTempMarkIsRelevant
-              := WTempMark . TokMark . Kind IN Marks . MarkKindSetEstLeaf 
+              := WTempMark . TokMark . TkmKind IN Marks . MarkKindSetEstLeaf 
                  AND LeafRef = WTempMark . TokMark . TkmEstRef 
           END (* WITH *) 
         END (* IF *)  
@@ -1126,7 +1126,7 @@ END
           , WTravInfo = NpsSeEstRef . SeEstTravInfo  
           DO IF WTempMark . TokMark . TkmFmtNo = FmtNo 
             THEN
-              CASE WTempMark . TokMark . Kind 
+              CASE WTempMark . TokMark . TkmKind 
               OF MarkKindTyp . LeftSibFmtNo  
               => NpsNextTempMarkIsRelevant 
                    := WTravInfo . EtiChildLeafElem . LeChildRef 
@@ -1231,7 +1231,7 @@ END
                WTempMark 
                = ParseInfo . PiTravTempMarkListRef ^ [ RTempMarkSs ] 
              DO WTempMark . TokMark . TkmEstRef := NodeRef 
-             ; WTempMark . TokMark . Kind := Kind 
+             ; WTempMark . TokMark . TkmKind := Kind 
              END (* WITH *) 
           END (* WHILE *) 
         END (* IF *) 
@@ -1301,7 +1301,7 @@ END
                   IF NpsStmTLeafElem . LeChildRef # WTempMark . TokMark . TkmEstRef 
                   THEN 
                     EXIT 
-                  ELSIF WTempMark .  TokMark . Kind 
+                  ELSIF WTempMark .  TokMark . TkmKind 
                         = MarkKindTyp . RightSibFmtNo
                   THEN 
                     IF Depth = 0 AND NpsStmTChildNo + 1 >= ToChildNo 
@@ -1952,9 +1952,9 @@ END
                   , AFT . A_NpsDssIncludeTempMarks_fmtno_not_original 
                   ) 
               ; Assert
-                  ( WTempMark . TokMark . Kind 
+                  ( WTempMark . TokMark . TkmKind 
                     = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
-                      . TokMark . Kind 
+                      . TokMark . TkmKind 
                   , AFT . A_NpsDssIncludeTempMarks_kind_not_original 
                   ) 
               ; Assert
@@ -4902,7 +4902,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
               ELSE
                 WITH W1stTempMark 
                      = ParseInfo . PiOrigTempMarkListRef ^ [ LTempMarkSs ]
-                DO IF W1stTempMark . TokMark . Kind = MarkKindTyp . ChildFmtNo  
+                DO IF W1stTempMark . TokMark . TkmKind = MarkKindTyp . ChildFmtNo  
                    THEN
                      Assert
                        ( W1stTempMark . TokMark . TkmEstRef = ModTok 
@@ -4918,7 +4918,7 @@ TRUE OR         NpsSeEstRef . SeEstAdvanceState . PtsTokInfo
                               = ParseInfo . PiOrigTempMarkListRef
                                 ^ [ LTempMarkSs ]
                          DO
-                           IF WLaterTempMark . TokMark . Kind 
+                           IF WLaterTempMark . TokMark . TkmKind 
                               = MarkKindTyp . ChildFmtNo  
                            THEN 
                              Assert

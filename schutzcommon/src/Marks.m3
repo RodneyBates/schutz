@@ -64,9 +64,10 @@ MODULE Marks
       THEN LTokImage := LbeStd . NumIdTokImage ( Mark . TkmTok ) 
       ELSE LTokImage := LangUtil . TokImage ( Mark . TkmTok , Lang ) 
       END (* IF *) 
-    ; IF Mark . Kind = MarkKindTyp . BlankLine
+    ; IF Mark . TkmKind = MarkKindTyp . BlankLine
       THEN
-        LBlCharPosImage := "BlCharPos=" & LbeStd . CharNoImage ( Mark . BlCharPos )
+        LBlCharPosImage
+          := "TkmBlCharPos=" & LbeStd . CharNoImage ( Mark . TkmBlCharPos )
       ELSE LBlCharPosImage := ""
       END (* IF*)
     ; RETURN
@@ -74,7 +75,7 @@ MODULE Marks
         & "(" & LbeStd . EstNodeNoImage ( Mark . TkmEstNodeCt ) & ")"
         & Fmt . Pad ( Misc . RefanyImage ( Mark . TkmEstRef ) , RefanyPad )
         & ","
-        & MarkKindImageShort ( Mark . Kind ) 
+        & MarkKindImageShort ( Mark . TkmKind ) 
         & EstHs . FmtNoImage ( Mark . TkmFmtNo ) 
         & Misc . BooleanImageShort ( Mark . StartAtEnd ) 
         & Misc . BooleanImageShort ( Mark . IsImpliedNewLine )
@@ -93,11 +94,11 @@ MODULE Marks
                redundant, and if not, because it didn't get patched right
                after changes, we want compares to be equal anyway. 
             *) 
-         OR Left . Kind # Right . Kind 
+         OR Left . TkmKind # Right . TkmKind 
       THEN 
         RETURN FALSE 
       ELSE 
-        CASE Left . Kind 
+        CASE Left . TkmKind 
         OF MarkKindTyp . Null 
         , MarkKindTyp . Changed 
         => RETURN TRUE 
@@ -121,13 +122,13 @@ MODULE Marks
   = VAR LResult : [ - 1 .. 1 ] 
 
   ; BEGIN 
-      CASE Left . Kind 
+      CASE Left . TkmKind 
       OF MarkKindTyp . Null 
       , MarkKindTyp . Changed   
       => RAISE Unordered 
 
       | MarkKindTyp . LeftSibFmtNo  
-      => CASE Right . Kind 
+      => CASE Right . TkmKind 
          OF MarkKindTyp . Null 
          , MarkKindTyp . Changed   
          => RAISE Unordered 
@@ -168,7 +169,7 @@ MODULE Marks
       | MarkKindTyp . Plain 
       , MarkKindTyp . BlankLine 
       , MarkKindTyp . ChildFmtNo  
-      => CASE Right . Kind 
+      => CASE Right . TkmKind 
          OF MarkKindTyp . Null 
          , MarkKindTyp . Changed   
          => RAISE Unordered 
@@ -192,9 +193,9 @@ MODULE Marks
            THEN (* I could avoid retesting Kind fields, but it would be a
                    cartesian explosion of code.
                 *) 
-             IF Left . Kind # Right . Kind 
+             IF Left . TkmKind # Right . TkmKind 
              THEN RAISE Unordered 
-             ELSIF Left . Kind = MarkKindTyp . ChildFmtNo 
+             ELSIF Left . TkmKind = MarkKindTyp . ChildFmtNo 
              THEN RETURN Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )  
              ELSE 
                RETURN 
@@ -217,7 +218,7 @@ MODULE Marks
          END (* CASE *) 
 
       | MarkKindTyp . RightSibFmtNo 
-      => CASE Right . Kind 
+      => CASE Right . TkmKind 
          OF MarkKindTyp . Null 
          , MarkKindTyp . Changed   
          => RAISE Unordered 
@@ -270,7 +271,7 @@ MODULE Marks
 ; PROCEDURE IsNull ( Mark : TokMarkTyp ) : BOOLEAN 
 
   = BEGIN (* IsNull *) 
-      RETURN Mark . Kind = MarkKindTyp . Null 
+      RETURN Mark . TkmKind = MarkKindTyp . Null 
     END IsNull 
 
 ; BEGIN (* Marks *) 

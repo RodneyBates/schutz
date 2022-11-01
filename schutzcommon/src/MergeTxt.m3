@@ -1463,7 +1463,7 @@ MODULE MergeTxt
                        { TkmEstNodeNo := MarkNodeNo
                        , TkmEstNodeCt := 1 
                        , TkmEstRef := LBlankLineModRef 
-                       , Kind := MarkKindTyp . BlankLine 
+                       , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
@@ -1511,7 +1511,7 @@ MODULE MergeTxt
                                so, the whole mark will be overlaid. *) 
                          , TkmEstNodeCt := 1   
                          , TkmEstRef := LRightNewModRef  
-                         , Kind := MarkKindTyp . Plain 
+                         , TkmKind := MarkKindTyp . Plain 
                          , TkmFmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
@@ -1543,7 +1543,7 @@ MODULE MergeTxt
                                so, the whole mark will be overlaid. *) 
                          , TkmEstNodeCt := 1 
                          , TkmEstRef := LLeftNewModRef  
-                         , Kind := MarkKindTyp . Plain 
+                         , TkmKind := MarkKindTyp . Plain 
                          , TkmFmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
@@ -1559,7 +1559,7 @@ MODULE MergeTxt
                                so, the whole mark will be overlaid. *) 
                          , TkmEstNodeCt := 1 
                          , TkmEstRef := LLeftNewModRef  
-                         , Kind := MarkKindTyp . Plain 
+                         , TkmKind := MarkKindTyp . Plain 
                          , TkmFmtNo := FmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
@@ -1581,7 +1581,7 @@ MODULE MergeTxt
                        { TkmEstNodeNo := MarkNodeNo 
                        , TkmEstNodeCt := 1
                        , TkmEstRef := LBlankLineModRef  
-                       , Kind := MarkKindTyp . BlankLine 
+                       , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
@@ -2448,7 +2448,7 @@ MODULE MergeTxt
                        , TkmEstNodeCt := 1   
                        , TkmEstRef
                            := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
-                       , Kind := MarkKindTyp . BlankLine 
+                       , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := TRUE 
                        , IsImpliedNewLine := FALSE 
@@ -2481,7 +2481,7 @@ MODULE MergeTxt
                        , TkmEstNodeCt := 1   
                        , TkmEstRef
                            := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
-                       , Kind := MarkKindTyp . BlankLine 
+                       , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE  
                        , IsImpliedNewLine := FALSE 
@@ -2813,7 +2813,7 @@ MODULE MergeTxt
                      , TkmEstNodeCt := 1   
                      , TkmEstRef
                          := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
-                     , Kind := MarkKindTyp . Plain 
+                     , TkmKind := MarkKindTyp . Plain 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
                      , StartAtEnd := FALSE
                      , IsImpliedNewLine := NOT ModCmnt . ModCmntNlBefore 
@@ -3074,7 +3074,7 @@ MODULE MergeTxt
                             , TkmEstRef
                                 := MteTeEstTravInfo . EtiChildLeafElem
                                      . LeChildRef
-                            , Kind := MarkKindTyp . Plain 
+                            , TkmKind := MarkKindTyp . Plain 
                             , TkmFmtNo := FsNodeRef . FsFmtNo 
                             , StartAtEnd := TRUE 
                             , IsImpliedNewLine := FALSE 
@@ -3208,7 +3208,7 @@ MODULE MergeTxt
                        , TkmEstNodeCt := 1
                        , TkmEstRef
                            := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
-                       , Kind := MarkKindTyp . Plain 
+                       , TkmKind := MarkKindTyp . Plain 
                        , TkmFmtNo := FsNodeRef . FsFmtNo 
                        , StartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
@@ -3378,7 +3378,7 @@ MODULE MergeTxt
                               , TkmEstRef
                                   := MteTeEstTravInfo . EtiChildLeafElem
                                      . LeChildRef 
-                              , Kind := MarkKindTyp . Plain 
+                              , TkmKind := MarkKindTyp . Plain 
                               , TkmFmtNo := FsNodeRef . FsFmtNo 
                               , StartAtEnd := TRUE 
                               , IsImpliedNewLine := FALSE 
@@ -3428,7 +3428,7 @@ MODULE MergeTxt
                   child of EstRef.  Will come back in MteStateDone. *)
          (* ; IF StartTokMark . TkmEstNodeNo 
                  = EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo
-                 AND StartTokMark . Kind = MarkKindTyp . Plain 
+                 AND StartTokMark . TkmKind = MarkKindTyp . Plain 
               THEN (* StartTokMark denotes this ModTok.  This would mean 
                       starting at an implied Nl for the ModTok, which can't
                       happen. *)  
@@ -3534,7 +3534,7 @@ MODULE MergeTxt
                                   ) 
                          , TkmEstRef
                              := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
-                         , Kind := MarkKindTyp . Plain
+                         , TkmKind := MarkKindTyp . Plain
                          , TkmFmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
@@ -3562,7 +3562,7 @@ MODULE MergeTxt
                                   ) 
                          , TkmEstRef
                              := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
-                         , Kind := MarkKindTyp . Plain
+                         , TkmKind := MarkKindTyp . Plain
                          , TkmFmtNo := FsNodeRef . FsFmtNo 
                          , StartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
@@ -3712,7 +3712,7 @@ MODULE MergeTxt
                          , TkmEstNodeCt := 1   
                          , TkmEstRef
                              := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
-                         , Kind := MarkKindTyp . Plain 
+                         , TkmKind := MarkKindTyp . Plain 
                          , TkmFmtNo := FsNodeRef . FsFmtNo , StartAtEnd := FALSE 
                          , IsImpliedNewLine := TRUE  
                          , TkmTok := LbeStd . Tok__Null  
@@ -4225,7 +4225,7 @@ MODULE MergeTxt
                    , TkmEstNodeCt := LEstNodeCt
                    , TkmEstRef := LMarkEstRef 
                    (* ^May be overlaid. *) 
-                   , Kind := LMarkKind
+                   , TkmKind := LMarkKind
                    , TkmFmtNo := FsNodeRef . FsFmtNo 
                    , StartAtEnd := FALSE 
                    , IsImpliedNewLine := FALSE 
@@ -4244,7 +4244,7 @@ MODULE MergeTxt
 
         = BEGIN (* MteTeTfsBegOfImage *) 
             IF MteState IN MteStateSetStart
-               AND StartTokMark . Kind IN Marks . MarkKindSetEstLeaf 
+               AND StartTokMark . TkmKind IN Marks . MarkKindSetEstLeaf 
             THEN (* Ignore the BOI and move on to its trailing mods. *) 
             ELSE 
               CASE MteState 
@@ -4372,7 +4372,7 @@ MODULE MergeTxt
             , MteStateTyp . MteStateStartAtEnd   
             => (* Ignore the InsTok and move on to its trailing mods. *) 
                Assert
-                 ( StartTokMark . Kind IN Marks . MarkKindSetEstLeaf 
+                 ( StartTokMark . TkmKind IN Marks . MarkKindSetEstLeaf 
                  , AFT . A_MteTeTfsInsTok_StartAtInsTok 
                  ) 
 
@@ -4443,7 +4443,7 @@ MODULE MergeTxt
 
         = BEGIN (* MteTeTfsLineBreak *) 
             IF MteState IN MteStateSetStart
-               AND StartTokMark . Kind IN Marks . MarkKindSetEstLeaf 
+               AND StartTokMark . TkmKind IN Marks . MarkKindSetEstLeaf 
             THEN (* Ignore the LineBreak and move on to its trailing mods,
                     staying in the start state. *) 
             ELSE 
@@ -4825,7 +4825,7 @@ MODULE MergeTxt
               => IF TEstRef . EstNodeKind 
                     = EstHs . EstNodeKindTyp . EstNodeKindModTok 
                  THEN 
-                   CASE StartTokMark . Kind <* NOWARN *> 
+                   CASE StartTokMark . TkmKind <* NOWARN *> 
                    OF MarkKindTyp . LeftSibFmtNo 
                    , MarkKindTyp . RightSibFmtNo 
                    => IF StartTokMark . TkmEstNodeNo 
@@ -4847,7 +4847,7 @@ MODULE MergeTxt
                 END (* IF  *) 
 
               | ModHs . ModCmntTrailingTyp 
-              => CASE StartTokMark . Kind <* NOWARN *> 
+              => CASE StartTokMark . TkmKind <* NOWARN *> 
                  OF MarkKindTyp . LeftSibFmtNo 
                  , MarkKindTyp . RightSibFmtNo 
                  => RETURN WhatNextTyp . FsItem 
@@ -4857,7 +4857,7 @@ MODULE MergeTxt
                  END (* CASE *) 
 
               | ModHs . ModRefTyp (* Any leading Mod. *)  
-              => CASE StartTokMark . Kind <* NOWARN *> 
+              => CASE StartTokMark . TkmKind <* NOWARN *> 
                  OF MarkKindTyp . LeftSibFmtNo 
                  , MarkKindTyp . RightSibFmtNo 
                  => RETURN WhatNextTyp . FsItem 
@@ -5096,7 +5096,7 @@ MODULE MergeTxt
             , MteStateTyp . MteStateStartAtEnd 
             => IF EstAbsNodeNo = StartTokMark . TkmEstNodeNo 
                THEN (* StartTokMark identifies this parent node. *)  
-                 CASE StartTokMark . Kind <* NOWARN *> 
+                 CASE StartTokMark . TkmKind <* NOWARN *> 
                  OF MarkKindTyp . Plain 
                  , MarkKindTyp . BlankLine 
                  => (* The mark denotes the Est root, which is a leaf. 
@@ -5128,7 +5128,7 @@ MODULE MergeTxt
                    , KindSet
                    , EstAbsNodeNo 
                    ) 
-               ; IF StartTokMark . Kind = MarkKindTyp . RightSibFmtNo 
+               ; IF StartTokMark . TkmKind = MarkKindTyp . RightSibFmtNo 
                     AND EstAbsNodeNo + MteTeEstTravInfo . EtiChildRelNodeNo 
                         = StartTokMark . TkmEstNodeNo 
                  THEN 
@@ -5138,7 +5138,7 @@ MODULE MergeTxt
 
             (* Choose the correct FmtNo. *) 
             ; MteTeStartFmtNo := MteTeEstTravInfo . EtiChildFmtNo (* Default. *)
-            ; CASE StartTokMark . Kind 
+            ; CASE StartTokMark . TkmKind 
               OF MarkKindTyp . ChildFmtNo 
               => IF EstAbsNodeNo = StartTokMark . TkmEstNodeNo 
                  THEN MteTeStartFmtNo := StartTokMark . TkmFmtNo 

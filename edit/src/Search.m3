@@ -409,7 +409,7 @@ MODULE Search
                            , SearchStartPos := LCharPos 
                            , CaseSensitive := CaseSensitive  
                            ) 
-                  ELSIF ( LLinesRef . LrBolTokMark . Kind = MarkKindBlankLine 
+                  ELSIF ( LLinesRef . LrBolTokMark . TkmKind = MarkKindBlankLine 
                           AND NOT LLinesRef . LrBolTokMark . StartAtEnd 
                         ) 
                         OR LLinesRef . LrLineText = NIL 
@@ -432,7 +432,7 @@ MODULE Search
                     IF LNewCursorLineNoInWindow < LbeStd . LineNoMax 
                     THEN INC ( LNewCursorLineNoInWindow ) 
                     END (* IF *) 
-                  ; IF LLinesRef . LrBolTokMark . Kind = MarkKindBlankLine 
+                  ; IF LLinesRef . LrBolTokMark . TkmKind = MarkKindBlankLine 
                        AND LLineNo < LLinesRef . LrLineCt - 1 
                     THEN 
                       INC ( LLineNo ) (* And loop. *) 
@@ -674,7 +674,7 @@ MODULE Search
               ; LNewCursorLineNoInWindow := Window . WrCursorLineNoInWindow 
               END (* IF *) 
             ; LOOP (* Through lines, to find string. *) 
-                IF LLinesRef . LrBolTokMark . Kind = MarkKindBlankLine 
+                IF LLinesRef . LrBolTokMark . TkmKind = MarkKindBlankLine 
                    OR LLinesRef . LrLineText = NIL 
                    OR Text . Equal ( LLinesRef . LrLineText , "" ) 
                 THEN 
@@ -695,7 +695,7 @@ MODULE Search
                   IF LNewCursorLineNoInWindow > - LbeStd . LineNoMax 
                   THEN DEC ( LNewCursorLineNoInWindow ) 
                   END (* IF *) 
-                ; IF LLinesRef . LrBolTokMark . Kind = MarkKindBlankLine 
+                ; IF LLinesRef . LrBolTokMark . TkmKind = MarkKindBlankLine 
                      AND LLineNo > 0 
                   THEN 
                     DEC ( LLineNo ) (* And loop. *) 

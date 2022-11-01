@@ -1656,7 +1656,7 @@ MODULE TravUtil
   ; VAR LParentIndentPos : LbeStd . LimitedCharNoTyp  
 
   ; BEGIN (* IndentPosOfBolTokMark *) 
-      CASE TokMark . Kind <* NOWARN *> 
+      CASE TokMark . TkmKind <* NOWARN *> 
       OF MarkKindTyp . Null 
       => RETURN Options . InitialIndentPos 
 
@@ -3371,7 +3371,7 @@ MODULE TravUtil
             END (* IF *) 
           ELSIF StartMarkIsKnownNl 
           THEN (* From above, no Nl before. *)
-            IF StartMark . Kind IN Marks . MarkKindSetFmtNo 
+            IF StartMark . TkmKind IN Marks . MarkKindSetFmtNo 
             THEN (* Descending towards a line break, which implies it is taken,
                     and all containing Est & Fs Subtrees are non-horizontal. *)
               RETURN LResultIfNotHoriz 
@@ -3579,7 +3579,7 @@ TRUE OR
 
       ; IF StartMarkIsKnownNl 
         THEN 
-          IF StartMark . Kind IN Marks . MarkKindSetFmtNo 
+          IF StartMark . TkmKind IN Marks . MarkKindSetFmtNo 
           THEN (* Descending towards an undeleted line break, which implies it
           is taken, and all containing Est & Fs Subtrees are non-horizontal. *)
             RETURN LResultIfNotHoriz 
