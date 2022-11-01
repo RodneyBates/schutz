@@ -77,7 +77,7 @@ MODULE Marks
         & ","
         & MarkKindImageShort ( Mark . TkmKind ) 
         & EstHs . FmtNoImage ( Mark . TkmFmtNo ) 
-        & Misc . BooleanImageShort ( Mark . StartAtEnd ) 
+        & Misc . BooleanImageShort ( Mark . TkmStartAtEnd ) 
         & Misc . BooleanImageShort ( Mark . IsImpliedNewLine )
         & ",Tok={" & LTokImage & "}"
         & LBlCharPosImage 
@@ -105,7 +105,7 @@ MODULE Marks
 
         | MarkKindTyp . Plain 
         , MarkKindTyp . BlankLine 
-        => RETURN Left . StartAtEnd = Right . StartAtEnd 
+        => RETURN Left . TkmStartAtEnd = Right . TkmStartAtEnd 
 
         | MarkKindTyp . LeftSibFmtNo 
         , MarkKindTyp . RightSibFmtNo 
@@ -199,7 +199,7 @@ MODULE Marks
              THEN RETURN Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )  
              ELSE 
                RETURN 
-                 Boolean . Compare ( Left . StartAtEnd , Right . StartAtEnd )  
+                 Boolean . Compare ( Left . TkmStartAtEnd , Right . TkmStartAtEnd )  
              END (* IF *) 
            ELSE RETURN LResult 
            END (* IF *) 

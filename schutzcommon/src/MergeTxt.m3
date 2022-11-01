@@ -1465,7 +1465,7 @@ MODULE MergeTxt
                        , TkmEstRef := LBlankLineModRef 
                        , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FmtNo 
-                       , StartAtEnd := FALSE 
+                       , TkmStartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
                        , TkmTok := LbeStd . Tok__BlankLine  
                        }
@@ -1513,7 +1513,7 @@ MODULE MergeTxt
                          , TkmEstRef := LRightNewModRef  
                          , TkmKind := MarkKindTyp . Plain 
                          , TkmFmtNo := FmtNo 
-                         , StartAtEnd := FALSE 
+                         , TkmStartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
                          , TkmTok := LbeStd . Tok__ModText 
                          } 
@@ -1545,7 +1545,7 @@ MODULE MergeTxt
                          , TkmEstRef := LLeftNewModRef  
                          , TkmKind := MarkKindTyp . Plain 
                          , TkmFmtNo := FmtNo 
-                         , StartAtEnd := FALSE 
+                         , TkmStartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
                          , TkmTok := LbeStd . Tok__ModText 
                          } 
@@ -1561,7 +1561,7 @@ MODULE MergeTxt
                          , TkmEstRef := LLeftNewModRef  
                          , TkmKind := MarkKindTyp . Plain 
                          , TkmFmtNo := FmtNo 
-                         , StartAtEnd := FALSE 
+                         , TkmStartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
                          , TkmTok := LbeStd . Tok__ModText 
                          }
@@ -1583,7 +1583,7 @@ MODULE MergeTxt
                        , TkmEstRef := LBlankLineModRef  
                        , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FmtNo 
-                       , StartAtEnd := FALSE 
+                       , TkmStartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
                        , TkmTok := LbeStd . Tok__BlankLine 
                        } 
@@ -2450,7 +2450,7 @@ MODULE MergeTxt
                            := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FsNodeRef . FsFmtNo 
-                       , StartAtEnd := TRUE 
+                       , TkmStartAtEnd := TRUE 
                        , IsImpliedNewLine := FALSE 
                        , TkmTok := LbeStd . Tok__BlankLine 
                        } 
@@ -2483,7 +2483,7 @@ MODULE MergeTxt
                            := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                        , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FsNodeRef . FsFmtNo 
-                       , StartAtEnd := FALSE  
+                       , TkmStartAtEnd := FALSE  
                        , IsImpliedNewLine := FALSE 
                        , TkmTok := LbeStd . Tok__BlankLine 
                        } 
@@ -2815,7 +2815,7 @@ MODULE MergeTxt
                          := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                      , TkmKind := MarkKindTyp . Plain 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
-                     , StartAtEnd := FALSE
+                     , TkmStartAtEnd := FALSE
                      , IsImpliedNewLine := NOT ModCmnt . ModCmntNlBefore 
                      , TkmTok := LTok  
                      } 
@@ -3076,7 +3076,7 @@ MODULE MergeTxt
                                      . LeChildRef
                             , TkmKind := MarkKindTyp . Plain 
                             , TkmFmtNo := FsNodeRef . FsFmtNo 
-                            , StartAtEnd := TRUE 
+                            , TkmStartAtEnd := TRUE 
                             , IsImpliedNewLine := FALSE 
                             , TkmTok := LbeStd . Tok__CmntAtEndOfLine 
                             } 
@@ -3210,7 +3210,7 @@ MODULE MergeTxt
                            := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , TkmKind := MarkKindTyp . Plain 
                        , TkmFmtNo := FsNodeRef . FsFmtNo 
-                       , StartAtEnd := FALSE 
+                       , TkmStartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
                        , TkmTok := LbeStd . Tok__ModText 
                        } 
@@ -3380,7 +3380,7 @@ MODULE MergeTxt
                                      . LeChildRef 
                               , TkmKind := MarkKindTyp . Plain 
                               , TkmFmtNo := FsNodeRef . FsFmtNo 
-                              , StartAtEnd := TRUE 
+                              , TkmStartAtEnd := TRUE 
                               , IsImpliedNewLine := FALSE 
                               , TkmTok := LbeStd . Tok__ModText 
                               } 
@@ -3536,7 +3536,7 @@ MODULE MergeTxt
                              := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                          , TkmKind := MarkKindTyp . Plain
                          , TkmFmtNo := FsNodeRef . FsFmtNo 
-                         , StartAtEnd := FALSE 
+                         , TkmStartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
                          , TkmTok := EstRef . EstTok  
                          } 
@@ -3564,7 +3564,7 @@ MODULE MergeTxt
                              := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                          , TkmKind := MarkKindTyp . Plain
                          , TkmFmtNo := FsNodeRef . FsFmtNo 
-                         , StartAtEnd := FALSE 
+                         , TkmStartAtEnd := FALSE 
                          , IsImpliedNewLine := FALSE 
                          , TkmTok := EstRef . EstTok  
                          } 
@@ -3713,7 +3713,8 @@ MODULE MergeTxt
                          , TkmEstRef
                              := MteTeEstTravInfo . EtiChildLeafElem . LeChildRef
                          , TkmKind := MarkKindTyp . Plain 
-                         , TkmFmtNo := FsNodeRef . FsFmtNo , StartAtEnd := FALSE 
+                         , TkmFmtNo := FsNodeRef . FsFmtNo
+                         , TkmStartAtEnd := FALSE 
                          , IsImpliedNewLine := TRUE  
                          , TkmTok := LbeStd . Tok__Null  
                          } 
@@ -4227,7 +4228,7 @@ MODULE MergeTxt
                    (* ^May be overlaid. *) 
                    , TkmKind := LMarkKind
                    , TkmFmtNo := FsNodeRef . FsFmtNo 
-                   , StartAtEnd := FALSE 
+                   , TkmStartAtEnd := FALSE 
                    , IsImpliedNewLine := FALSE 
                    , TkmTok := MteTeEstTravInfo . EtiParentRef . EstTok 
 (* TODO: ^This probably needs a case for OptSingletonList, but that field
@@ -5414,7 +5415,7 @@ MODULE MergeTxt
       ; MaxTouchedNodeNo := LbeStd . EstNodeNoNull  
       ; LeadingBlankLinesIncluded := 0
       ; TrailingBlankLinesIncluded := 0
-      ; IF StartTokMark . StartAtEnd 
+      ; IF StartTokMark . TkmStartAtEnd 
         THEN 
           MteState := MteStateTyp . MteStateStartAtEnd 
         ; MteFinishItemNo := 1 (* Will be reassigned later, same value. *)  

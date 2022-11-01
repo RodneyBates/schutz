@@ -3085,7 +3085,7 @@ MODULE TextEdit
                    => IF NOT TPredLinesRef . LrGapAfter 
                          AND TPredLinesRef . LrBolTokMark . TkmKind 
                              = MarkKindTyp . BlankLine 
-                         AND NOT TPredLinesRef . LrBolTokMark . StartAtEnd 
+                         AND NOT TPredLinesRef . LrBolTokMark . TkmStartAtEnd 
                       THEN 
                         LDoInBlankLineBefore := TRUE 
                       END (* IF *) 
@@ -3160,7 +3160,7 @@ MODULE TextEdit
                      ELSIF WCursorMark . LmLinesRef . LrBolTokMark . TkmKind 
                            = MarkKindTyp . BlankLine 
                            AND NOT WCursorMark . LmLinesRef . LrBolTokMark 
-                                   . StartAtEnd 
+                                   . TkmStartAtEnd 
                      THEN (* Cursor inside blank line(s). *) 
                        IF LTempEditRef . TeDelFromPos 
                           = LbeStd . LimitedCharNoInfinity 

@@ -1670,7 +1670,7 @@ MODULE TravUtil
            , (* VAR *) ParentFsNodeRef := LParentFsNodeRef 
            , (* VAR *) ParentIndentPos := LParentIndentPos 
            ) 
-      ; IF TokMark . StartAtEnd 
+      ; IF TokMark . TkmStartAtEnd 
         THEN 
           RETURN LParentIndentPos 
         ELSE 

@@ -204,14 +204,14 @@ MODULE LineNumbers
       | MarkKindTyp . Plain 
       => LNodeNo 
            := LineMark . LmTokMark . TkmEstNodeNo 
-              + 4 * ORD ( LineMark . LmTokMark . StartAtEnd )  
+              + 4 * ORD ( LineMark . LmTokMark . TkmStartAtEnd )  
                 (* Estimate 4 nodes per line, average. *) 
 
       | MarkKindTyp . BlankLine 
       => LNodeNo 
            := LineMark . LmTokMark . TkmEstNodeNo 
               + LineMark . LmLineNo  
-              + 4 * ORD ( LineMark . LmTokMark . StartAtEnd )  
+              + 4 * ORD ( LineMark . LmTokMark . TkmStartAtEnd )  
                 (* Estimate 4 nodes per line, average. *) 
 
       | MarkKindTyp . LeftSibFmtNo 

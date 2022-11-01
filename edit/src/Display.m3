@@ -106,7 +106,7 @@ MODULE Display
       => RETURN 0 
 
       | MarkKindTyp . BlankLine 
-      => IF TokMark . StartAtEnd 
+      => IF TokMark . TkmStartAtEnd 
          THEN 
            RETURN 0 
          ELSE 

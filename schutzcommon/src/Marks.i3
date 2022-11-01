@@ -126,7 +126,7 @@ INTERFACE Marks
               Kind 
               IN MarkKindTyp { LeftSibFmtNo , RightSibFmtNo , ChildFmtNo } *) 
       ; TkmKind : MarkKindTyp := MarkKindTyp . Null 
-      ; StartAtEnd : BOOLEAN := FALSE 
+      ; TkmStartAtEnd : BOOLEAN := FALSE 
         (* Allows denoting the new line at the end of the token. 
            This happens only for blankline, text, and comment mods. Must be
            FALSE in marks to other things (i.e. that can never have a 
@@ -159,7 +159,7 @@ INTERFACE Marks
         , TkmTok := LbeStd . Tok__Null
         , TkmKind := MarkKindTyp . Null 
         , TkmFmtNo := EstHs . FmtNoNull  
-        , StartAtEnd := FALSE 
+        , TkmStartAtEnd := FALSE 
         , IsImpliedNewLine := FALSE 
         } 
 

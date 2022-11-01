@@ -410,7 +410,7 @@ MODULE Search
                            , CaseSensitive := CaseSensitive  
                            ) 
                   ELSIF ( LLinesRef . LrBolTokMark . TkmKind = MarkKindBlankLine 
-                          AND NOT LLinesRef . LrBolTokMark . StartAtEnd 
+                          AND NOT LLinesRef . LrBolTokMark . TkmStartAtEnd 
                         ) 
                         OR LLinesRef . LrLineText = NIL 
                         OR Text . Equal ( LLinesRef . LrLineText , "" ) 

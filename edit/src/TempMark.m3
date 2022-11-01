@@ -1870,7 +1870,7 @@ MODULE TempMark
                 , AFT . A_BuildTempMarkList_Line_mark_and_LinesRef_unequal_marks 
                 )  
             ; BtmEnterLine ( BtmLineMarkMeat . LmLinesRef ) 
-            ; IF BtmLineMarkMeat . LmTokMark . StartAtEnd 
+            ; IF BtmLineMarkMeat . LmTokMark . TkmStartAtEnd 
               THEN 
                 BtmState := BtmStateTyp . BtmStateStartAtEnd 
               ELSE 
@@ -2791,7 +2791,7 @@ MODULE TempMark
                            := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FsNodeRef . FsFmtNo 
-                       , StartAtEnd := FALSE 
+                       , TkmStartAtEnd := FALSE 
                        , IsImpliedNewLine := FALSE 
                        , TkmTok := LbeStd . Tok__BlankLine 
                        } 
@@ -2834,7 +2834,7 @@ MODULE TempMark
                            := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , TkmKind := MarkKindTyp . BlankLine 
                        , TkmFmtNo := FsNodeRef . FsFmtNo 
-                       , StartAtEnd := TRUE 
+                       , TkmStartAtEnd := TRUE 
                        , IsImpliedNewLine := FALSE 
                        , TkmTok := LbeStd . Tok__BlankLine 
                        }
@@ -2889,7 +2889,7 @@ MODULE TempMark
                          := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , TkmKind := MarkKindTyp . Plain 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
-                     , StartAtEnd := TRUE 
+                     , TkmStartAtEnd := TRUE 
                      , IsImpliedNewLine := FALSE 
                      , TkmTok := LbeStd . Tok__CmntAtEndOfLine 
                      } 
@@ -2927,7 +2927,7 @@ MODULE TempMark
                        := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                    , TkmKind := MarkKindTyp . Plain 
                    , TkmFmtNo := FsNodeRef . FsFmtNo 
-                   , StartAtEnd := FALSE 
+                   , TkmStartAtEnd := FALSE 
                    , IsImpliedNewLine := FALSE 
                    , TkmTok := LTok 
                    } 
@@ -3230,7 +3230,7 @@ MODULE TempMark
                          := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , TkmKind := MarkKindTyp . Plain 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
-                     , StartAtEnd := FALSE 
+                     , TkmStartAtEnd := FALSE 
                      , IsImpliedNewLine := TRUE 
                      , TkmTok := LTok 
                      } 
@@ -3283,7 +3283,7 @@ MODULE TempMark
                          := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , TkmKind := MarkKindTyp . Plain 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
-                     , StartAtEnd := TRUE 
+                     , TkmStartAtEnd := TRUE 
                      , IsImpliedNewLine := FALSE 
                      , TkmTok := LbeStd . Tok__CmntAtEndOfLine 
                      } 
@@ -3674,7 +3674,7 @@ MODULE TempMark
                      , TkmEstRef := RbmTeEstTravInfo . EtiNodeRef 
                      , TkmKind := MarkKindTyp . ChildFmtNo 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
-                     , StartAtEnd := FALSE 
+                     , TkmStartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
                      , TkmTok := LTok 
                      } 
@@ -3701,7 +3701,7 @@ MODULE TempMark
                          := RbmTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                      , TkmKind := MarkKindTyp . LeftSibFmtNo 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
-                     , StartAtEnd := FALSE 
+                     , TkmStartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
                      , TkmTok := LTok 
                      } 
@@ -3717,7 +3717,7 @@ MODULE TempMark
                      , TkmEstRef := RbmTeRMChildRef
                      , TkmKind := MarkKindTyp . RightSibFmtNo 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
-                     , StartAtEnd := FALSE 
+                     , TkmStartAtEnd := FALSE 
                      , IsImpliedNewLine := FALSE 
                      , TkmTok := LTok 
                      } 
