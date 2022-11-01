@@ -121,7 +121,7 @@ INTERFACE Marks
            For Plain, I also put Tok__ModText , Tok__Cmnt, and 
            Tok__CmntAtEndOfLine in here, as appropriate, just for consistency, 
            but as of this writing, these are not used. *) 
-      ; FmtNo : EstHs . FmtNoTyp := EstHs . FmtNoNull 
+      ; TkmFmtNo : EstHs . FmtNoTyp := EstHs . FmtNoNull 
           (* ^Meaningful IFF 
               Kind 
               IN MarkKindTyp { LeftSibFmtNo , RightSibFmtNo , ChildFmtNo } *) 
@@ -158,7 +158,7 @@ INTERFACE Marks
         , BlCharPos := LbeStd . CharNoUnknown 
         , TkmTok := LbeStd . Tok__Null
         , Kind := MarkKindTyp . Null 
-        , FmtNo := EstHs . FmtNoNull  
+        , TkmFmtNo := EstHs . FmtNoNull  
         , StartAtEnd := FALSE 
         , IsImpliedNewLine := FALSE 
         } 

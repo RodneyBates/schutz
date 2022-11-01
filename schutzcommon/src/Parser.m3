@@ -577,8 +577,8 @@ MODULE Parser
         ParseMark . TokMark . Kind # MarkKindTyp . Null
         AND ( ParseMark . TokMark . Kind 
               # OrigMark. TokMark . Kind 
-              OR ParseMark . TokMark . FmtNo 
-                 # OrigMark. TokMark . FmtNo  
+              OR ParseMark . TokMark . TkmFmtNo 
+                 # OrigMark. TokMark . TkmFmtNo  
               OR ParseMark . TokMark . TkmEstRef 
                  # OrigMark . TokMark . TkmEstRef 
             ) 
@@ -739,7 +739,7 @@ MODULE Parser
       ; TraceTempMarkList ( TempMarkListRef , "    Before : " ) 
       ; FOR RTempMarkSs := TempMarkRange . From TO TempMarkRange . To - 1 
         DO
-          TempMarkListRef ^ [ RTempMarkSs ] . TokMark . FmtNo := FmtNo
+          TempMarkListRef ^ [ RTempMarkSs ] . TokMark . TkmFmtNo := FmtNo
         END (* FOR *) 
       ; TraceTempMarkList ( TempMarkListRef , "     After:  " )
       END (* IF *) 

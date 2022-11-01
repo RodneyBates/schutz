@@ -1694,13 +1694,13 @@ MODULE TravUtil
                 , EstHs . EstChildKindSetEstChild 
                 ) 
             ; IF LEstTravInfo . EtiChildNo >= LEstTravInfo . EtiChildCt 
-                 OR LEstTravInfo . EtiChildFmtNo # TokMark . FmtNo 
+                 OR LEstTravInfo . EtiChildFmtNo # TokMark . TkmFmtNo 
               THEN (* Est child is absent. *) 
                 LFsLeafNodeRef 
                   := FsLeafRefOfFmtNo   
                        ( Lang 
                        , LParentFsNodeRef 
-                       , TokMark . FmtNo 
+                       , TokMark . TkmFmtNo 
                        , ChildEstRef := NIL 
                        , ChildKindSet := EstHs . EstChildKindSetEmpty 
                        )
@@ -1709,7 +1709,7 @@ MODULE TravUtil
                   := FsLeafRefOfFmtNo   
                        ( Lang 
                        , LParentFsNodeRef 
-                       , TokMark . FmtNo 
+                       , TokMark . TkmFmtNo 
                        , ChildEstRef 
                            := LEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , ChildKindSet 
@@ -1747,7 +1747,7 @@ MODULE TravUtil
            , (* VAR *) ParentIndentPos := LParentIndentPos 
            ) 
       ; LFsLeafNodeRef 
-          := LangUtil . FsLeafRefOfFmtNo ( LParentFsNodeRef , TokMark . FmtNo )
+          := LangUtil . FsLeafRefOfFmtNo ( LParentFsNodeRef , TokMark . TkmFmtNo )
       ; RETURN 
           IndentPos 
             ( Lang 
@@ -1768,7 +1768,7 @@ MODULE TravUtil
           := EstUtil . FsRuleForEstNode 
                ( Lang , LEstTravInfo . EtiChildLeafElem . LeChildRef ) 
       ; LFsLeafNodeRef 
-          := LangUtil . FsLeafRefOfFmtNo ( LFsRuleNodeRef , TokMark . FmtNo )
+          := LangUtil . FsLeafRefOfFmtNo ( LFsRuleNodeRef , TokMark . TkmFmtNo )
       ; RETURN 
           IndentPos 
             ( Lang 

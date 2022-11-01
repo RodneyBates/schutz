@@ -75,7 +75,7 @@ MODULE Marks
         & Fmt . Pad ( Misc . RefanyImage ( Mark . TkmEstRef ) , RefanyPad )
         & ","
         & MarkKindImageShort ( Mark . Kind ) 
-        & EstHs . FmtNoImage ( Mark . FmtNo ) 
+        & EstHs . FmtNoImage ( Mark . TkmFmtNo ) 
         & Misc . BooleanImageShort ( Mark . StartAtEnd ) 
         & Misc . BooleanImageShort ( Mark . IsImpliedNewLine )
         & ",Tok={" & LTokImage & "}"
@@ -109,7 +109,7 @@ MODULE Marks
         | MarkKindTyp . LeftSibFmtNo 
         , MarkKindTyp . RightSibFmtNo 
         , MarkKindTyp . ChildFmtNo 
-        => RETURN Left . FmtNo = Right . FmtNo 
+        => RETURN Left . TkmFmtNo = Right . TkmFmtNo 
         END (* CASE *) 
       END (* IF *) 
     END Equal 
@@ -137,7 +137,7 @@ MODULE Marks
            LResult 
              := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
          ; IF LResult = 0 
-           THEN RETURN Integer . Compare ( Left . FmtNo , Right . FmtNo )  
+           THEN RETURN Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )  
            ELSE RETURN LResult 
            END (* IF *) 
 
@@ -195,7 +195,7 @@ MODULE Marks
              IF Left . Kind # Right . Kind 
              THEN RAISE Unordered 
              ELSIF Left . Kind = MarkKindTyp . ChildFmtNo 
-             THEN RETURN Integer . Compare ( Left . FmtNo , Right . FmtNo )  
+             THEN RETURN Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )  
              ELSE 
                RETURN 
                  Boolean . Compare ( Left . StartAtEnd , Right . StartAtEnd )  
@@ -256,7 +256,7 @@ MODULE Marks
                := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo )  
            ; IF LResult = 0 
              THEN (* It's really the same node. *) 
-               RETURN Integer . Compare ( Left . FmtNo , Right . FmtNo )  
+               RETURN Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )  
              ELSE RETURN - LResult 
              END (* IF *) 
            ELSE RETURN LResult 

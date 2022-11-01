@@ -1124,7 +1124,7 @@ END
             WTempMark 
             = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ] 
           , WTravInfo = NpsSeEstRef . SeEstTravInfo  
-          DO IF WTempMark . TokMark . FmtNo = FmtNo 
+          DO IF WTempMark . TokMark . TkmFmtNo = FmtNo 
             THEN
               CASE WTempMark . TokMark . Kind 
               OF MarkKindTyp . LeftSibFmtNo  
@@ -1946,9 +1946,9 @@ END
               DO
 (* TODO: The following 3 assertions are probably overly pedantic. *)
                 Assert
-                  ( WTempMark . TokMark . FmtNo 
+                  ( WTempMark . TokMark . TkmFmtNo 
                     = ParseInfo . PiOrigTempMarkListRef ^ [ NpsNextTempMarkSs ]
-                      . TokMark . FmtNo
+                      . TokMark . TkmFmtNo 
                   , AFT . A_NpsDssIncludeTempMarks_fmtno_not_original 
                   ) 
               ; Assert
