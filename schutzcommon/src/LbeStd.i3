@@ -328,7 +328,7 @@ INTERFACE LbeStd
      not a valid Ldl identifier. *)
 
 ; PROCEDURE StdTokImage ( Tok : StdTokTyp ) : TEXT 
-  (* Image of a standard tok.  A valid Modula-3 identifier, but
+  (* Image of a standard token.  A valid Modula-3 identifier, but
      not a valid Ldl identifier.
   *) 
 

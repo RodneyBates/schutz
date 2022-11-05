@@ -17,9 +17,9 @@ MODULE LbeStd
 ; IMPORT PortTypes 
 ; IMPORT Version 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE StdTokImage ( Tok : StdTokTyp ) : TEXT 
-  (* Image of a standard tok.  It is a valid Modula-3 identifier, but
+  (* Image of a standard token.  It is a valid Modula-3 identifier, but
      not a valid Ldl identifier.
   *) 
 
@@ -61,7 +61,7 @@ MODULE LbeStd
       END (* CASE *) 
     END StdTokImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE StdTokPlaceholderImage ( Tok : StdTokTyp ) : TEXT 
 
   = BEGIN 
@@ -102,7 +102,7 @@ MODULE LbeStd
       END (* CASE *) 
     END StdTokPlaceholderImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE TokClassPred ( Class : TokClassTyp ) : TokClassTyp 
   (* Predecessor function on TokClassTyp.  Will crash on FIRST(TokClassTyp) *) 
 
@@ -110,7 +110,7 @@ MODULE LbeStd
       RETURN VAL ( ORD ( Class ) - 1 , TokClassTyp ) 
     END TokClassPred 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE TokClassSucc ( Class : TokClassTyp ) : TokClassTyp 
   (* Successor function on TokClassTyp.  Will crash on LAST(TokClassTyp) *) 
 
@@ -118,7 +118,7 @@ MODULE LbeStd
       RETURN VAL ( ORD ( Class ) + 1 , TokClassTyp ) 
     END TokClassSucc 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE TokClassImage ( TokClass : TokClassTyp ) : TEXT 
   (* Unqualified enumeration constant identifier of TokClass. *) 
 
@@ -150,7 +150,7 @@ MODULE LbeStd
       END (* CASE *) 
    END TokClassImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE LimitedTokCtSum 
     ( Left , Right : LimitedTokCtTyp ) : LimitedTokCtTyp 
 
@@ -165,7 +165,7 @@ MODULE LbeStd
       END (* IF *) 
     END LimitedTokCtSum 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IncLimitedTokCt 
     ( VAR Left : LimitedTokCtTyp 
     ; Right : LimitedTokCtTyp := 1 
@@ -175,7 +175,7 @@ MODULE LbeStd
       Left := LimitedTokCtSum ( Left , Right ) 
     END IncLimitedTokCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ProjectToLimitedCharNoTyp  ( Value : PortTypes . Int32Typ ) 
   : LimitedCharNoTyp 
 
@@ -184,14 +184,14 @@ MODULE LbeStd
         MIN ( MAX ( FIRST ( LimitedCharNoTyp ) , Value ) , LimitedCharNoMax ) 
     END ProjectToLimitedCharNoTyp  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE NumIdTokImage ( Tok : TokTyp ) : TEXT 
 
   = BEGIN 
       RETURN "Tok__" & NumTokImage ( Tok ) 
     END NumIdTokImage 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ScanStateImage ( Value : ScanStateTyp ) : TEXT 
 
   = BEGIN (* ScanStateImage *) 
@@ -211,7 +211,7 @@ MODULE LbeStd
       END (* CASE *) 
     END ScanStateImage 
 
-(* VISIBLE: *)
+(* EXPORTED: *)
 ; PROCEDURE VersionImage ( Version : VersionTyp ) : TEXT
  
   = BEGIN (* VersionImage *)
@@ -224,7 +224,7 @@ MODULE LbeStd
         & Fmt . Int ( Version . Minor )
     END VersionImage
 
-(* VISIBLE: *)
+(* EXPORTED: *)
 ; PROCEDURE PickleKindImage ( Kind : PickleKindTyp ) : TEXT 
  
   = BEGIN (* PickleKindImage *)
