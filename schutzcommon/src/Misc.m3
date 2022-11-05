@@ -192,13 +192,17 @@ MODULE Misc
 ; PROCEDURE RefanyImage ( Ref : REFANY ) : TEXT 
 
   = BEGIN
-      RETURN 
-        "16_" 
-        & Fmt . Pad 
-            ( Fmt . Unsigned ( UnsafeUtils . IntOfRefany ( Ref ) , base := 16 ) 
-            , length := AddressImageLen 
-            , padChar := '0' 
-            ) 
+      IF Ref = NIL THEN RETURN "NIL"
+      ELSE 
+        RETURN 
+          "16_" 
+          & Fmt . Pad 
+              ( Fmt . Unsigned
+                  ( UnsafeUtils . IntOfRefany ( Ref ) , base := 16 ) 
+              , length := AddressImageLen 
+              , padChar := '0' 
+              )
+      END (* IF *) 
     END RefanyImage 
 
 (* EXPORTED: *) 
