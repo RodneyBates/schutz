@@ -1117,6 +1117,7 @@ MODULE LangUtil
 ; PROCEDURE TextForTok ( Lang : LbeStd . LangTyp ; Tok : LbeStd . TokTyp )
   : TEXT 
   (* The display Text for an Ldl-defined token.  "" if anything goes wrong. *)
+(* TODO: This and TokImage have same 2 params in opposite order. Consistify. *)
 
   = VAR LBiasedTok : LbeStd . TokTyp 
   ; VAR LEstNodeNo : LbeStd . EstNodeNoTyp 

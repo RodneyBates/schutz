@@ -22,7 +22,8 @@ MODULE TextEdit
 ; FROM Failures IMPORT Backout , Ignore 
 ; IMPORT Display 
 ; IMPORT EditWindow 
-; IMPORT Errors 
+; IMPORT Errors
+; IMPORT EstDump 
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
 ; IMPORT LbeStd 
@@ -312,7 +313,7 @@ MODULE TextEdit
           , LNewIsOptSingletonList
           )
 ; IF LOldEstRef # LNewEstRef
-  THEN
+  THEN (* No, it could be a different node, at the same NodeNo in the 2 trees. *)
     LDebug := 11
   END 
       ; LNewEstNodeCt := EstUtil . EstNodeCt ( LNewEstRef ) 
@@ -322,6 +323,10 @@ MODULE TextEdit
 
 ; IF LLinesRef . LrBolTokMark . TkmEstNodeCt # LNewEstNodeCt
   THEN LDebug := 13
+  ; EstDump.WriteTreeToFile( "OldEstDump" , OldEstRoot , 10 ) 
+  ; EstDump.WriteTreeToFile( "NewEstDump" , NewEstRoot , 10 ) 
+
+
   END 
 
       ;

@@ -9,7 +9,7 @@
 INTERFACE EstHs 
 
 (* Data structure for interior Est nodes. 
-   Because of a some cartesian products of fields, there are accessor and
+   Because of some cartesian products of fields, there are accessor and
    mutator procedures in here.  
 *) 
 

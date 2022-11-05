@@ -108,6 +108,7 @@ INTERFACE Marks
     = RECORD 
         TkmEstRef : LbeStd . EstRootTyp := NIL 
       ; TkmEstNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull 
+      ; TkmParentNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull
       ; TkmEstNodeCt : LbeStd . EstNodeNoTyp := 0 
       ; TkmBlCharPos : LbeStd . CharNoTyp := LbeStd . CharNoUnknown 
         (* Maintained only when Kind = BlankLine.  The CharPos at the end of
@@ -131,7 +132,7 @@ INTERFACE Marks
            This happens only for blankline, text, and comment mods. Must be
            FALSE in marks to other things (i.e. that can never have a 
            Nl after. *) 
-      ; IsImpliedNewLine : BOOLEAN := FALSE  
+      ; TkmIsImpliedNewLine : BOOLEAN := FALSE  
         (* An implied new line.  Can only happen at the beginning of a
            ModCmntSameLineFixedTyp, to which the mark leads. *) 
       END (* RECORD  TokMarkTyp *) 
@@ -154,13 +155,14 @@ INTERFACE Marks
     = TokMarkTyp 
         { TkmEstRef := NIL
         , TkmEstNodeNo := LbeStd . EstNodeNoNull 
+        , TkmParentNodeNo := LbeStd . EstNodeNoNull 
         , TkmEstNodeCt := 0 
         , TkmBlCharPos := LbeStd . CharNoUnknown 
         , TkmTok := LbeStd . Tok__Null
         , TkmKind := MarkKindTyp . Null 
         , TkmFmtNo := EstHs . FmtNoNull  
         , TkmStartAtEnd := FALSE 
-        , IsImpliedNewLine := FALSE 
+        , TkmIsImpliedNewLine := FALSE 
         } 
 
 ; END Marks 

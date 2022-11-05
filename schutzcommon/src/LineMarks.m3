@@ -644,7 +644,7 @@ MODULE LineMarks
                    , TkmKind := MarkKindTyp . BlankLine 
                    , TkmFmtNo := FsNodeRef . FsFmtNo 
                    , TkmStartAtEnd := TRUE
-                   , IsImpliedNewLine := FALSE 
+                   , TkmIsImpliedNewLine := FALSE 
                    , TkmTok := LbeStd . Tok__BlankLine  
                    } 
           ; IF Marks . Equal ( ExistingMark , NewMark ) 
@@ -695,7 +695,7 @@ MODULE LineMarks
                       , TkmKind := MarkKindTyp . BlankLine 
                       , TkmFmtNo := FsNodeRef . FsFmtNo 
                       , TkmStartAtEnd := FALSE 
-                      , IsImpliedNewLine := FALSE 
+                      , TkmIsImpliedNewLine := FALSE 
                       , TkmTok := LbeStd . Tok__BlankLine 
                       } 
             ; IF Marks . Equal ( ExistingMark , NewMark ) 
@@ -717,7 +717,7 @@ MODULE LineMarks
                       , TkmKind := MarkKindTyp . BlankLine
                       , TkmFmtNo := FsNodeRef . FsFmtNo 
                       , TkmStartAtEnd := FALSE 
-                      , IsImpliedNewLine := FALSE 
+                      , TkmIsImpliedNewLine := FALSE 
                       , TkmTok := LbeStd . Tok__BlankLine 
                       } 
             ; IF Marks . Equal ( ExistingMark , NewMark ) 
@@ -775,7 +775,7 @@ MODULE LineMarks
                      , TkmKind := MarkKindTyp . Plain 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
                      , TkmStartAtEnd := TRUE 
-                     , IsImpliedNewLine := FALSE 
+                     , TkmIsImpliedNewLine := FALSE 
                      , TkmTok := LbeStd . Tok__CmntAtEndOfLine  
                      } 
             ; IF Marks . Equal ( ExistingMark , NewMark ) 
@@ -830,7 +830,7 @@ MODULE LineMarks
               THEN
                 GnlCharPos := 0  
               ; Assert
-                  ( LIsImpliedNewLine = StartMark . IsImpliedNewLine 
+                  ( LIsImpliedNewLine = StartMark . TkmIsImpliedNewLine 
                   , AFT . A_GnlTeTfsModCmnt_ImpliedNewLineDisagreement  
                   ) 
               END (* IF *) 
@@ -857,7 +857,7 @@ MODULE LineMarks
                           , TkmKind := MarkKindTyp . Plain 
                           , TkmFmtNo := FsNodeRef . FsFmtNo 
                           , TkmStartAtEnd := FALSE 
-                          , IsImpliedNewLine := LIsImpliedNewLine  
+                          , TkmIsImpliedNewLine := LIsImpliedNewLine  
                           , TkmTok := LbeStd . Tok__Cmnt  
                           } 
                 ; IF Marks . Equal ( ExistingMark , NewMark ) 
@@ -909,7 +909,7 @@ MODULE LineMarks
                      , TkmKind := MarkKindTyp . Plain 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
                      , TkmStartAtEnd := TRUE 
-                     , IsImpliedNewLine := FALSE 
+                     , TkmIsImpliedNewLine := FALSE 
                      , TkmTok := LbeStd . Tok__ModText  
                      } 
             ; IF Marks . Equal ( ExistingMark , NewMark ) 
@@ -973,7 +973,7 @@ MODULE LineMarks
                         , TkmEstRef
                             := GnlTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                         , TkmKind := MarkKindTyp . Plain 
-                        , IsImpliedNewLine := FALSE 
+                        , TkmIsImpliedNewLine := FALSE 
                         , TkmFmtNo := FsNodeRef . FsFmtNo 
                         , TkmStartAtEnd := FALSE 
                         , TkmTok := LbeStd . Tok__ModText 
@@ -1052,7 +1052,7 @@ MODULE LineMarks
                        , TkmEstRef
                            := GnlTeEstTravInfo . EtiChildLeafElem . LeChildRef 
                        , TkmKind := MarkKindTyp . Plain 
-                       , IsImpliedNewLine := FALSE 
+                       , TkmIsImpliedNewLine := FALSE 
                        , TkmFmtNo := FsNodeRef . FsFmtNo 
                        , TkmStartAtEnd := FALSE 
                        , TkmTok := EstRef . EstTok 
@@ -1312,7 +1312,7 @@ MODULE LineMarks
                      , TkmKind := MarkKindTyp . ChildFmtNo 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
                      , TkmStartAtEnd := FALSE 
-                     , IsImpliedNewLine := FALSE 
+                     , TkmIsImpliedNewLine := FALSE 
                      , TkmTok := LTok 
                      } 
             ELSIF GnlTeEstTravInfo . EtiChildNo 
@@ -1338,7 +1338,7 @@ MODULE LineMarks
                      , TkmKind := MarkKindTyp . LeftSibFmtNo 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
                      , TkmStartAtEnd := FALSE 
-                     , IsImpliedNewLine := FALSE 
+                     , TkmIsImpliedNewLine := FALSE 
                      , TkmTok := LTok 
                      } 
             ELSE (* There is an Est child to the left but not to the right. 
@@ -1355,7 +1355,7 @@ MODULE LineMarks
                      , TkmKind := MarkKindTyp . RightSibFmtNo 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
                      , TkmStartAtEnd := FALSE 
-                     , IsImpliedNewLine := FALSE 
+                     , TkmIsImpliedNewLine := FALSE 
                      , TkmTok := LTok 
                      } 
             END (* IF *) 
@@ -2118,7 +2118,7 @@ MODULE LineMarks
                       , TkmKind := MarkKindTyp . BlankLine 
                       , TkmFmtNo := FsNodeRef . FsFmtNo 
                       , TkmStartAtEnd := FALSE 
-                      , IsImpliedNewLine := FALSE 
+                      , TkmIsImpliedNewLine := FALSE 
                       , TkmTok := LbeStd . Tok__BlankLine 
                       } 
             ; GplState := GplStateTyp . GplStateDoneWithLine 
@@ -2139,7 +2139,7 @@ MODULE LineMarks
                       , TkmKind := MarkKindTyp . BlankLine 
                       , TkmFmtNo := FsNodeRef . FsFmtNo 
                       , TkmStartAtEnd := TRUE 
-                      , IsImpliedNewLine := FALSE 
+                      , TkmIsImpliedNewLine := FALSE 
                       , TkmTok := LbeStd . Tok__BlankLine 
                       } 
             ; GplState := GplStateTyp . GplStateDoneWithLine 
@@ -2192,7 +2192,7 @@ MODULE LineMarks
                         , TkmKind := MarkKindTyp . Plain 
                         , TkmFmtNo := FsNodeRef . FsFmtNo 
                         , TkmStartAtEnd := FALSE 
-                        , IsImpliedNewLine := NOT NlBefore  
+                        , TkmIsImpliedNewLine := NOT NlBefore  
                         , TkmTok := Tok 
                         } 
                ; GplState := GplStateTyp . GplStateDoneWithLine 
@@ -2226,7 +2226,7 @@ MODULE LineMarks
                         , TkmKind := MarkKindTyp . Plain 
                         , TkmFmtNo := FsNodeRef . FsFmtNo 
                         , TkmStartAtEnd := TRUE 
-                        , IsImpliedNewLine := FALSE 
+                        , TkmIsImpliedNewLine := FALSE 
                         , TkmTok := Tok 
                         } 
                ; GplState := GplStateTyp . GplStateDoneWithLine 
@@ -2246,7 +2246,7 @@ MODULE LineMarks
                         , TkmKind := MarkKindTyp . Plain 
                         , TkmFmtNo := FsNodeRef . FsFmtNo 
                         , TkmStartAtEnd := FALSE 
-                        , IsImpliedNewLine := NOT NlBefore 
+                        , TkmIsImpliedNewLine := NOT NlBefore 
                         , TkmTok := Tok 
                         } 
                ; GplState := GplStateTyp . GplStateDoneWithLine 
@@ -2491,7 +2491,7 @@ MODULE LineMarks
                      , TkmKind := MarkKindTyp . ChildFmtNo 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
                      , TkmStartAtEnd := FALSE 
-                     , IsImpliedNewLine := FALSE 
+                     , TkmIsImpliedNewLine := FALSE 
                      , TkmTok := LTok 
                      } 
             ELSIF GplTeEstTravInfo . EtiChildNo 
@@ -2516,7 +2516,7 @@ MODULE LineMarks
                      , TkmKind := MarkKindTyp . RightSibFmtNo 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
                      , TkmStartAtEnd := FALSE 
-                     , IsImpliedNewLine := FALSE 
+                     , TkmIsImpliedNewLine := FALSE 
                      , TkmTok := LTok 
                      } 
             ELSE (* Make it LeftSibFmtNo *) 
@@ -2533,7 +2533,7 @@ MODULE LineMarks
                      , TkmKind := MarkKindTyp . LeftSibFmtNo 
                      , TkmFmtNo := FsNodeRef . FsFmtNo 
                      , TkmStartAtEnd := FALSE 
-                     , IsImpliedNewLine := FALSE 
+                     , TkmIsImpliedNewLine := FALSE 
                      , TkmTok := LTok 
                      } 
             END (* IF *) 
@@ -3090,7 +3090,7 @@ MODULE LineMarks
                  , TkmKind := MarkKindTyp . ChildFmtNo 
                  , TkmFmtNo := 0 
                  , TkmStartAtEnd := FALSE 
-                 , IsImpliedNewLine := FALSE 
+                 , TkmIsImpliedNewLine := FALSE 
                  , TkmTok := LbeStd . Tok__BegOfImage  
                  } 
         ELSE 
@@ -3108,7 +3108,7 @@ MODULE LineMarks
                  , TkmKind := MarkKindTyp . LeftSibFmtNo 
                  , TkmFmtNo := LChildFsNodeRef . FsFmtNo 
                  , TkmStartAtEnd := FALSE 
-                 , IsImpliedNewLine := FALSE 
+                 , TkmIsImpliedNewLine := FALSE 
                  , TkmTok := EstUtil . EstTok 
                             ( LEstTravInfo . EtiChildLeafElem . LeChildRef ) 
                  }
@@ -3122,7 +3122,7 @@ MODULE LineMarks
                , TkmKind := MarkKindTyp . ChildFmtNo 
                , TkmFmtNo := LChildFsNodeRef . FsFmtNo 
                , TkmStartAtEnd := FALSE 
-               , IsImpliedNewLine := FALSE 
+               , TkmIsImpliedNewLine := FALSE 
                , TkmTok := EstUtil . EstTok ( RootEstRef )  
                } 
       END (* IF *) 
@@ -3229,7 +3229,7 @@ MODULE LineMarks
                , TkmKind := MarkKindTyp . RightSibFmtNo 
                , TkmFmtNo := LChildFsNodeRef . FsFmtNo 
                , TkmStartAtEnd := FALSE 
-               , IsImpliedNewLine := FALSE 
+               , TkmIsImpliedNewLine := FALSE 
                , TkmTok := EstUtil . EstTok  
                           ( LEstTravInfo . EtiChildLeafElem . LeChildRef ) 
                } 
@@ -3242,7 +3242,7 @@ MODULE LineMarks
                , TkmKind := MarkKindTyp . ChildFmtNo 
                , TkmFmtNo := LChildFsNodeRef . FsFmtNo 
                , TkmStartAtEnd := FALSE 
-               , IsImpliedNewLine := FALSE 
+               , TkmIsImpliedNewLine := FALSE 
                , TkmTok := EstUtil . EstTok ( RootEstRef )   
                } 
       END (* IF *) 

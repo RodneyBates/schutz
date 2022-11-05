@@ -73,13 +73,14 @@ MODULE Marks
     ; RETURN
         LbeStd . EstNodeNoImage ( Mark . TkmEstNodeNo ) 
         & "(" & LbeStd . EstNodeNoImage ( Mark . TkmEstNodeCt ) & ")"
+        & "parent" & LbeStd . EstNodeNoImage ( Mark . TkmParentNodeNo )
         & Fmt . Pad ( Misc . RefanyImage ( Mark . TkmEstRef ) , RefanyPad )
         & ","
         & MarkKindImageShort ( Mark . TkmKind ) 
         & EstHs . FmtNoImage ( Mark . TkmFmtNo ) 
         & Misc . BooleanImageShort ( Mark . TkmStartAtEnd ) 
-        & Misc . BooleanImageShort ( Mark . IsImpliedNewLine )
-        & ",Tok={" & LTokImage & "}"
+        & Misc . BooleanImageShort ( Mark . TkmIsImpliedNewLine )
+        & ",TkmTok={" & LTokImage & "}"
         & LBlCharPosImage 
     END MarkImage 
 

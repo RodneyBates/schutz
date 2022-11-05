@@ -422,7 +422,7 @@ MODULE EstHs
 ; PROCEDURE EstChildKindImageShort ( Value : EstChildKindTyp ) : TEXT
   (* Only the distinct part, e.g. "FirstOfGroup" *)
 
-  = BEGIN (* EstChildKindShortImage *) 
+  = BEGIN (* EstChildKindImageShort *) 
       CASE Value 
       OF EstChildKindEstChild 
       => RETURN "EstChild" 
