@@ -12,6 +12,7 @@ MODULE EstDump
 ; IMPORT LbeStd 
 ; IMPORT Misc 
 ; IMPORT TravUtil
+; IMPORT VersionedFiles 
 
 ; VAR GWrT : Wr . T 
 
@@ -94,7 +95,7 @@ MODULE EstDump
   = VAR LWrT : Wr . T
 
   ; BEGIN
-      LWrT := FileWr . Open ( FileName ) 
+      LWrT := VersionedFiles . OpenWrite ( FileName ) 
     ; WriteTreeWr
         ( LWrT , RootRef , Lang , "TreeDump file: \"" & FileName & "\"")
     ; Wr . Close ( LWrT ) 
@@ -132,20 +133,22 @@ MODULE EstDump
         ; WT ( "NodeNo:" )
         ; WI ( LEstTravInfo . EtiAbsNodeNo )
         ; WT ( " FIELDS:" ) 
-        ; WT ( " Node Addr:" ) 
+        ; WT ( " Addr:" ) 
         ; WX ( TEstRef ) 
-        ; WT ( " Height:" ) 
+        ; WT ( " NodeCt:" ) 
+        ; WI ( EstUtil . EstNodeCt ( TEstRef ) )
+        ; WT ( " Ht:" ) 
         ; WI ( TEstRef . EstHeight )
         ; WC ( ' ' )
         ; WT ( EstHs . EstNodeKindImage ( TEstRef . EstNodeKind ) ) 
         ; WEOL ( )
         
         ; WT ( Misc . Blanks ( Indent + GFieldsIndent ) )
-        ; WT ( "LeftTok: " )
+        ; WT ( "LeftTok:" )
         ; WT ( LangUtil . TokImage ( TEstRef . EstLeftTok , Lang ) ) 
-        ; WT ( " Tok: " )
+        ; WT ( " Tok:" )
         ; WT ( LangUtil . TokImage ( TEstRef . EstTok , Lang ) )  
-        ; WT ( " RightTok: " )
+        ; WT ( " RightTok:" )
         ; WT ( LangUtil . TokImage ( TEstRef . EstRightTok , Lang ) ) 
         ; WT ( " Sem:" ) 
         ; WX ( TEstRef . EstSemRef )

@@ -831,6 +831,7 @@ INTERFACE EstHs
         ; EstNodeKind : EstNodeKindPackedTyp 
         (* EstHeight = 0 => no children at all. *) 
         ; EstHeight : KTreeHeightPackedTyp
+          (* Of the KTree only, no Est children included. *) 
         ; EstRepairCost : LbeStd . RepairCostTyp  
 (* TODO: ^Add this field, use it, review packing of this type. *) 
         ; EstChildKindSet : EstChildKindSetTyp 
