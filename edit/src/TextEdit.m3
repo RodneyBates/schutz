@@ -13,7 +13,7 @@ MODULE TextEdit
 ; IMPORT Compiler 
 ; IMPORT Fmt 
 ; IMPORT Text 
-; IMPORT Thread 
+; IMPORT Thread
 
 ; IMPORT Ascii 
 ; IMPORT AssertDevel 
@@ -23,7 +23,6 @@ MODULE TextEdit
 ; IMPORT Display 
 ; IMPORT EditWindow 
 ; IMPORT Errors
-; IMPORT EstDump 
 ; IMPORT EstHs 
 ; IMPORT EstUtil 
 ; IMPORT LbeStd 
@@ -37,13 +36,14 @@ MODULE TextEdit
 ; IMPORT Strings 
 ; IMPORT SyntEdit 
 ; IMPORT TravUtil 
-; IMPORT TreeBrowse 
+; IMPORT TreeBrowse
 
 ; TYPE AFT = MessageCodes . T 
-; TYPE MarkKindTyp = Marks . MarkKindTyp
+; CONST TF = Compiler . ThisFile ( ) 
+; CONST CTL = Compiler . ThisLine
+; CONST FI = Fmt . Int 
 
-; CONST CTF = Compiler . ThisFile
-; CONST CTL = Compiler . ThisLine 
+; TYPE MarkKindTyp = Marks . MarkKindTyp
 
 ; PROCEDURE PaintTempEditedLineInAllWindows 
     ( ImageTrans : PaintHs . ImageTransientTyp 
@@ -275,7 +275,8 @@ MODULE TextEdit
 
 ; PROCEDURE AdjustLinesRefsNodeNos 
     ( ImageRef : PaintHs . ImageTransientTyp
-    ; OldEstRoot , NewEstRoot : EstHs . EstRefTyp 
+    ; <* UNUSED *> OldEstRoot : EstHs . EstRefTyp 
+    ; NewEstRoot : EstHs . EstRefTyp 
     ; FirstLinesRefToAdjust : PaintHs . LinesRefTyp 
     ; Bias : LbeStd . EstNodeNoTyp 
     ) 
@@ -286,25 +287,11 @@ MODULE TextEdit
   ; VAR LNewKindSet : EstHs . EstChildKindSetTyp 
   ; VAR LNewIsOptSingletonList : BOOLEAN
   ; VAR LNewEstNodeCt : INTEGER
-; VAR LOldEstRef : LbeStd . EstRootTyp 
-; VAR LOldKindSet : EstHs . EstChildKindSetTyp 
-; VAR LOldIsOptSingletonList : BOOLEAN
-; VAR LOldEstNodeCt : INTEGER
-; VAR LDebug : INTEGER := 17 
-; VAR LCTF  : TEXT 
-; VAR LCTL : CARDINAL  
 
   ; BEGIN (* AdjustLinesRefsNodeNos *) 
       LLinesRef := FirstLinesRefToAdjust 
     ; LOOP
-        TravUtil . GetDescendantWithNodeNo
-          ( OldEstRoot
-          , LLinesRef . LrBolTokMark . TkmEstNodeNo 
-          , LOldEstRef 
-          , LOldKindSet 
-          , LOldIsOptSingletonList
-          )
-      ; INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias )
+        INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias )
       ; TravUtil . GetDescendantWithNodeNo
           ( NewEstRoot
           , LLinesRef . LrBolTokMark . TkmEstNodeNo 
@@ -312,33 +299,16 @@ MODULE TextEdit
           , LNewKindSet 
           , LNewIsOptSingletonList
           )
-; IF LOldEstRef # LNewEstRef
-  THEN (* No, it could be a different node, at the same NodeNo in the 2 trees. *)
-    LDebug := 11
-  END 
       ; LNewEstNodeCt := EstUtil . EstNodeCt ( LNewEstRef ) 
 
-; LCTF := CTF ( ) 
-; LCTL := CTL ( )
-
-; IF LLinesRef . LrBolTokMark . TkmEstNodeCt # LNewEstNodeCt
-  THEN LDebug := 13
-  ; EstDump.WriteTreeToFile( "OldEstDump" , OldEstRoot , 10 ) 
-  ; EstDump.WriteTreeToFile( "NewEstDump" , NewEstRoot , 10 ) 
-
-
-  END 
-
-      ;
-
-        (* <* ASSERT LLinesRef . LrBolTokMark . TkmEstNodeCt = LEstNodeCt 
-                  , CTF ( ) & ":" & Fmt . Int ( CTL ( ) ) & " Mismatched node counts." 
-        *> *)
+      ;  <* ASSERT LLinesRef . LrBolTokMark . TkmEstNodeCt = LNewEstNodeCt 
+            , TF & ":" & FI ( CTL ( ) ) & " Mismatched node counts." 
+         *>
         IF LLinesRef . LrRightLink = ImageRef . ItPers . IpLineHeaderRef 
         THEN EXIT 
         ELSE LLinesRef := LLinesRef . LrRightLink 
         END (* IF *) 
-      END (* LOOP *) 
+      END (* LOOP *)
     END AdjustLinesRefsNodeNos 
 
 (* Old version: 
