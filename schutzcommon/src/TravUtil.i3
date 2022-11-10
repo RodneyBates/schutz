@@ -253,7 +253,15 @@ INTERFACE TravUtil
       (* ^Node number relative to Root. *) 
     ) 
   : LbeStd . EstNodeNoTyp 
-  RAISES { Backout } 
+  RAISES { Backout }
+
+; PROCEDURE DescendantIsInteriorAstNode 
+    ( Root : LbeStd . EstRootTyp 
+    ; EstNodeNo : LbeStd . EstNodeNoTyp 
+      (* ^Node number relative to Root. *) 
+    ) 
+  : BOOLEAN 
+  RAISES { Backout }
 
 ; PROCEDURE DescendCondFmt 
     ( Lang : LbeStd . LangTyp 

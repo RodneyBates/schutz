@@ -1371,7 +1371,37 @@ MODULE TravUtil
     ; LResult := EstUtil . EstNodeCt ( LEstRef ) 
     ; INC ( LResult , ORD ( LIsOptSingletonList ) )
     ; RETURN LResult 
-    END NodeCtOfDescendantWithNodeNo 
+    END NodeCtOfDescendantWithNodeNo
+
+(* EXPORTED: *) 
+; PROCEDURE DescendantIsInteriorAstNode 
+    ( Root : LbeStd . EstRootTyp 
+    ; EstNodeNo : LbeStd . EstNodeNoTyp 
+      (* ^Node number relative to Root. *) 
+    ) 
+  : BOOLEAN 
+  RAISES { Backout }
+  
+  = VAR LEstRef : LbeStd . EstRootTyp
+  ; VAR LKindSet : EstHs . EstChildKindSetTyp  
+  ; VAR LResult : LbeStd . EstNodeNoTyp  
+  ; VAR LIsOptSingletonList : BOOLEAN 
+
+  ; BEGIN 
+      GetDescendantWithNodeNo 
+        ( Root 
+        , EstNodeNo 
+        , (* VAR *) EstRef := LEstRef 
+        , (* VAR *) KindSet := LKindSet 
+        , (* VAR *) IsOptSingletonList := LIsOptSingletonList  
+        )
+    ; TYPECASE LEstRef
+      OF NULL => RETURN FALSE 
+      | EstHs . EstRefTyp
+      => RETURN TRUE 
+      ELSE RETURN FALSE
+      END (* TYPECASE *) 
+    END DescendantIsInteriorAstNode 
 
 (* EXPORTED: *) 
 ; PROCEDURE DescendCondFmt 
