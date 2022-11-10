@@ -418,15 +418,21 @@ EXPORTS Main
         ; EVAL LangUtil . LoadLanguage ( "m3" ) 
 *)
 (*      ; Assertions . CauseRuntimeError ( "" ) For testing *) 
-        ; LReturnCode
-            := Ui . Install 
-                 ( Options . EditFileName 
-                 , PlaybackFileName 
-                 , DoRunPlayback 
-                 , RespectStops 
-                 , RecordFileName 
-                 , DelayTime 
-                 )
+        ; TRY
+            LReturnCode
+              := Ui . Install 
+                   ( Options . EditFileName 
+                   , PlaybackFileName 
+                   , DoRunPlayback 
+                   , RespectStops 
+                   , RecordFileName 
+                   , DelayTime 
+                   )
+          EXCEPT Failures . Terminate
+          => LReturnCode := Failures . RcFailure 
+          ELSE LReturnCode := Failures . RcBadTerminate 
+          END (* EXCEPT *) 
+              
         ; IF LReturnCode = Failures . RcNormal 
           THEN Assertions . TerminatingNormally := TRUE 
           ELSE Assertions . TerminatingNormally := FALSE 
