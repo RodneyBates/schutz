@@ -116,17 +116,18 @@ MODULE EstDump
       TYPECASE NodeRef
       OF NULL 
         => WT ( Misc . Blanks ( Indent ) )
-        ; WT ( "NIL" )
+        ; WT ( "NodeNo:" )
+        ; WI ( NodeNo )
+        ; WT ( " NIL" )
         ; WEOL ( ) 
 
       | EstHs . EstRefTyp ( TEstRef ) 
         => TravUtil .  InitEstTravInfoFwd 
-            ( (* OUT *) LEstTravInfo 
-            , NodeRef 
-            , KindSet := TEstRef . EstChildKindSet 
-            , ParentAbsNodeNo := NodeNo
-            ) 
-
+        ( (* OUT *) LEstTravInfo 
+        , NodeRef 
+        , KindSet := TEstRef . EstChildKindSet 
+        , ParentAbsNodeNo := NodeNo
+        ) 
         ; <* ASSERT NodeNo = LEstTravInfo . EtiAbsNodeNo *> 
            
           WT ( Misc . Blanks ( Indent ) )
@@ -210,6 +211,9 @@ MODULE EstDump
 
       ELSE
         WT ( Misc . Blanks ( Indent ) )
+      ; WT ( "NodeNo:" )
+      ; WI ( NodeNo )
+      ; WC ( ' ' ) 
       ; WT ( EstUtil . EstNodeImage ( NodeRef , Indent , NodeNo , Lang ) ) 
       ; WEOL ( )
       END (* TYPECASE *) 
