@@ -688,11 +688,15 @@ MODULE Worker
         END (* IF *)
       ; LDoGuiActions := LInteractive AND IAmWorkerThread ( ) 
       END (* LOCK *)
-    ; LCheckpointMsg := CheckpointForFailure ( MessageCodes . T . NullCode ) 
+    ; LCheckpointMsg
+        := CheckpointForFailure ( MessageCodes . T . NullCode )
+           (* ^Has SIDE EFFECT of writing the checkpoint. *) 
     ; FailureMessageCommandLine
         ( Act , StoppedReason , LCheckpointMsg ) 
 
-    ; IF LDoGuiActions 
+    ; IF Options . Crash
+      THEN LResult :=  Failures . FailureActionTyp . FaCrash
+      ELSIF LDoGuiActions 
       THEN
         IF Failures . FailureActionTyp . FaBackout IN AllowedActions
         THEN FormsVBT . MakeActive ( Options . MainForm , "Fv_Assert_Backout" )
@@ -732,6 +736,7 @@ MODULE Worker
         ELSE LResult := Failures . FailureActionTyp . FaCrash
         END (* IF *) 
       END (* IF *)
+      
     ; CASE LResult
       OF Failures . FailureActionTyp . FaCrash
       => RTIO . PutText 
