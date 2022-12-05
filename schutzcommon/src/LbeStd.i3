@@ -591,7 +591,7 @@ INTERFACE LbeStd
 
 ; TYPE PickleKindSetTyp = SET OF PickleKindTyp  
 
-; CONST PickleKindSetImageYielding  
+; CONST PickleKindSetYieldsImage
     = PickleKindSetTyp 
         { PickleKindTyp . Est 
         , PickleKindTyp . Image  

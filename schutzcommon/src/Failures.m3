@@ -434,14 +434,16 @@ UNSAFE MODULE Failures
 
     ; LActPtr := LOOPHOLE ( ADR ( Act ) , RT0 . ActivationPtr )
     ; IF Act . exception = GTerminateRef 
-      THEN (* This shouldn't happen. *) 
+      THEN (* This shouldn't happen.  Terminate is IMPLICT, so won't be blocked
+              and should always be caught. *)
+      (* Pass this one on. *)
         RTIO . PutText ( Wr . EOL )
       ; RTIO . PutText ( "##### " )
       ; RTIO . PutText ( StoppedReason ( wasBlocked ) )  
       ; RTIO . PutText ( " exception Failures.Terminate. #####" )
       ; RTIO . PutText ( Wr . EOL )
       ; RTIO . Flush ( ) 
-      ; TerminateBluntly ( RcBadTerminate ) <* NORETURN *> 
+      ; TerminateBluntly ( RcBadTerminate ) <* NORETURN *>
       END (* IF *)
 
     ; LActIsFresh := ActIsFresh ( Act )

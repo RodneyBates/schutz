@@ -56,7 +56,7 @@ MODULE Marks
     ( Mark : TokMarkTyp ; Lang : LbeStd . LangTyp := LbeStd . LangNull )
   : TEXT 
 
-  = VAR LBlCharPosImage : TEXT 
+  = VAR LBlCharPosImage : TEXT := ""  
   ; VAR LTokImage : TEXT
   
   ; BEGIN
@@ -73,14 +73,14 @@ MODULE Marks
     ; RETURN
         LbeStd . EstNodeNoImage ( Mark . TkmEstNodeNo ) 
         & "(" & LbeStd . EstNodeNoImage ( Mark . TkmEstNodeCt ) & ")"
-        & "parent" & LbeStd . EstNodeNoImage ( Mark . TkmParentNodeNo )
+        & " parent" & LbeStd . EstNodeNoImage ( Mark . TkmParentNodeNo )
         & Fmt . Pad ( Misc . RefanyImage ( Mark . TkmEstRef ) , RefanyPad )
-        & ","
+        & ", "
         & MarkKindImageShort ( Mark . TkmKind ) 
         & EstHs . FmtNoImage ( Mark . TkmFmtNo ) 
         & Misc . BooleanImageShort ( Mark . TkmStartAtEnd ) 
         & Misc . BooleanImageShort ( Mark . TkmIsImpliedNewLine )
-        & ",TkmTok={" & LTokImage & "}"
+        & ",TkmTok={" & LTokImage & "} "
         & LBlCharPosImage 
     END MarkImage 
 
@@ -197,10 +197,12 @@ MODULE Marks
              IF Left . TkmKind # Right . TkmKind 
              THEN RAISE Unordered 
              ELSIF Left . TkmKind = MarkKindTyp . ChildFmtNo 
-             THEN RETURN Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )  
+             THEN
+               RETURN Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )
              ELSE 
                RETURN 
-                 Boolean . Compare ( Left . TkmStartAtEnd , Right . TkmStartAtEnd )  
+                 Boolean . Compare
+                   ( Left . TkmStartAtEnd , Right . TkmStartAtEnd )
              END (* IF *) 
            ELSE RETURN LResult 
            END (* IF *) 

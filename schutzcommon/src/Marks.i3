@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2020, Rodney M. Bates.                                    *)
+(* Copyright 1988..2022, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -22,7 +22,7 @@ INTERFACE Marks
    One of these is called a LineMark. 
  
    During reparsing, each LineMark is converted to token-relative form. 
-   This leads to a token (anything which has text associated with 
+   This leads to a token (anything that has text associated with 
    it) and gives a character position relative to that.  The character 
    position could lie outside the actual token, if it is off the 
    left or right end of the nonblank text on a line.  One of these 
@@ -38,7 +38,7 @@ INTERFACE Marks
            or a mod. *) 
       , BlankLine 
         (* A BlankLine mark works like Plain, except that it uses the 
-           BlankLineNo and TkmBlCharPos fields. *) 
+           TkmBlankLineNo and TkmBlCharPos fields. *) 
       , ChildFmtNo 
         (* A ChildFmtNo mark is used to indicate a point in an InsTok 
            that belongs to the format syntax tree for an Est node that
@@ -84,17 +84,16 @@ INTERFACE Marks
    1. In LineMarks, (PaintHs . LineMarkMeatTyp,) which give locations 
       of cursors, ends of selections, bookmarks, etc. 
    2. In TempMarks.  (ParseHs.TempMarkTyp.)  LineMarks are converted 
-      temporarily to TempMarks during reparsing and accepting syntactic 
-      repairs, then converted back.
+      temporarily to TempMarks during reparsing, then converted back.
    3. In LinesRefs, (PaintHs . LinesRefMeatTyp) which hold a displayed 
       line of text.  These can be very numerous. 
    The set of fields used in the three do not fit any hierarchy.
    Tok is maintained, but not currently used. 
-   Kind and FmtNo are used in all three.  
-   EstNodeNo, EstCount, StartAtEnd and IsImpliedNewLine are used in 
+   TkmKind and TkmFmtNo are used in all three.  
+   TkmEstNodeNo, TkmEstCt, TkmStartAtEnd and TkmIsImpliedNewLine are used in 
    LineMarks and LinesRefs.
-   CharPos and LineNo are used in TempMarks and LinesRefs and are duplicated
-   fields, copied as necessary.
+   TkmCharPos and TkmLineNo are used in TempMarks and LinesRefs and are
+   duplicated fields, copied as necessary.
    TkmEstRef is used to effect only in TempMarks, but is set in others
    to agree with EstNodeNo, for debugging and consistency checks.  
    This breakdown of fields in records seems not a lot worse than any other.
@@ -109,6 +108,7 @@ INTERFACE Marks
         TkmEstRef : LbeStd . EstRootTyp := NIL 
       ; TkmEstNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull 
       ; TkmParentNodeNo : LbeStd . EstNodeNoTyp := LbeStd . EstNodeNoNull
+        (* ^+ 2022-11-11, not being maintained or used. *) 
       ; TkmEstNodeCt : LbeStd . EstNodeNoTyp := 0 
       ; TkmBlCharPos : LbeStd . CharNoTyp := LbeStd . CharNoUnknown 
         (* Maintained only when Kind = BlankLine.  The CharPos at the end of
@@ -116,7 +116,7 @@ INTERFACE Marks
       ; TkmTok : LbeStd . TokTyp := LbeStd . Tok__Null  
         (* For ChildFmtNo, the token in node number EstNodeNo.
            For LeftSibFmtNo and RightSibFmtNo, the token in the
-           parent of node number EstNodeNo, i.e., the list node. 
+           parent of node number EstNodeNo. 
            For BlankLine, the rightmost token on the nonblank line
            before the blank lines.  
            For Plain, I also put Tok__ModText , Tok__Cmnt, and 

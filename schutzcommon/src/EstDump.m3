@@ -173,7 +173,7 @@ MODULE EstDump
           ; WI ( LEstTravInfo . EtiAbsNodeNo )
           ; WT ( " ChildNo:" ) 
           ; WI ( LEstTravInfo . EtiChildNo )
-          ; WT ( " FmtNo: " ) 
+          ; WT ( " FmtNo:" ) 
           ; WI ( LEstTravInfo . EtiChildFmtNo )
           ; WT ( " ChildRelNodeNo:" )
           ; WI ( LEstTravInfo . EtiChildRelNodeNo )

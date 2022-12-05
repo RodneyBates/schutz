@@ -122,8 +122,9 @@ MODULE Misc
          and then available for the next time.
 *) 
 (* TODO: I think this is duplicated somewhere. *) 
-  ; BEGIN (* Blanks *) 
-      IF Length <= FixedLength 
+  ; BEGIN (* Blanks *)
+      IF Length <= 0 THEN RETURN "" END (* IF *) 
+    ; IF Length <= FixedLength 
       THEN (* Fast path: *) 
         RETURN Text . FromChars ( SUBARRAY ( FixedBlanks , 0 , Length ) ) 
       ELSE 
@@ -215,8 +216,9 @@ MODULE Misc
     <* FATAL Rd . EndOfFile *> 
     VAR C : CHAR 
 
-  ; BEGIN (* EscapeText *) 
-      EVAL WrT . init ( ) 
+  ; BEGIN (* EscapeText *)
+      IF String = NIL THEN RETURN "" END (* IF *) 
+    ; EVAL WrT . init ( ) 
     ; EVAL RdT . init ( String ) 
     ; WHILE NOT Rd . EOF ( RdT ) 
       DO 
@@ -385,7 +387,8 @@ MODULE Misc
   ; VAR LDigitCount : INTEGER 
 
   ; BEGIN (* UnescapeText *) 
-      EVAL WrT . init ( ) 
+      IF String = NIL THEN RETURN "" END (* IF *) 
+    ; EVAL WrT . init ( ) 
     ; EVAL RdT . init ( String ) 
     ; WHILE NOT Rd . EOF ( RdT ) 
       DO 
@@ -445,7 +448,8 @@ MODULE Misc
   ; VAR LHasLeadingQuote , LHasTrailingQuote : BOOLEAN  
 
   ; BEGIN 
-      LLength := Text . Length ( String ) 
+      IF String = NIL THEN RETURN "" END (* IF *) 
+    ; LLength := Text . Length ( String ) 
     ; LStart := 0 
     ; LOOP 
         IF LLength <= 0 

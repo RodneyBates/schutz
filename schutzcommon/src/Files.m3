@@ -295,7 +295,7 @@ MODULE Files
       FINALLY 
         Rd . Close ( LRd ) 
       END (* TRY FINALLY *)
-    ; IF NOT  LPickleIdInfoRef ^ . Kind IN LbeStd . PickleKindSetImageYielding 
+    ; IF NOT  LPickleIdInfoRef ^ . Kind IN LbeStd . PickleKindSetYieldsImage 
       THEN 
         LMsg := "Not a " & LbeStd . AppName & " image file: \"" 
                  & FileName & "\""
