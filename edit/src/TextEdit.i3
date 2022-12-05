@@ -49,7 +49,9 @@ INTERFACE TextEdit
 ; PROCEDURE DeleteBetweenMarks 
     ( ImageTrans : PaintHs . ImageTransientTyp   
     ; FromMark : PaintHs . LineMarkMeatTyp 
-    ; ThruMark : PaintHs . LineMarkMeatTyp 
+    ; ThruMark : PaintHs . LineMarkMeatTyp
+      (* Delete *thru* the line beginning at ThruMark (including its new line),
+         but only *to* its LmCharPos. *)  
     ) 
   RAISES { Backout , Thread . Alerted } 
 

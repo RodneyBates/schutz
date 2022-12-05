@@ -138,7 +138,7 @@ MODULE Display
 
   (* LineCt values have the invariant that they 
      are zero for a text-containing LinesRef or EndOfImage.  This allows 
-     Lines to be easily detected. But sometimes you just 
+     Lines to be easily detected.  But sometimes you just 
      want the actual LineCt, regardless of whether this is 
      a blank line or not.  This function gives this. *) 
 

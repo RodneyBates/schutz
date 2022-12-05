@@ -38,7 +38,10 @@ MODULE TextEdit
 ; IMPORT TravUtil 
 ; IMPORT TreeBrowse
 
-; TYPE AFT = MessageCodes . T 
+; IMPORT EstDump 
+
+; TYPE AFT = MessageCodes . T
+; CONST MCI = MessageCodes . Image 
 ; CONST TF = Compiler . ThisFile ( ) 
 ; CONST CTL = Compiler . ThisLine
 ; CONST FI = Fmt . Int 
@@ -86,7 +89,7 @@ MODULE TextEdit
     END PaintTempEditedLineInAllWindows 
 
 ; PROCEDURE InitTempEditTextOnly 
-    ( (* OUT *) TempEditRef : PaintHs . TempEditRefTyp 
+    ( (* IN OUT ^ *) TempEditRef : PaintHs . TempEditRefTyp 
     ; LinesRef : PaintHs . LinesRefMeatTyp 
     ) 
   RAISES { Backout } 
@@ -260,7 +263,7 @@ MODULE TextEdit
       END (* IF *) 
     END VerifyEditedLine 
 
-; PROCEDURE IsAncestorMark 
+; PROCEDURE IsAncestorNodeNo 
     ( LeftNodeNo : LbeStd . EstNodeNoTyp 
     ; LeftNodeCt : LbeStd . EstNodeNoTyp 
     ; RightNodeNo : LbeStd . EstNodeNoTyp 
@@ -271,8 +274,93 @@ MODULE TextEdit
       RETURN LeftNodeNo < RightNodeNo 
              AND LeftNodeNo + LeftNodeCt > RightNodeNo  
                  (* >= RightNodeNo + RightNodeCt - 1 *) 
-    END IsAncestorMark 
+    END IsAncestorNodeNo 
 
+; PROCEDURE AdjustLinesRefs
+    ( OldEstRoot : EstHs . EstRefTyp 
+    ; NewEstRoot : EstHs . EstRefTyp 
+    ; LinesRefHeader : PaintHs . LinesRefHeaderTyp 
+    ; CentralNodeNo : LbeStd . EstNodeNoTyp 
+    ; Bias : LbeStd . EstNodeNoTyp 
+    ) 
+  RAISES { Backout } 
+
+  = VAR LLinesRef : PaintHs . LinesRefMeatTyp
+  ; VAR LOldMarkNodeNo : LbeStd . EstNodeNoTyp
+  ; VAR LOldMarkNodeCt : LbeStd . EstNodeNoTyp
+  ; VAR LNewMarkedEstNodeCt : LbeStd . EstNodeNoTyp
+
+; VAR LBreakpoint := 0 
+
+  ; BEGIN (* AdjustLinesRefs *)
+      IF LinesRefHeader = NIL THEN RETURN END (* IF *) 
+    ; IF LinesRefHeader . LrRightLink = LinesRefHeader  THEN RETURN END (* IF *) 
+    ; LLinesRef := LinesRefHeader . LrRightLink
+    ; LOOP
+        LOldMarkNodeNo := LLinesRef . LrBolTokMark . TkmEstNodeNo
+      ; LOldMarkNodeCt
+          := TravUtil . NodeCtOfDescendantWithNodeNo
+               ( OldEstRoot , LOldMarkNodeNo  )
+      ; IF LOldMarkNodeNo > CentralNodeNo
+           (* ^Node ref'd by mark is to right of changed Est region. *)
+        THEN (* Adjust mark's NodeNo. *)
+        
+IF TravUtil . NodeCtOfDescendantWithNodeNo
+     ( NewEstRoot , LOldMarkNodeNo + Bias ) 
+   # LOldMarkNodeCt
+(* ^Adjusted NodeNo points to a node with different NodeCt. *)
+THEN  
+    EstDump.WriteTreeToFile ("NodeNoOld.dump",OldEstRoot,10)
+  ; EstDump.WriteTreeToFile ( "NodeNoNew.dump",NewEstRoot, 10 )
+  ; LBreakpoint := 7 
+END (* IF *)
+;
+
+          (* Assert Adjusted NodeNo points to node with same NodeCt. *) 
+          <* ASSERT TravUtil . NodeCtOfDescendantWithNodeNo
+                      ( NewEstRoot , LOldMarkNodeNo + Bias ) 
+                    = LOldMarkNodeCt
+          , MCI ( AFT . A_AdjustedRightMarkNodeNosCtMismatch ) 
+          *> 
+          INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias )
+        ELSIF LOldMarkNodeNo + LOldMarkNodeCt <= CentralNodeNo 
+              (* ^Node ref'd by mark is to left of changed Est region. *) 
+        THEN (* Leave mark unchanged. *)
+        ELSE (* Node ref'd by mark encloses the changed Est region. *) 
+          IF NOT TravUtil . DescendantIsInteriorAstNode
+                   ( NewEstRoot , LOldMarkNodeNo )
+             (* Will not have had a NodeCt change *) 
+          THEN (* Leave mark unchanged. *)
+          ELSE (* Adjust mark's NodeCt. *)
+            LNewMarkedEstNodeCt := LOldMarkNodeCt + Bias
+
+; IF TravUtil . NodeCtOfDescendantWithNodeNo ( NewEstRoot , LOldMarkNodeNo ) 
+     # LNewMarkedEstNodeCt 
+  THEN (* Adjusted NodeCt # that of pointed-to Est node. *) 
+      EstDump.WriteTreeToFile("NodeCtOld.dump",OldEstRoot,10)
+    ; EstDump.WriteTreeToFile ( "NodeCtNew.dump", NewEstRoot , 10 ) 
+    ; LBreakpoint := 13 
+  END (* IF *)
+; 
+
+            (* Adjusted NodeCt # that of pointed-to Est node. *)
+            <* ASSERT 
+                 TravUtil . NodeCtOfDescendantWithNodeNo
+                   ( NewEstRoot , LOldMarkNodeNo ) 
+                 = LNewMarkedEstNodeCt        
+            , MCI ( AFT . A_AdjustedRightMarkNodeNoMismatch ) 
+            *> 
+            INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias )
+          END (* IF *) 
+        END (* IF *) 
+      ; IF LLinesRef . LrRightLink = LinesRefHeader
+        THEN EXIT 
+        ELSE LLinesRef := LLinesRef . LrRightLink
+        END (* IF *)
+      END (* LOOP *)
+    END AdjustLinesRefs
+
+(* Middle version: 
 ; PROCEDURE AdjustLinesRefsNodeNos 
     ( ImageRef : PaintHs . ImageTransientTyp
     ; <* UNUSED *> OldEstRoot : EstHs . EstRefTyp 
@@ -299,24 +387,31 @@ MODULE TextEdit
           , LNewKindSet 
           , LNewIsOptSingletonList
           )
-      ; LNewEstNodeCt := EstUtil . EstNodeCt ( LNewEstRef ) 
-
-      ;  <* ASSERT LLinesRef . LrBolTokMark . TkmEstNodeCt = LNewEstNodeCt 
+      ; LNewEstNodeCt := EstUtil . EstNodeCt ( LNewEstRef )
+(*
+; IF LLinesRef . LrBolTokMark . TkmEstNodeCt # LNewEstNodeCt
+  THEN
+    EstDump.WriteTreeToFile("Old.dump",OldEstRoot,10)
+  ; EstDump.WriteTreeToFile ( "NewEst.dump", NewEstRoot , 10 ) 
+  END 
+*)
+      ;  (* <* ASSERT LLinesRef . LrBolTokMark . TkmEstNodeCt = LNewEstNodeCt 
             , TF & ":" & FI ( CTL ( ) ) & " Mismatched node counts." 
-         *>
+         *> *) 
         IF LLinesRef . LrRightLink = ImageRef . ItPers . IpLineHeaderRef 
         THEN EXIT 
         ELSE LLinesRef := LLinesRef . LrRightLink 
         END (* IF *) 
       END (* LOOP *)
-    END AdjustLinesRefsNodeNos 
+    END AdjustLinesRefsNodeNos
+*) 
 
 (* Old version: 
 
-; PROCEDURE AdjustLinesRefsNodeNos 
+; PROCEDURE AdjustLinesRefsNodeNos
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; FirstLinesRefToAdjust : PaintHs . LinesRefTyp 
-    ; MinNodeNoToAdjust : LbeStd . EstNodeNoTyp 
+    ; CentralNodeNo : LbeStd . EstNodeNoTyp 
     ; Bias : LbeStd . EstNodeNoTyp 
     ) 
   RAISES { Backout } 
@@ -337,15 +432,15 @@ MODULE TextEdit
         IF LLinesRef = FirstLinesRefToAdjust 
         THEN LPastFirstLinesRef := TRUE 
         END (* IF *)  
-      ; IF IsAncestorMark 
+      ; IF IsAncestorNodeNo 
              ( LLinesRef . LrBolTokMark . TkmEstNodeNo  
              , LLinesRef . LrBolTokMark . TkmEstNodeCt 
-             , MinNodeNoToAdjust 
+             , CentralNodeNo 
              ) 
         THEN 
           INC ( LLinesRef . LrBolTokMark . TkmEstNodeCt , Bias ) 
         END (* IF *)   
-      ; IF LLinesRef . LrBolTokMark . TkmEstNodeNo >= MinNodeNoToAdjust 
+      ; IF LLinesRef . LrBolTokMark . TkmEstNodeNo >= CentralNodeNo 
         THEN 
           Assert 
             ( LPastFirstLinesRef 
@@ -390,7 +485,7 @@ MODULE TextEdit
         THEN 
           DEC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias ) 
         END (* IF *) 
-      ; IF IsAncestorMark 
+      ; IF IsAncestorNodeNo 
              ( LLinesRef . LrBolTokMark . TkmEstNodeNo (* Already unadjusted. *) 
              , LLinesRef . LrBolTokMark . TkmEstNodeCt 
              , MinNodeNoToAdjust  
@@ -430,7 +525,7 @@ MODULE TextEdit
           IF LMark . LmLinesRef # NIL 
           THEN LMark . LmTokMark := LMark . LmLinesRef . LrBolTokMark 
           ELSE 
-            IF IsAncestorMark 
+            IF IsAncestorNodeNo 
                  ( LMark . LmTokMark . TkmEstNodeNo  
                  , LMark . LmTokMark . TkmEstNodeCt 
                  , MinNodeNoToAdjust  
@@ -1014,7 +1109,7 @@ MODULE TextEdit
           ELSE (* Outside the new LinesRefs. *) 
             IF LMark . LmLinesRef = NIL 
             THEN (* Doesn't point to a LinesRef at all.  Adjust numerically *) 
-              IF IsAncestorMark 
+              IF IsAncestorNodeNo 
                    ( LMark . LmTokMark . TkmEstNodeNo  
                    , LMark . LmTokMark . TkmEstNodeCt 
                    , MinNodeNoToAdjust 
@@ -1072,12 +1167,12 @@ MODULE TextEdit
 (* FIX: AdjustLinesRefsNodeNos can raise assertion failures.
         Do something about it. 
 *) 
-      ; AdjustLinesRefsNodeNos 
-          ( ImageRef
-          , IfteOldEstRoot 
-          , IfteNewEstRoot 
-          , IfteSuccLinesRefMeat 
-          , IfteNodeNoChange 
+      ; AdjustLinesRefs
+          ( IfteOldEstRoot 
+          , IfteNewEstRoot
+          , ImageRef . ItPers . IpLineHeaderRef 
+          , CentralNodeNo := IfteMaxTouchedNodeNo 
+          , Bias := IfteNodeNoChange 
           ) 
 
       ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
@@ -1596,12 +1691,18 @@ MODULE TextEdit
         ; TYPECASE LSuccOfEditedLinesRefs 
           OF NULL (* Can happen with damaged checkpoint files. *) 
           => LineMarks . GetEndOfImage 
-               ( IfteImagePers . IpLang , IfteOldEstRoot , LOldEndBolTokMark ) 
+               ( IfteImagePers . IpLang
+               , IfteOldEstRoot
+               , (*OUT*) NewMark := LOldEndBolTokMark
+               ) 
           | PaintHs . LinesRefMeatTyp ( TSuccLinesRefMeat ) 
           => LOldEndBolTokMark := TSuccLinesRefMeat . LrBolTokMark 
           ELSE 
             LineMarks . GetEndOfImage 
-              ( IfteImagePers . IpLang , IfteOldEstRoot , LOldEndBolTokMark ) 
+              ( IfteImagePers . IpLang
+              , IfteOldEstRoot
+              , (*OUT*) NewMark := LOldEndBolTokMark
+              ) 
           END (* TYPECASE *) 
         ; IfteStartBolTokMark := Marks . TokMarkNull  
         ; IF Options . TreeBrowsing 
@@ -1665,7 +1766,7 @@ MODULE TextEdit
             ) 
         ; SkipBlankLinesToRight 
             ( ImageRef 
-            , (* VAR *) IfteOldThruLinesRef 
+            , (* VA"R *) IfteOldThruLinesRef 
             , LTrailingBlankLinesIncluded 
             ) 
 
@@ -1680,11 +1781,12 @@ MODULE TextEdit
           THEN (* Deleted new line, two lines are joined. *) 
             IF LBlankPrefixLen 
                = Strings . Length ( TempEditRef . TeEditedString ) 
-            THEN (* Joined lines are entirely blank *) 
+            THEN (* Joined lines are entirely blank *)
+(* FIXME: Must account for whether each old line was already blank. *) 
               IfteExpectedBlankLinesBefore 
                 := LLeadingBlankLinesIncluded 
                    + IfteFirstOldActualLineCt 
-                   - 1 
+                   - 2 
                    + LSecondOldActualLineCt  
                    + LTrailingBlankLinesIncluded 
             ELSE (* Joined lines contain nonblank text. *) 
@@ -2473,10 +2575,10 @@ MODULE TextEdit
 ; PROCEDURE GrabTempEditRef 
     ( ImageTrans : PaintHs . ImageTransientTyp 
     ; Mark : PaintHs . LineMarkMeatTyp 
-    ; RmFromPos : LbeStd . CharNoTyp 
+    ; RmAllowedFromPos : LbeStd . CharNoTyp 
       (* The FromPos of the previously-edited region, if any, of the returned 
          TempEditRef, must be no farther right than this.  *) 
-    ; LmToPos : LbeStd . CharNoTyp 
+    ; LmAllowedToPos : LbeStd . CharNoTyp 
       (* The ToPos of the previously-edited region, if any, of the returned 
          TempEditRef, must be no farther left than this.  *) 
     ; VAR (* OUT *) TempEditRef : PaintHs . TempEditRefTyp 
@@ -2513,10 +2615,10 @@ MODULE TextEdit
                  (* Different line w/in block of blank lines. *) 
               OR TempEditRef . TeDelFromPos 
                  # LbeStd . LimitedCharNoInfinity 
-                 AND ( TempEditRef . TeDelFromPos > RmFromPos  
+                 AND ( TempEditRef . TeDelFromPos > RmAllowedFromPos  
                        OR TempEditRef . TeDelFromPos 
                           + TempEditRef . TeInsLen 
-                          < LmToPos 
+                          < LmAllowedToPos 
                      ) 
                  (* Outside the already edited region. *) 
            THEN 
@@ -2598,21 +2700,21 @@ MODULE TextEdit
   (* Assert that length of TempEditRef is consistent. *) 
 
   = VAR LLinesRef : PaintHs . LinesRefMeatTyp 
-  ; VAR LSuccLength : LbeStd . CharNoTyp 
+  ; VAR LSuccLen : LbeStd . CharNoTyp 
+  ; VAR LDelLen : LbeStd . CharNoTyp 
 
   ; BEGIN 
       LLinesRef := TempEditRef . TeLinesRef 
     ; IF SuccLinesRef # NIL AND NOT SuccLinesRef . LrGapAfter 
-      THEN
-        LSuccLength := SuccLinesRef . LrLineLen 
-      ELSE 
-        LSuccLength := 0 
+      THEN LSuccLen := SuccLinesRef . LrLineLen 
+      ELSE LSuccLen := 0 
+      END (* IF *) 
+    ; IF TempEditRef . TeDelFromPos = LbeStd . LimitedCharNoInfinity 
+      THEN LDelLen := 0 
+      ELSE LDelLen := TempEditRef . TeDelToPos - TempEditRef . TeDelFromPos 
       END (* IF *) 
     ; Assert
-        ( LLinesRef . LrLineLen 
-          - ( TempEditRef . TeDelToPos - TempEditRef . TeDelFromPos ) 
-          + TempEditRef . TeInsLen 
-          + LSuccLength 
+        ( LLinesRef . LrLineLen - LDelLen + TempEditRef . TeInsLen + LSuccLen 
           = Strings . Length ( TempEditRef . TeEditedString ) 
         , AFT . A_AssertTempEdit_Wrong_length
         )  
@@ -2641,8 +2743,8 @@ MODULE TextEdit
     ; GrabTempEditRef 
         ( ImageTrans 
         , Mark 
-        , RmFromPos := Mark . LmCharPos + 1 
-        , LmToPos := Mark . LmCharPos 
+        , RmAllowedFromPos := Mark . LmCharPos + 1 
+        , LmAllowedToPos := Mark . LmCharPos 
         , (* VAR *) TempEditRef := LTempEditRef 
         ) 
     ; LTempEditLength 
@@ -3086,9 +3188,9 @@ MODULE TextEdit
                ; GrabTempEditRef 
                    ( LImageTrans 
                    , WCursorMark 
-                   , RmFromPos 
+                   , RmAllowedFromPos 
                        := WCursorMark . LmCharPos + ORD ( NOT IsInsert ) 
-                   , LmToPos := WCursorMark . LmCharPos 
+                   , LmAllowedToPos := WCursorMark . LmCharPos 
                    , (* VAR *) TempEditRef := LTempEditRef 
                    ) 
                ; LSavedTempEditRef := CopyOfTempEditRef ( LTempEditRef ) 
@@ -3209,9 +3311,9 @@ MODULE TextEdit
                  GrabTempEditRef 
                    ( LImageTrans 
                    , WCursorMark 
-                   , RmFromPos 
+                   , RmAllowedFromPos 
                        := WCursorMark . LmCharPos + ORD ( NOT IsInsert ) 
-                   , LmToPos := WCursorMark . LmCharPos 
+                   , LmAllowedToPos := WCursorMark . LmCharPos 
                    , (* VAR *) TempEditRef := LTempEditRef 
                    ) 
                ; LLength := Strings . Length ( LTempEditRef . TeEditedString ) 
@@ -3463,8 +3565,8 @@ MODULE TextEdit
                 GrabTempEditRef 
                   ( LImageTrans 
                   , WCursorMark 
-                  , RmFromPos := WCursorMark . LmCharPos + 1 
-                  , LmToPos := WCursorMark . LmCharPos - 1 
+                  , RmAllowedFromPos := WCursorMark . LmCharPos + 1 
+                  , LmAllowedToPos := WCursorMark . LmCharPos - 1 
                   , (* VAR *) TempEditRef := LTempEditRef 
                   ) 
               ; LLength := Strings . Length ( LTempEditRef . TeEditedString ) 
@@ -3655,8 +3757,8 @@ MODULE TextEdit
                 GrabTempEditRef 
                   ( LImageTrans 
                   , WCursorMark 
-                  , RmFromPos := LbeStd . CharNoInfinity 
-                  , LmToPos := WCursorMark . LmCharPos 
+                  , RmAllowedFromPos := LbeStd . CharNoInfinity 
+                  , LmAllowedToPos := WCursorMark . LmCharPos 
                   , (* VAR *) TempEditRef := LTempEditRef 
                   ) 
               ; LSavedTempEditRef := CopyOfTempEditRef ( LTempEditRef ) 
@@ -3753,7 +3855,8 @@ MODULE TextEdit
   ; VAR LSavedTempEditState : PaintHs . TempEditStateTyp 
 
   ; BEGIN 
-      LImagePers := ImageTrans . ItPers  
+      IF ToCharPos <= FromCharPos THEN RETURN END (* IF *) 
+    ; LImagePers := ImageTrans . ItPers  
     ; LTempEditRef := LImagePers . IpTempEditRef 
     ; LSavedTempEditRef := CopyOfTempEditRef ( LTempEditRef ) 
     ; LSavedTempEditState := LImagePers . IpTempEditState 
@@ -3826,19 +3929,23 @@ MODULE TextEdit
 ; PROCEDURE DeleteBetweenMarks 
     ( ImageTrans : PaintHs . ImageTransientTyp   
     ; FromMark : PaintHs . LineMarkMeatTyp 
-    ; ThruMark : PaintHs . LineMarkMeatTyp 
+    ; ThruMark : PaintHs . LineMarkMeatTyp
+      (* Delete *thru* the line beginning at ThruMark (including its new line),
+         but only *to* its LmCharPos. *)  
     ) 
   RAISES { Backout , Thread . Alerted } 
 
   = VAR LTempEditRef : PaintHs . TempEditRefTyp   
-  ; VAR LFromPos : LbeStd . CharNoTyp 
+  ; VAR LFromPosInLine : LbeStd . CharNoTyp 
   ; VAR LLength : LbeStd . CharNoTyp 
-  ; VAR LLinesInvolved : [ 1 .. 3 ]  (* 3 denotes >= 3 *) 
+  ; VAR LLinesInvolved : [ 1 .. 3 ]  (* 3 denotes >= 3 *)
+  ; VAR LLinesToLeft : INTEGER
+  ; VAR LNewCursorLineNo : INTEGER 
   ; VAR LMark : PaintHs . LineMarkMeatTyp 
   ; VAR LPredMark : PaintHs . LineMarkTyp 
   ; VAR LLinesRef : PaintHs . LinesRefMeatTyp 
   ; VAR LLineShift : LbeStd . LineNoTyp 
-  ; VAR LPredLinesRef : PaintHs . LinesRefMeatTyp 
+  ; VAR LRMLineEditedString : Strings . T 
 
   ; BEGIN 
       IF ImageTrans # NIL 
@@ -3848,107 +3955,96 @@ MODULE TextEdit
       ; Display . SecureSucc ( ImageTrans , ThruMark . LmLinesRef ) 
       ; IF Marks . Equal ( FromMark . LmTokMark , ThruMark . LmTokMark ) 
         THEN 
-          LFromPos := FromMark . LmCharPos 
+          LFromPosInLine := FromMark . LmCharPos 
         ; LLinesInvolved := 1 
         ELSE 
-          LFromPos := 0 
+          LFromPosInLine := 0 (* Prepare to do lines right-to-left. *) 
         ; IF ThruMark . LmLinesRef . LrLeftLink = FromMark . LmLinesRef 
           THEN LLinesInvolved := 2 
           ELSE LLinesInvolved := 3 (* Or more. *) 
           END (* IF *) 
         END (* IF *) 
 
-      (* Adjust any included marks to point to start of selection. *) 
-      ; LLinesRef := FromMark . LmLinesRef 
-      ; LLineShift := 0  
-      ; LMark := FromMark . LmRightLink 
-      ; WHILE LMark # ThruMark 
-        DO 
-          TRY 
-            Assert 
-              ( Marks . Compare ( FromMark . LmTokMark , LMark . LmTokMark ) 
-                <= 0 
-              , AFT . A_DeleteSelection_Out_of_order_mark 
-              ) 
-          EXCEPT Marks . Unordered 
-          => CantHappen 
-               ( AFT . A_DeleteBetweenMarks_Unordered_marks ) 
-          END (* TRY EXCEPT *) 
+      (* Adjust any LineMarks in the to-be-deleted text 
+         line, to point to the beginning of the deletion. *) 
+      ; LLinesRef := FromMark . LmLinesRef
+      ; LLinesToLeft := 0  
+      ; LMark := FromMark . LmRightLink
+      ; LOOP
+          IF LMark = ThruMark THEN EXIT END (* IF *)
         ; IF LMark . LmMarkSs = PaintHs . MarkSsTyp . MarkSsCursor 
-          THEN
-            WHILE LLinesRef # LMark . LmLinesRef 
-            DO 
-              INC ( LLineShift 
-                  , Display . ActualNoOfLines ( LLinesRef . LrLineCt ) 
-                  )
-            ; LLinesRef := LLinesRef . LrRightLink 
-            END (* WHILE *) 
-          ; DEC ( LMark . LmWindowRef . WrCursorLineNoInWindow 
-                , LLineShift + LMark . LmLineNo 
-                ) 
+          THEN (* It's the cursor.  Adjust WrCursorLineNoInWindow. *) 
+            WITH WCursorLineNo
+                 = LMark . LmWindowRef . WrCursorLineNoInWindow
+            DO LNewCursorLineNo 
+                 := MAX ( WCursorLineNo
+                          - LLinesToLeft
+                          - LMark . LmLineNo
+                          + FromMark . LmLineNo
+                        , 0
+                        ) 
+            ; WCursorLineNo := LNewCursorLineNo
+            END (* WITH *)
           END (* IF *)
+
+        (* Count displayed lines between FromMark and short of LMark. *) 
+        ; LOOP
+            IF LLinesRef = LMark . LmLinesRef THEN EXIT END (* IF *) 
+          ; INC ( LLinesToLeft 
+                , Display . ActualNoOfLines ( LLinesRef . LrLineCt ) 
+                )
+          ; TYPECASE LLinesRef . LrRightLink
+            OF NULL => (* Shouldn't happen. *) EXIT
+            | PaintHs . LinesRefMeatTyp ( TLinesRefMeat )
+            => LLinesRef := TLinesRefMeat (* And loop. *)
+            ELSE EXIT 
+            END (* TYPECASE *) 
+          END (* LOOP *) 
+
         ; LMark . LmTokMark := FromMark . LmTokMark 
         ; LMark . LmLinesRef := FromMark . LmLinesRef 
-        ; LMark . LmCharPos := FromMark . LmCharPos 
-        ; LMark . LmLineNo := FromMark . LmLineNo 
-        ; LMark := LMark . LmRightLink 
-        END (* WHILE *) 
+        ; LMark . LmLineNo := FromMark . LmLineNo
+        ; LMark . LmCharPos := FromMark . LmCharPos
 
-      (* Move any included marks out of selected range. *) 
-      ; IF FromMark . LmRightLink # ThruMark 
-        THEN
-          PaintHs . UnlinkLineMark ( FromMark ) 
-        ; PaintHs . LinkLineMarkToLeft 
-            ( InsertToLeftOfRef := ThruMark , RefToInsert := FromMark ) 
+        ; TYPECASE LMark . LmRightLink 
+          OF NULL => (* Shouldn't happen. *) EXIT
+          | PaintHs . LineMarkMeatTyp ( TLineMarkMeat )
+          => LMark := TLineMarkMeat (* And loop. *)
+          ELSE EXIT 
+          END (* TYPECASE *) 
+
+        END (* LOOP *)
+
+      (* Relink any adjusted marks to left of FromMark. These now all point to
+         the same place as FromMark, but have different addresses.  This will
+         restore FromMark.LmTokMark's status as the rightmost of a group of
+         joined new lines. *)
+      ; IF FromMark . LmRightLink # ThruMark
+        THEN (* There are adjusted marks to move. *) 
+          PaintHs . UnlinkLineMark ( FromMark )
+        ; PaintHs . LinkLineMarkToLeft
+            ( InsertToLeftOfRef := ThruMark , RefToInsert := FromMark )
         ; PaintHs . BruteForceVerifyLineMarks ( ImageTrans ) 
         END (* IF *) 
 
-      (* Delete selected portion of last included line. *) 
-      ; GrabTempEditRef 
-          ( ImageTrans 
-          , Mark := ThruMark 
-          , RmFromPos := ThruMark . LmCharPos 
-          , LmToPos := LFromPos  
-          , (* VAR *) TempEditRef := LTempEditRef 
-          ) 
-      ; LLength := Strings . Length ( LTempEditRef . TeEditedString ) 
-      ; IF ThruMark . LmCharPos >= LLength  
-        THEN (* Delete Nl at end too. *) 
-          DeleteTempEditedCharRange ( ImageTrans , LFromPos , LLength ) 
-        ; TYPECASE ThruMark . LmLinesRef . LrRightLink 
-          OF PaintHs . LinesRefMeatTyp ( TRightLinesRef ) 
-          => Display . SecureSucc ( ImageTrans , TRightLinesRef ) 
-          ; TRY 
-              Strings . InsertBlanksInPlace 
-                ( LTempEditRef . TeEditedString 
-                , PrefixLength := LFromPos 
-                , BlankCount := TRightLinesRef . LrFromPos 
-                , EventualLengthHint 
-                    := LFromPos + TRightLinesRef . LrLineLen 
-                )
-            EXCEPT Strings . SsOutOfBounds
-            => CantHappen 
-                 ( AFT . A_DeleteBetweenMarks_String_subscript_out_of_bounds_last_line ) 
-          END (* TRY EXCEPT *) 
-          ; Strings . AppendTextInPlace 
-              ( LTempEditRef . TeEditedString 
-              , TRightLinesRef . LrLineText 
-              ) 
-          ; AssertTempEdit ( LTempEditRef , TRightLinesRef ) 
-          ELSE 
-            AssertTempEdit ( LTempEditRef ) 
-          END (* TYPECASE *) 
-        ; InnerFlushTempEdit 
+      (* Delete selected portion of last included line. *)
+      ; IF FALSE AND ThruMark . LmCharPos = 0
+        THEN  (* For ThruMark, only the new line at its beginning is to be
+                 deleted.  Do nothing for ThruMark.  The Mark to the left
+                 will delete ThruMark's new line. *) 
+        ELSE (* Some characters to delete. *) 
+          GrabTempEditRef 
             ( ImageTrans 
-            , ThruMark . LmLinesRef 
-            , LTempEditRef 
-            , DelNlShift := LFromPos   
+            , Mark := ThruMark 
+            , RmAllowedFromPos := ThruMark . LmCharPos 
+            , LmAllowedToPos := LFromPosInLine
+              (* ^Zero, unless this is also the 1st line. *) 
+            , (* OUT *) TempEditRef := LTempEditRef 
             ) 
-        ; InitTempEditForText ( LTempEditRef , NIL , 0 ) 
-        ELSE 
-          DeleteTempEditedCharRange 
-            ( ImageTrans , LFromPos , ThruMark . LmCharPos ) 
+        ; DeleteTempEditedCharRange 
+            ( ImageTrans , LFromPosInLine , ToCharPos := ThruMark . LmCharPos ) 
         END (* IF *) 
+      ; LRMLineEditedString := LTempEditRef . TeEditedString 
 
       (* Delete any full lines properly between FromMark and ThruMark. *)
       ; IF LLinesInvolved = 3 (* Or more *) 
@@ -3967,45 +4063,50 @@ MODULE TextEdit
             , SuccMark := ThruMark 
             , Image := ImageTrans 
             ) 
-        ; PaintHs . BruteForceVerifyLineMarks ( ImageTrans ) 
+        (* Use LTempEditRef mostly unchanged, so it will repeatedly be joined 
+           onto the right of each full line as it is removed. *) 
+        ; LTempEditRef . TeDelFromPos := 0 
+
         ; LOOP 
             Display . SecurePred ( ImageTrans , LLinesRef ) 
+          ; LTempEditRef . TeLinesRef := LLinesRef 
+(*
           ; GrabTempEditRef 
               ( ImageTrans 
               , Mark := LMark 
-              , RmFromPos := LbeStd . CharNoInfinity 
-              , LmToPos := 0 
+              , RmAllowedFromPos := LbeStd . CharNoInfinity 
+              , LmAllowedToPos := 0 
               , (* VAR *) TempEditRef := LTempEditRef 
               ) 
+          ; LTempEditRef . TeEditedString := LRMLineEditedString  
           ; LTempEditRef . TeDelFromPos := 0 
           ; LTempEditRef . TeDelToPos 
               := Strings . Length ( LTempEditRef . TeEditedString ) 
           ; LTempEditRef . TeInsLen := 0 
-          ; InitTempEditTextOnly ( LTempEditRef , ThruMark . LmLinesRef ) 
-          ; LPredLinesRef := LLinesRef . LrLeftLink 
+*)
+          ; LTempEditRef . TeDelToPos := LLinesRef . LrLineLen 
           ; AssertTempEdit ( LTempEditRef , LLinesRef . LrRightLink ) 
           ; InnerFlushTempEdit 
-              ( ImageTrans 
-              , LLinesRef 
-              , LTempEditRef 
-              , DelNlShift := 0  
-              ) 
+              ( ImageTrans , LLinesRef , LTempEditRef , DelNlShift := 0 ) 
           ; InitTempEditForText ( LTempEditRef , NIL , 0 ) 
           ; IF LMark . LmLineNo > 0 
-            THEN DEC ( LMark . LmLineNo ) 
+            THEN DEC ( LMark . LmLineNo )
+                 (* And loop to do another blank line of LLinesRef. *) 
             ELSE 
-              LLinesRef := LPredLinesRef 
+              LLinesRef := LLinesRef . LrLeftLink 
             ; IF LLinesRef = FromMark . LmLinesRef 
               THEN EXIT 
               ELSE 
                 LMark . LmLinesRef := LLinesRef 
-              ; LLinesRef . LrHasMark := TRUE 
+              ; LLinesRef . LrHasMark := TRUE
+                (* ^LLinesRef will soon become garbage, so no need to reset
+                   this FALSE when done. *) 
               ; LMark . LmTokMark := LLinesRef . LrBolTokMark 
               ; LMark . LmCharPos := 0 
               ; LMark . LmLineNo 
-                  := Display . ActualLineCtOfLinesRef 
-                       ( ImageTrans , LLinesRef ) 
-                     - 1 
+                  := Display . ActualLineCtOfLinesRef ( ImageTrans , LLinesRef )
+                     - 1
+              (* And loop for this new LLinesRef. *) 
               END (* IF *) 
             END (* IF *)  
           END (* LOOP *) 
@@ -4014,17 +4115,18 @@ MODULE TextEdit
             , (* VAR *) PredMark := LPredMark (* Dead *) 
             , Image := ImageTrans 
             ) 
+        ; PaintHs . BruteForceVerifyLineMarks ( ImageTrans ) 
         END (* IF *) 
 
-      (* Delete relevant portion first line of selection. *) 
+      (* Delete the selected portion of first line of selection. *) 
       ; IF LLinesInvolved >= 2 
         THEN
           GrabTempEditRef 
             ( ImageTrans 
             , Mark := FromMark 
-            , RmFromPos := LbeStd . CharNoInfinity 
-            , LmToPos := FromMark . LmCharPos 
-            , (* VAR *) TempEditRef := LTempEditRef 
+            , RmAllowedFromPos := LbeStd . CharNoInfinity 
+            , LmAllowedToPos := FromMark . LmCharPos 
+            , (* OUT *) TempEditRef := LTempEditRef 
             ) 
         ; DeleteTempEditedCharRange 
             ( ImageTrans 
@@ -4038,7 +4140,7 @@ MODULE TextEdit
                   := Strings . Length ( LTempEditRef . TeEditedString )
               , BlankCount := ThruMark . LmLinesRef . LrFromPos 
               , EventualLengthHint 
-                  := LLength + ThruMark . LmLinesRef . LrLineLen 
+                  := FromMark . LmCharPos + ThruMark . LmLinesRef . LrLineLen 
               )
           EXCEPT Strings . SsOutOfBounds
           => CantHappen 
@@ -4179,8 +4281,8 @@ MODULE TextEdit
             GrabTempEditRef 
               ( WindowRef . WrImageRef 
               , WCursorMark 
-              , RmFromPos := WCursorMark . LmCharPos  
-              , LmToPos := WCursorMark . LmCharPos 
+              , RmAllowedFromPos := WCursorMark . LmCharPos  
+              , LmAllowedToPos := WCursorMark . LmCharPos 
               , (* VAR *) TempEditRef := ArTempEditRef 
               ) 
           ; IF ArTempEditRef . TeTextAttrArrayRef # NIL 
