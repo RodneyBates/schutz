@@ -24,7 +24,8 @@ INTERFACE PaintHs
 ; IMPORT ModHs 
 ; IMPORT PortTypes 
 ; IMPORT ScannerIf 
-; IMPORT Strings 
+; IMPORT Strings
+; IMPORT Thread 
 
 <* PRAGMA LL *> 
 
@@ -38,6 +39,8 @@ INTERFACE PaintHs
 
 ; CONST WindowNoSetEmpty = WindowNoSetTyp { } 
 ; CONST WindowNoSetFull = WindowNoSetTyp { WindowNoMin .. WindowNoMax } 
+
+; PROCEDURE WindowNoSetImage ( Set : WindowNoSetTyp ; Indent : INTEGER ) : TEXT
 
 (* Text attributes *) 
 
@@ -231,6 +234,10 @@ INTERFACE PaintHs
         ; LrLineText : TEXT := NIL (* Leading blanks removed. *) 
         END (* OBJECT LinesRefMeatTyp *) 
 
+; PROCEDURE LinesRefImage ( FLinesRef : LinesRefTyp ; LineIndent : INTEGER )
+  : TEXT 
+  RAISES { Thread . Alerted , Wr . Failure } 
+
 ; PROCEDURE IncludeLrVisibleIn 
     ( Ref : LinesRefMeatTyp ; Value : WindowNoTyp ) 
 
@@ -402,6 +409,23 @@ INTERFACE PaintHs
 ; PROCEDURE BruteForceVerifyLineMarks 
     ( ImageTrans : ImageTransientTyp ; DoCheckOrder : BOOLEAN := TRUE ) 
   RAISES { Backout } 
+
+; EXCEPTION Nonlinear 
+
+; PROCEDURE WriteLinesListToStdout  
+    ( StartLinesRef : LinesRefTyp ; Lang : LbeStd . LangTyp )
+
+; PROCEDURE WriteLinesListToFile 
+    ( FileName : TEXT ; StartLinesRef : LinesRefTyp ; Lang : LbeStd . LangTyp )
+
+; PROCEDURE WriteLinesListWr
+    ( WrT : Wr . T
+    ; StartLinesRef : LinesRefTyp
+    ; Lang : LbeStd . LangTyp
+    ; FileLabel : TEXT
+    )
+  RAISES { Nonlinear , Thread . Alerted , Wr . Failure } 
+  (* May be circular, with or without a header, or linear with NILs at ends. *)
 
 ; PROCEDURE TextAttrArrayCt 
     ( ImageTrans : ImageTransientTyp ) : CARDINAL 

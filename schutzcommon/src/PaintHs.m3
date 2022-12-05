@@ -10,22 +10,28 @@ MODULE PaintHs
 
 (* Data structures for painting the screen. *) 
 
+(* Library: *) 
+; IMPORT Assertions 
+; FROM Assertions IMPORT Assert , CantHappen 
 ; IMPORT Fmt 
-; IMPORT Integer 
+; IMPORT Integer
+; IMPORT Stdio 
+; IMPORT TextWr
+; IMPORT Thread 
+; IMPORT Wr 
 
-; IMPORT WindowPrivate 
+(* Schutz: *) 
+; FROM Failures IMPORT Backout  
 ; IMPORT LbeStd 
-; IMPORT MessageCodes 
-; IMPORT Marks 
-; IMPORT Options 
 ; IMPORT LineMarks 
+; IMPORT Marks
+; IMPORT MessageCodes 
+; IMPORT Misc 
+; IMPORT Options 
 ; IMPORT PaintHs 
 ; IMPORT Version 
-
-; IMPORT Assertions 
-
-; FROM Assertions IMPORT Assert , CantHappen 
-; FROM Failures IMPORT Backout  
+; IMPORT VersionedFiles  
+; IMPORT WindowPrivate 
 
 <* PRAGMA LL *> 
 
@@ -61,7 +67,7 @@ MODULE PaintHs
     ; RETURN Self 
     END InitWindowRef 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE TextAttrIsEqual ( VALUE Left , Right : TextAttrTyp ) : BOOLEAN 
   (* Equal, except for the TaCharPos field. *) 
 
@@ -71,7 +77,7 @@ MODULE PaintHs
     ; RETURN Left = Right 
     END TextAttrIsEqual 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IncludeLrVisibleIn 
     ( Ref : LinesRefMeatTyp ; Value : WindowNoTyp ) 
 
@@ -79,7 +85,7 @@ MODULE PaintHs
       Ref . LrVisibleIn := Ref . LrVisibleIn + WindowNoSetTyp { Value } 
     END IncludeLrVisibleIn 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ExcludeLrVisibleIn 
     ( Ref : LinesRefMeatTyp ; Value : WindowNoTyp ) 
 
@@ -87,14 +93,14 @@ MODULE PaintHs
       Ref . LrVisibleIn := Ref . LrVisibleIn - WindowNoSetTyp { Value } 
     END ExcludeLrVisibleIn 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE LineIsVisible ( Ref : LinesRefMeatTyp ) : BOOLEAN 
 
   = BEGIN (* LineIsVisible *) 
       RETURN Ref . LrVisibleIn # WindowNoSetEmpty 
     END LineIsVisible 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InsertLinesRefToRight 
     ( InsertToRightOfRef : LinesRefTyp ; RefToInsert : LinesRefMeatTyp ) 
 
@@ -108,7 +114,7 @@ MODULE PaintHs
     ; LRightRef . LrLeftLink := RefToInsert 
     END InsertLinesRefToRight 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InsertLinesRefToLeft 
     ( InsertToLeftOfRef : LinesRefTyp ; RefToInsert : LinesRefMeatTyp ) 
 
@@ -122,7 +128,7 @@ MODULE PaintHs
     ; LLeftRef . LrRightLink := RefToInsert 
     END InsertLinesRefToLeft 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE UnlinkLinesRef ( LinesRef : LinesRefMeatTyp ) 
   (* Delete LinesRef from whatever list it is in. 
      No action if LinesRef is NIL. 
@@ -132,7 +138,7 @@ MODULE PaintHs
       UnlinkLinesRefRange ( LinesRef , LinesRef ) 
     END UnlinkLinesRef 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InsertLinesRefRangeToLeft 
     ( InsertToLeftOfRef : LinesRefTyp 
     ; FromLinesRef : LinesRefMeatTyp 
@@ -156,7 +162,7 @@ MODULE PaintHs
       END (* IF *) 
     END InsertLinesRefRangeToLeft 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE UnlinkLinesRefRange 
     ( FromLinesRef : LinesRefMeatTyp ; ThruLinesRef : LinesRefMeatTyp ) 
   (* Delete FromLinesRef .. ThruLinesRef from whatever list they are in. 
@@ -181,7 +187,7 @@ MODULE PaintHs
       END (* IF *) 
     END UnlinkLinesRefRange 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ResetAllLrHasMarkFields ( ImageTrans : ImageTransientTyp ) 
 
   = VAR LImagePers : ImagePersistentTyp 
@@ -214,7 +220,7 @@ MODULE PaintHs
       END (* IF *) 
     END ResetAllLrHasMarkFields 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE RecomputeLrHasMark ( Mark : LineMarkMeatTyp ) 
   (* Mark is about to be removed from this line. If it points to a LinesRec,
      maybe reset the LrHasMark field of the LinesRec. *)  
@@ -246,7 +252,7 @@ MODULE PaintHs
       END (* IF *) 
     END RecomputeLrHasMark  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE LinkLineMarkToRight 
     ( InsertToRightOfRef : LineMarkTyp ; RefToInsert : LineMarkMeatTyp ) 
   RAISES { Backout } 
@@ -265,7 +271,7 @@ MODULE PaintHs
     ; LRightRef . LmLeftLink := RefToInsert 
     END LinkLineMarkToRight 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE LinkLineMarkToLeft 
     ( InsertToLeftOfRef : LineMarkTyp ; RefToInsert : LineMarkMeatTyp ) 
   RAISES { Backout } 
@@ -284,7 +290,7 @@ MODULE PaintHs
     ; LLeftRef . LmRightLink := RefToInsert 
     END LinkLineMarkToLeft 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE UnlinkLineMark ( LineMark : LineMarkMeatTyp ) 
   (* Delete LineMark from whatever list it is in. 
      No action if LineMark or either of its links is NIL. *) 
@@ -319,7 +325,7 @@ MODULE PaintHs
       END (* IF *) 
     END UnlinkLineMarkRange 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InsertLineMarkToLeft 
     ( InsertMark : LineMarkMeatTyp 
     ; SuccMark : LineMarkTyp 
@@ -342,7 +348,7 @@ MODULE PaintHs
       END (* IF *) 
     END InsertLineMarkToLeft 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InsertLineMarkToRight 
     ( InsertMark : LineMarkMeatTyp 
     ; PredMark : LineMarkTyp 
@@ -365,7 +371,7 @@ MODULE PaintHs
       END (* IF *) 
     END InsertLineMarkToRight 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InsertLineMark
     ( InsertMark : LineMarkMeatTyp 
     ; Image : ImageTransientTyp 
@@ -517,7 +523,7 @@ MODULE PaintHs
       END (* IF *) 
     END InsertLineMark  
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DeleteLineMark
     ( Mark : LineMarkMeatTyp 
     ; VAR PredMark : LineMarkTyp 
@@ -538,7 +544,7 @@ MODULE PaintHs
       END (* IF *) 
     END DeleteLineMark 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE SwapMarkOrder ( LeftMark : LineMarkTyp ) 
   (* Swap LeftMark with its right neighbor. *) 
 
@@ -567,7 +573,7 @@ MODULE PaintHs
       END (* IF *) 
     END SwapMarkOrder 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE CompareLineMarks ( Left , Right : LineMarkMeatTyp ) 
   : [ - 1 .. 1 ] 
   RAISES { Backout } 
@@ -593,7 +599,7 @@ MODULE PaintHs
       END (* IF *)  
     END CompareLineMarks 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE GetMarksInOrder 
     ( Mark1 : LineMarkMeatTyp
     ; Mark2 : LineMarkMeatTyp
@@ -623,7 +629,7 @@ MODULE PaintHs
       END (* IF *) 
     END GetMarksInOrder 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE BruteForceVerifyLineMarks 
     ( ImageTrans : ImageTransientTyp ; DoCheckOrder : BOOLEAN := TRUE ) 
   RAISES { Backout } 
@@ -732,9 +738,318 @@ MODULE PaintHs
       ; LImagePers . IpMarkCt := LMarkCt 
         (* Repair it.  This can help when loading a damaged checkpoint file. *)
       END (* IF *) 
-    END BruteForceVerifyLineMarks 
+    END BruteForceVerifyLineMarks
 
-(* VISIBLE: *) 
+; CONST BoolImage = Misc . BooleanImageShort
+; CONST RefanyImage = Misc . RefanyImage
+
+(* EXPORTED: *)
+; PROCEDURE WindowNoSetImage ( Set : WindowNoSetTyp ; Indent : INTEGER ) : TEXT
+
+  = BEGIN
+      RETURN "{<PaintHs.WindowNoSetImage not implemented.>"
+(* TODO: Implement this.  And genericize it.  There are a few other
+         *SetImage functions hanging around. *) 
+    END WindowNoSetImage
+
+; PROCEDURE NonNilText ( T : TEXT ) : TEXT
+
+  = BEGIN
+      IF T = NIL THEN RETURN "" ELSE RETURN T END (* IF *) 
+    END NonNilText 
+
+(* EXPORTED: *)
+; PROCEDURE LinesRefImage ( FLinesRef : LinesRefTyp ; LineIndent : INTEGER )
+  : TEXT 
+  RAISES { Thread . Alerted , Wr . Failure } 
+    
+  = VAR LWrT : Wr . T
+  ; VAR LBlanks : TEXT 
+  ; VAR LResult : TEXT 
+  ; VAR LAddlIndent := 4
+  ; VAR LFullIndent := LineIndent + LAddlIndent 
+  
+  ; BEGIN
+      IF FLinesRef = NIL
+      THEN RETURN "NIL"
+      ELSE 
+        LWrT := TextWr . New ( ) 
+      ; Wr . PutText ( LWrT , RefanyImage ( FLinesRef ) )  
+      ; Wr . PutText ( LWrT , " LrLeftLink:" )
+      ; Wr . PutText ( LWrT , RefanyImage ( FLinesRef . LrLeftLink ) ) 
+      ; Wr . PutText ( LWrT , " LrRightLink:" )
+      ; Wr . PutText ( LWrT , RefanyImage ( FLinesRef . LrRightLink ) ) 
+      ; Wr . PutText ( LWrT , " LrGapAfter:" )
+      ; Wr . PutText ( LWrT , BoolImage ( FLinesRef . LrGapAfter ) ) 
+      ; TYPECASE FLinesRef
+        OF LinesRefMeatTyp ( TLinesRefMeat )
+        => LBlanks := Misc . Blanks ( LFullIndent ) 
+        ; Wr . PutText ( LWrT , Wr . EOL )
+        ; Wr . PutText ( LWrT , LBlanks )
+        ; Wr . PutText ( LWrT , "LrBolTokMark:{" )
+        ; Wr . PutText
+            ( LWrT , Marks . MarkImage ( TLinesRefMeat . LrBolTokMark ) ) 
+            
+        ; Wr . PutText ( LWrT , Wr . EOL )
+        ; Wr . PutText ( LWrT , LBlanks )
+        ; Wr . PutText ( LWrT , "LrTextAddrArray:" ) 
+        ; Wr . PutText
+            ( LWrT , RefanyImage ( TLinesRefMeat . LrTextAttrArrayRef ) ) 
+        ; Wr . PutChar ( LWrT , '}' )
+        
+        ; Wr . PutText ( LWrT , Wr . EOL )
+        ; Wr . PutText ( LWrT , LBlanks )
+        ; Wr . PutText ( LWrT , "LrLineErrArray:" ) 
+        ; Wr . PutText
+            ( LWrT , RefanyImage ( TLinesRefMeat . LrLineErrArrayRef ) ) 
+        
+        ; Wr . PutText ( LWrT , Wr . EOL )
+        ; Wr . PutText ( LWrT , LBlanks )
+        ; Wr . PutText ( LWrT , "LrVisibleIn:" ) 
+        ; Wr . PutText
+            ( LWrT , WindowNoSetImage 
+                ( TLinesRefMeat . LrVisibleIn , LFullIndent )
+            ) 
+        ; Wr . PutText ( LWrT , " LrLineCt:" )
+        ; Wr . PutText ( LWrT , Fmt . Int ( TLinesRefMeat . LrLineCt ) ) 
+        ; Wr . PutText ( LWrT , " LrIsStopper:" ) 
+        ; Wr . PutText
+            ( LWrT , BoolImage ( TLinesRefMeat . LrIsStopper ) ) 
+        ; Wr . PutText ( LWrT , " LrHasMark:" ) 
+        ; Wr . PutText ( LWrT , BoolImage ( TLinesRefMeat . LrHasMark ) )
+        ; Wr . PutText ( LWrT , " LrFromPos:" ) 
+        ; Wr . PutText ( LWrT , Fmt . Int ( TLinesRefMeat . LrFromPos ) ) 
+        ; Wr . PutText ( LWrT , " LrLineLen:" ) 
+        ; Wr . PutText ( LWrT , Fmt . Int ( TLinesRefMeat . LrLineLen ) ) 
+        
+        ; Wr . PutText ( LWrT , Wr . EOL )
+        ; Wr . PutText ( LWrT , LBlanks )
+        ; Wr . PutText ( LWrT , "LrLineText:" ) 
+        ; Wr . PutText
+            ( LWrT
+            , Misc . QuoteText ( NonNilText ( TLinesRefMeat . LrLineText ) )
+            )
+
+        ELSE 
+        END (* TYPECASE *)
+      ; LResult := TextWr . ToText ( LWrT )
+      ; RETURN LResult 
+      END (* IF *) 
+    END LinesRefImage 
+
+
+(*
+  ; PROCEDURE DumpHeader ( FHeader : LinesRefTyp ; NodeNo : INTEGER ) )
+
+    = BEGIN
+        Wr . PutText ( WrT , "NodeNo:" )
+      ; WI ( NodeNo )
+      ; Wr . PutChar ( WrT , ' ' )
+      ; IF FHeader = NIL
+        THEN Wr . PutText ( WrT , "NIL" )
+        ELSE 
+          WX ( FHeader ) 
+        ; Wr . PutText ( WrT , " LrLeftLink: " )
+        ; WX ( FHeader . LrLeftLink ) 
+        ; Wr . PutText ( WrT , " LrRightLink: " )
+        ; WX ( FHeader . LrRightLink )
+        END (* IF *) 
+      ; Wr . PutText ( Wr . EOL )
+      END DumpHeader
+
+  ; PROCEDURE Dump ( FLinesRef : LinesRefTyp ; NodeNo : INTEGER ) )
+
+    = BEGIN
+        DumpHeader ( FLinesRef , NodeNo )
+      ; TYPECASE FLinesRef
+        OF NIL =>
+        | LinesRefMeatTyp ( TLinesRefMeat )
+        
+        ELSE
+        END (* TYPECASE *) 
+      END Dump
+*)
+
+(* EXPORTED: *)
+; PROCEDURE WriteLinesListToStdout  
+    ( StartLinesRef : LinesRefTyp ; Lang : LbeStd . LangTyp )
+
+  = BEGIN
+      WriteLinesListWr
+        ( Stdio . stdout , StartLinesRef , Lang , "Stdout:" ) 
+    END WriteLinesListToStdout 
+
+(* EXPORTED: *)
+; PROCEDURE WriteLinesListToFile 
+    ( FileName : TEXT ; StartLinesRef : LinesRefTyp ; Lang : LbeStd . LangTyp )
+
+  = VAR LWrT : Wr . T
+
+  ; BEGIN
+      LWrT := VersionedFiles . OpenWrite ( FileName ) 
+    ; WriteLinesListWr
+        ( LWrT , StartLinesRef
+        , Lang
+        , "LinesListDump file: \"" & FileName & "\""
+        )
+    ; Wr . Close ( LWrT ) 
+    END WriteLinesListToFile 
+
+(* EXPORTED: *)
+; PROCEDURE WriteLinesListWr
+    ( WrT : Wr . T
+    ; StartLinesRef : LinesRefTyp
+    ; Lang : LbeStd . LangTyp
+    ; FileLabel : TEXT
+    )
+  RAISES { Nonlinear , Thread . Alerted , Wr . Failure } 
+  (* May be circular, with or without a header, or linear with NILs at ends. *)
+
+  = VAR LLinesRef : LinesRefTyp
+  ; VAR LHeader : LinesRefTyp
+  ; VAR LIndent : INTEGER := 0  
+
+  ; PROCEDURE WllMoveLeft ( VAR FLinesRef : LinesRefTyp )
+    : BOOLEAN (* Succeeded. *)
+    RAISES { Thread . Alerted , Wr . Failure } 
+    
+    = BEGIN
+        IF FLinesRef . LrLeftLink = NIL
+        THEN   
+          Wr . PutText ( WrT , "NIL LrLeftLink: " ) 
+        ; Wr . PutText ( WrT , Wr . EOL ) 
+        ; Wr . PutText ( WrT , LinesRefImage ( FLinesRef , LIndent ) ) 
+        ; RETURN FALSE 
+        ELSIF FLinesRef . LrLeftLink . LrRightLink # FLinesRef
+        THEN
+          Wr . PutText ( WrT , "Links to left don't match:" ) 
+        ; Wr . PutText ( WrT , Wr . EOL ) 
+        ; Wr . PutText ( WrT , LinesRefImage ( FLinesRef . LrLeftLink , LIndent ) ) 
+        ; Wr . PutText ( WrT , Wr . EOL ) 
+        ; Wr . PutText ( WrT , LinesRefImage ( FLinesRef , LIndent ) ) 
+        ; RETURN FALSE 
+        ELSE
+          FLinesRef := FLinesRef . LrLeftLink
+        ; RETURN TRUE 
+        END (* IF *) 
+      END WllMoveLeft 
+
+  ; PROCEDURE WllMoveRight ( VAR FLinesRef : LinesRefTyp )
+    : BOOLEAN (* Succeeded. *) 
+    RAISES { Thread . Alerted , Wr . Failure } 
+    = BEGIN
+        IF FLinesRef . LrRightLink = NIL
+        THEN   
+          Wr . PutText ( WrT , "NIL LrRightLink:" ) 
+        ; Wr . PutText ( WrT , Wr . EOL ) 
+        ; Wr . PutText ( WrT , LinesRefImage ( FLinesRef , LIndent ) ) 
+        ; RETURN FALSE 
+        ELSIF FLinesRef . LrRightLink . LrLeftLink # FLinesRef
+        THEN
+          Wr . PutText ( WrT , "Links to right don't match:" ) 
+        ; Wr . PutText ( WrT , Wr . EOL ) 
+        ; Wr . PutText ( WrT , LinesRefImage ( FLinesRef , LIndent ) ) 
+        ; Wr . PutText ( WrT , Wr . EOL ) 
+        ; Wr . PutText ( WrT , LinesRefImage ( FLinesRef . LrRightLink , LIndent ) ) 
+        ; RETURN FALSE 
+        ELSE
+          FLinesRef := FLinesRef . LrRightLink
+        ; RETURN TRUE 
+        END (* IF *) 
+      END WllMoveRight
+
+  ; BEGIN (* WriteLinesListWr *)
+  
+    (* Ascertain what sort of cobweb we have. *) 
+      LLinesRef := StartLinesRef
+    ; TYPECASE LLinesRef
+      OF NULL
+      => Wr . PutText ( WrT , "NIL" )
+      ; Wr . PutText ( WrT , Wr . EOL )
+      ; RETURN
+      
+      | LinesRefMeatTyp ( TLinesRefMeat )
+      => (* Starting in the middle of a list. *)
+        (* Look for left end. *) 
+        LOOP
+          TYPECASE LLinesRef . LrLeftLink
+          OF NULL 
+          =>  Wr . PutText ( WrT , "No header on left." )
+            ; Wr . PutText ( WrT , Wr . EOL )
+            ; LHeader := NIL 
+            ; EXIT
+          
+          | LinesRefMeatTyp ( TLeftLinesRefMeat )
+           => IF TLeftLinesRefMeat = StartLinesRef
+            THEN
+              Wr . PutText ( WrT , "Circular with no header." ) 
+            ; Wr . PutText ( WrT , Wr . EOL )
+            ; LHeader := NIL 
+            ; LLinesRef := StartLinesRef 
+            ; EXIT 
+            ELSE
+              IF NOT WllMoveLeft ( LLinesRef ) THEN EXIT 
+           (* ELSE loop. *)
+              END (* IF *) 
+            END (*( IF *)
+            
+          ELSE (* List header is to the left:*)
+            LHeader := LLinesRef . LrLeftLink 
+          ; Wr . PutText ( WrT , Wr . EOL ) 
+          ; Wr . PutText ( WrT , LinesRefImage ( LHeader , LIndent ) ) 
+          ; EXIT 
+          END (* TYPECASE *) 
+        END (* LOOP *)
+        
+      ELSE (* Starting with a list header. *)
+        LHeader := LLinesRef
+      ; Wr . PutText ( WrT , Wr . EOL ) 
+      ; Wr . PutText ( WrT , LinesRefImage ( LHeader , LIndent ) ) 
+      ; IF NOT WllMoveRight ( LLinesRef ) THEN RETURN END (* IF *)
+      END (* TYPECASE *)
+      
+    (* Write meat nodes left-to-right, starting with LLinesRef. *)
+    ; LOOP 
+        Wr . PutText ( WrT , Wr . EOL ) 
+      ; Wr . PutText ( WrT , LinesRefImage ( LLinesRef , LIndent ) ) 
+      ; TYPECASE LLinesRef . LrRightLink
+        OF NULL
+        => Wr . PutText ( WrT , "No header on right." )
+        ; Wr . PutText ( WrT , Wr . EOL )
+        ; EXIT 
+
+        | LinesRefMeatTyp ( TLinesRefMeat )
+        =>  IF LLinesRef = StartLinesRef
+            THEN 
+              Wr . PutText ( WrT , "Started here:" ) 
+            ; Wr . PutText ( WrT , Wr . EOL )
+            ; Wr . PutText ( WrT , LinesRefImage ( LLinesRef , LIndent ) ) 
+            ; EXIT 
+            END (* IF *)
+          ; IF NOT WllMoveRight ( LLinesRef ) THEN EXIT
+         (* ELSE loop. *) 
+            END (* IF *) 
+          
+        ELSE (* Right node is a header. *) 
+          IF LLinesRef # LHeader
+          THEN
+            Wr . PutText ( WrT , "Extra header." ) 
+          ; Wr . PutText ( WrT , Wr . EOL )
+          ; Wr . PutText ( WrT , LinesRefImage ( LLinesRef , LIndent ) ) 
+          ; IF NOT WllMoveRight ( LLinesRef ) THEN EXIT
+         (* ELSE loop. *) 
+            END (* IF *) 
+          ELSE
+            Wr . PutText ( WrT , "Back to header:" ) 
+          ; Wr . PutText ( WrT , Wr . EOL )
+          ; Wr . PutText ( WrT , LinesRefImage ( LLinesRef , LIndent ) ) 
+          ; EXIT 
+          END (* IF *) 
+        END (* TYPECASE *)
+      END (* LOOP *) 
+    END WriteLinesListWr 
+
+(* EXPORTED: *) 
 ; PROCEDURE TextAttrArrayCt 
     ( ImageTrans : ImageTransientTyp ) : CARDINAL 
 (* NOTE: TextAttrArrayCt and TextAttrElemCt are coded as separate functions
@@ -765,7 +1080,7 @@ MODULE PaintHs
     ; RETURN LResult 
     END TextAttrArrayCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE TextAttrElemCt 
     ( ImageTrans : ImageTransientTyp ) : CARDINAL 
 
@@ -793,7 +1108,7 @@ MODULE PaintHs
     ; RETURN LResult 
     END TextAttrElemCt 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE DisplayTextAttrStats ( ImageTrans : ImageTransientTyp ) 
 
   = VAR LArrayCt : CARDINAL 
@@ -814,7 +1129,7 @@ MODULE PaintHs
         ) 
     END DisplayTextAttrStats 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE InitDefaults ( ImageRef : ImageRefTyp ) : ImageRefTyp 
 
   = BEGIN (* InitDefaults *) 
@@ -823,7 +1138,7 @@ MODULE PaintHs
       RETURN ImageRef 
     END InitDefaults 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE IpInitDefaults ( Ip : ImagePersistentTyp ) 
   : ImagePersistentTyp 
 
@@ -856,7 +1171,7 @@ MODULE PaintHs
     ; RETURN Ip 
     END IpInitDefaults 
 
-(* VISIBLE: *) 
+(* EXPORTED: *) 
 ; PROCEDURE ItInitDefaults ( It : ImageTransientTyp ) 
   : ImageTransientTyp 
 
