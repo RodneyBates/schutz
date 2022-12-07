@@ -1587,7 +1587,201 @@ END (* IF *)
               := Strings . ToText ( LEditedString , WLinesRef . LrFromPos ) 
           END (* IF *) 
         END (* WITH WLinesRef *) 
-      END IfteVerifyNewLines 
+      END IfteVerifyNewLines
+
+(* NEW CODE: *)
+
+  ; PROCEDURE IfteRebuildLists 
+      ( OldEstRoot : EstHs . EstRefTyp
+      ; READONLY OldFromTokMark : Marks . TokMarkTyp 
+      ; READONLY OldToTokMark : Marks . TokMarkTyp
+        (* ^To the Nl at the right of the edited line(s). *) 
+      ; NewEstRoot : EstHs . EstRefTyp 
+      ; READONLY NewFromTokMark : Marks . TokMarkTyp
+      ; VAR NewLinesRefHeader : PaintHs . LinesRefHeaderTyp 
+      ; VAR NewMarksHeader : PaintHs . LineMarkHeaderTyp 
+      ) 
+     RAISES { Backout } 
+
+    = VAR LOldCurLinesRefMeat : PaintHs . LinesRefMeatTyp
+    ; VAR LNewPrevLinesRef : PaintHs . LinesRefHeaderTyp
+    ; VAR LNewCurLinesRefMeat : PaintHs . LinesRefMeatTyp
+    ; VAR LLinesRefMeat : PaintHs . LinesRefMeatTyp
+
+    ; VAR LOldPrevMarkMeat : PaintHs . LineMarkMeatTyp 
+    ; VAR LOldCurMarkMeat : PaintHs . LineMarkMeatTyp 
+    ; VAR LNewPrevMark : PaintHs . LineMarkHeaderTyp 
+    ; VAR LNewCurMarkMeat : PaintHs . LineMarkMeatTyp 
+
+    ; VAR LMarkToCompare : [ - 1 .. 1 ] 
+    ; VAR LLinesToCompare : [ - 1 .. 1 ] 
+    ; VAR LMutualCompare : [ - 1 .. 1 ]
+
+    ; VAR LNewTokMark : Marks . TokMarkTyp
+    
+    ; BEGIN (* IfteRebuildLists *)
+        IF IfteImagePers . IpLineHeaderRef = NIL
+        THEN
+          NewLinesRefHeader := NIL
+        ; LOldCurLinesRefMeat := NIL 
+        ELSE 
+          LOldCurLinesRefMeat := IfteImagePers . IpLineHeaderRef . LrRightLink
+        ; IF LOldCurLinesRefMeat = IfteImagePers . IpLineHeaderRef
+          THEN NewLinesRefHeader := NIL
+          ELSE NewLinesRefHeader := NEW ( PaintHs . LinesRefHeaderTyp )
+          END (* IF *) 
+        END (* IF *) 
+      ; LNewPrevLinesRef := NewLinesRefHeader 
+
+      ; IF IfteImagePers . IpMarkHeader = NIL
+        THEN
+          NewMarksHeader := NIL
+        ; LOldCurMarkMeat := NIL 
+        ELSE
+          LOldCurMarkMeat := IfteImagePers . IpMarkHeader . LmRightLink
+        ; IF LOldCurMarkMeat = IfteImagePers . IpMarkHeader
+          THEN NewMarksHeader := NIL 
+          ELSE NewMarksHeader := NEW ( PaintHs . LineMarkHeaderTyp )
+          END (* IF *) 
+        END (* IF *) 
+      ; LNewPrevMark := NewMarksHeader 
+
+      (* Copy things that are left of the merged region. *)
+      
+      ; LOOP
+          IF LOldCurLinesRefMeat = NIL 
+          THEN (* At end of list.  This shouldn't happen. *) 
+            LLinesToCompare := 0
+          ELSE 
+            LLinesToCompare
+              := Marks . Compare
+                   ( LOldCurLinesRefMeat . LrBolTokMark , OldFromTokMark )
+          END (* IF *)
+          
+        ; IF LOldCurMarkMeat = NIL 
+          THEN (* At end of list.  This shouldn't happen. *)
+            LMarkToCompare := 0
+          ELSE 
+            LMarkToCompare
+              := Marks . Compare
+                   ( LOldCurMarkMeat . LmTokMark , OldFromTokMark ) 
+          END (* IF *)
+          
+        ; IF LLinesToCompare >= 0 AND LMarkToCompare >= 0 
+          THEN (* Done with this portion of both liste. *)
+            EXIT
+          ELSIF LOldCurMarkMeat = NIL
+          THEN (* IMPLIES LOldCurLinesRefMeat # NIL *)
+            LMutualCompare := - 1
+          ELSIF LOldCurLinesRefMeat = NIL
+          THEN LMutualCompare := 1
+          ELSE 
+            LMutualCompare
+              := Marks . Compare
+                   ( LOldCurLinesRefMeat . LrBolTokMark
+                   , LOldCurMarkMeat . LmTokMark
+                   )
+          END (* IF *) 
+
+        ; IF LOldCurLinesRefMeat # NIL
+             AND LMutualCompare # 1 (* LinesRef's TokMark is <= Mark's. *)   
+          THEN (* Copy a LinesRef. *)
+            LNewCurLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp )
+          ; LNewCurLinesRefMeat . LrBolTokMark
+              := LOldCurLinesRefMeat . LrBolTokMark
+          ; LNewCurLinesRefMeat . LrTextAttrArrayRef
+              := LOldCurLinesRefMeat . LrTextAttrArrayRef
+          ; LNewCurLinesRefMeat . LrLineErrArrayRef
+              := LOldCurLinesRefMeat . LrLineErrArrayRef
+          ; LNewCurLinesRefMeat . LrLineCt := LOldCurLinesRefMeat . LrLineCt 
+          ; LNewCurLinesRefMeat . LrVisibleIn
+              := LOldCurLinesRefMeat . LrVisibleIn 
+          ; LNewCurLinesRefMeat . LrIsStopper := LOldCurLinesRefMeat . LrIsStopper
+          ; LNewCurLinesRefMeat . LrHasMark := LOldCurLinesRefMeat . LrHasMark
+          ; LNewCurLinesRefMeat . LrFromPos := LOldCurLinesRefMeat . LrFromPos
+          ; LNewCurLinesRefMeat . LrLineLen := LOldCurLinesRefMeat . LrLineLen
+          ; LNewCurLinesRefMeat . LrLineText
+              := LOldCurLinesRefMeat . LrLineText
+
+          ; LNewPrevLinesRef . LrRightLink := LNewCurLinesRefMeat
+          ; LNewCurLinesRefMeat . LrLeftLink := LNewPrevLinesRef
+          ; LNewPrevLinesRef := LNewCurLinesRefMeat
+          ; IF LOldCurLinesRefMeat . LrRightLink
+               = IfteImagePers . IpLineHeaderRef
+            THEN LOldCurLinesRefMeat := NIL 
+            ELSE LOldCurLinesRefMeat := LOldCurLinesRefMeat . LrRightLink
+                 (* ^Implied NARROW ca'mt faail. *)
+            END (* IF *) 
+          END (* IF *)
+
+        ; IF LOldCurMarkMeat # NIL
+             AND LMutualCompare # - 1 (* Mark's TokMark is <= LinesRef's. *)  
+          THEN (* Copy this mark and all with equal LmTokMark. *) 
+            IF LMutualCompare = 0
+            THEN LLinesRefMeat := LNewPrevLinesRef
+                 (* ^Implied NARROW is OK. *) 
+            ELSE LLinesRefMeat := NIL 
+            END (* IF *) 
+          ; LOOP 
+              LNewCurMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
+            ; LNewCurMarkMeat . LmLinesRef := LLinesRefMeat 
+            ; LNewCurMarkMeat . LmWindowRef := LOldCurMarkMeat . LmWindowRef 
+            ; LNewCurMarkMeat . LmMarkSs := LOldCurMarkMeat . LmMarkSs 
+            ; LNewCurMarkMeat . LmTokMark := LOldCurMarkMeat . LmTokMark 
+            ; LNewCurMarkMeat . LmCharPos := LOldCurMarkMeat . LmCharPos 
+            ; LNewCurMarkMeat . LmLineNo := LOldCurMarkMeat . LmLineNo
+
+            ; LNewPrevMark . LmRightLink := LNewCurMarkMeat
+            ; LNewCurMarkMeat . LmLeftLink := LNewPrevMark
+            ; LNewPrevMark := LNewCurMarkMeat 
+            ; IF LOldCurMarkMeat . LmRightLink = IfteImagePers . IpMarkHeader
+              THEN
+                LOldCurMarkMeat := NIL
+              ; EXIT (* Inner LOOP *) 
+              ELSE
+                LOldPrevMarkMeat := LOldCurMarkMeat
+              ; LOldCurMarkMeat := LOldCurMarkMeat . LmRightLink
+                         (* ^Implied NARROW w'oont phail. *)
+              ; IF NOT Marks . Equal
+                         ( LOldPrevMarkMeat . LmTokMark
+                         , LOldCurMarkMeat . LmTokMark
+                         )
+                THEN EXIT (* Inner LOOP. *) 
+                ELSE (* And go around inner LOOP. *) 
+                END (* IF *) 
+              END (* IF *) 
+            END (* Inner LOOP *) 
+          (* And go around outer LOOP. *) 
+          END (* IF *) 
+        END (* LOOP *)
+
+      (* Recompute things inside the merged region. *)
+
+      ; LNewTokMark := Marks . TokMarkNull  
+
+      (* Adjust things right of the merged region. *)
+
+      (* Complete the lists. *) 
+      ; IF NewLinesRefHeader # NIL
+        THEN
+          LNewPrevLinesRef . LrRightLink := NewLinesRefHeader 
+        ; NewLinesRefHeader . LrLeftLink := LNewPrevLinesRef
+        END (* IF *) 
+
+      ; IF NewMarksHeader # NIL
+        THEN
+          LNewPrevMark . LmRightLink := NewMarksHeader 
+        ; NewMarksHeader . LmLeftLink := LNewPrevMark
+        END (* IF *) 
+
+      END IfteRebuildLists
+
+
+
+(**) 
+
+
+
 
   ; BEGIN (* InnerFlushTempEdit *) 
       VAR LEditedLinesRefMeat : PaintHs . LinesRefMeatTyp 
@@ -1766,11 +1960,12 @@ END (* IF *)
             ) 
         ; SkipBlankLinesToRight 
             ( ImageRef 
-            , (* VA"R *) IfteOldThruLinesRef 
+            , (* VAR *) IfteOldThruLinesRef 
             , LTrailingBlankLinesIncluded 
             ) 
 
-        (* Compute what is expected, from the text editing. *) 
+        (* From the edited text, compute what the new Est is expected to
+           produce. *) 
         ; IfteExpectedBlankLinesBefore := 0 
         ; IfteExpectedString1 := Strings . Empty ( ) 
         ; IfteExpectedString2 := Strings . Empty ( ) 
