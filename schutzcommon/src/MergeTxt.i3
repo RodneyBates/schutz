@@ -35,8 +35,8 @@ INTERFACE MergeTxt
 ; PROCEDURE MergeTextEdit 
     ( Lang : LbeStd . LangTyp 
     ; EstRootRef : EstHs . EstRefTyp 
-    ; StartTokMark : Marks . TokMarkTyp 
-    ; EndTokMark : Marks . TokMarkTyp 
+    ; READONLY StartTokMark : Marks . TokMarkTyp 
+    ; READONLY EndTokMark : Marks . TokMarkTyp 
     ; BlankLineNo : LbeStd . LineNoTyp 
       (* Line number within a blank line mod or EndOfImage. *) 
     ; DelFromPos : LbeStd . LimitedCharNoTyp 
