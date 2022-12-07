@@ -53,7 +53,9 @@ MODULE Marks
 
 (* EXPORTED: *) 
 ; PROCEDURE MarkImage
-    ( Mark : TokMarkTyp ; Lang : LbeStd . LangTyp := LbeStd . LangNull )
+    ( READONLY Mark : TokMarkTyp
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull
+    )
   : TEXT 
 
   = VAR LBlCharPosImage : TEXT := ""  
@@ -85,7 +87,7 @@ MODULE Marks
     END MarkImage 
 
 (* EXPORTED: *) 
-; PROCEDURE Equal ( Left , Right : TokMarkTyp ) : BOOLEAN 
+; PROCEDURE Equal ( READONLY Left , Right : TokMarkTyp ) : BOOLEAN 
   (* Returns FALSE if unordered. *) 
 
   = BEGIN (* Equal *) 
@@ -117,7 +119,7 @@ MODULE Marks
     END Equal 
 
 (* EXPORTED: *) 
-; PROCEDURE Compare ( Left , Right : TokMarkTyp ) : [ - 1 .. 1 ] 
+; PROCEDURE Compare ( READONLY Left , Right : TokMarkTyp ) : [ - 1 .. 1 ] 
   RAISES { Unordered } 
 
   = VAR LResult : [ - 1 .. 1 ] 
@@ -137,9 +139,11 @@ MODULE Marks
          | MarkKindTyp . LeftSibFmtNo  
          => (* LeftSib, LeftSib *)  
            LResult 
-             := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
+             := Integer . Compare
+                  ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
          ; IF LResult = 0 
-           THEN RETURN Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )  
+           THEN RETURN
+                  Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )  
            ELSE RETURN LResult 
            END (* IF *) 
 
@@ -148,7 +152,8 @@ MODULE Marks
          , MarkKindTyp . ChildFmtNo 
          => (* LeftSib, Center. *)  
            LResult 
-             := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
+             := Integer . Compare
+                  ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
          ; IF LResult = 0 
            THEN RETURN - 1 
            ELSE RETURN LResult 
@@ -178,7 +183,8 @@ MODULE Marks
          | MarkKindTyp . LeftSibFmtNo  
          => (* Center, LeftSib *)  
            LResult 
-             := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
+             := Integer . Compare
+                  ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
          ; IF LResult = 0 
            THEN RETURN 1 
            ELSE RETURN LResult 
@@ -189,7 +195,8 @@ MODULE Marks
          , MarkKindTyp . ChildFmtNo 
          => (* Center, Center *) 
            LResult 
-             := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
+             := Integer . Compare
+                  ( Left . TkmEstNodeNo , Right . TkmEstNodeNo ) 
          ; IF LResult = 0 
            THEN (* I could avoid retesting Kind fields, but it would be a
                    cartesian explosion of code.
@@ -257,7 +264,8 @@ MODULE Marks
                    Two LeftSib marks is the only case where this matters.
                 *) 
              LResult 
-               := Integer . Compare ( Left . TkmEstNodeNo , Right . TkmEstNodeNo )  
+               := Integer . Compare
+                    ( Left . TkmEstNodeNo , Right . TkmEstNodeNo )  
            ; IF LResult = 0 
              THEN (* It's really the same node. *) 
                RETURN Integer . Compare ( Left . TkmFmtNo , Right . TkmFmtNo )  
@@ -271,7 +279,7 @@ MODULE Marks
     END Compare 
 
 (* EXPORTED: *) 
-; PROCEDURE IsNull ( Mark : TokMarkTyp ) : BOOLEAN 
+; PROCEDURE IsNull ( READONLY Mark : TokMarkTyp ) : BOOLEAN 
 
   = BEGIN (* IsNull *) 
       RETURN Mark . TkmKind = MarkKindTyp . Null 

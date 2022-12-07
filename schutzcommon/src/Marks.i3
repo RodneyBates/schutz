@@ -138,18 +138,20 @@ INTERFACE Marks
       END (* RECORD  TokMarkTyp *) 
 
 ; PROCEDURE MarkImage
-    ( Mark : TokMarkTyp ; Lang : LbeStd . LangTyp := LbeStd . LangNull )
+    ( READONLY Mark : TokMarkTyp
+    ; Lang : LbeStd . LangTyp := LbeStd . LangNull
+    )
   : TEXT 
 
-; PROCEDURE Equal ( Left , Right : TokMarkTyp ) : BOOLEAN 
+; PROCEDURE Equal ( READONLY Left , Right : TokMarkTyp ) : BOOLEAN 
   (* Returns FALSE if unordered. *) 
 
 ; EXCEPTION Unordered 
 
-; PROCEDURE Compare ( Left , Right : TokMarkTyp ) : [ - 1 .. 1 ] 
+; PROCEDURE Compare ( READONLY Left , Right : TokMarkTyp ) : [ - 1 .. 1 ] 
   RAISES { Unordered } 
 
-; PROCEDURE IsNull ( Mark : TokMarkTyp ) : BOOLEAN 
+; PROCEDURE IsNull ( READONLY Mark : TokMarkTyp ) : BOOLEAN 
 
 ; CONST TokMarkNull 
     = TokMarkTyp 
