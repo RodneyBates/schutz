@@ -311,7 +311,7 @@ INTERFACE PaintHs
     = LineMarkTyp OBJECT END (* OBJECT *) 
 
 ; TYPE LineMarkMeatTyp 
-    = LineMarkTyp 
+    = LineMarkHeaderTyp 
         OBJECT 
           LmWindowRef : WindowRefTyp 
         ; LmLinesRef : LinesRefMeatTyp 
