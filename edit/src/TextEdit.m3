@@ -31,7 +31,8 @@ MODULE TextEdit
 ; IMPORT MergeTxt 
 ; IMPORT MessageCodes 
 ; IMPORT Options 
-; IMPORT PaintHs 
+; IMPORT PaintHs
+; FROM PaintHs IMPORT MarkSsTyp
 ; IMPORT PortTypes 
 ; IMPORT Strings 
 ; IMPORT SyntEdit 
@@ -64,7 +65,7 @@ MODULE TextEdit
          THEN 
            WITH 
              WLoopMarkRec 
-             = LWindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ]
+             = LWindowRef . WrMarks [ MarkSsTyp . MarkSsCursor ]
            DO 
              Display . PaintTempEditedLine 
                ( WindowRef := LWindowRef 
@@ -224,7 +225,7 @@ MODULE TextEdit
                    ( ExpectedString , RegeneratedString ) 
           THEN 
             IF FailureOccurred (* Previously. *) 
-            THEN Assertions . Message ( AFT . A_VerifyEditedLineStringMismatch ) 
+            THEN Assertions . Message ( AFT . A_VerifyEditedLineStringMismatch )
             ELSE 
               FailureOccurred := TRUE 
             ; CantHappen ( AFT . A_VerifyEditedLineStringMismatch ) 
@@ -255,10 +256,8 @@ MODULE TextEdit
         END (* IF *) 
       ELSE 
         IF ExpectedLineCt = 0 
-        THEN 
-          RegeneratedString := Strings . Copy ( ExpectedString ) 
-        ELSE 
-          RegeneratedString := Strings . Empty ( ) 
+        THEN RegeneratedString := Strings . Copy ( ExpectedString ) 
+        ELSE RegeneratedString := Strings . Empty ( ) 
         END (* IF *) 
       END (* IF *) 
     END VerifyEditedLine 
@@ -549,18 +548,16 @@ END (* IF *)
     END UnadjustLineMarksNodeNos 
 
 ; PROCEDURE BruteForceRepairLineMarks 
-    ( ImageRef : PaintHs . ImageTransientTyp ) 
+    ( MarkHeader : PaintHs . LineMarkTyp ) 
 
-  = VAR LImagePers : PaintHs . ImagePersistentTyp 
-  ; VAR LMark : PaintHs . LineMarkMeatTyp 
+  = VAR LMark : PaintHs . LineMarkMeatTyp 
 
   ; BEGIN (* BruteForceRepairLineMarks *) 
-      LImagePers := ImageRef . ItPers 
-    ; IF LImagePers . IpMarkHeader # NIL 
-         AND LImagePers . IpMarkHeader . LmRightLink 
-             # LImagePers . IpMarkHeader 
+      IF MarkHeader # NIL 
+         AND MarkHeader . LmRightLink 
+             # MarkHeader 
       THEN 
-        LMark := LImagePers . IpMarkHeader . LmRightLink 
+        LMark := MarkHeader . LmRightLink 
       ; LOOP 
           IF LMark . LmLinesRef # NIL 
              AND ( NOT Marks . Equal 
@@ -586,7 +583,7 @@ END (* IF *)
               ) 
           ; LMark . LmTokMark := LMark . LmLinesRef . LrBolTokMark 
           END (* IF *) 
-        ; IF LMark . LmRightLink = LImagePers . IpMarkHeader 
+        ; IF LMark . LmRightLink = MarkHeader 
           THEN (* End of list. *) 
             EXIT 
           ELSE 
@@ -761,10 +758,11 @@ END (* IF *)
 
 ; PROCEDURE SkipBlankLinesToLeft 
     ( ImageRef : PaintHs . ImageTransientTyp 
-    ; VAR LinesRefMeat : PaintHs . LinesRefMeatTyp 
+    ; VAR (* IN OUT *) LinesRefMeat : PaintHs . LinesRefMeatTyp 
     ; BlankLineCt : LbeStd . LineNoTyp 
     ) 
-  RAISES { Backout , Thread . Alerted } 
+  RAISES { Backout , Thread . Alerted }
+  (* In whatever LinesRef list is current in ImageRef. *) 
 
   = BEGIN 
       LOOP 
@@ -794,10 +792,11 @@ END (* IF *)
 
 ; PROCEDURE SkipBlankLinesToRight 
     ( ImageRef : PaintHs . ImageTransientTyp 
-    ; VAR LinesRefMeat : PaintHs . LinesRefMeatTyp 
+    ; VAR (* IN OUT *) LinesRefMeat : PaintHs . LinesRefMeatTyp 
     ; BlankLineCt : LbeStd . LineNoTyp 
     ) 
   RAISES { Backout , Thread . Alerted } 
+  (* In whatever LinesRef list is current in ImageRef. *) 
 
   = BEGIN 
       LOOP 
@@ -934,24 +933,30 @@ END (* IF *)
         } 
   ; TYPE RepaintKindSetTyp = SET OF RepaintKindTyp 
 
-  ; VAR IfteImagePers : PaintHs . ImagePersistentTyp 
+  ; VAR IfteImagePers : PaintHs . ImagePersistentTyp
+  ; VAR IfteOldLinesRefHeader : PaintHs . LinesRefTyp 
+  ; VAR IfteNewLinesRefHeader : PaintHs . LinesRefTyp 
+  ; VAR IfteOldMarkHeader : PaintHs . LineMarkTyp
+  ; VAR IfteNewMarkHeader : PaintHs . LineMarkTyp 
   ; VAR IfteLinesRefArray : LinesRefArrayTyp 
   ; VAR IfteNewEstRoot : EstHs . EstRefTyp 
   ; VAR IfteStartBolTokMark : Marks . TokMarkTyp 
-  ; VAR IfteLinesAccountedFor : LbeStd . LineNoTyp 
+  ; VAR IfteLinesRefsAccountedFor : LbeStd . LineNoTyp 
   ; VAR IfteFirstOldActualLineCt : LbeStd . LineNoTyp 
-  ; VAR IfteNewLinesCt : LbeStd . LineNoTyp 
+  ; VAR IfteNewLinesRefCt : LbeStd . LineNoTyp 
+  ; VAR IfteOldEndBolTokMark : Marks . TokMarkTyp 
   ; VAR IfteNewEndBolTokMark : Marks . TokMarkTyp 
+  ; VAR IfteOldFromLinesRefMeat : PaintHs . LinesRefMeatTyp 
   ; VAR IfteSecondOldLinesRef : PaintHs . LinesRefMeatTyp 
-  ; VAR IfteOldFromLinesRef : PaintHs . LinesRefMeatTyp 
   ; VAR IfteOldThruLinesRef : PaintHs . LinesRefMeatTyp 
         (* IfteOld[From|Thru]LinesRef are the range of LinesRefs in the
            old list that are to be unlinked.  This could include blank
            lines before and/or after the line(s) edited, if MergeTxt
            pulled them into its revised set of LinesRefs.
-           It could also be empty (denoted by IfteOldFromLinesRef = NIL)
+           It could also be empty (denoted by IfteOldFromLinesRefMeat = NIL)
            when editing "beyond" EOI. 
         *) 
+  ; VAR IftePrevNewLinesRef : PaintHs . LinesRefHeaderTyp
   ; VAR IfteSuccLinesRef : PaintHs . LinesRefTyp 
         (* Points to the LinesRef following _all_ new LinesRefs. *) 
   ; VAR IfteSuccLinesRefMeat : PaintHs . LinesRefMeatTyp 
@@ -960,13 +965,17 @@ END (* IF *)
   ; VAR IfteNodeNoChange : LbeStd . EstNodeNoTyp 
   ; VAR IfteOldSuccBolTokMark : Marks . TokMarkTyp 
   ; VAR IfteExpectedString1 : Strings . StringTyp 
-  ; VAR IfteExpectedString2 : Strings . StringTyp 
-  ; VAR IfteExpectedBlankLinesBefore : LbeStd . LineNoTyp 
+  ; VAR IfteExpectedString2 : Strings . StringTyp
+  
+  ; VAR IfteExpectedBlankLinesBefore : LbeStd . LineNoTyp
   ; VAR IfteExpectedBlankLinesAfter : LbeStd . LineNoTyp 
   ; VAR IfteActualBlankLinesBefore : LbeStd . LineNoTyp 
   ; VAR IfteActualBlankLinesAfter : LbeStd . LineNoTyp 
-  ; VAR IfteOldEstRoot : LbeStd . EstRootTyp 
+        (* ^Every *displayed* blank line counts in *BlankLines*. *) 
+  ; VAR IfteOldEstRoot : LbeStd . EstRootTyp
+  ; VAR IfteNewMarks : PaintHs . MarkArrayTyp 
 
+(* TODO: Uncalled? remove? *) 
 ; PROCEDURE IfteAdjustLineMarks 
     ( MinNodeNoToAdjust : LbeStd . EstNodeNoTyp 
     ; Bias : LbeStd . EstNodeNoTyp 
@@ -979,7 +988,7 @@ END (* IF *)
   ; VAR LNextNewLinesRef : PaintHs . LinesRefMeatTyp 
   ; VAR LNextOldLineNo : LbeStd . EstNodeNoTyp 
   ; VAR LNextNewLineNo : LbeStd . EstNodeNoTyp 
-    (* The actual lines denoted by IfteOldFromLinesRef through
+    (* The actual lines denoted by IfteOldFromLinesRefMeat through
        IfteOldThruLinesRef correspond almost one-to-one to those
        denoted by elements in IfteLinesRefArray.  Exceptions are when
        a Nl is inserted or deleted.  In each group, we count line
@@ -1001,7 +1010,7 @@ END (* IF *)
              # IfteImagePers . IpMarkHeader 
       THEN 
         LMark := IfteImagePers . IpMarkHeader . LmRightLink 
-      ; LNextOldLinesRef := IfteOldFromLinesRef
+      ; LNextOldLinesRef := IfteOldFromLinesRefMeat
       ; LNextOldLineNo := 0 
       ; LNextNewLinesSs := MarkIdTyp . MiLeadingLine  
       ; LNextNewLineNo := 0 
@@ -1038,15 +1047,15 @@ END (* IF *)
 
         (* Now adjust the mark. *) 
         ; IF ( LNextOldLinesRef # NIL 
-               (* ^Which implies IfteOldFromLinesRef # NIL *) 
+               (* ^Which implies IfteOldFromLinesRefMeat # NIL *) 
                AND Marks . Equal 
                      ( LMark . LmTokMark , LNextOldLinesRef . LrBolTokMark ) 
              ) 
-            OR ( IfteOldFromLinesRef = NIL 
+            OR ( IfteOldFromLinesRefMeat = NIL 
                  AND LMark . LmLineNo <= TempEditRef . TeLineNo 
                ) 
           THEN (* Adjustment involves the newly created LinesRefs. *) 
-            IF LNextOldLinesRef = LinesRef OR IfteOldFromLinesRef = NIL 
+            IF LNextOldLinesRef = LinesRef OR IfteOldFromLinesRefMeat = NIL 
             THEN (* In the the edited region. *) 
               IF InsNlPos # LbeStd . LimitedCharNoInfinity 
               THEN (* We are in a newly split, edited LinesRef. *)  
@@ -1100,7 +1109,7 @@ END (* IF *)
           ; LMark . LmTokMark := LNextNewLinesRef . LrBolTokMark  
           ; LMark . LmLineNo := LNewLineNo - LNextNewLineNo  
           ; LMark . LmLinesRef := LNextNewLinesRef 
-          ; IF LMark . LmMarkSs = PaintHs . MarkSsTyp . MarkSsCursor 
+          ; IF LMark . LmMarkSs = MarkSsTyp . MarkSsCursor 
             THEN 
               INC ( LMark . LmWindowRef . WrCursorLineNoInWindow 
                   , LOldToNewLineNoBias 
@@ -1146,7 +1155,31 @@ END (* IF *)
       END (* IF *) 
     END IfteAdjustLineMarks 
 
-  ; PROCEDURE IfteMakeChanges ( ) 
+; PROCEDURE IfteMakeChanges ( ) 
+    RAISES { Backout }  
+    (* Make changes to non-functional data structures.  Hopefully, we
+       won't crash during these.  If a crash occurs later, we can undo
+       them, with the same hope, before writing a checkpoint and for
+       ignoring the failing operation. 
+    *) 
+
+    = BEGIN 
+        IF IfteSuccLinesRefMeat # NIL 
+        THEN 
+          IfteOldSuccBolTokMark := IfteSuccLinesRefMeat . LrBolTokMark 
+        ; IfteSuccLinesRefMeat . LrBolTokMark := IfteNewEndBolTokMark 
+        END (* IF *) 
+      (* Switch to the new Est and adjust the marks in LinesRefs 
+         beyond the point of change. *) 
+(* TODO: do versions here: Also altered tree, although that will 
+         mainly happen when chars are edited. *)
+      ; ImageRef . ItPers . IpEstRoot := IfteNewEstRoot
+      ; ImageRef . ItPers . IpLineHeaderRef := IfteNewLinesRefHeader 
+      ; ImageRef . ItPers . IpMarkHeader := IfteNewMarkHeader 
+      END IfteMakeChanges 
+
+(* Old version:  
+; PROCEDURE IfteMakeChanges ( ) 
     RAISES { Backout }  
     (* Make changes to non-functional data structures.  Hopefully, we
        won't crash during these.  If a crash occurs later, we can undo
@@ -1157,7 +1190,7 @@ END (* IF *)
     = BEGIN 
       (* Modify the list of LinesRefs. *)
         PaintHs . UnlinkLinesRefRange 
-          ( IfteOldFromLinesRef , IfteOldThruLinesRef ) 
+          ( IfteOldFromLinesRefMeat , IfteOldThruLinesRef ) 
         (* NOTE: There can be marks that point into these LinesRefs.  
                  Patch them later. 
         *) 
@@ -1177,12 +1210,12 @@ END (* IF *)
 
       ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
             TO MarkIdTyp . MiTrailingLine 
-	DO WITH WLinesRef = IfteLinesRefArray [ RLinesRefSs ] 
-	   DO IF WLinesRef # NIL 
+	DO WITH WLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ] 
+	   DO IF WLinesRefMeat # NIL 
 	      THEN 
                 PaintHs . InsertLinesRefToLeft 
                   ( InsertToLeftOfRef := IfteSuccLinesRef 
-                  , RefToInsert := WLinesRef 
+                  , RefToInsert := WLinesRefMeat 
                   ) 
               END (* IF *) 
            END (* WITH *) 
@@ -1201,19 +1234,28 @@ END (* IF *)
 (* TODO: do versions here: Also altered tree, although that will 
          mainly happen when chars are edited. *) 
       ; ImageRef . ItPers . IpEstRoot := IfteNewEstRoot 
-      END IfteMakeChanges 
+      END IfteMakeChanges
+End old version^ *) 
 
-  ; PROCEDURE IfteUndoChanges ( ) 
+  ; PROCEDURE IfteUndoChanges ( )
+    = BEGIN 
+        ImageRef . ItPers . IpEstRoot := IfteOldEstRoot
+      ; ImageRef . ItPers . IpLineHeaderRef := IfteOldLinesRefHeader 
+      ; ImageRef . ItPers . IpMarkHeader := IfteOldMarkHeader 
+      END IfteUndoChanges
+
+(* Old version:  
+    ; PROCEDURE IfteUndoChanges ( ) 
 
     = VAR LSavedCallback : Assertions . QueryProcTyp 
 
     ; BEGIN 
         FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
             TO MarkIdTyp . MiTrailingLine 
-        DO WITH WLinesRef = IfteLinesRefArray [ RLinesRefSs ] 
-           DO IF WLinesRef # NIL 
+        DO WITH WLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ] 
+           DO IF WLinesRefMeat # NIL 
               THEN 
-                PaintHs . UnlinkLinesRef ( WLinesRef ) 
+                PaintHs . UnlinkLinesRef ( WLinesRefMeat ) 
               END (* IF *) 
            END (* WITH *) 
         END (* FOR *) 
@@ -1226,7 +1268,7 @@ END (* IF *)
 
       ; PaintHs . InsertLinesRefRangeToLeft 
           ( InsertToLeftOfRef := IfteSuccLinesRef 
-          , FromLinesRef := IfteOldFromLinesRef 
+          , FromLinesRef := IfteOldFromLinesRefMeat 
           , ThruLinesRef := IfteOldThruLinesRef 
           ) 
       ; IF IfteSuccLinesRefMeat # NIL 
@@ -1261,10 +1303,19 @@ END (* IF *)
           , IfteMaxTouchedNodeNo + 1  
           , IfteNodeNoChange 
           ) 
-      END IfteUndoChanges 
+      END IfteUndoChanges
+End old version^ *) 
 
-  ; PROCEDURE IfteBuildNewLines ( ) 
-    RAISES { Backout , Thread . Alerted } 
+  ; PROCEDURE IfteBuildMergedLinesRefs
+      ( VAR LinesRefArray : LinesRefArrayTyp ) 
+    RAISES { Backout , Thread . Alerted }
+    (* POST:
+         LinesRefArray is filled in with refs to new LinesRefs, some
+           possibly NIL.
+         IfteLinesRefsAccountedFor = number of non-NIL elements of
+           LinesRefArray.  
+         IfteNewEndBolTokMark advanced to leftmost Nl after the merged region.
+    *) 
 
     = VAR LLineCt : LbeStd . LineNoTyp 
     ; VAR LStartBolTokMark : Marks . TokMarkTyp 
@@ -1273,8 +1324,9 @@ END (* IF *)
     ; VAR LLineErrArrayRef : PaintHs . LineErrArrayRefTyp 
     ; VAR LNewLinesNo : LbeStd . LineNoTyp 
 
-    ; BEGIN (* IfteBuildNewLines *) 
-        IfteLinesRefArray := LinesRefArrayNull 
+    ; BEGIN (* IfteBuildMergedLinesRefs *) 
+        LinesRefArray := LinesRefArrayNull 
+      ; IfteLinesRefsAccountedFor := 0 
       ; LNewLinesNo := 0 
       ; LStartBolTokMark := IfteStartBolTokMark 
       ; LLineCt 
@@ -1282,13 +1334,13 @@ END (* IF *)
                ( IfteNewEstRoot , LStartBolTokMark ) 
 
       (* Look for MiLeadingLine *) 
-      ; IF IfteLinesAccountedFor < IfteNewLinesCt  
+      ; IF IfteLinesRefsAccountedFor < IfteNewLinesRefCt  
         THEN 
           IF LLineCt > 0 
           THEN (* We have a new blank line. It will be element 
                   MiLeadingLine. *) 
-            WITH WLinesRef 
-                 = IfteLinesRefArray [ MarkIdTyp . MiLeadingLine ] 
+            WITH WLinesRefMeat 
+                 = LinesRefArray [ MarkIdTyp . MiLeadingLine ] 
             DO RegenerateEditedLine 
                  ( ImageRef := ImageRef 
                  , EstRoot := IfteNewEstRoot 
@@ -1300,25 +1352,25 @@ END (* IF *)
                  , (* VAR *) EndBolTokMark := IfteNewEndBolTokMark 
                  ) 
             ; IfteActualBlankLinesBefore := LLineCt 
-            ; IF LNewLinesNo < IfteNewLinesCt 
+            ; IF LNewLinesNo < IfteNewLinesRefCt 
               THEN 
-                WLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
-              ; WLinesRef . LrBolTokMark := LStartBolTokMark 
-              ; WLinesRef . LrVisibleIn := PaintHs . WindowNoSetEmpty 
-              ; WLinesRef . LrFromPos := 0 
-              ; WLinesRef . LrLineLen := 0 
-              ; WLinesRef . LrLineCt := LLineCt 
-              ; WLinesRef . LrGapAfter := FALSE 
-              ; WLinesRef . LrHasMark := FALSE 
-              ; WLinesRef . LrIsStopper := FALSE 
-              ; WLinesRef . LrLineText := "" 
+                WLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp ) 
+              ; WLinesRefMeat . LrBolTokMark := LStartBolTokMark 
+              ; WLinesRefMeat . LrVisibleIn := PaintHs . WindowNoSetEmpty 
+              ; WLinesRefMeat . LrFromPos := 0 
+              ; WLinesRefMeat . LrLineLen := 0 
+              ; WLinesRefMeat . LrLineCt := LLineCt 
+              ; WLinesRefMeat . LrGapAfter := FALSE 
+              ; WLinesRefMeat . LrHasMark := FALSE 
+              ; WLinesRefMeat . LrIsStopper := FALSE 
+              ; WLinesRefMeat . LrLineText := "" 
 (* CHECK: ^Can we get away with a NIL here instead? (and below, too.) 
              Places in Display do it, but for LrGapAfter = TRUE. *) 
-              ; WLinesRef . LrTextAttrArrayRef := NIL 
-              ; WLinesRef . LrLineErrArrayRef := NIL 
+              ; WLinesRefMeat . LrTextAttrArrayRef := NIL 
+              ; WLinesRefMeat . LrLineErrArrayRef := NIL 
               END (* IF *) 
-            END (* WITH WLinesRef *) 
-          ; INC ( IfteLinesAccountedFor (* , LLineCt *) ) 
+            END (* WITH WLinesRefMeat *) 
+          ; INC ( IfteLinesRefsAccountedFor ) 
           ; LStartBolTokMark := IfteNewEndBolTokMark 
           ; LLineCt 
               := Display . LineCtOfBolTokMark 
@@ -1328,11 +1380,11 @@ END (* IF *)
         END (* IF *) 
 
       (* Look for MiFirstText *) 
-      ; IF IfteLinesAccountedFor < IfteNewLinesCt  
+      ; IF IfteLinesRefsAccountedFor < IfteNewLinesRefCt  
         THEN 
           IF LLineCt = 0 
           THEN (* This is the first text line. *) 
-            WITH WLinesRef = IfteLinesRefArray [ MarkIdTyp . MiFirstText ] 
+            WITH WLinesRefMeat = LinesRefArray [ MarkIdTyp . MiFirstText ] 
             DO RegenerateEditedLine 
                  ( ImageRef := ImageRef 
                  , EstRoot := IfteNewEstRoot 
@@ -1343,26 +1395,26 @@ END (* IF *)
                  , (* VAR *) RegeneratedLineErrArrayRef := LLineErrArrayRef 
                  , (* VAR *) EndBolTokMark := IfteNewEndBolTokMark 
                  ) 
-            ; IF LNewLinesNo < IfteNewLinesCt 
+            ; IF LNewLinesNo < IfteNewLinesRefCt 
               THEN 
-                WLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
-              ; WLinesRef . LrBolTokMark := LStartBolTokMark 
-              ; WLinesRef . LrVisibleIn := PaintHs . WindowNoSetEmpty 
-              ; WLinesRef . LrFromPos 
+                WLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp ) 
+              ; WLinesRefMeat . LrBolTokMark := LStartBolTokMark 
+              ; WLinesRefMeat . LrVisibleIn := PaintHs . WindowNoSetEmpty 
+              ; WLinesRefMeat . LrFromPos 
                   := Strings . PosOf1stNonblank ( LEditedString ) 
-              ; WLinesRef . LrLineLen := Strings . Length ( LEditedString ) 
-              ; WLinesRef . LrLineCt := 0 
-              ; WLinesRef . LrGapAfter := FALSE 
-              ; WLinesRef . LrHasMark := FALSE 
-              ; WLinesRef . LrIsStopper := FALSE 
-              ; WLinesRef . LrLineText 
+              ; WLinesRefMeat . LrLineLen := Strings . Length ( LEditedString ) 
+              ; WLinesRefMeat . LrLineCt := 0 
+              ; WLinesRefMeat . LrGapAfter := FALSE 
+              ; WLinesRefMeat . LrHasMark := FALSE 
+              ; WLinesRefMeat . LrIsStopper := FALSE 
+              ; WLinesRefMeat . LrLineText 
                   := Strings . ToText 
-                       ( LEditedString , WLinesRef . LrFromPos ) 
-              ; WLinesRef . LrTextAttrArrayRef := LTextAttrArrayRef  
-              ; WLinesRef . LrLineErrArrayRef := LLineErrArrayRef  
+                       ( LEditedString , WLinesRefMeat . LrFromPos ) 
+              ; WLinesRefMeat . LrTextAttrArrayRef := LTextAttrArrayRef  
+              ; WLinesRefMeat . LrLineErrArrayRef := LLineErrArrayRef  
               END (* IF *) 
-            END (* WITH WLinesRef *) 
-          ; INC ( IfteLinesAccountedFor ) 
+            END (* WITH WLinesRefMeat *) 
+          ; INC ( IfteLinesRefsAccountedFor ) 
           ; LStartBolTokMark := IfteNewEndBolTokMark 
           ; LLineCt 
               := Display . LineCtOfBolTokMark 
@@ -1372,11 +1424,11 @@ END (* IF *)
         END (* IF *) 
 
       (* Look for MiSecondText *) 
-      ; IF IfteLinesAccountedFor < IfteNewLinesCt 
+      ; IF IfteLinesRefsAccountedFor < IfteNewLinesRefCt 
         THEN 
           IF LLineCt = 0 
           THEN (* This is the second text line. *) 
-            WITH WLinesRef = IfteLinesRefArray [ MarkIdTyp . MiSecondText ] 
+            WITH WLinesRefMeat = LinesRefArray [ MarkIdTyp . MiSecondText ] 
             DO RegenerateEditedLine 
                  ( ImageRef := ImageRef 
                  , EstRoot := IfteNewEstRoot 
@@ -1387,26 +1439,26 @@ END (* IF *)
                  , (* VAR *) RegeneratedLineErrArrayRef := LLineErrArrayRef 
                  , (* VAR *) EndBolTokMark := IfteNewEndBolTokMark 
                  ) 
-            ; IF LNewLinesNo < IfteNewLinesCt 
+            ; IF LNewLinesNo < IfteNewLinesRefCt 
               THEN 
-                WLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
-              ; WLinesRef . LrBolTokMark := LStartBolTokMark 
-              ; WLinesRef . LrVisibleIn := PaintHs . WindowNoSetEmpty 
-              ; WLinesRef . LrFromPos 
+                WLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp ) 
+              ; WLinesRefMeat . LrBolTokMark := LStartBolTokMark 
+              ; WLinesRefMeat . LrVisibleIn := PaintHs . WindowNoSetEmpty 
+              ; WLinesRefMeat . LrFromPos 
                   := Strings . PosOf1stNonblank ( LEditedString ) 
-              ; WLinesRef . LrLineLen := Strings . Length ( LEditedString ) 
-              ; WLinesRef . LrLineCt := 0 
-              ; WLinesRef . LrGapAfter := FALSE 
-              ; WLinesRef . LrHasMark := FALSE 
-              ; WLinesRef . LrIsStopper := FALSE 
-              ; WLinesRef . LrLineText 
+              ; WLinesRefMeat . LrLineLen := Strings . Length ( LEditedString ) 
+              ; WLinesRefMeat . LrLineCt := 0 
+              ; WLinesRefMeat . LrGapAfter := FALSE 
+              ; WLinesRefMeat . LrHasMark := FALSE 
+              ; WLinesRefMeat . LrIsStopper := FALSE 
+              ; WLinesRefMeat . LrLineText 
                   := Strings . ToText 
-                       ( LEditedString , WLinesRef . LrFromPos ) 
-              ; WLinesRef . LrTextAttrArrayRef := LTextAttrArrayRef  
-              ; WLinesRef . LrLineErrArrayRef := LLineErrArrayRef  
+                       ( LEditedString , WLinesRefMeat . LrFromPos ) 
+              ; WLinesRefMeat . LrTextAttrArrayRef := LTextAttrArrayRef  
+              ; WLinesRefMeat . LrLineErrArrayRef := LLineErrArrayRef  
               END (* IF *) 
-            END (* WITH WLinesRef *) 
-          ; INC ( IfteLinesAccountedFor ) 
+            END (* WITH WLinesRefMeat *) 
+          ; INC ( IfteLinesRefsAccountedFor ) 
           ; LStartBolTokMark := IfteNewEndBolTokMark 
           ; LLineCt 
               := Display . LineCtOfBolTokMark 
@@ -1416,9 +1468,9 @@ END (* IF *)
         END (* IF *) 
 
       (* Look for MiTrailingLine *) 
-      ; IF IfteLinesAccountedFor < IfteNewLinesCt  
+      ; IF IfteLinesRefsAccountedFor < IfteNewLinesRefCt  
         THEN 
-          WITH WLinesRef = IfteLinesRefArray [ MarkIdTyp . MiTrailingLine ] 
+          WITH WLinesRefMeat = LinesRefArray [ MarkIdTyp . MiTrailingLine ] 
           DO RegenerateEditedLine 
                ( ImageRef := ImageRef 
                , EstRoot := IfteNewEstRoot 
@@ -1429,41 +1481,44 @@ END (* IF *)
                , (* VAR *) EndBolTokMark := IfteNewEndBolTokMark 
                ) 
           ; IfteActualBlankLinesAfter := LLineCt 
-          ; IF LNewLinesNo < IfteNewLinesCt 
+          ; IF LNewLinesNo < IfteNewLinesRefCt 
             THEN 
-              WLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
-            ; WLinesRef . LrBolTokMark := LStartBolTokMark 
-            ; WLinesRef . LrVisibleIn := PaintHs . WindowNoSetEmpty 
-            ; WLinesRef . LrFromPos := 0 
-            ; WLinesRef . LrLineLen := 0 
-            ; WLinesRef . LrLineCt := LLineCt 
-            ; WLinesRef . LrGapAfter := FALSE 
-            ; WLinesRef . LrHasMark := FALSE 
-            ; WLinesRef . LrIsStopper := FALSE 
-            ; WLinesRef . LrLineText := "" 
-            ; WLinesRef . LrTextAttrArrayRef := NIL 
-            ; WLinesRef . LrLineErrArrayRef := NIL 
+              WLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp ) 
+            ; WLinesRefMeat . LrBolTokMark := LStartBolTokMark 
+            ; WLinesRefMeat . LrVisibleIn := PaintHs . WindowNoSetEmpty 
+            ; WLinesRefMeat . LrFromPos := 0 
+            ; WLinesRefMeat . LrLineLen := 0 
+            ; WLinesRefMeat . LrLineCt := LLineCt 
+            ; WLinesRefMeat . LrGapAfter := FALSE 
+            ; WLinesRefMeat . LrHasMark := FALSE 
+            ; WLinesRefMeat . LrIsStopper := FALSE 
+            ; WLinesRefMeat . LrLineText := "" 
+            ; WLinesRefMeat . LrTextAttrArrayRef := NIL 
+            ; WLinesRefMeat . LrLineErrArrayRef := NIL 
             END (* IF *) 
-          END (* WITH WLinesRef *) 
-        ; INC ( IfteLinesAccountedFor (* , LLineCt *) ) 
+          END (* WITH WLinesRefMeat *) 
+        ; INC ( IfteLinesRefsAccountedFor ) 
         END (* IF *) 
-      END IfteBuildNewLines 
+      END IfteBuildMergedLinesRefs 
 
-  ; PROCEDURE IfteVerifyNewLines ( ) 
-    RAISES { Backout , Thread . Alerted } 
+  ; PROCEDURE IfteVerifyMergedLinesRefs
+      ( READONLY LinesRefArray : LinesRefArrayTyp ) 
+    RAISES { Backout , Thread . Alerted }
+    (* Verify that the elements of LinesRefArray can be regenerated
+       by Est traversal. *) 
 
     = VAR LStartBolTokMark : Marks . TokMarkTyp 
     ; VAR LEndBolTokMark : Marks . TokMarkTyp 
     ; VAR LEditedString : Strings . StringTyp 
     ; VAR LFailureOccurred : BOOLEAN 
 
-    ; BEGIN (* IfteVerifyNewLines *) 
+    ; BEGIN (* IfteVerifyMergedLinesRefs *) 
         LFailureOccurred := FALSE 
       ; LStartBolTokMark := IfteStartBolTokMark 
 
       (* Look for MiLeadingLine *) 
-      ; WITH WLinesRef = IfteLinesRefArray [ MarkIdTyp . MiLeadingLine ] 
-        DO IF WLinesRef = NIL 
+      ; WITH WLinesRefMeat = LinesRefArray [ MarkIdTyp . MiLeadingLine ] 
+        DO IF WLinesRefMeat = NIL 
           THEN 
             Assert 
               ( IfteExpectedBlankLinesBefore = 0 
@@ -1481,21 +1536,21 @@ END (* IF *)
               , ExpectedString := Strings . Empty ( ) 
               , (* VAR *) RegeneratedString := LEditedString 
               , (* VAR *) RegeneratedTextAttrArrayRef 
-                            := WLinesRef . LrTextAttrArrayRef 
+                            := WLinesRefMeat . LrTextAttrArrayRef 
               , (* VAR *) RegeneratedLineErrArrayRef 
-                            := WLinesRef . LrLineErrArrayRef 
+                            := WLinesRefMeat . LrLineErrArrayRef 
               , (* VAR *) EndBolTokMark := LEndBolTokMark 
               , (* IN OUT *) FailureOccurred := LFailureOccurred 
               ) 
-          ; WLinesRef . LrLineText 
-              := Strings . ToText ( LEditedString , WLinesRef . LrFromPos ) 
+          ; WLinesRefMeat . LrLineText 
+              := Strings . ToText ( LEditedString , WLinesRefMeat . LrFromPos ) 
           ; LStartBolTokMark := LEndBolTokMark 
           END (* IF *) 
-        END (* WITH WLinesRef *) 
+        END (* WITH WLinesRefMeat *) 
 
       (* Look for MiFirstText *) 
-      ; WITH WLinesRef = IfteLinesRefArray [ MarkIdTyp . MiFirstText ] 
-        DO IF WLinesRef = NIL 
+      ; WITH WLinesRefMeat = LinesRefArray [ MarkIdTyp . MiFirstText ] 
+        DO IF WLinesRefMeat = NIL 
           THEN
             Assert 
               ( Strings . Length ( IfteExpectedString1 ) = 0 
@@ -1511,21 +1566,21 @@ END (* IF *)
                  , ExpectedString := IfteExpectedString1 
                  , (* VAR *) RegeneratedString := LEditedString  
                  , (* VAR *) RegeneratedTextAttrArrayRef 
-                     := WLinesRef . LrTextAttrArrayRef 
+                     := WLinesRefMeat . LrTextAttrArrayRef 
                  , (* VAR *) RegeneratedLineErrArrayRef 
-                     := WLinesRef . LrLineErrArrayRef 
+                     := WLinesRefMeat . LrLineErrArrayRef 
                  , (* VAR *) EndBolTokMark := LEndBolTokMark 
                  , (* IN OUT *) FailureOccurred := LFailureOccurred 
                  ) 
-          ; WLinesRef . LrLineText 
-              := Strings . ToText ( LEditedString , WLinesRef . LrFromPos ) 
+          ; WLinesRefMeat . LrLineText 
+              := Strings . ToText ( LEditedString , WLinesRefMeat . LrFromPos ) 
           ; LStartBolTokMark := LEndBolTokMark 
           END (* IF *) 
-        END (* WITH WLinesRef *) 
+        END (* WITH WLinesRefMeat *) 
 
       (* Look for MiSecondText *) 
-      ; WITH WLinesRef = IfteLinesRefArray [ MarkIdTyp . MiSecondText ] 
-        DO IF WLinesRef = NIL 
+      ; WITH WLinesRefMeat = LinesRefArray [ MarkIdTyp . MiSecondText ] 
+        DO IF WLinesRefMeat = NIL 
           THEN 
             Assert 
               ( Strings . Length ( IfteExpectedString2 ) = 0 
@@ -1545,21 +1600,21 @@ END (* IF *)
               , ExpectedString := IfteExpectedString2  
               , (* VAR *) RegeneratedString := LEditedString   
               , (* VAR *) RegeneratedTextAttrArrayRef 
-                  := WLinesRef . LrTextAttrArrayRef 
+                  := WLinesRefMeat . LrTextAttrArrayRef 
               , (* VAR *) RegeneratedLineErrArrayRef 
-                  := WLinesRef . LrLineErrArrayRef 
+                  := WLinesRefMeat . LrLineErrArrayRef 
               , (* VAR *) EndBolTokMark := LEndBolTokMark 
               , (* IN OUT *) FailureOccurred := LFailureOccurred 
               ) 
-          ; WLinesRef . LrLineText 
-              := Strings . ToText ( LEditedString , WLinesRef . LrFromPos ) 
+          ; WLinesRefMeat . LrLineText 
+              := Strings . ToText ( LEditedString , WLinesRefMeat . LrFromPos ) 
           ; LStartBolTokMark := LEndBolTokMark 
           END (* IF *) 
-        END (* WITH WLinesRef *) 
+        END (* WITH WLinesRefMeat *) 
 
       (* Look for MiTrailingLine *) 
-      ; WITH WLinesRef = IfteLinesRefArray [ MarkIdTyp . MiTrailingLine ] 
-        DO IF WLinesRef = NIL  
+      ; WITH WLinesRefMeat = LinesRefArray [ MarkIdTyp . MiTrailingLine ] 
+        DO IF WLinesRefMeat = NIL  
           THEN
             Assert 
               ( IfteExpectedBlankLinesAfter = 0 
@@ -1577,17 +1632,17 @@ END (* IF *)
                , ExpectedString := Strings . Empty ( ) 
                , (* VAR *) RegeneratedString := LEditedString  
                , (* VAR *) RegeneratedTextAttrArrayRef 
-                   := WLinesRef . LrTextAttrArrayRef 
+                   := WLinesRefMeat . LrTextAttrArrayRef 
                , (* VAR *) RegeneratedLineErrArrayRef 
-                   := WLinesRef . LrLineErrArrayRef 
+                   := WLinesRefMeat . LrLineErrArrayRef 
                , (* VAR *) EndBolTokMark := LEndBolTokMark 
                , (* IN OUT *) FailureOccurred := LFailureOccurred 
                ) 
-          ; WLinesRef . LrLineText 
-              := Strings . ToText ( LEditedString , WLinesRef . LrFromPos ) 
+          ; WLinesRefMeat . LrLineText 
+              := Strings . ToText ( LEditedString , WLinesRefMeat . LrFromPos ) 
           END (* IF *) 
-        END (* WITH WLinesRef *) 
-      END IfteVerifyNewLines
+        END (* WITH WLinesRefMeat *) 
+      END IfteVerifyMergedLinesRefs
 
 (* NEW CODE: *)
 
@@ -1599,185 +1654,395 @@ END (* IF *)
       ; NewEstRoot : EstHs . EstRefTyp 
       ; READONLY NewFromTokMark : Marks . TokMarkTyp
       ; VAR NewLinesRefHeader : PaintHs . LinesRefHeaderTyp 
-      ; VAR NewMarksHeader : PaintHs . LineMarkHeaderTyp 
+      ; VAR NewMarkHeader : PaintHs . LineMarkTyp 
       ) 
      RAISES { Backout } 
 
-    = VAR LOldCurLinesRefMeat : PaintHs . LinesRefMeatTyp
-    ; VAR LNewPrevLinesRef : PaintHs . LinesRefHeaderTyp
-    ; VAR LNewCurLinesRefMeat : PaintHs . LinesRefMeatTyp
-    ; VAR LLinesRefMeat : PaintHs . LinesRefMeatTyp
+    = VAR IfteRblCurOldLinesRefMeat : PaintHs . LinesRefMeatTyp
+    ; VAR IfteRblCurNewLinesRefMeat : PaintHs . LinesRefMeatTyp
+    ; VAR IfteRblMarkLinesRefMeat : PaintHs . LinesRefMeatTyp
 
-    ; VAR LOldPrevMarkMeat : PaintHs . LineMarkMeatTyp 
-    ; VAR LOldCurMarkMeat : PaintHs . LineMarkMeatTyp 
-    ; VAR LNewPrevMark : PaintHs . LineMarkHeaderTyp 
-    ; VAR LNewCurMarkMeat : PaintHs . LineMarkMeatTyp 
+    ; VAR IfteRblPrevOldMarkMeat : PaintHs . LineMarkMeatTyp 
+    ; VAR IfteRblCurOldMarkMeat : PaintHs . LineMarkMeatTyp 
+    ; VAR IfteRblPrevNewMark : PaintHs . LineMarkHeaderTyp 
+    ; VAR IfteRblCurNewMarkMeat : PaintHs . LineMarkMeatTyp 
 
-    ; VAR LMarkToCompare : [ - 1 .. 1 ] 
-    ; VAR LLinesToCompare : [ - 1 .. 1 ] 
-    ; VAR LMutualCompare : [ - 1 .. 1 ]
+    ; VAR IfteRblMergeLineNo : LbeStd . LineNoTyp 
+    ; VAR IfteRblMergeMiddleLineNo : LbeStd . LineNoTyp 
+    ; VAR IfteRblPrevNewMergeToLineNo : LbeStd . LineNoTyp 
+    ; VAR IfteRblCurNewMergeToLineNo : LbeStd . LineNoTyp
+    ; VAR IfteRblOldLineCtToLeft : LbeStd . LineNoTyp
 
-    ; VAR LNewTokMark : Marks . TokMarkTyp
-    
-    ; BEGIN (* IfteRebuildLists *)
-        IF IfteImagePers . IpLineHeaderRef = NIL
-        THEN
-          NewLinesRefHeader := NIL
-        ; LOldCurLinesRefMeat := NIL 
-        ELSE 
-          LOldCurLinesRefMeat := IfteImagePers . IpLineHeaderRef . LrRightLink
-        ; IF LOldCurLinesRefMeat = IfteImagePers . IpLineHeaderRef
-          THEN NewLinesRefHeader := NIL
-          ELSE NewLinesRefHeader := NEW ( PaintHs . LinesRefHeaderTyp )
-          END (* IF *) 
-        END (* IF *) 
-      ; LNewPrevLinesRef := NewLinesRefHeader 
+    ; VAR IfteRblNewCharPos : LbeStd . LimitedCharNoSignedTyp 
 
-      ; IF IfteImagePers . IpMarkHeader = NIL
-        THEN
-          NewMarksHeader := NIL
-        ; LOldCurMarkMeat := NIL 
-        ELSE
-          LOldCurMarkMeat := IfteImagePers . IpMarkHeader . LmRightLink
-        ; IF LOldCurMarkMeat = IfteImagePers . IpMarkHeader
-          THEN NewMarksHeader := NIL 
-          ELSE NewMarksHeader := NEW ( PaintHs . LineMarkHeaderTyp )
-          END (* IF *) 
-        END (* IF *) 
-      ; LNewPrevMark := NewMarksHeader 
+    ; VAR IfteRblCmpMarkTo : [ - 1 .. 1 ] 
+    ; VAR IfteRblCmpLinesTo : [ - 1 .. 1 ] 
+    ; VAR IfteRblCmpMutual : [ - 1 .. 1 ]
+    ; VAR IfteRblCmpMarks : [ - 1 .. 1 ]
 
-      (* Copy things that are left of the merged region. *)
-      
-      ; LOOP
-          IF LOldCurLinesRefMeat = NIL 
-          THEN (* At end of list.  This shouldn't happen. *) 
-            LLinesToCompare := 0
-          ELSE 
-            LLinesToCompare
-              := Marks . Compare
-                   ( LOldCurLinesRefMeat . LrBolTokMark , OldFromTokMark )
-          END (* IF *)
-          
-        ; IF LOldCurMarkMeat = NIL 
-          THEN (* At end of list.  This shouldn't happen. *)
-            LMarkToCompare := 0
-          ELSE 
-            LMarkToCompare
-              := Marks . Compare
-                   ( LOldCurMarkMeat . LmTokMark , OldFromTokMark ) 
-          END (* IF *)
-          
-        ; IF LLinesToCompare >= 0 AND LMarkToCompare >= 0 
-          THEN (* Done with this portion of both liste. *)
-            EXIT
-          ELSIF LOldCurMarkMeat = NIL
-          THEN (* IMPLIES LOldCurLinesRefMeat # NIL *)
-            LMutualCompare := - 1
-          ELSIF LOldCurLinesRefMeat = NIL
-          THEN LMutualCompare := 1
-          ELSE 
-            LMutualCompare
-              := Marks . Compare
-                   ( LOldCurLinesRefMeat . LrBolTokMark
-                   , LOldCurMarkMeat . LmTokMark
-                   )
-          END (* IF *) 
+    ; VAR IfteRblIn2ndOldLinesRef : BOOLEAN 
 
-        ; IF LOldCurLinesRefMeat # NIL
-             AND LMutualCompare # 1 (* LinesRef's TokMark is <= Mark's. *)   
-          THEN (* Copy a LinesRef. *)
-            LNewCurLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp )
-          ; LNewCurLinesRefMeat . LrBolTokMark
-              := LOldCurLinesRefMeat . LrBolTokMark
-          ; LNewCurLinesRefMeat . LrTextAttrArrayRef
-              := LOldCurLinesRefMeat . LrTextAttrArrayRef
-          ; LNewCurLinesRefMeat . LrLineErrArrayRef
-              := LOldCurLinesRefMeat . LrLineErrArrayRef
-          ; LNewCurLinesRefMeat . LrLineCt := LOldCurLinesRefMeat . LrLineCt 
-          ; LNewCurLinesRefMeat . LrVisibleIn
-              := LOldCurLinesRefMeat . LrVisibleIn 
-          ; LNewCurLinesRefMeat . LrIsStopper := LOldCurLinesRefMeat . LrIsStopper
-          ; LNewCurLinesRefMeat . LrHasMark := LOldCurLinesRefMeat . LrHasMark
-          ; LNewCurLinesRefMeat . LrFromPos := LOldCurLinesRefMeat . LrFromPos
-          ; LNewCurLinesRefMeat . LrLineLen := LOldCurLinesRefMeat . LrLineLen
-          ; LNewCurLinesRefMeat . LrLineText
-              := LOldCurLinesRefMeat . LrLineText
+    ; PROCEDURE IfteRblCopyNodes ( Bias : LbeStd . EstNodeNoTyp)
+      (* Copy nodes. *)
 
-          ; LNewPrevLinesRef . LrRightLink := LNewCurLinesRefMeat
-          ; LNewCurLinesRefMeat . LrLeftLink := LNewPrevLinesRef
-          ; LNewPrevLinesRef := LNewCurLinesRefMeat
-          ; IF LOldCurLinesRefMeat . LrRightLink
-               = IfteImagePers . IpLineHeaderRef
-            THEN LOldCurLinesRefMeat := NIL 
-            ELSE LOldCurLinesRefMeat := LOldCurLinesRefMeat . LrRightLink
-                 (* ^Implied NARROW ca'mt faail. *)
+      = BEGIN
+          LOOP (* Thru' lists of LinesRefs and Marks, while matching
+                  pairs with equal TokMarks. *) 
+            IF IfteRblCurOldLinesRefMeat = NIL 
+            THEN (* At end of LinesRef list. *) 
+              IfteRblCmpLinesTo := 0
+            ELSE
+              TRY 
+                IfteRblCmpLinesTo
+                  := Marks . Compare
+                       ( IfteRblCurOldLinesRefMeat . LrBolTokMark
+                       , OldFromTokMark
+                       )
+              EXCEPT Marks . Unordered
+              => <* ASSERT FALSE , "Marks.Unordered." *> 
+              END (* EXCEPT *)
+            END (* IF *)
+
+          ; IF IfteRblCurOldMarkMeat = NIL 
+            THEN (* At end of Marks list. *)
+              IfteRblCmpMarkTo := 0
+            ELSE 
+              TRY 
+                IfteRblCmpMarkTo
+                  := Marks . Compare
+                       ( IfteRblCurOldMarkMeat . LmTokMark , OldFromTokMark ) 
+              EXCEPT Marks . Unordered 
+              => <* ASSERT FALSE , "Marks.Unordered." *>
+              END (* EXCEPT *)
+            END (* IF *)
+
+          ; IF IfteRblCmpLinesTo >= 0 AND IfteRblCmpMarkTo >= 0 
+            THEN (* Done with this portion of both liste. *)
+              EXIT
+            ELSIF IfteRblCurOldMarkMeat = NIL
+            THEN (* IMPLIES IfteRblCurOldLinesRefMeat # NIL *)
+              IfteRblCmpMutual := - 1 (* Current LinesRef is behind. *) 
+            ELSIF IfteRblCurOldLinesRefMeat = NIL
+            THEN IfteRblCmpMutual := 1 (* Current Mark is behind. *) 
+            ELSE
+              TRY 
+                IfteRblCmpMutual
+                  := Marks . Compare
+                       ( IfteRblCurOldLinesRefMeat . LrBolTokMark
+                       , IfteRblCurOldMarkMeat . LmTokMark
+                       )
+              EXCEPT Marks . Unordered
+              => <* ASSERT FALSE , "Marks.Unordered." *> 
+              END (* EXCEPT *)
             END (* IF *) 
-          END (* IF *)
 
-        ; IF LOldCurMarkMeat # NIL
-             AND LMutualCompare # - 1 (* Mark's TokMark is <= LinesRef's. *)  
-          THEN (* Copy this mark and all with equal LmTokMark. *) 
-            IF LMutualCompare = 0
-            THEN LLinesRefMeat := LNewPrevLinesRef
-                 (* ^Implied NARROW is OK. *) 
-            ELSE LLinesRefMeat := NIL 
-            END (* IF *) 
-          ; LOOP 
-              LNewCurMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
-            ; LNewCurMarkMeat . LmLinesRef := LLinesRefMeat 
-            ; LNewCurMarkMeat . LmWindowRef := LOldCurMarkMeat . LmWindowRef 
-            ; LNewCurMarkMeat . LmMarkSs := LOldCurMarkMeat . LmMarkSs 
-            ; LNewCurMarkMeat . LmTokMark := LOldCurMarkMeat . LmTokMark 
-            ; LNewCurMarkMeat . LmCharPos := LOldCurMarkMeat . LmCharPos 
-            ; LNewCurMarkMeat . LmLineNo := LOldCurMarkMeat . LmLineNo
+          (* Copy a LinesRef, if it is not to the right of current Mark. *) 
+          ; IF IfteRblCmpMutual # 1 (* LinesRef's TokMark is <= Mark's. *)   
+            THEN (* Copy a LinesRef. *)
+              IfteRblCurNewLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp )
+            ; IfteRblCurNewLinesRefMeat . LrBolTokMark
+                := IfteRblCurOldLinesRefMeat . LrBolTokMark
+            ; INC ( IfteRblCurNewLinesRefMeat . LrBolTokMark . TkmEstNodeCt
+                  , Bias
+                  ) 
+            ; IfteRblCurNewLinesRefMeat . LrTextAttrArrayRef
+                := IfteRblCurOldLinesRefMeat . LrTextAttrArrayRef
+            ; IfteRblCurNewLinesRefMeat . LrLineErrArrayRef
+                := IfteRblCurOldLinesRefMeat . LrLineErrArrayRef
+            ; IfteRblCurNewLinesRefMeat . LrLineCt
+                := IfteRblCurOldLinesRefMeat . LrLineCt 
+            ; IfteRblCurNewLinesRefMeat . LrVisibleIn
+                := IfteRblCurOldLinesRefMeat . LrVisibleIn 
+            ; IfteRblCurNewLinesRefMeat . LrIsStopper
+                := IfteRblCurOldLinesRefMeat . LrIsStopper
+            ; IfteRblCurNewLinesRefMeat . LrHasMark
+                := IfteRblCurOldLinesRefMeat . LrHasMark
+            ; IfteRblCurNewLinesRefMeat . LrFromPos
+                := IfteRblCurOldLinesRefMeat . LrFromPos
+            ; IfteRblCurNewLinesRefMeat . LrLineLen
+                := IfteRblCurOldLinesRefMeat . LrLineLen
+            ; IfteRblCurNewLinesRefMeat . LrLineText
+                := IfteRblCurOldLinesRefMeat . LrLineText
 
-            ; LNewPrevMark . LmRightLink := LNewCurMarkMeat
-            ; LNewCurMarkMeat . LmLeftLink := LNewPrevMark
-            ; LNewPrevMark := LNewCurMarkMeat 
-            ; IF LOldCurMarkMeat . LmRightLink = IfteImagePers . IpMarkHeader
-              THEN
-                LOldCurMarkMeat := NIL
-              ; EXIT (* Inner LOOP *) 
-              ELSE
-                LOldPrevMarkMeat := LOldCurMarkMeat
-              ; LOldCurMarkMeat := LOldCurMarkMeat . LmRightLink
-                         (* ^Implied NARROW w'oont phail. *)
-              ; IF NOT Marks . Equal
-                         ( LOldPrevMarkMeat . LmTokMark
-                         , LOldCurMarkMeat . LmTokMark
-                         )
-                THEN EXIT (* Inner LOOP. *) 
-                ELSE (* And go around inner LOOP. *) 
-                END (* IF *) 
+(* CHECK: Do we want to assert  TmNodeCt = node ct in new tree? *)
+
+            ; IftePrevNewLinesRef . LrRightLink := IfteRblCurNewLinesRefMeat
+            ; IfteRblCurNewLinesRefMeat . LrLeftLink := IftePrevNewLinesRef
+            ; IftePrevNewLinesRef := IfteRblCurNewLinesRefMeat
+            ; IF IfteRblCurOldLinesRefMeat . LrRightLink = IfteOldLinesRefHeader
+              THEN IfteRblCurOldLinesRefMeat := NIL 
+              ELSE IfteRblCurOldLinesRefMeat 
+                     := NARROW 
+                          ( IfteRblCurOldLinesRefMeat . LrRightLink 
+                          , PaintHs . LinesRefMeatTyp 
+                          ) (* Ca'nt faail. *) 
               END (* IF *) 
-            END (* Inner LOOP *) 
-          (* And go around outer LOOP. *) 
+            END (* IF *)
+
+          ; IF IfteRblCurOldMarkMeat # NIL
+               AND IfteRblCmpMutual # - 1 (* Mark's TokMark is <= LinesRef's. *)
+            THEN
+
+              (* Copy this Mark and all Marks having equal LmTokMark. *) 
+              IF IfteRblCmpMutual = 0
+              THEN IfteRblMarkLinesRefMeat 
+                     := NARROW 
+                          ( IftePrevNewLinesRef 
+                          , PaintHs . LinesRefMeatTyp 
+                          ) (* Nothik can goo wroong. *) 
+              ELSE IfteRblMarkLinesRefMeat := NIL 
+              END (* IF *) 
+            ; LOOP 
+                IfteRblCurNewMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
+              ; IfteRblCurNewMarkMeat . LmLinesRef := IfteRblMarkLinesRefMeat 
+              ; IfteRblCurNewMarkMeat . LmWindowRef
+                  := IfteRblCurOldMarkMeat . LmWindowRef 
+              ; IfteRblCurNewMarkMeat . LmMarkSs
+                  := IfteRblCurOldMarkMeat . LmMarkSs
+              ; IF IfteRblCurOldMarkMeat . LmWindowRef # NIL 
+                   AND MarkSsTyp . MarkSsStartSel
+                   <= IfteRblCurOldMarkMeat . LmMarkSs
+                   AND IfteRblCurOldMarkMeat . LmMarkSs
+                       <= MarkSsTyp . MarkSsEndSel
+                THEN IfteNewMarks [ IfteRblCurOldMarkMeat . LmMarkSs ] 
+                       := IfteRblCurOldMarkMeat . LmWindowRef
+                            . WrMarks [ IfteRblCurOldMarkMeat . LmMarkSs ]
+                END (* IF *) 
+              ; IfteRblCurNewMarkMeat . LmTokMark
+                  := IfteRblCurOldMarkMeat . LmTokMark 
+              ; INC ( IfteRblCurNewMarkMeat . LmTokMark . TkmEstNodeCt
+                    , Bias
+                    ) 
+              ; IfteRblCurNewMarkMeat . LmCharPos
+                  := IfteRblCurOldMarkMeat . LmCharPos 
+              ; IfteRblCurNewMarkMeat . LmLineNo
+                  := IfteRblCurOldMarkMeat . LmLineNo
+
+(* CHECK: Do we want to assert .TmNodeCt = node ct in new tree? *)
+
+              ; IfteRblPrevNewMark . LmRightLink := IfteRblCurNewMarkMeat
+              ; IfteRblCurNewMarkMeat . LmLeftLink := IfteRblPrevNewMark
+              ; IfteRblPrevNewMark := IfteRblCurNewMarkMeat 
+              ; IfteRblPrevOldMarkMeat := IfteRblCurOldMarkMeat
+              ; IF IfteRblCurOldMarkMeat . LmRightLink = IfteOldMarkHeader
+                THEN
+                  IfteRblCurOldMarkMeat := NIL
+                ; EXIT (* Inner LOOP *) 
+                ELSE
+                  IfteRblCurOldMarkMeat 
+                    := NARROW 
+                         ( IfteRblCurOldMarkMeat . LmRightLink 
+                         , PaintHs . LineMarkMeatTyp 
+                         ) (* ^NARROW w'oont phail. *)
+                ; IF NOT Marks . Equal
+                           ( IfteRblPrevOldMarkMeat . LmTokMark
+                           , IfteRblCurOldMarkMeat . LmTokMark
+                           )
+                  THEN EXIT (* Inner LOOP. *) 
+                  ELSE (* And go around inner LOOP. *) 
+                  END (* IF *) 
+                END (* IF *) 
+              END (* Inner LOOP *) 
+            (* And go around outer LOOP. *) 
+            END (* IF *) 
+          END (* LOOP *)
+        END IfteRblCopyNodes
+        
+    ; BEGIN (* IfteRebuildLists *)
+        IfteNewMarks := PaintHs . MarkArrayTyp { NIL , .. } 
+      ; IF IfteOldLinesRefHeader = NIL
+        THEN (* No old LinesRef list. *) 
+          NewLinesRefHeader := NIL
+        ; IfteRblCurOldLinesRefMeat := NIL
+(* Check: How do we get out of this? *) 
+        ELSE 
+          NewLinesRefHeader := NEW ( PaintHs . LinesRefHeaderTyp )
+        ; IF IfteOldLinesRefHeader = IfteOldLinesRefHeader . LrRightLink 
+          THEN (* Empty old LinesRefList. *) 
+            NewLinesRefHeader . LrLeftLink := NewLinesRefHeader 
+          ; NewLinesRefHeader . LrRightLink := NewLinesRefHeader 
+          ; IfteRblCurOldLinesRefMeat := NIL
+          ELSE IfteRblCurOldLinesRefMeat := IfteOldLinesRefHeader . LrRightLink
           END (* IF *) 
-        END (* LOOP *)
+        END (* IF *) 
+      ; IftePrevNewLinesRef := NewLinesRefHeader 
+
+      ; IF IfteOldMarkHeader = NIL
+        THEN (* No old Marks list. *) 
+          NewMarkHeader := NIL
+        ; IfteRblCurOldMarkMeat := NIL 
+(* Check: How do we get out of this? *) 
+        ELSE
+          NewMarkHeader := NEW ( PaintHs . LineMarkHeaderTyp )
+        ; IF IfteOldMarkHeader = IfteOldMarkHeader . LmRightLink 
+          THEN (* Empty old Marks list. *) 
+            NewMarkHeader . LmLeftLink := NewMarkHeader 
+          ; NewMarkHeader . LmRightLink := NewMarkHeader 
+          ; IfteRblCurOldMarkMeat := NIL
+          ELSE 
+            IfteRblCurOldMarkMeat := IfteOldMarkHeader . LmRightLink
+          END (* IF *) 
+        END (* IF *) 
+      ; IfteRblPrevNewMark := NewMarkHeader 
+
+      (* Copy things that are to the left of the merged region. *)
+      
+      ; IfteRblCopyNodes ( 0 ) 
 
       (* Recompute things inside the merged region. *)
 
-      ; LNewTokMark := Marks . TokMarkNull  
+      ; IfteBuildMergedLinesRefs ( IfteLinesRefArray )
+      ; IfteVerifyMergedLinesRefs ( IfteLinesRefArray )
+
+      (* Link in the new LinesRefs. *)
+      ; IfteRblCurNewLinesRefMeat := NIL
+(* CHECK: What if there no new linesRefs? *) 
+      ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine
+            TO MarkIdTyp . MiTrailingLine 
+        DO WITH WLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ]
+          DO IF WLinesRefMeat # NIL
+            THEN
+              IF IfteRblCurNewLinesRefMeat = NIL
+                 (* WLinesRefMeat is leftmost new LinesRef. *) 
+              THEN IfteRblCurNewLinesRefMeat := WLinesRefMeat
+              END (* IF *) 
+            ; IftePrevNewLinesRef . LrRightLink := WLinesRefMeat 
+            ; WLinesRefMeat . LrLeftLink := IftePrevNewLinesRef
+            ; WLinesRefMeat . LrRightLink := NIL
+              (* ^To detect going off end of Marks list. *) 
+            ; IftePrevNewLinesRef := WLinesRefMeat 
+            END (* IF *) 
+          END (* WITH *) 
+        END (* FOR *)
+        
+      ; IfteRblOldLineCtToLeft := 0 
+      ; IfteRblIn2ndOldLinesRef := FALSE 
+      ; IfteRblPrevNewMergeToLineNo := 0 
+      ; IF IfteRblCurOldLinesRefMeat = NIL (* Off end of old LinesRef list. *) 
+        THEN IfteRblMergeMiddleLineNo := 0 
+        ELSE IfteRblMergeMiddleLineNo  
+               := Display . ActualNoOfLines
+                    ( IfteRblCurOldLinesRefMeat . LrLineCt )
+        END (* IF *) 
+      ; IfteRblCurNewMergeToLineNo
+          := Display . ActualNoOfLines ( IfteRblCurNewLinesRefMeat . LrLineCt ) 
+
+      ; LOOP (* Thru marks in the merged region. *) 
+          IF IfteRblCurOldMarkMeat = NIL 
+          THEN IfteRblCmpMarks := 1 
+          ELSE  
+            TRY 
+              IfteRblCmpMarks 
+                := Marks . Compare
+                     ( IfteRblCurOldMarkMeat . LmTokMark
+                     , IfteOldThruLinesRef . LrBolTokMark
+                     )
+            EXCEPT Marks . Unordered 
+            => <* ASSERT FALSE , "Marks.Unordered." *> 
+            END (* EXCEPT *)
+          END (* IF *) 
+        ; IF IfteRblCmpMarks = 1 (* Next Mark is to right of merge region. *)
+          THEN EXIT
+          ELSE
+            IF NOT IfteRblIn2ndOldLinesRef
+               AND DelNlShift # LbeStd . LimitedCharNoInfinity 
+               AND IfteRblCurOldMarkMeat . LmLineNo >= IfteRblMergeMiddleLineNo
+            THEN (* Advance to 2nd old LinesRef. *) 
+              IfteRblOldLineCtToLeft   
+                := Display . ActualNoOfLines
+                     ( IfteRblCurOldLinesRefMeat . LrLineCt ) - 1
+            ; IF IfteRblCurOldLinesRefMeat . LrRightLink = IfteOldLinesRefHeader
+              THEN IfteRblCurOldLinesRefMeat := NIL
+              ELSE IfteRblCurOldLinesRefMeat
+                     := NARROW 
+                          ( IfteRblCurOldLinesRefMeat . LrRightLink
+                          , PaintHs . LinesRefMeatTyp
+                          )
+                        (* Can't fail. *) 
+              END (* IF *) 
+            ; IfteRblIn2ndOldLinesRef := TRUE 
+            END (* IF *)
+          ; IfteRblMergeLineNo
+              := IfteRblOldLineCtToLeft + IfteRblCurOldMarkMeat . LmLineNo 
+          ; IF IfteRblCurOldMarkMeat . LmCharPos = IfteRblMergeLineNo 
+            THEN IF IfteRblIn2ndOldLinesRef
+              THEN IfteRblNewCharPos
+                     := DelNlShift + IfteRblCurOldMarkMeat . LmCharPos
+              ELSE IfteRblNewCharPos
+                     := MIN ( IfteRblCurOldMarkMeat . LmCharPos , DelNlShift )  
+              END (*IF *) 
+            ELSE IfteRblNewCharPos := IfteRblCurOldMarkMeat . LmCharPos
+            END (* IF *)
+
+            (* Skip already linked LinesRefs to left of IfteRblMergeLineNo. *)
+          ; WHILE IfteRblCurNewMergeToLineNo <= IfteRblMergeLineNo 
+            DO IftePrevNewLinesRef := IfteRblCurNewLinesRefMeat 
+            ; IfteRblCurNewLinesRefMeat
+                := IfteRblCurNewLinesRefMeat . LrRightLink 
+            ; <* ASSERT IfteRblCurNewLinesRefMeat # NIL , "NIL LrRightLink" *>
+              IfteRblPrevNewMergeToLineNo := IfteRblCurNewMergeToLineNo 
+            ; INC ( IfteRblCurNewMergeToLineNo
+                  , Display . ActualNoOfLines
+                      ( IfteRblCurNewLinesRefMeat . LrLineCt )
+                  )
+            END (* WHILE *)
+            
+          ; IfteRblCurNewMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
+          ; IfteRblCurNewMarkMeat . LmLinesRef := IfteRblCurNewLinesRefMeat 
+          ; IfteRblCurNewMarkMeat . LmWindowRef
+              := IfteRblCurOldMarkMeat . LmWindowRef 
+          ; IfteRblCurNewMarkMeat . LmMarkSs
+              := IfteRblCurOldMarkMeat . LmMarkSs 
+          ; IF IfteRblCurOldMarkMeat . LmWindowRef # NIL 
+               AND MarkSsTyp . MarkSsStartSel
+                   <= IfteRblCurOldMarkMeat . LmMarkSs
+               AND IfteRblCurOldMarkMeat . LmMarkSs <= MarkSsTyp . MarkSsEndSel 
+            THEN IfteNewMarks [ IfteRblCurOldMarkMeat . LmMarkSs ] 
+                   := IfteRblCurOldMarkMeat . LmWindowRef
+                      . WrMarks [ IfteRblCurOldMarkMeat . LmMarkSs ]
+            END (* IF *) 
+          ; IfteRblCurNewMarkMeat . LmTokMark
+              := IfteRblCurNewLinesRefMeat . LrBolTokMark 
+          ; IfteRblCurNewMarkMeat . LmCharPos := IfteRblNewCharPos  
+          ; IfteRblCurNewMarkMeat . LmLineNo
+              := IfteRblMergeLineNo - IfteRblPrevNewMergeToLineNo 
+
+          ; IfteRblPrevOldMarkMeat := IfteRblCurOldMarkMeat
+          ; IF IfteRblCurOldMarkMeat . LmRightLink = IfteOldMarkHeader
+            THEN
+              IfteRblCurOldMarkMeat := NIL
+            ELSE
+              IfteRblCurOldMarkMeat 
+                := NARROW 
+                     ( IfteRblCurOldMarkMeat . LmRightLink 
+                     , PaintHs . LineMarkMeatTyp 
+                     ) (* ^NARROW shur too werk. *)
+            END (* IF *) 
+
+          ; IfteRblPrevNewMark . LmRightLink := IfteRblCurNewMarkMeat
+          ; IfteRblCurNewMarkMeat . LmLeftLink := IfteRblPrevNewMark
+          ; IfteRblPrevNewMark := IfteRblCurNewMarkMeat
+          END (* IF *)
+        END (* LOOP *)
 
       (* Adjust things right of the merged region. *)
+
+      ; IfteRblCopyNodes ( IfteNodeNoChange ) 
 
       (* Complete the lists. *) 
       ; IF NewLinesRefHeader # NIL
         THEN
-          LNewPrevLinesRef . LrRightLink := NewLinesRefHeader 
-        ; NewLinesRefHeader . LrLeftLink := LNewPrevLinesRef
+          IftePrevNewLinesRef . LrRightLink := NewLinesRefHeader 
+        ; NewLinesRefHeader . LrLeftLink := IftePrevNewLinesRef
         END (* IF *) 
 
-      ; IF NewMarksHeader # NIL
+      ; IF NewMarkHeader # NIL
         THEN
-          LNewPrevMark . LmRightLink := NewMarksHeader 
-        ; NewMarksHeader . LmLeftLink := LNewPrevMark
+          IfteRblPrevNewMark . LmRightLink := NewMarkHeader 
+        ; NewMarkHeader . LmLeftLink := IfteRblPrevNewMark
         END (* IF *) 
 
       END IfteRebuildLists
-
-
-
 (**) 
 
 
@@ -1788,8 +2053,7 @@ END (* IF *)
     ; VAR LPredOfEditedLinesRefs : PaintHs . LinesRefTyp 
     ; VAR LSuccOfEditedLinesRefs : PaintHs . LinesRefTyp 
       (* If two LinesRefs joined, successor of the second joined one. *)  
-    ; VAR LOldEndBolTokMark : Marks . TokMarkTyp 
-    ; VAR LLinesRef : PaintHs . LinesRefMeatTyp 
+    ; VAR LLinesRefMeat : PaintHs . LinesRefMeatTyp 
     ; VAR LSecondOldActualLineCt : LbeStd . LineNoTyp 
     ; VAR LLineNo : LbeStd . LineNoTyp 
     ; VAR LThruLineNo : LbeStd . LineNoTyp 
@@ -1803,578 +2067,593 @@ END (* IF *)
     ; VAR LWindowLineLen : LbeStd . CharNoTyp 
 
     ; BEGIN (* Block for InnerFlushTempEdit *)
-
+        IF TempEditRef . TeDelFromPos = LbeStd . LimitedCharNoInfinity 
+           (* There is no temp editing to flush. *) 
+        THEN RETURN
+        END (* IF *)
+        
       (* I think it is now always true that LinesRef 
          = TempEditRef . TeLinesRef. 
          But for some calls, the argument is rather tangled, so leave these 
          as separate parameters.  Eventually remove the LinesRef parameter 
          and this assertion.
       *) 
-        Assert 
+      ; Assert 
           ( LinesRef = TempEditRef . TeLinesRef 
           , AFT . A_TextEdit_InnerFlushTempEdit_ParameterMismatch 
           ) 
 
-      ; IF TempEditRef . TeDelFromPos # LbeStd . LimitedCharNoInfinity 
-        THEN (* There is some temp editing to flush. *)   
-          IfteImagePers := ImageRef . ItPers 
-        ; LEditedLinesRefMeat := TempEditRef . TeLinesRef 
+      ; IfteImagePers := ImageRef . ItPers 
+      ; IfteOldEstRoot := IfteImagePers . IpEstRoot 
+      ; IfteOldLinesRefHeader := IfteImagePers . IpLineHeaderRef
+      ; IfteOldMarkHeader := IfteImagePers . IpMarkHeader
+      ; LEditedLinesRefMeat := TempEditRef . TeLinesRef 
+      ; Assert 
+          ( NOT LEditedLinesRefMeat . LrGapAfter 
+          , AFT . A_InnerFlushTempEdit_EditingWithGapAfter   
+          ) 
+      ; LPredOfEditedLinesRefs := LEditedLinesRefMeat . LrLeftLink 
+      ; IfteSecondOldLinesRef := NIL 
+      ; LSecondOldActualLineCt := 0 
+      ; IF Display . LinesRefIsEndOfImage ( ImageRef , LEditedLinesRefMeat ) 
+        THEN (* LEditedLinesRefMeat is the empty EOI one. *) 
+        (* Do not unlink anything, not even LinesRef. *) 
+          IfteOldFromLinesRefMeat := NIL 
+        ; IfteOldThruLinesRef := NIL 
+        ; IfteFirstOldActualLineCt := TempEditRef . TeLineNo + 1 
+        ; LSuccOfEditedLinesRefs := LEditedLinesRefMeat . LrRightLink   
+          (* ^Which will be the list header. *) 
+        ; DelNlShift := LbeStd . LimitedCharNoInfinity 
+          (* ^Callers may ensure this, but if not, it's robust. *) 
+        ; IfteSuccLinesRef := LEditedLinesRefMeat
+        ; IfteSuccLinesRefMeat := LEditedLinesRefMeat 
+        ELSE (* Not editing in EOI. *) 
+          IfteOldFromLinesRefMeat := LEditedLinesRefMeat  
+        ; IfteFirstOldActualLineCt 
+            := Display . ActualNoOfLines ( LEditedLinesRefMeat . LrLineCt ) 
         ; Assert 
-            ( NOT LEditedLinesRefMeat . LrGapAfter 
-            , AFT . A_InnerFlushTempEdit_EditingWithGapAfter   
+            ( TempEditRef . TeLineNo < IfteFirstOldActualLineCt 
+            , AFT . A_InnerFlushTempEdit_EditingBeyondLineCt   
             ) 
-        ; LPredOfEditedLinesRefs := LEditedLinesRefMeat . LrLeftLink 
-        ; IfteSecondOldLinesRef := NIL 
-        ; LSecondOldActualLineCt := 0 
-        ; IF Display . LinesRefIsEndOfImage ( ImageRef , LEditedLinesRefMeat ) 
-          THEN (* LEditedLinesRefMeat is the empty EOI one. *) 
-          (* Do not unlink anything, not even LinesRef. *) 
-            IfteOldFromLinesRef := NIL 
-          ; IfteOldThruLinesRef := NIL 
-          ; IfteFirstOldActualLineCt := TempEditRef . TeLineNo + 1 
-          ; LSuccOfEditedLinesRefs := LEditedLinesRefMeat . LrRightLink   
-            (* ^Which will be the list header. *) 
-          ; DelNlShift := LbeStd . LimitedCharNoInfinity 
-            (* ^Callers may ensure this, but if not, it's robust. *) 
-          ; IfteSuccLinesRef := LEditedLinesRefMeat
-          ; IfteSuccLinesRefMeat := LEditedLinesRefMeat 
-          ELSE (* Not editing in EOI. *) 
-            IfteOldFromLinesRef := LEditedLinesRefMeat  
-          ; IfteFirstOldActualLineCt 
-              := Display . ActualNoOfLines ( LEditedLinesRefMeat . LrLineCt ) 
-          ; Assert 
-              ( TempEditRef . TeLineNo < IfteFirstOldActualLineCt 
-              , AFT . A_InnerFlushTempEdit_EditingBeyondLineCt   
-              ) 
-          ; TYPECASE LEditedLinesRefMeat . LrRightLink 
-            OF PaintHs . LinesRefMeatTyp ( TSecondOldLinesRef ) 
-            => IF DelNlShift # LbeStd . LimitedCharNoInfinity 
-              THEN (* Two lines are joined. *) 
-               (* Although this case could end up being
-                  RepaintKindPseudoShift in some windows, at least one
-                  window has the original line visible, because this is
-                  a change to the original first line.  So the new
-                  LEditedLinesRefMeat we are about to construct will never 
-                  be unnecessary garbage. 
-               *)
-                IfteOldThruLinesRef := TSecondOldLinesRef 
-              ; IfteSecondOldLinesRef := TSecondOldLinesRef 
-              ; Display . SecureSucc ( ImageRef , IfteSecondOldLinesRef ) 
-              ; LSecondOldActualLineCt 
-                  := Display . ActualNoOfLines
-                       ( IfteSecondOldLinesRef . LrLineCt )
-              ; Assert 
-                  ( NOT Display . LinesRefIsEndOfImage 
-                          ( ImageRef , IfteSecondOldLinesRef ) 
-                  , AFT . A_InnerFlushTempEditNlDeletedAtEOI 
-                  ) 
-              ; LSuccOfEditedLinesRefs := IfteSecondOldLinesRef . LrRightLink 
-              ELSE (* No joined lines. *) 
-                IfteOldThruLinesRef := IfteOldFromLinesRef
-              ; LSuccOfEditedLinesRefs := LEditedLinesRefMeat . LrRightLink 
-              END (* IF *) 
-            ELSE 
-              CantHappen 
-                ( AFT . A_InnerFlushTempEdit_NonEoiLinesRefIsLast ) 
-            ; IfteOldThruLinesRef := IfteOldFromLinesRef
+        ; TYPECASE LEditedLinesRefMeat . LrRightLink 
+          OF PaintHs . LinesRefMeatTyp ( TSecondOldLinesRef ) 
+          => IF DelNlShift # LbeStd . LimitedCharNoInfinity 
+            THEN (* Two lines are joined. *) 
+             (* Although this case could end up being
+                RepaintKindPseudoShift in some windows, at least one
+                window has the original line visible, because this is
+                a change to the original first line.  So the new
+                LEditedLinesRefMeat we are about to construct will never 
+                be unnecessary garbage. 
+             *)
+              IfteOldThruLinesRef := TSecondOldLinesRef 
+            ; IfteSecondOldLinesRef := TSecondOldLinesRef 
+            ; Display . SecureSucc ( ImageRef , IfteSecondOldLinesRef ) 
+            ; LSecondOldActualLineCt 
+                := Display . ActualNoOfLines
+                     ( IfteSecondOldLinesRef . LrLineCt )
+            ; Assert 
+                ( NOT Display . LinesRefIsEndOfImage 
+                        ( ImageRef , IfteSecondOldLinesRef ) 
+                , AFT . A_InnerFlushTempEditNlDeletedAtEOI 
+                ) 
+            ; LSuccOfEditedLinesRefs := IfteSecondOldLinesRef . LrRightLink 
+            ELSE (* No joined lines. *) 
+              IfteOldThruLinesRef := IfteOldFromLinesRefMeat
             ; LSuccOfEditedLinesRefs := LEditedLinesRefMeat . LrRightLink 
-            END (* TYPECASE *) 
-          END (* IF *) 
-
-        ; IfteOldEstRoot := IfteImagePers . IpEstRoot 
-        ; TYPECASE LSuccOfEditedLinesRefs 
-          OF NULL (* Can happen with damaged checkpoint files. *) 
-          => LineMarks . GetEndOfImage 
-               ( IfteImagePers . IpLang
-               , IfteOldEstRoot
-               , (*OUT*) NewMark := LOldEndBolTokMark
-               ) 
-          | PaintHs . LinesRefMeatTyp ( TSuccLinesRefMeat ) 
-          => LOldEndBolTokMark := TSuccLinesRefMeat . LrBolTokMark 
+            END (* IF *) 
           ELSE 
-            LineMarks . GetEndOfImage 
-              ( IfteImagePers . IpLang
-              , IfteOldEstRoot
-              , (*OUT*) NewMark := LOldEndBolTokMark
-              ) 
+            CantHappen 
+              ( AFT . A_InnerFlushTempEdit_NonEoiLinesRefIsLast ) 
+          ; IfteOldThruLinesRef := IfteOldFromLinesRefMeat
+          ; LSuccOfEditedLinesRefs := LEditedLinesRefMeat . LrRightLink 
           END (* TYPECASE *) 
-        ; IfteStartBolTokMark := Marks . TokMarkNull  
-        ; IF Options . TreeBrowsing 
-          THEN
-            TreeBrowse . Browse 
-              ( IfteOldEstRoot , IfteImagePers . IpLang 
-              , "Before MergeTextEdit " 
-              ) 
-          END (* IF *)
+        END (* IF *) 
 
-        ; IF DelNlShift = LbeStd . LimitedCharNoInfinity
-           AND InsNlPos = LbeStd . LimitedCharNoInfinity
-           AND ( TempEditRef . TeDelFromPos = LbeStd . LimitedCharNoInfinity 
-                 OR TempEditRef . TeDelToPos = TempEditRef . TeDelFromPos
-                    AND TempEditRef . TeInsLen = 0
-               )
+      ; TYPECASE LSuccOfEditedLinesRefs 
+        OF NULL (* Can happen with damaged checkpoint files. *) 
+        => LineMarks . GetEndOfImage 
+             ( IfteImagePers . IpLang
+             , IfteOldEstRoot
+             , (*OUT*) NewMark := IfteOldEndBolTokMark
+             ) 
+        | PaintHs . LinesRefMeatTyp ( TSuccLinesRefMeat ) 
+        => IfteOldEndBolTokMark := TSuccLinesRefMeat . LrBolTokMark 
+        ELSE 
+          LineMarks . GetEndOfImage 
+            ( IfteImagePers . IpLang
+            , IfteOldEstRoot
+            , (*OUT*) NewMark := IfteOldEndBolTokMark
+            ) 
+        END (* TYPECASE *) 
+      ; IfteStartBolTokMark := Marks . TokMarkNull  
+      ; IF Options . TreeBrowsing 
+        THEN
+          TreeBrowse . Browse 
+            ( IfteOldEstRoot , IfteImagePers . IpLang 
+            , "Before MergeTextEdit " 
+            ) 
+        END (* IF *)
+
+      ; IF DelNlShift = LbeStd . LimitedCharNoInfinity
+         AND InsNlPos = LbeStd . LimitedCharNoInfinity
+         AND ( TempEditRef . TeDelFromPos = LbeStd . LimitedCharNoInfinity 
+               OR TempEditRef . TeDelToPos = TempEditRef . TeDelFromPos
+                  AND TempEditRef . TeInsLen = 0
+             )
 (* TODO: Check how this ever happened.  test14_142, in Edit_Cut. *)  
-          THEN RETURN
-          END (* IF *) 
+        THEN RETURN
+        END (* IF *) 
 
-        ; MergeTxt . MergeTextEdit 
-            ( Lang := IfteImagePers . IpLang 
-            , EstRootRef := IfteOldEstRoot 
-            , StartTokMark := LEditedLinesRefMeat . LrBolTokMark 
-            , EndTokMark := LOldEndBolTokMark 
-            , BlankLineNo := TempEditRef . TeLineNo 
-            , DelFromPos := TempEditRef . TeDelFromPos 
-            , DelToPos := TempEditRef . TeDelToPos 
-            , InsText := TempEditRef . TeEditedString 
-            , InsLen := TempEditRef . TeInsLen 
-            , InsNlPos := InsNlPos 
-            , NlIndentPos := NlIndentPos 
-            , DelNlShift := DelNlShift 
-            , (* VAR *) NewEstRootRef := IfteNewEstRoot 
-            , (* VAR *) NodeNoChange := IfteNodeNoChange 
-            , (* VAR *) MaxTouchedNodeNo := IfteMaxTouchedNodeNo 
-            , (* VAR *) NewBolTokMark := IfteStartBolTokMark 
-            , (* VAR *) NewLinesCt := IfteNewLinesCt 
-            , (* VAR *) LeadingBlankLinesIncluded 
-                          := LLeadingBlankLinesIncluded 
-            , (* VAR *) TrailingBlankLinesIncluded 
-                          := LTrailingBlankLinesIncluded 
+      ; MergeTxt . MergeTextEdit 
+          ( Lang := IfteImagePers . IpLang 
+          , EstRootRef := IfteOldEstRoot 
+          , StartTokMark := LEditedLinesRefMeat . LrBolTokMark 
+          , EndTokMark := IfteOldEndBolTokMark 
+          , BlankLineNo := TempEditRef . TeLineNo 
+          , DelFromPos := TempEditRef . TeDelFromPos 
+          , DelToPos := TempEditRef . TeDelToPos 
+          , InsText := TempEditRef . TeEditedString 
+          , InsLen := TempEditRef . TeInsLen 
+          , InsNlPos := InsNlPos 
+          , NlIndentPos := NlIndentPos 
+          , DelNlShift := DelNlShift 
+          , (* VAR *) NewEstRootRef := IfteNewEstRoot 
+          , (* VAR *) NodeNoChange := IfteNodeNoChange 
+          , (* VAR *) MaxTouchedNodeNo := IfteMaxTouchedNodeNo 
+          , (* VAR *) NewBolTokMark := IfteStartBolTokMark 
+          , (* VAR *) NewLinesCt := IfteNewLinesRefCt 
+          , (* VAR *) LeadingBlankLinesIncluded 
+                        := LLeadingBlankLinesIncluded 
+          , (* VAR *) TrailingBlankLinesIncluded 
+                        := LTrailingBlankLinesIncluded 
+          ) 
+      ; IF Options . TreeBrowsing 
+        THEN
+          TreeBrowse . Browse 
+            ( IfteNewEstRoot , IfteImagePers . IpLang 
+            , "After MergeTextEdit " 
             ) 
-        ; IF Options . TreeBrowsing 
-          THEN
-            TreeBrowse . Browse 
-              ( IfteNewEstRoot , IfteImagePers . IpLang 
-              , "After MergeTextEdit " 
-              ) 
-          END (* IF *) 
+        END (* IF *) 
 
-        ; Assert 
-            ( NOT Marks . IsNull ( IfteStartBolTokMark ) 
-            , AFT . A_InnerFlushTempEditNoNewTokMark 
-            ) 
+      ; Assert 
+          ( NOT Marks . IsNull ( IfteStartBolTokMark ) 
+          , AFT . A_InnerFlushTempEditNoNewTokMark 
+          ) 
 
-        ; SkipBlankLinesToLeft 
-            ( ImageRef 
-            , (* VAR *) IfteOldFromLinesRef 
-            , LLeadingBlankLinesIncluded 
-            ) 
-        ; SkipBlankLinesToRight 
-            ( ImageRef 
-            , (* VAR *) IfteOldThruLinesRef 
-            , LTrailingBlankLinesIncluded 
-            ) 
+      ; SkipBlankLinesToLeft 
+          ( ImageRef 
+          , (* IN OUT *) IfteOldFromLinesRefMeat 
+          , LLeadingBlankLinesIncluded 
+          ) 
+      ; SkipBlankLinesToRight 
+          ( ImageRef 
+          , (* IN OUT *) IfteOldThruLinesRef 
+          , LTrailingBlankLinesIncluded 
+          ) 
 
-        (* From the edited text, compute what the new Est is expected to
-           produce. *) 
-        ; IfteExpectedBlankLinesBefore := 0 
-        ; IfteExpectedString1 := Strings . Empty ( ) 
-        ; IfteExpectedString2 := Strings . Empty ( ) 
-        ; IfteExpectedBlankLinesAfter := 0 
-        ; LBlankPrefixLen 
-            := Strings . PosOf1stNonblank ( TempEditRef . TeEditedString ) 
-        ; IF DelNlShift # LbeStd . LimitedCharNoInfinity 
-          THEN (* Deleted new line, two lines are joined. *) 
-            IF LBlankPrefixLen 
-               = Strings . Length ( TempEditRef . TeEditedString ) 
-            THEN (* Joined lines are entirely blank *)
+      (* From the edited text, compute what the new Est is expected to
+         produce. *) 
+      ; IfteExpectedBlankLinesBefore := 0 
+      ; IfteExpectedString1 := Strings . Empty ( ) 
+      ; IfteExpectedString2 := Strings . Empty ( ) 
+      ; IfteExpectedBlankLinesAfter := 0 
+      ; LBlankPrefixLen 
+          := Strings . PosOf1stNonblank ( TempEditRef . TeEditedString ) 
+      ; IF DelNlShift # LbeStd . LimitedCharNoInfinity 
+        THEN (* Deleted new line, two lines are joined. *) 
+          IF LBlankPrefixLen 
+             = Strings . Length ( TempEditRef . TeEditedString ) 
+          THEN (* Joined lines are entirely blank *)
 (* FIXME: Must account for whether each old line was already blank. *) 
-              IfteExpectedBlankLinesBefore 
-                := LLeadingBlankLinesIncluded 
-                   + IfteFirstOldActualLineCt 
-                   - 2 
-                   + LSecondOldActualLineCt  
-                   + LTrailingBlankLinesIncluded 
-            ELSE (* Joined lines contain nonblank text. *) 
-              IfteExpectedBlankLinesBefore 
-                := LLeadingBlankLinesIncluded + IfteFirstOldActualLineCt - 1 
-            ; IfteExpectedString1 := TempEditRef . TeEditedString 
-            ; IfteExpectedBlankLinesAfter 
-                := LSecondOldActualLineCt - 1 + LTrailingBlankLinesIncluded 
-            END (* IF *) 
-          ELSIF InsNlPos # LbeStd . LimitedCharNoInfinity 
-          THEN (* One line split into two new edited lines *) 
-            IF LBlankPrefixLen 
-               = Strings . Length ( TempEditRef . TeEditedString ) 
-            THEN (* Both edited lines are all blank *) 
-              IfteExpectedBlankLinesBefore 
-                := LLeadingBlankLinesIncluded 
-                   + IfteFirstOldActualLineCt 
-                   + 1 
-                   + LTrailingBlankLinesIncluded 
-            ELSIF InsNlPos <= LBlankPrefixLen 
-            THEN (* Edited lines are blank, nonblank. *) 
-              IfteExpectedBlankLinesBefore 
-                := LLeadingBlankLinesIncluded + TempEditRef . TeLineNo + 1 
-            ; IfteExpectedBlankLinesAfter 
-                := ( IfteFirstOldActualLineCt - 1 - TempEditRef . TeLineNo )  
-                   + LTrailingBlankLinesIncluded 
-            ; IfteExpectedString1 
-                := Strings . Substring 
-                     ( TempEditRef . TeEditedString , InsNlPos ) 
-            ; TRY 
-                Strings . InsertBlanksInPlace 
-                  ( IfteExpectedString1 , 0 , NlIndentPos ) 
-              EXCEPT Strings . SsOutOfBounds
-              => CantHappen 
-                   ( AFT . A_InnerFlushTempEdit_String_subscript_out_of_bounds1 ) 
-              END (* TRY EXCEPT *) 
-            ELSIF Strings . PosOfLastNonblank 
-                    ( TempEditRef . TeEditedString ) 
-                  < InsNlPos 
-            THEN (* Edited is nonblank, blank. *) 
-              IfteExpectedBlankLinesBefore 
-                := LLeadingBlankLinesIncluded + TempEditRef . TeLineNo 
-            ; IfteExpectedBlankLinesAfter 
-                := ( IfteFirstOldActualLineCt - TempEditRef . TeLineNo ) 
-                   + LTrailingBlankLinesIncluded  
-            ; IfteExpectedString1 
-                := Strings . Substring 
-                     ( TempEditRef . TeEditedString , 0 , InsNlPos ) 
-            ELSE (* Two nonblank edited lines. *) 
-              IfteExpectedBlankLinesBefore 
-                := LLeadingBlankLinesIncluded + TempEditRef . TeLineNo 
-            ; IfteExpectedBlankLinesAfter 
-                := ( IfteFirstOldActualLineCt - 1 - TempEditRef . TeLineNo ) 
-                   + LTrailingBlankLinesIncluded  
-            ; IfteExpectedString1 
-                := Strings . Substring 
-                     ( TempEditRef . TeEditedString , 0 , InsNlPos ) 
-            ; IfteExpectedString2 
-                := Strings . Substring 
-                     ( TempEditRef . TeEditedString , InsNlPos ) 
-            ; TRY 
-                Strings . InsertBlanksInPlace 
-                  ( IfteExpectedString2 , 0 , NlIndentPos ) 
-              EXCEPT Strings . SsOutOfBounds
-              => CantHappen 
-                   ( AFT . A_InnerFlushTempEdit_String_subscript_out_of_bounds2 ) 
-              END (* TRY EXCEPT *) 
-            END (* IF *) 
-          ELSE (* One line, before and after edits. *) 
-            IF LBlankPrefixLen 
-               = Strings . Length ( TempEditRef . TeEditedString ) 
-            THEN (* Edited line is now entirely blank *) 
-              IfteExpectedBlankLinesBefore 
-                := LLeadingBlankLinesIncluded 
-                   + IfteFirstOldActualLineCt 
-                   + LTrailingBlankLinesIncluded 
-            ELSE  (* Edited line contains nonblanks. *)  
-              IfteExpectedBlankLinesBefore 
-                := LLeadingBlankLinesIncluded + TempEditRef . TeLineNo 
-            ; IfteExpectedString1 := TempEditRef . TeEditedString 
-            ; IfteExpectedBlankLinesAfter 
-                := ( IfteFirstOldActualLineCt - 1 - TempEditRef . TeLineNo ) 
-                   + LTrailingBlankLinesIncluded  
-            END (* IF *) 
+            IfteExpectedBlankLinesBefore 
+              := LLeadingBlankLinesIncluded 
+                 + IfteFirstOldActualLineCt 
+                 - 2 
+                 + LSecondOldActualLineCt  
+                 + LTrailingBlankLinesIncluded 
+          ELSE (* Joined lines contain nonblank text. *) 
+            IfteExpectedBlankLinesBefore 
+              := LLeadingBlankLinesIncluded + IfteFirstOldActualLineCt - 1 
+          ; IfteExpectedString1 := TempEditRef . TeEditedString 
+          ; IfteExpectedBlankLinesAfter 
+              := LSecondOldActualLineCt - 1 + LTrailingBlankLinesIncluded 
           END (* IF *) 
-        ; IF IfteOldThruLinesRef # NIL 
-          THEN 
-            IfteSuccLinesRef := IfteOldThruLinesRef . LrRightLink 
-          ; IfteSuccLinesRefMeat := NIL 
-          ; TYPECASE IfteSuccLinesRef 
-            OF NULL =>
-            | PaintHs . LinesRefMeatTyp ( TSuccLinesRefMeat ) 
-            => IfteSuccLinesRefMeat := TSuccLinesRefMeat
-            ELSE 
-            END (* TYPECASE *) 
+        ELSIF InsNlPos # LbeStd . LimitedCharNoInfinity 
+        THEN (* One line split into two new edited lines *) 
+          IF LBlankPrefixLen 
+             = Strings . Length ( TempEditRef . TeEditedString ) 
+          THEN (* Both edited lines are all blank *) 
+            IfteExpectedBlankLinesBefore 
+              := LLeadingBlankLinesIncluded 
+                 + IfteFirstOldActualLineCt 
+                 + 1 
+                 + LTrailingBlankLinesIncluded 
+          ELSIF InsNlPos <= LBlankPrefixLen 
+          THEN (* Edited lines are blank, nonblank. *) 
+            IfteExpectedBlankLinesBefore 
+              := LLeadingBlankLinesIncluded + TempEditRef . TeLineNo + 1 
+          ; IfteExpectedBlankLinesAfter 
+              := ( IfteFirstOldActualLineCt - 1 - TempEditRef . TeLineNo )  
+                 + LTrailingBlankLinesIncluded 
+          ; IfteExpectedString1 
+              := Strings . Substring 
+                   ( TempEditRef . TeEditedString , InsNlPos ) 
+          ; TRY 
+              Strings . InsertBlanksInPlace 
+                ( IfteExpectedString1 , 0 , NlIndentPos ) 
+            EXCEPT Strings . SsOutOfBounds
+            => CantHappen 
+                 ( AFT . A_InnerFlushTempEdit_String_subscript_out_of_bounds1 ) 
+            END (* TRY EXCEPT *) 
+          ELSIF Strings . PosOfLastNonblank 
+                  ( TempEditRef . TeEditedString ) 
+                < InsNlPos 
+          THEN (* Edited is nonblank, blank. *) 
+            IfteExpectedBlankLinesBefore 
+              := LLeadingBlankLinesIncluded + TempEditRef . TeLineNo 
+          ; IfteExpectedBlankLinesAfter 
+              := ( IfteFirstOldActualLineCt - TempEditRef . TeLineNo ) 
+                 + LTrailingBlankLinesIncluded  
+          ; IfteExpectedString1 
+              := Strings . Substring 
+                   ( TempEditRef . TeEditedString , 0 , InsNlPos ) 
+          ELSE (* Two nonblank edited lines. *) 
+            IfteExpectedBlankLinesBefore 
+              := LLeadingBlankLinesIncluded + TempEditRef . TeLineNo 
+          ; IfteExpectedBlankLinesAfter 
+              := ( IfteFirstOldActualLineCt - 1 - TempEditRef . TeLineNo ) 
+                 + LTrailingBlankLinesIncluded  
+          ; IfteExpectedString1 
+              := Strings . Substring 
+                   ( TempEditRef . TeEditedString , 0 , InsNlPos ) 
+          ; IfteExpectedString2 
+              := Strings . Substring 
+                   ( TempEditRef . TeEditedString , InsNlPos ) 
+          ; TRY 
+              Strings . InsertBlanksInPlace 
+                ( IfteExpectedString2 , 0 , NlIndentPos ) 
+            EXCEPT Strings . SsOutOfBounds
+            => CantHappen 
+                 ( AFT . A_InnerFlushTempEdit_String_subscript_out_of_bounds2 ) 
+            END (* TRY EXCEPT *) 
           END (* IF *) 
-
-        ; IfteLinesAccountedFor := 0 
-        ; IfteBuildNewLines ( ) 
-        ; IfteVerifyNewLines ( ) 
-        ; IF IfteLinesRefArray [ MarkIdTyp . MiFirstText ] = NIL 
-             AND IfteLinesRefArray [ MarkIdTyp . MiSecondText ] = NIL 
-          THEN (* There are some cases where two successive all blank 
-                  lines, as seen by TextEdit are combined into one, but 
-                  MergeTxt can't combine the corresponding blank line mods 
-                  in the Est, because they are in disjoint subtrees. 
-                  So, if there are no intervening text mods, we insist 
-                  only that the total number of blank lines be as expected. 
-               *) 
-            Assert 
-              ( IfteActualBlankLinesBefore + IfteActualBlankLinesAfter 
-                = IfteExpectedBlankLinesBefore 
-                  + IfteExpectedBlankLinesAfter 
-              , AFT . A_InnerFlushTempEdit_UnequalTotalBlankLines 
-              ) 
+        ELSE (* One line, before and after edits. *) 
+          IF LBlankPrefixLen 
+             = Strings . Length ( TempEditRef . TeEditedString ) 
+          THEN (* Edited line is now entirely blank *) 
+            IfteExpectedBlankLinesBefore 
+              := LLeadingBlankLinesIncluded 
+                 + IfteFirstOldActualLineCt 
+                 + LTrailingBlankLinesIncluded 
+          ELSE  (* Edited line contains nonblanks. *)  
+            IfteExpectedBlankLinesBefore 
+              := LLeadingBlankLinesIncluded + TempEditRef . TeLineNo 
+          ; IfteExpectedString1 := TempEditRef . TeEditedString 
+          ; IfteExpectedBlankLinesAfter 
+              := ( IfteFirstOldActualLineCt - 1 - TempEditRef . TeLineNo ) 
+                 + LTrailingBlankLinesIncluded  
+          END (* IF *) 
+        END (* IF *) 
+      ; IF IfteOldThruLinesRef # NIL 
+        THEN 
+          IfteSuccLinesRef := IfteOldThruLinesRef . LrRightLink 
+        ; IfteSuccLinesRefMeat := NIL 
+        ; TYPECASE IfteSuccLinesRef 
+          OF NULL =>
+          | PaintHs . LinesRefMeatTyp ( TSuccLinesRefMeat ) 
+          => IfteSuccLinesRefMeat := TSuccLinesRefMeat
           ELSE 
-            Assert 
-              ( IfteActualBlankLinesBefore = IfteExpectedBlankLinesBefore 
-              , AFT . A_InnerFlushTempEdit_UnequalBlankLinesBefore 
-              ) 
-          ; Assert 
-              ( IfteActualBlankLinesAfter = IfteExpectedBlankLinesAfter 
-              , AFT . A_InnerFlushTempEdit_UnequalBlankLinesAfter 
-              ) 
-          END (* IF *) 
-        ; Assert 
-            ( IfteLinesAccountedFor = IfteNewLinesCt  
-            , AFT . A_InnerFlushTempEditLineCtMismatch 
+          END (* TYPECASE *) 
+        END (* IF *) 
+
+      ; IfteRebuildLists
+          ( OldEstRoot := IfteOldEstRoot
+          , OldFromTokMark := LEditedLinesRefMeat . LrBolTokMark 
+          , OldToTokMark := IfteOldEndBolTokMark 
+          , NewEstRoot := IfteNewEstRoot
+          , NewFromTokMark := IfteStartBolTokMark 
+          , NewLinesRefHeader := (*VAR*) IfteNewLinesRefHeader
+          , NewMarkHeader := (*VAR*) IfteNewMarkHeader 
+          ) 
+
+      ; IF IfteLinesRefArray [ MarkIdTyp . MiFirstText ] = NIL 
+           AND IfteLinesRefArray [ MarkIdTyp . MiSecondText ] = NIL 
+        THEN (* There are some cases where two successive all blank 
+                lines, as seen by TextEdit are combined into one, but 
+                MergeTxt can't combine the corresponding blank line mods 
+                in the Est, because they are in disjoint subtrees. 
+                So, if there are no intervening text mods, we insist 
+                only that the total number of blank lines be as expected. 
+             *) 
+          Assert 
+            ( IfteActualBlankLinesBefore + IfteActualBlankLinesAfter 
+              = IfteExpectedBlankLinesBefore 
+                + IfteExpectedBlankLinesAfter 
+            , AFT . A_InnerFlushTempEdit_UnequalTotalBlankLines 
             ) 
+        ELSE 
+          Assert 
+            ( IfteActualBlankLinesBefore = IfteExpectedBlankLinesBefore 
+            , AFT . A_InnerFlushTempEdit_UnequalBlankLinesBefore 
+            ) 
+        ; Assert 
+            ( IfteActualBlankLinesAfter = IfteExpectedBlankLinesAfter 
+            , AFT . A_InnerFlushTempEdit_UnequalBlankLinesAfter 
+            ) 
+        END (* IF *) 
+      ; Assert 
+          ( IfteLinesRefsAccountedFor = IfteNewLinesRefCt  
+          , AFT . A_InnerFlushTempEditLineCtMismatch 
+          ) 
 
-        (* Nothing has been changed yet, so any assertion failures raised
-           before here will just propagate out.  The state of everything
-           will be as before the action. 
-        *)
+      (* Nothing has been changed yet, so any assertion failures raised
+         before here will just propagate out.  The state of everything
+         will be as before the action. 
+      *)
 
-        (* There are several changes to the list of lines refs and the
-           Est, that have to be atomic WRT whether we get an assertion
-           failure, so that any checkpoint file written is consistent.
-           First, we do all the changes here, with nothing that raises an
-           assertion failure.  
-        *)
+      (* There are several changes to the list of lines refs and the
+         Est, that have to be atomic WRT whether we get an assertion
+         failure, so that any checkpoint file written is consistent.
+         First, we do all the changes here, with nothing that raises an
+         assertion failure.  
+      *)
 
-        (* Modify the list of LinesRefs, hopefully without failures during
-           the process. *)
-        ; IfteMakeChanges ( ) 
+      (* Modify the list of LinesRefs, hopefully without failures during
+         the process. *)
+      ; IfteMakeChanges ( ) 
 
-        (* Now do checks that have to be done on the modified Est and
-           LinesRefs list.  If something fails, catch the exception and
-           undo the changes. *)
+      (* Now do checks that have to be done on the modified Est and
+         LinesRefs list.  If something fails, catch the exception and
+         undo the changes. *)
 
-        ; TRY 
-            BruteForceVerifyAllLinesRefs ( ImageRef , RepairIsOK := TRUE ) 
+      ; TRY 
+          BruteForceVerifyAllLinesRefs ( ImageRef , RepairIsOK := TRUE ) 
 
-          (* Now go thru all windows, updating their fields and 
-             repainting, as needed. *) 
-          ; LWindowRef := ImageRef . ItWindowList 
-          ; WHILE LWindowRef # NIL 
-            DO IF LWindowRef . WrWindowNo 
-                  IN LEditedLinesRefMeat . LrVisibleIn 
-                  OR IfteSecondOldLinesRef # NIL 
-                     AND LWindowRef . WrWindowNo 
-                         IN IfteSecondOldLinesRef . LrVisibleIn 
-                     (* This will be RepaintKindPseudoShift. *)  
-              THEN (* We need LinesRefs and possibly some repainting 
-                      for this window. 
-                   *) 
-                IF InsNlPos # LbeStd . LimitedCharNoInfinity 
+        (* Now go thru all windows, updating their fields and 
+           repainting, as needed. *) 
+        ; LWindowRef := ImageRef . ItWindowList 
+        ; WHILE LWindowRef # NIL 
+          DO IF LWindowRef . WrWindowNo 
+                IN LEditedLinesRefMeat . LrVisibleIn 
+                OR IfteSecondOldLinesRef # NIL 
+                   AND LWindowRef . WrWindowNo 
+                       IN IfteSecondOldLinesRef . LrVisibleIn 
+                   (* This will be RepaintKindPseudoShift. *)  
+            THEN (* We need LinesRefs and possibly some repainting 
+                    for this window. 
+                 *) 
+              IF InsNlPos # LbeStd . LimitedCharNoInfinity 
+              THEN 
+                LRepaintKind := RepaintKindTyp . RepaintKindShiftDown 
+              ELSIF DelNlShift # LbeStd . LimitedCharNoInfinity 
+              THEN 
+                IF NOT LWindowRef . WrWindowNo 
+                       IN LEditedLinesRefMeat . LrVisibleIn 
                 THEN 
-                  LRepaintKind := RepaintKindTyp . RepaintKindShiftDown 
-                ELSIF DelNlShift # LbeStd . LimitedCharNoInfinity 
-                THEN 
-                  IF NOT LWindowRef . WrWindowNo 
-                         IN LEditedLinesRefMeat . LrVisibleIn 
-                  THEN 
-                    LRepaintKind 
-                      := RepaintKindTyp . RepaintKindPseudoShift 
+                  LRepaintKind 
+                    := RepaintKindTyp . RepaintKindPseudoShift 
+                ELSE 
+                  LRepaintKind := RepaintKindTyp . RepaintKindShiftUp 
+                END (* IF *) 
+              ELSE 
+                LRepaintKind := RepaintKindTyp . RepaintKindNoShift  
+              END (* IF *) 
+            (* Display . LineNoInWindow depends on WrFirstLineLinesRef 
+               and WrFirstLineLineNo being set.  We use it only in 
+               cases where they are not changing. 
+            *)    
+            ; IF LWindowRef . WrFirstLineLinesRef 
+              = LEditedLinesRefMeat 
+              THEN 
+                LLineNoInWindow := - LWindowRef . WrFirstLineLineNo 
+              ELSIF LWindowRef . WrFirstLineLinesRef 
+                    = IfteSecondOldLinesRef 
+              THEN 
+                LLineNoInWindow 
+                  := - LWindowRef . WrFirstLineLineNo 
+                     - Display . ActualNoOfLines 
+                         ( LEditedLinesRefMeat . LrLineCt ) 
+              ELSE 
+                LLineNoInWindow 
+                  := Display . LineNoInWindow 
+                       ( LWindowRef 
+                       , LPredOfEditedLinesRefs . LrRightLink 
+                       )
+              END (* IF *) 
+            (* INVARIANT: LLineNoInWindow is the window-relative line 
+                 number of the first line represented by the current
+                 new LinesRef. 
+            *) 
+            ; IF LRepaintKind 
+                 = RepaintKindTyp . RepaintKindPseudoShift 
+              THEN (* Tricky!  We in effect shift the top of the 
+                      new set of lines downward one line 
+                      (relative to the window) 
+                      so that the previously invisible first 
+                      of the two joined lines is now just 
+                      visible at the top of the window. *) 
+                INC ( LLineNoInWindow ) 
+              END (* IF *) 
+            ; LWindowLineLen 
+                := EditWindow . SouthEastToCorner ( LWindowRef ) . h
+            ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
+                    TO MarkIdTyp . MiTrailingLine 
+              DO WITH WLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ] 
+                 DO IF WLinesRefMeat # NIL 
+                    THEN 
+                      LLineCt 
+                        := Display . ActualNoOfLines ( WLinesRefMeat . LrLineCt ) 
+                    ; IF LLineNoInWindow + LLineCt > 0 
+                         AND LLineNoInWindow 
+                             < EditWindow . SouthEastToCorner 
+                                 ( LWindowRef ) 
+                               . v 
+                      THEN (* Some portion of new line is visible. *) 
+                        PaintHs . IncludeLrVisibleIn 
+                          ( WLinesRefMeat , LWindowRef . WrWindowNo ) 
+                      ; IF LLineNoInWindow <= 0 
+                        THEN (* This will be the first item visible 
+                                in the window. *) 
+                          LWindowRef . WrFirstLineLinesRef 
+                            := WLinesRefMeat 
+                        ; LWindowRef . WrFirstLineLineNo 
+                            := - LLineNoInWindow 
+                        END (* IF *) 
+
+                      (* Do any needed repainting for new LinesRef. *)
+                      ; IF TRUE 
+(* CHECK: is this needed or not? *) 
+                           OR LRepaintKind 
+                              # RepaintKindTyp . RepaintKindNoShift 
+                        THEN 
+                          CASE RLinesRefSs 
+                          OF MarkIdTyp . MiLeadingLine 
+                          , MarkIdTyp . MiTrailingLine 
+                          => LLineNo := MAX ( LLineNoInWindow , 0 ) 
+                          ; LThruLineNo 
+                              := MIN 
+                                   ( LLineNoInWindow + LLineCt 
+                                   , EditWindow . SouthEastToCorner 
+                                       ( LWindowRef ) 
+                                     . v 
+                                   ) 
+                                 - 1 
+                          ; FOR RI := LLineNo TO LThruLineNo 
+                            DO EditWindow . PaintBackground  
+                                 ( Window := LWindowRef 
+                                 , LineNoInWindow := RI 
+                                 , FromPosInWindow := 0 
+                                 , Len := LWindowLineLen 
+                                 , BgColor := PaintHs . TaBgColorPlain 
+                                 ) 
+                            END (* FOR *) 
+                          | MarkIdTyp . MiFirstText 
+                          , MarkIdTyp . MiSecondText 
+                          => Display . PaintUneditedNonblankLine 
+                               ( WindowRef := LWindowRef 
+                               , LineNoInWindow := LLineNoInWindow 
+                               , LinesRef := WLinesRefMeat 
+                               ) 
+                          END (* CASE *) 
+                        END (* IF *) 
+                      END (* IF *) 
+                    ; INC ( LLineNoInWindow , LLineCt ) 
+                    END (* IF *) 
+                 END (* WITH WLinesRefMeat *) 
+              END (* FOR *) 
+
+            (* Do any needed repainting of shifted lines below the 
+               site of the new LinesRefs. *) 
+            ; IF IftePrevNewLinesRef . LrRightLink # IfteNewLinesRefHeader 
+                 AND LRepaintKind 
+                     IN RepaintKindSetTyp 
+                          { RepaintKindTyp . RepaintKindShiftUp 
+                          , RepaintKindTyp . RepaintKindShiftDown 
+                          } 
+                 AND LLineNoInWindow 
+                     < EditWindow . SouthEastToCorner ( LWindowRef ) . v 
+              THEN 
+                LLinesRefMeat := IftePrevNewLinesRef . LrRightLink 
+              ; LOOP 
+                  IF LLineNoInWindow 
+                     >= EditWindow . SouthEastToCorner ( LWindowRef ) . v 
+                  THEN EXIT 
                   ELSE 
-                    LRepaintKind := RepaintKindTyp . RepaintKindShiftUp 
-                  END (* IF *) 
-                ELSE 
-                  LRepaintKind := RepaintKindTyp . RepaintKindNoShift  
-                END (* IF *) 
-              (* Display . LineNoInWindow depends on WrFirstLineLinesRef 
-                 and WrFirstLineLineNo being set.  We use it only in 
-                 cases where they are not changing. 
-              *)    
-              ; IF LWindowRef . WrFirstLineLinesRef 
-                = LEditedLinesRefMeat 
-                THEN 
-                  LLineNoInWindow := - LWindowRef . WrFirstLineLineNo 
-                ELSIF LWindowRef . WrFirstLineLinesRef 
-                      = IfteSecondOldLinesRef 
-                THEN 
-                  LLineNoInWindow 
-                    := - LWindowRef . WrFirstLineLineNo 
-                       - Display . ActualNoOfLines 
-                           ( LEditedLinesRefMeat . LrLineCt ) 
-                ELSE 
-                  LLineNoInWindow 
-                    := Display . LineNoInWindow 
-                         ( LWindowRef 
-                         , LPredOfEditedLinesRefs . LrRightLink 
-                         )
-                END (* IF *) 
-              (* INVARIANT: LLineNoInWindow is the window-relative line 
-                   number of the first line represented by the current
-                   new LinesRef. 
-              *) 
-              ; IF LRepaintKind 
-                   = RepaintKindTyp . RepaintKindPseudoShift 
-                THEN (* Tricky!  We in effect shift the top of the 
-                        new set of lines downward one line 
-                        (relative to the window) 
-                        so that the previously invisible first 
-                        of the two joined lines is now just 
-                        visible at the top of the window. *) 
-                  INC ( LLineNoInWindow ) 
-                END (* IF *) 
-              ; LWindowLineLen 
-                  := EditWindow . SouthEastToCorner ( LWindowRef ) . h
-              ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
-                      TO MarkIdTyp . MiTrailingLine 
-                DO WITH WLinesRef = IfteLinesRefArray [ RLinesRefSs ] 
-                   DO IF WLinesRef # NIL 
+                    Display . SecureSucc ( ImageRef , LLinesRefMeat ) 
+                  ; IF LLinesRefMeat . LrRightLink = IfteNewLinesRefHeader   
+                    THEN (* We know NOT PaintHs.LrGapAfter( LLinesRefMeat ), 
+                            so this means LLinesRefMeat is to EndOfImage. *) 
+                      WHILE LLineNoInWindow 
+                            < EditWindow . SouthEastToCorner ( LWindowRef ) . v 
+                      DO EditWindow . PaintBackground  
+                           ( Window := LWindowRef 
+                           , LineNoInWindow := LLineNoInWindow 
+                           , FromPosInWindow := 0 
+                           , Len := LWindowLineLen 
+                           , BgColor := PaintHs . TaBgColorPlain 
+                           ) 
+                      ; INC ( LLineNoInWindow ) 
+                      END (* WHILE *) 
+                    ; EXIT 
+                    ELSE 
+                      LLineCt := LLinesRefMeat . LrLineCt 
+                    ; IF LLineCt = 0 
                       THEN 
-                        LLineCt 
-                          := Display . ActualNoOfLines 
-                               ( WLinesRef . LrLineCt ) 
-                      ; IF LLineNoInWindow + LLineCt > 0 
-                           AND LLineNoInWindow 
-                               < EditWindow . SouthEastToCorner 
+                        Display . PaintUneditedNonblankLine 
+                          ( LWindowRef , LLineNoInWindow , LLinesRefMeat ) 
+                      ; INC ( LLineNoInWindow ) 
+                      ELSE 
+                        LThruLineNo 
+                          := MIN 
+                               ( LLineNoInWindow + LLineCt 
+                               , EditWindow . SouthEastToCorner 
                                    ( LWindowRef ) 
                                  . v 
-                        THEN (* Some portion of new line is visible. *) 
-                          PaintHs . IncludeLrVisibleIn 
-                            ( WLinesRef , LWindowRef . WrWindowNo ) 
-                        ; IF LLineNoInWindow <= 0 
-                          THEN (* This will be the first item visible 
-                                  in the window. *) 
-                            LWindowRef . WrFirstLineLinesRef 
-                              := WLinesRef 
-                          ; LWindowRef . WrFirstLineLineNo 
-                              := - LLineNoInWindow 
-                          END (* IF *) 
-
-                        (* Do any needed repainting for new LinesRef. *)
-                        ; IF TRUE 
-(* CHECK: is this needed or not? *) 
-                             OR LRepaintKind 
-                                # RepaintKindTyp . RepaintKindNoShift 
-                          THEN 
-                            CASE RLinesRefSs 
-                            OF MarkIdTyp . MiLeadingLine 
-                            , MarkIdTyp . MiTrailingLine 
-                            => LLineNo := MAX ( LLineNoInWindow , 0 ) 
-                            ; LThruLineNo 
-                                := MIN 
-                                     ( LLineNoInWindow + LLineCt 
-                                     , EditWindow . SouthEastToCorner 
-                                         ( LWindowRef ) 
-                                       . v 
-                                     ) 
-                                   - 1 
-                            ; FOR RI := LLineNo TO LThruLineNo 
-                              DO EditWindow . PaintBackground  
-                                   ( Window := LWindowRef 
-                                   , LineNoInWindow := RI 
-                                   , FromPosInWindow := 0 
-                                   , Len := LWindowLineLen 
-                                   , BgColor := PaintHs . TaBgColorPlain 
-                                   ) 
-                              END (* FOR *) 
-                            | MarkIdTyp . MiFirstText 
-                            , MarkIdTyp . MiSecondText 
-                            => Display . PaintUneditedNonblankLine 
-                                 ( WindowRef := LWindowRef 
-                                 , LineNoInWindow := LLineNoInWindow 
-                                 , LinesRef := WLinesRef 
-                                 ) 
-                            END (* CASE *) 
-                          END (* IF *) 
-                        END (* IF *) 
-                      ; INC ( LLineNoInWindow , LLineCt ) 
-                      END (* IF *) 
-                   END (* WITH WLinesRef *) 
-                END (* FOR *) 
-
-              (* Do any needed repainting of shifted lines below the 
-                 site of the new LinesRefs. *) 
-              ; IF IfteSuccLinesRefMeat # NIL 
-                   AND LRepaintKind 
-                       IN RepaintKindSetTyp 
-                            { RepaintKindTyp . RepaintKindShiftUp 
-                            , RepaintKindTyp . RepaintKindShiftDown 
-                            } 
-                   AND LLineNoInWindow 
-                       < EditWindow . SouthEastToCorner ( LWindowRef ) . v 
-                THEN 
-                  LLinesRef := IfteSuccLinesRefMeat  
-                ; LOOP 
-                    IF LLineNoInWindow 
-                       >= EditWindow . SouthEastToCorner ( LWindowRef ) . v 
-                    THEN EXIT 
-                    ELSE 
-                      Display . SecureSucc ( ImageRef , LLinesRef ) 
-                    ; IF LLinesRef . LrRightLink 
-                         = IfteImagePers . IpLineHeaderRef 
-                      THEN (* We know NOT PaintHs.LrGapAfter( LLinesRef ), 
-                              so this means LLinesRef is to EndOfImage. *) 
-                        WHILE LLineNoInWindow 
-                              < EditWindow . SouthEastToCorner ( LWindowRef ) . v 
+                               ) 
+                             - 1 
+                      ; FOR RI := LLineNoInWindow TO LThruLineNo 
                         DO EditWindow . PaintBackground  
                              ( Window := LWindowRef 
-                             , LineNoInWindow := LLineNoInWindow 
+                             , LineNoInWindow := RI 
                              , FromPosInWindow := 0 
                              , Len := LWindowLineLen 
                              , BgColor := PaintHs . TaBgColorPlain 
                              ) 
-                        ; INC ( LLineNoInWindow ) 
-                        END (* WHILE *) 
-                      ; EXIT 
-                      ELSE 
-                        LLineCt := LLinesRef . LrLineCt 
-                      ; IF LLineCt = 0 
-                        THEN 
-                          Display . PaintUneditedNonblankLine 
-                            ( LWindowRef , LLineNoInWindow , LLinesRef ) 
-                        ; INC ( LLineNoInWindow ) 
-                        ELSE 
-                          LThruLineNo 
-                            := MIN 
-                                 ( LLineNoInWindow + LLineCt 
-                                 , EditWindow . SouthEastToCorner 
-                                     ( LWindowRef ) 
-                                   . v 
-                                 ) 
-                               - 1 
-                        ; FOR RI := LLineNoInWindow TO LThruLineNo 
-                          DO EditWindow . PaintBackground  
-                               ( Window := LWindowRef 
-                               , LineNoInWindow := RI 
-                               , FromPosInWindow := 0 
-                               , Len := LWindowLineLen 
-                               , BgColor := PaintHs . TaBgColorPlain 
-                               ) 
-                          END (* FOR *) 
-                        ; INC ( LLineNoInWindow , LLineCt ) 
-                        END (* IF *) 
-                      ; LLinesRef := LLinesRef . LrRightLink 
+                        END (* FOR *) 
+                      ; INC ( LLineNoInWindow , LLineCt ) 
+                      END (* IF *) 
+                    ; IF LLinesRefMeat . LrRightLink = IfteNewLinesRefHeader
+                      THEN EXIT
+ELSIF NOT ISTYPE ( LLinesRefMeat . LrRightLink , PaintHs . LinesRefMeatTyp )
+THEN
+EVAL LLinesRefMeat
+
+                      ELSE LLinesRefMeat := LLinesRefMeat . LrRightLink
                       END (* IF *) 
                     END (* IF *) 
-                  END (* LOOP still visible in new window state *) 
-                ; IF LRepaintKind = RepaintKindTyp . RepaintKindShiftDown 
-                  THEN (* At most one LinesRef can become 
-                                not visible in window. *) 
-                    Display . MakeLinesRefsNotVisibleInWindow 
-                      ( ImageRef 
-                      , LLinesRef 
-                      , LLinesRef 
-                      , LWindowRef . WrWindowNo 
-                      ) 
                   END (* IF *) 
+                END (* LOOP still visible in new window state *) 
+              ; IF LRepaintKind = RepaintKindTyp . RepaintKindShiftDown 
+                THEN (* At most one LinesRef can become 
+                              not visible in window. *) 
+                  Display . MakeLinesRefsNotVisibleInWindow 
+                    ( ImageRef 
+                    , LLinesRefMeat 
+                    , LLinesRefMeat 
+                    , LWindowRef . WrWindowNo 
+                    ) 
                 END (* IF *) 
               END (* IF *) 
-            ; LWindowRef := LWindowRef . WrImageLink 
-            END (* WHILE LWindowRef # NIL *) 
-          ; BruteForceRepairLineMarks ( ImageRef )
-          ; IF IfteSecondOldLinesRef # NIL 
-            THEN IfteSecondOldLinesRef . LrHasMark := FALSE 
-                 (* ^Why? Isn't it garbage? *) 
             END (* IF *) 
-          ; Display . NoteImageSavedState ( ImageRef , FALSE ) 
-          ; Display . NoteImageParsedState ( ImageRef , FALSE ) 
-          ; Display . NoteImageAnalyzedState ( ImageRef , FALSE ) 
-          EXCEPT Backout ( EMessage ) 
-          => (* Undo changes to the LinesRefs list and the Est root. *) 
-            IfteUndoChanges ( ) 
-          ; AssertDevel . WriteCheckpoint 
-              ( ImageRef := ImageRef 
-              , Message := EMessage 
-              , DoCreateVersion := FALSE 
-              ) 
-            (* ^This will rewrite the checkpoint that was already written from 
-                inside AssertDevel, but with the changes undone. 
-            *) 
+          ; LWindowRef := LWindowRef . WrImageLink 
+          END (* WHILE LWindowRef # NIL *) 
+        ; BruteForceRepairLineMarks ( IfteNewMarkHeader )
+        ; IF IfteSecondOldLinesRef # NIL 
+          THEN IfteSecondOldLinesRef . LrHasMark := FALSE 
+               (* ^Why? Isn't it garbage? *) 
+          END (* IF *) 
+        ; Display . NoteImageSavedState ( ImageRef , FALSE ) 
+        ; Display . NoteImageParsedState ( ImageRef , FALSE ) 
+        ; Display . NoteImageAnalyzedState ( ImageRef , FALSE ) 
+        EXCEPT Backout ( EMessage ) 
+        => (* Undo changes to the LinesRefs list and the Est root. *) 
+          IfteUndoChanges ( ) 
+        ; AssertDevel . WriteCheckpoint 
+            ( ImageRef := ImageRef 
+            , Message := EMessage 
+            , DoCreateVersion := FALSE 
+            ) 
+          (* ^This will rewrite the checkpoint that was already written from 
+              inside AssertDevel, but with the changes undone. 
+          *) 
 (* TODO: This is pretty inefficient.  Find some not-too-inelegant way to 
-         communicate to AssertDevel not to write a checkpoint. 
+       communicate to AssertDevel not to write a checkpoint. 
 *) 
-          ; RAISE Backout ( EMessage ) (* Pass it on up. *) 
-          END (* TRY EXCEPT *) 
-        ; EVAL LThruLineNo (* Place for a breakpoint. *) 
-        END (* IF *) 
-      END (* Block *) 
+        ; RAISE Backout ( EMessage ) (* Pass it on up. *) 
+        END (* TRY EXCEPT *) 
+      ; EVAL LThruLineNo (* Place for a breakpoint. *) 
+      END (* Block for InnerFlushTempEdit *) 
     END InnerFlushTempEdit 
 
 (* EXPORTED: *)
@@ -2408,11 +2687,11 @@ END (* IF *)
 
 ; PROCEDURE EnsureTextAttrArraySize 
     ( VAR (* IN OUT *) ArrayRef : PaintHs . TextAttrArrayRefTyp 
-    ; MinSize : PortTypes . Int32Typ := 0 
+    ; MinSize : INTEGER := 0 
     ) 
 
-  = VAR LOldSize : PortTypes . Int32Typ 
-  ; VAR LNewSize : PortTypes . Int32Typ 
+  = VAR LOldSize : INTEGER 
+  ; VAR LNewSize : INTEGER 
   ; VAR LOldRef : PaintHs . TextAttrArrayRefTyp 
 
   ; BEGIN
@@ -2423,8 +2702,7 @@ END (* IF *)
                  , MinSize + TextAttrArrayTempGrowthSize 
                  ) 
       ; FOR RI := 0 TO NUMBER ( ArrayRef ^ ) - 1 
-        DO 
-          ArrayRef ^ [ RI ] := PaintHs . TextAttrDefault 
+        DO ArrayRef ^ [ RI ] := PaintHs . TextAttrDefault 
         END (* FOR *)  
       ELSE
         LOldSize := NUMBER ( ArrayRef ^ ) 
@@ -2436,8 +2714,7 @@ END (* IF *)
         ; ArrayRef := NEW ( PaintHs . TextAttrArrayRefTyp , LNewSize ) 
         ; SUBARRAY ( ArrayRef ^ , 0 , LOldSize ) := LOldRef ^ 
         ; FOR RI := LOldSize TO LNewSize - 1 
-          DO 
-            ArrayRef ^ [ RI ] := PaintHs . TextAttrDefault 
+          DO ArrayRef ^ [ RI ] := PaintHs . TextAttrDefault 
           END (* FOR *)  
         END (* IF *) 
       END (* IF *) 
@@ -3134,7 +3411,7 @@ END (* IF *)
         LImagePers := WindowRef . WrImageRef . ItPers  
       ; WITH 
           WCursorMark 
-          = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+          = WindowRef . WrMarks [ MarkSsTyp . MarkSsCursor ] 
         DO 
           IF WCursorMark . LmLinesRef # NIL 
           THEN (* An image is open in the window *) 
@@ -3328,7 +3605,7 @@ END (* IF *)
                        ( WindowRef . WrImageRef ) 
         ; WITH 
             WCursorMark 
-            = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+            = WindowRef . WrMarks [ MarkSsTyp . MarkSsCursor ] 
           DO IF ( NewChar = ' ' OR NewChar = Ascii . ht ) 
                 AND ( LImagePers . IpTempEditState 
                       = PaintHs . TempEditStateTyp . TeStateIdle 
@@ -3702,7 +3979,7 @@ END (* IF *)
           => InsertOrOverlayChar ( WindowRef , WCh , IsInsert ) 
           ; Display . HorizMoveCursorWindowRef 
               ( WindowRef 
-              , - WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+              , - WindowRef . WrMarks [ MarkSsTyp . MarkSsCursor ] 
                   . LmCharPos 
               , (* VAR *) MustRepaint := LMustRepaint (* Dead *) 
               )  
@@ -3744,7 +4021,7 @@ END (* IF *)
           LImagePers := LImageTrans . ItPers
         ; WITH 
             WCursorMark 
-            = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+            = WindowRef . WrMarks [ MarkSsTyp . MarkSsCursor ] 
           DO
             IF WCursorMark # NIL AND WCursorMark . LmLinesRef # NIL 
             THEN
@@ -3919,7 +4196,7 @@ END (* IF *)
           LImagePers := LImageTrans . ItPers  
         ; WITH 
             WCursorMark 
-            = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+            = WindowRef . WrMarks [ MarkSsTyp . MarkSsCursor ] 
           DO
             IF WCursorMark # NIL AND WCursorMark . LmLinesRef # NIL 
             THEN
@@ -4167,7 +4444,7 @@ END (* IF *)
       ; LMark := FromMark . LmRightLink
       ; LOOP
           IF LMark = ThruMark THEN EXIT END (* IF *)
-        ; IF LMark . LmMarkSs = PaintHs . MarkSsTyp . MarkSsCursor 
+        ; IF LMark . LmMarkSs = MarkSsTyp . MarkSsCursor 
           THEN (* It's the cursor.  Adjust WrCursorLineNoInWindow. *) 
             WITH WCursorLineNo
                  = LMark . LmWindowRef . WrCursorLineNoInWindow
@@ -4222,7 +4499,7 @@ END (* IF *)
         ; PaintHs . BruteForceVerifyLineMarks ( ImageTrans ) 
         END (* IF *) 
 
-      (* Delete selected portion of last included line. *)
+      (* Delete selected portion of rightmost included line. *)
       ; IF FALSE AND ThruMark . LmCharPos = 0
         THEN  (* For ThruMark, only the new line at its beginning is to be
                  deleted.  Do nothing for ThruMark.  The Mark to the left
@@ -4247,7 +4524,7 @@ END (* IF *)
           LLinesRef := ThruMark . LmLinesRef . LrLeftLink 
         ; LMark := NEW ( PaintHs . LineMarkMeatTyp ) 
         ; LMark . LmWindowRef := NIL 
-        ; LMark . LmMarkSs := PaintHs . MarkSsTyp . MarkSsNull 
+        ; LMark . LmMarkSs := MarkSsTyp . MarkSsNull 
         ; LMark . LmLinesRef := LLinesRef  
         ; LMark . LmTokMark := LLinesRef . LrBolTokMark 
         ; LMark . LmCharPos := 0 
@@ -4471,7 +4748,7 @@ END (* IF *)
         THEN 
           WITH 
             WCursorMark 
-            = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+            = WindowRef . WrMarks [ MarkSsTyp . MarkSsCursor ] 
           DO 
             GrabTempEditRef 
               ( WindowRef . WrImageRef 
@@ -4491,7 +4768,7 @@ END (* IF *)
             ; LRightAttrSs := - 1 
             ; WITH 
                 WCursorMark 
-                = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+                = WindowRef . WrMarks [ MarkSsTyp . MarkSsCursor ] 
               DO 
                 IF WCursorMark . LmCharPos <= 0 
                 THEN 
@@ -4639,9 +4916,9 @@ END (* IF *)
   = BEGIN (* InitTextEdit *) 
       FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
             TO MarkIdTyp . MiTrailingLine 
-      DO WITH WLinesRef = LinesRefArrayNull [ RLinesRefSs ] 
-         DO WLinesRef := NIL 
-         END (* WITH WLinesRef *) 
+      DO WITH WLinesRefMeat = LinesRefArrayNull [ RLinesRefSs ] 
+         DO WLinesRefMeat := NIL 
+         END (* WITH WLinesRefMeat *) 
       END (* FOR *) 
     END InitTextEdit 
 
