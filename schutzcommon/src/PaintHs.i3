@@ -302,13 +302,14 @@ INTERFACE PaintHs
       } 
 
 ; TYPE LineMarkTyp 
-    = OBJECT (* ABSTRACT *) 
+    = OBJECT  
         LmLeftLink : LineMarkTyp := NIL 
       ; LmRightLink : LineMarkTyp := NIL 
       END (* OBJECT *) 
 
 ; TYPE LineMarkHeaderTyp 
-    = LineMarkTyp OBJECT END (* OBJECT *) 
+    = LineMarkTyp OBJECT END (* OBJECT *)
+(* TODO ^ Eliminate uses of this, in favor of LineMarkTyp. *) 
 
 ; TYPE LineMarkMeatTyp 
     = LineMarkHeaderTyp 
