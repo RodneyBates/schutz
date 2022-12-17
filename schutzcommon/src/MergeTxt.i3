@@ -47,8 +47,10 @@ INTERFACE MergeTxt
       (* ^This is an image of the entire line, after the edits to be merged. *)
     ; InsLen : LbeStd . LimitedCharNoTyp 
     ; InsNlPos : LbeStd . LimitedCharNoTyp 
-      (* ^Position in the edited line before which an inserted new line goes. 
-          LbeStd . LimitedCharNoInfinity if no new line at all. *) 
+      (* ^Position in the edited line before which a new line goes. 
+          LbeStd . LimitedCharNoInfinity if no new line at all. 
+          Otherwise, must lie in the interval 
+          [ DelFromPos , DelFromPos + InsLen ] *) 
     ; NlIndentPos : LbeStd . LimitedCharNoTyp 
       (* ^If InsNlPos # LbeStd . LimitedCharNoInfinity, this the amount 
           of indentation of the new text line, after the inserted Nl. 
@@ -74,6 +76,8 @@ INTERFACE MergeTxt
       *) 
     ; VAR NewBolTokMark : Marks . TokMarkTyp 
     ; VAR NewLinesCt : LbeStd . LineNoTyp 
+          (* ^A ModBlankLine counts only as one here, regardless of
+             ModBlankLineCt. *) 
     ; VAR LeadingBlankLinesIncluded : LbeStd . LineNoTyp  
       (* ^This many lines from leading blank mods were incorporated into the 
          resulting set of tree children. *)  

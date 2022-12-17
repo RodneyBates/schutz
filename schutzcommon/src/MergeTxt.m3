@@ -52,7 +52,7 @@ MODULE MergeTxt
     ; InsNlPos : LbeStd . LimitedCharNoTyp 
       (* ^Position in the edited line before which a new line goes. 
           LbeStd . LimitedCharNoInfinity if no new line at all. 
-          Otherwise, must line in the interval 
+          Otherwise, must lie in the interval 
           [ DelFromPos , DelFromPos + InsLen ] *) 
     ; NlIndentPos : LbeStd . LimitedCharNoTyp 
       (* ^If InsNlPos # LbeStd . LimitedCharNoInfinity, this the amount 
@@ -78,7 +78,9 @@ MODULE MergeTxt
           marks it produces.
       *) 
     ; VAR NewBolTokMark : Marks . TokMarkTyp 
-    ; VAR NewLinesCt : LbeStd . LineNoTyp 
+    ; VAR NewLinesCt : LbeStd . LineNoTyp
+          (* ^A ModBlankLine counts only as one here, regardless of
+             ModBlankLineCt. *) 
     ; VAR LeadingBlankLinesIncluded : LbeStd . LineNoTyp  
       (* ^This many lines from leading blank mods were incorporated into the 
          resulting set of tree children. *)  
@@ -1572,7 +1574,7 @@ MODULE MergeTxt
               END (* IF *) 
 
             (* If necessary, insert the leading blank line mod. *) 
-            ; IF LNewBlankLinesBeforeCt # 0 
+            ; IF LNewBlankLinesBeforeCt > 0 
               THEN (* Insert leading blank line mod. *) 
                 MteTeWaitBlankLines ( LNewBlankLinesBeforeCt , FmtNo ) 
               ; LBlankLineModRef := MteTeFlushBlankLines ( ) 
