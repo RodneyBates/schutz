@@ -41,7 +41,8 @@ MODULE Ui
 ; IMPORT Messages 
 ; IMPORT Misc 
 ; IMPORT Options 
-; IMPORT PaintHs 
+; IMPORT PaintHs
+; FROM PaintHs IMPORT MarkSsTyp 
 ; IMPORT ParseHs 
 ; IMPORT PortTypes 
 ; IMPORT Selection 
@@ -1001,7 +1002,6 @@ MODULE Ui
     ) 
 
   = VAR LClosure : WorkerClosureTextTyp 
-  ; VAR LImageTrans : PaintHs . ImageTransientTyp 
   ; VAR LImagePers : PaintHs . ImagePersistentTyp 
 
   ; <* FATAL FormsVBT . Error *>
@@ -2140,11 +2140,15 @@ MODULE Ui
           , Mark2 := LSel . SelEndMark 
           , (* VAR *) Left := LLeftMark 
           , (* VAR *) Right := LRightMark 
-          ) 
+          )
+      ; Closure . Window . WrMarks [ MarkSsTyp . MarkSsStartSel ]
+          := LLeftMark 
+      ; Closure . Window . WrMarks [ MarkSsTyp . MarkSsEndSel ]
+          := LRightMark 
       ; TextEdit . DeleteBetweenMarks 
-          ( LImage 
-          , LLeftMark 
-          , LRightMark 
+          ( Closure . Window 
+          , MarkSsTyp . MarkSsStartSel  
+          , MarkSsTyp . MarkSsEndSel 
           ) 
       ; Selection . ClearSelection ( ) 
         (* LSel will be obsolete here. *) 
