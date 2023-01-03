@@ -123,11 +123,11 @@ MODULE EstDump
 
       | EstHs . EstRefTyp ( TEstRef ) 
         => TravUtil .  InitEstTravInfoFwd 
-        ( (* OUT *) LEstTravInfo 
-        , NodeRef 
-        , KindSet := TEstRef . EstChildKindSet 
-        , ParentAbsNodeNo := NodeNo
-        ) 
+           ( (* OUT *) LEstTravInfo 
+           , NodeRef 
+           , KindSet := TEstRef . EstChildKindSet 
+           , ParentAbsNodeNo := NodeNo
+           ) 
         ; <* ASSERT NodeNo = LEstTravInfo . EtiAbsNodeNo *> 
            
           WT ( Misc . Blanks ( Indent ) )
@@ -213,6 +213,8 @@ MODULE EstDump
         WT ( Misc . Blanks ( Indent ) )
       ; WT ( "NodeNo:" )
       ; WI ( NodeNo )
+      ; WT ( " Addr:" ) 
+      ; WX ( NodeRef ) 
       ; WC ( ' ' ) 
       ; WT ( EstUtil . EstNodeImage ( NodeRef , Indent , NodeNo , Lang ) ) 
       ; WEOL ( )
