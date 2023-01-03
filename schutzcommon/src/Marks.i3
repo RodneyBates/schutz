@@ -167,5 +167,24 @@ INTERFACE Marks
         , TkmIsImpliedNewLine := FALSE 
         } 
 
+; CONST TokMarkEOI 
+    = TokMarkTyp 
+        { TkmEstRef := NIL
+        , TkmEstNodeNo := LbeStd . EstNodeNoMax 
+        , TkmParentNodeNo := LbeStd . EstNodeNoNull 
+        , TkmEstNodeCt := 0 
+        , TkmBlCharPos := LbeStd . CharNoUnknown 
+        , TkmTok := LbeStd . Tok__EndOfImage 
+        , TkmKind := MarkKindTyp . Null 
+        , TkmFmtNo := EstHs . FmtNoMax
+          (* ^If we ever eliminate LbeStd.UseAugmentTrees=FALSE, it would be
+             better if this were EstHs.FmtNoEOIChildOfAugment and TkmEstNodeNo
+             were EstHs.FmtNoEOIChildOfAugment.  For now, it is not used to
+             detect TokMarkEOI.  (See Marks.Compare)  
+          *) 
+        , TkmStartAtEnd := FALSE 
+        , TkmIsImpliedNewLine := FALSE 
+        } 
+
 ; END Marks 
 . 

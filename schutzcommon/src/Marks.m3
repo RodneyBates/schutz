@@ -124,8 +124,15 @@ MODULE Marks
 
   = VAR LResult : [ - 1 .. 1 ] 
 
-  ; BEGIN 
-      CASE Left . TkmKind 
+  ; BEGIN
+      IF Right . TkmTok = LbeStd . Tok__EndOfImage
+      THEN IF Left . TkmTok = LbeStd . Tok__EndOfImage 
+        THEN RETURN 0 
+        ELSE RETURN - 1 
+        END (* IF *) 
+      END (* IF *)
+      
+    ; CASE Left . TkmKind 
       OF MarkKindTyp . Null 
       , MarkKindTyp . Changed   
       => RAISE Unordered 
