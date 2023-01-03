@@ -18,6 +18,7 @@ MODULE Search
 ; IMPORT Marks 
 ; IMPORT Misc 
 ; IMPORT PaintHs
+; FROM PaintHs IMPORT MarkSsTyp 
 ; IMPORT Strings 
 ; IMPORT TextEdit 
 
@@ -92,14 +93,14 @@ MODULE Search
   ; BEGIN 
       WITH 
         WCursorMark 
-        = Window . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+        = Window . WrMarks [ MarkSsTyp . MarkSsCursor ] 
       DO 
         LImageTrans := Window . WrImageRef 
       ; LOldCursorMark := WCursorMark 
 
       ; LMatchStartMark := NEW ( PaintHs . LineMarkMeatTyp )  
       ; LMatchStartMark . LmWindowRef := Window   
-      ; LMatchStartMark . LmMarkSs := PaintHs . MarkSsTyp . MarkSsStartMatch   
+      ; LMatchStartMark . LmMarkSs := MarkSsTyp . MarkSsStartMatch   
       ; LMatchStartMark . LmLinesRef := LinesRef  
       ; LMatchStartMark . LmTokMark := LinesRef . LrBolTokMark  
       ; LMatchStartMark . LmLineNo := LineNo  
@@ -107,7 +108,7 @@ MODULE Search
 
       ; LMatchEndMark := NEW ( PaintHs . LineMarkMeatTyp )  
       ; LMatchEndMark . LmWindowRef := Window   
-      ; LMatchEndMark . LmMarkSs := PaintHs . MarkSsTyp . MarkSsEndMatch   
+      ; LMatchEndMark . LmMarkSs := MarkSsTyp . MarkSsEndMatch   
       ; LMatchEndMark . LmLinesRef := LinesRef  
       ; LMatchEndMark . LmTokMark := LinesRef . LrBolTokMark  
       ; LMatchEndMark . LmLineNo := LineNo  
@@ -366,7 +367,7 @@ MODULE Search
         ; LLinesHeader := LImagePers . IpLineHeaderRef 
         ; WITH 
             WCursorMark 
-            = Window . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+            = Window . WrMarks [ MarkSsTyp . MarkSsCursor ] 
           DO 
             IF WCursorMark # NIL 
             THEN 
@@ -638,7 +639,7 @@ MODULE Search
         ; LLinesHeader := LImagePers . IpLineHeaderRef 
         ; WITH 
             WCursorMark 
-            = Window . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+            = Window . WrMarks [ MarkSsTyp . MarkSsCursor ] 
           DO 
             IF WCursorMark # NIL 
             THEN 
@@ -767,9 +768,9 @@ MODULE Search
           ELSE 
             LOOP 
               TextEdit . DeleteBetweenMarks  
-                ( LImageTrans 
-                , Window . WrMatchStartMark 
-                , Window . WrMatchEndMark 
+                ( Window  
+                , MarkSsTyp . MarkSsStartMatch 
+                , MarkSsTyp . MarkSsEndMatch 
                 ) 
             ; ClearMatch ( Window , (* VAR *) LMustRepaint (* Dead. *) ) 
             ; TextEdit . InsertOrOverlayString 
