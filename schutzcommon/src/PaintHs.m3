@@ -218,7 +218,23 @@ MODULE PaintHs
           END (* IF *) 
         END (* IF *) 
       END (* IF *) 
-    END ResetAllLrHasMarkFields 
+    END ResetAllLrHasMarkFields
+
+(* EXPORTED: *) 
+; PROCEDURE MarkSsImage ( MarkSsValue : MarkSsTyp ) : TEXT
+  = BEGIN
+      CASE MarkSsValue 
+      OF MarkSsTyp . MarkSsNull => RETURN "MarkSsNull"
+      | MarkSsTyp . MarkSsStartSel => RETURN "MarkSsStartSel"
+      | MarkSsTyp . MarkSsCursor => RETURN "MarkSsCursor"
+      | MarkSsTyp . MarkSsEndSel => RETURN "MarkSsEndSel"
+      | MarkSsTyp . MarkSsStartMatch => RETURN "MarkSsStartMatch"
+      | MarkSsTyp . MarkSsEndMatch => RETURN "MarkSsEndMatch"
+      | MarkSsTyp . MarkSsTemp => RETURN "MarkSsTemp"
+      END (* CASE *) 
+    END MarkSsImage 
+
+
 
 (* EXPORTED: *) 
 ; PROCEDURE RecomputeLrHasMark ( Mark : LineMarkMeatTyp ) 
@@ -730,11 +746,13 @@ MODULE PaintHs
             ; EXIT 
             END (* TYPECASE *) 
           END (* LOOP *) 
-        END (* IF *) 
+        END (* IF *)
+(* LineMark counts can change.   TextEdit.DeleteBetweenMarks adds a temporary one.    
       ; Assert 
           ( LMarkCt = LImagePers . IpMarkCt 
           , AFT . A_BruteForceVerifyLineMarks_Wrong_mark_count_in_image 
-          ) 
+          )
+*)
       ; LImagePers . IpMarkCt := LMarkCt 
         (* Repair it.  This can help when loading a damaged checkpoint file. *)
       END (* IF *) 
@@ -747,7 +765,7 @@ MODULE PaintHs
 ; PROCEDURE WindowNoSetImage ( Set : WindowNoSetTyp ; Indent : INTEGER ) : TEXT
 
   = BEGIN
-      RETURN "{<PaintHs.WindowNoSetImage not implemented.>"
+      RETURN "{?? NYI ??>"
 (* TODO: Implement this.  And genericize it.  There are a few other
          *SetImage functions hanging around. *) 
     END WindowNoSetImage
@@ -794,14 +812,16 @@ MODULE PaintHs
         ; Wr . PutText ( LWrT , LBlanks )
         ; Wr . PutText ( LWrT , "LrTextAddrArray:" ) 
         ; Wr . PutText
-            ( LWrT , RefanyImage ( TLinesRefMeat . LrTextAttrArrayRef ) ) 
-        ; Wr . PutChar ( LWrT , '}' )
+            ( LWrT , RefanyImage ( TLinesRefMeat . LrTextAttrArrayRef ) )
+(* TODO:  Emit the elements. *) 
+        ; Wr . PutText ( LWrT , "{ }" )
         
         ; Wr . PutText ( LWrT , Wr . EOL )
         ; Wr . PutText ( LWrT , LBlanks )
         ; Wr . PutText ( LWrT , "LrLineErrArray:" ) 
         ; Wr . PutText
             ( LWrT , RefanyImage ( TLinesRefMeat . LrLineErrArrayRef ) ) 
+(* TODO:  Emit the elements. *) 
         
         ; Wr . PutText ( LWrT , Wr . EOL )
         ; Wr . PutText ( LWrT , LBlanks )
@@ -824,7 +844,9 @@ MODULE PaintHs
         
         ; Wr . PutText ( LWrT , Wr . EOL )
         ; Wr . PutText ( LWrT , LBlanks )
-        ; Wr . PutText ( LWrT , "LrLineText:" ) 
+        ; Wr . PutText ( LWrT , "LrLineText: " ) 
+        ; Wr . PutText ( LWrT , RefanyImage ( TLinesRefMeat . LrLineText ) )
+        ; Wr . PutChar ( LWrT , ' ' ) 
         ; Wr . PutText
             ( LWrT
             , Misc . QuoteText ( NonNilText ( TLinesRefMeat . LrLineText ) )
@@ -1011,6 +1033,7 @@ MODULE PaintHs
     (* Write meat nodes left-to-right, starting with LLinesRef. *)
     ; LOOP 
         Wr . PutText ( WrT , Wr . EOL ) 
+      ; Wr . PutText ( WrT , Wr . EOL ) 
       ; Wr . PutText ( WrT , LinesRefImage ( LLinesRef , LIndent ) ) 
       ; TYPECASE LLinesRef . LrRightLink
         OF NULL

@@ -278,7 +278,7 @@ INTERFACE PaintHs
 ; PROCEDURE ResetAllLrHasMarkFields ( ImageTrans : ImageTransientTyp ) 
 
 (* Marks *) 
-(* Each image has a doubly linked list of LineMarks. The header 
+(* Each image has a doubly-linked list of LineMarks. The header 
    of this list is non-information-bearing, of type 
    LineMarkHeaderTyp.  The ImageTransientTyp object has a ref 
    to the header, and it also points back to the image. 
@@ -294,12 +294,15 @@ INTERFACE PaintHs
 *) 
 ; TYPE MarkSsTyp 
     = { MarkSsNull 
-      , MarkSsStartSel  (* Start point of selected text. *) 
-      , MarkSsCursor    (* The true cursor. *) 
-      , MarkSsEndSel    (* End point of selected text. *) 
-      , MarkSsStartMatch
-      , MarkSsEndMatch 
-      } 
+      , MarkSsStartSel   (* Start point of selected text. *) 
+      , MarkSsCursor     (* The true cursor. *) 
+      , MarkSsEndSel     (* End point of selected text. *) 
+      , MarkSsStartMatch (* Start point of matched text. *)  
+      , MarkSsEndMatch   (* End point of matched text. *) 
+      , MarkSsTemp       (* Used temporarily by a single operation. *) 
+      }
+
+; PROCEDURE MarkSsImage ( MarkSsValue : MarkSsTyp ) : TEXT 
 
 ; TYPE LineMarkTyp 
     = OBJECT  
@@ -323,7 +326,7 @@ INTERFACE PaintHs
         END (* OBJECT *) 
 
 ; TYPE MarkArrayTyp 
-    = ARRAY [ MarkSsTyp . MarkSsStartSel .. MarkSsTyp . MarkSsEndSel ] 
+    = ARRAY [ MarkSsTyp . MarkSsStartSel .. MarkSsTyp . MarkSsTemp ] 
       OF LineMarkMeatTyp 
 
 ; PROCEDURE RecomputeLrHasMark ( Mark : LineMarkMeatTyp ) 
@@ -485,7 +488,7 @@ INTERFACE PaintHs
         ; IrVisibleIn : WindowNoSetTyp  
         ; IrWindowList : WindowRefTyp := NIL 
         ; IrLineHeaderRef : LinesRefTyp := NIL 
-        (* ^Contentless list header of doubly, circularly linked 
+        (* ^Contentless list header of doubly-, circularly-linked 
             list of LinesRefs for the image. *) 
         ; IrEstRoot : LbeStd . EstRootTyp := NIL 
         ; IrSemRoot : REFANY 
@@ -529,7 +532,7 @@ INTERFACE PaintHs
           IpMagic : INTEGER := IpMagicNo 
         ; IpLang : LbeStd . LangTyp := LbeStd . LangNull 
         ; IpLineHeaderRef : LinesRefTyp := NIL 
-        (* ^Contentless list header of doubly, circularly linked 
+        (* ^Contentless list header of doubly-, circularly-linked 
             list of LinesRefs for the image. *) 
         ; IpEstRoot : LbeStd . EstRootTyp := NIL 
         ; IpSemRoot : REFANY := NIL 
@@ -610,8 +613,8 @@ INTERFACE PaintHs
         ; WrWindowNo : WindowNoTyp    (* Among the windows into its image. *) 
         ; WrCursorLineNoInWindow : LbeStd . LineNoTyp 
         ; WrHorizScroll 
-          : LbeStd . LimitedCharNoTyp (* This many chars are left of 
-                                         leftmost visible char. *) 
+          : LbeStd . LimitedCharNoTyp
+            (* ^This many chars are left of leftmost visible char. *) 
         ; WrVertScroll : LbeStd . LineNoTyp := 0 
           (* This many lines are above the window.  This value is
              sometimes estimated. *) 

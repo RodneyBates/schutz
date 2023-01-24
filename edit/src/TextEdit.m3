@@ -11,7 +11,8 @@
 MODULE TextEdit 
 
 ; IMPORT Compiler 
-; IMPORT Fmt 
+; IMPORT Fmt
+; IMPORT Stdio 
 ; IMPORT Text 
 ; IMPORT TextWr 
 ; IMPORT Thread
@@ -887,7 +888,48 @@ END (* IF *)
       ; LNewValue . TeLineErrArrayRef ^ := OldValue . TeLineErrArrayRef ^ 
       END (* IF *) 
     ; RETURN LNewValue 
-    END CopyOfTempEditRef 
+    END CopyOfTempEditRef
+
+; VAR GNodeNoToCatch := LAST ( INTEGER ) 
+; VAR GCatchAll := FALSE
+
+; PROCEDURE NotePatchedTokMark
+    ( READONLY TokMark : Marks . TokMarkTyp ; KindLabel : TEXT )
+  = VAR LBreakNodeNo : INTEGER := 0
+  ; VAR LImage : TEXT 
+
+  ; BEGIN
+      LBreakNodeNo := TokMark . TkmEstNodeNo 
+    ; IF GCatchAll OR LBreakNodeNo = GNodeNoToCatch
+      THEN
+        LImage := Marks . MarkImage ( TokMark ) 
+      ; Wr . PutText ( Stdio . stderr , "Patched TokMark for " ) 
+      ; Wr . PutText ( Stdio . stderr , KindLabel ) 
+      ; Wr . PutText ( Stdio . stderr , Wr . EOL ) 
+      ; Wr . PutText ( Stdio . stderr , "  " ) 
+      ; Wr . PutText ( Stdio . stderr , LImage ) 
+      ; Wr . PutText ( Stdio . stderr , Wr . EOL )
+      ; Wr . Flush ( Stdio . stderr )
+      END (* IF *) 
+    END NotePatchedTokMark  
+
+; PROCEDURE NoteNewLinesRef ( LinesRefMeat : PaintHs . LinesRefMeatTyp )
+
+  = VAR LBreakNodeNo : INTEGER := 0
+  ; VAR LImage : TEXT 
+
+  ; BEGIN
+      LBreakNodeNo := LinesRefMeat . LrBolTokMark . TkmEstNodeNo 
+    ; IF GCatchAll OR LBreakNodeNo = GNodeNoToCatch
+      THEN
+        LImage := PaintHs . LinesRefImage ( LinesRefMeat , LineIndent := 4 )
+      ; Wr . PutText ( Stdio . stderr , "NewLinesRef:" ) 
+      ; Wr . PutText ( Stdio . stderr , Wr . EOL ) 
+      ; Wr . PutText ( Stdio . stderr , LImage ) 
+      ; Wr . PutText ( Stdio . stderr , Wr . EOL )
+      ; Wr . Flush ( Stdio . stderr )
+      END (* IF *) 
+    END NoteNewLinesRef 
 
 ; TYPE MarkIdTyp 
   = { MiLeadingLine , MiFirstText , MiSecondText , MiTrailingLine } 
@@ -979,7 +1021,7 @@ END (* IF *)
            It could also be empty (denoted by IfteOldFromLinesRefMeat = NIL)
            when editing "beyond" EOI. 
         *) 
-  ; VAR IftePrevNewLinesRef : PaintHs . LinesRefHeaderTyp
+  ; VAR IfteRMNewLinesRef : PaintHs . LinesRefHeaderTyp
   ; VAR IfteSuccLinesRef : PaintHs . LinesRefTyp 
         (* Points to the LinesRef following _all_ new LinesRefs. *) 
   ; VAR IfteSuccLinesRefMeat : PaintHs . LinesRefMeatTyp 
@@ -1699,13 +1741,14 @@ End old version^ *)
              THEN
                LWrT := TextWr . New ( )
              ; Wr . PutText ( LWrT , Label ) 
-             ; Wr . PutText ( LWrT , " LinesRef.LrLineText:" ) 
+             ; Wr . PutText ( LWrT , " LinesRef:" ) 
              ; Wr . PutText ( LWrT , Wr . EOL ) 
+             ; Wr . PutText ( LWrT , "  LrLineText=" ) 
              ; Wr . PutText ( LWrT , "  \"" ) 
              ; Wr . PutText ( LWrT , TLinesRefMeat . LrLineText ) 
              ; Wr . PutChar ( LWrT , '\"' ) 
              ; Wr . PutText ( LWrT , Wr . EOL ) 
-             ; Wr . PutText ( LWrT , "  TokMark:{" ) 
+             ; Wr . PutText ( LWrT , "  TokMark={" ) 
              ; Wr . PutText ( LWrT , Marks . MarkImage ( WTokMark ) ) 
              ; Wr . PutChar ( LWrT , '}' ) 
              ; Wr . PutText ( LWrT , Wr . EOL ) 
@@ -1727,7 +1770,7 @@ End old version^ *)
            END (* WITH *) 
         ELSE RETURN
         END (* TYPECASE *)
-      END IfteCheckNodeCtMismatch 
+      END IfteCheckNodeCtMismatch
 
   ; PROCEDURE IfteRebuildLists 
       ( OldEstRoot : EstHs . EstRefTyp
@@ -1742,28 +1785,26 @@ End old version^ *)
      RAISES { Backout } 
 
     = VAR IfteRblCurOldLinesRefMeat : PaintHs . LinesRefMeatTyp
-    ; VAR IfteRblCurNewLinesRefMeat : PaintHs . LinesRefMeatTyp
     ; VAR IfteRblMarkLinesRefMeat : PaintHs . LinesRefMeatTyp
 
     ; VAR IfteRblPrevOldMarkMeat : PaintHs . LineMarkMeatTyp 
     ; VAR IfteRblCurOldMarkMeat : PaintHs . LineMarkMeatTyp 
-    ; VAR IfteRblPrevNewMark : PaintHs . LineMarkHeaderTyp 
+    ; VAR IfteRblRMNewMark : PaintHs . LineMarkHeaderTyp 
     ; VAR IfteRblCurNewMarkMeat : PaintHs . LineMarkMeatTyp 
 
     ; VAR IfteRblMergeLineNo : LbeStd . LineNoTyp 
-    ; VAR IfteRblMergeMiddleLineNo : LbeStd . LineNoTyp 
+    ; VAR IfteRblLastLineNoOf1stOldLinesRef : LbeStd . LineNoTyp 
     ; VAR IfteRblPrevNewMergeToLineNo : LbeStd . LineNoTyp 
     ; VAR IfteRblCurNewMergeToLineNo : LbeStd . LineNoTyp
-    ; VAR IfteRblOldLineCtToLeft : LbeStd . LineNoTyp
+    ; VAR IfteRbl0LineNoOfCurOldLinesRef : LbeStd . LineNoTyp
     ; VAR IfteRblToNodeNoOfFromTokMark : INTEGER 
     ; VAR IfteRblToNodeNoOfToTokMark : INTEGER 
 
     ; VAR IfteRblNewCharPos : LbeStd . LimitedCharNoSignedTyp 
 
-    ; VAR IfteRblCmpMarkTo : [ - 1 .. 1 ] 
-    ; VAR IfteRblCmpLinesTo : [ - 1 .. 1 ] 
-    ; VAR IfteRblCmpMutual : [ - 1 .. 1 ]
-    ; VAR IfteRblCmpMarks : [ - 1 .. 1 ]
+    ; VAR IfteRblCmpMarkToEnd : [ - 1 .. 1 ] 
+    ; VAR IfteRblCmpLinesToEnd : [ - 1 .. 1 ] 
+    ; VAR IfteRblCmpLinesToMark : [ - 1 .. 1 ]
 
     ; VAR IfteRblIn2ndOldLinesRef : BOOLEAN
 
@@ -1777,12 +1818,10 @@ End old version^ *)
              means N is on or to the X side of the path from the Y node to
              the root.  Y will be the from- or to-node of the merged region. *)
 
-
     ; PROCEDURE IfteRblAdvanceOldLinesRef ( )
 
       = BEGIN
-          IftePrevNewLinesRef := IfteRblCurNewLinesRefMeat
-        ; IF IfteRblCurOldLinesRefMeat . LrRightLink = IfteOldLinesRefHeader
+          IF IfteRblCurOldLinesRefMeat . LrRightLink = IfteOldLinesRefHeader
           THEN IfteRblCurOldLinesRefMeat := NIL 
           ELSE IfteRblCurOldLinesRefMeat 
                  := NARROW 
@@ -1791,6 +1830,84 @@ End old version^ *)
                       ) (* Ca'nt faail. *) 
           END (* IF *) 
         END IfteRblAdvanceOldLinesRef
+        
+    ; PROCEDURE IfteRblPatchTokMark
+        ( VAR TokMark : Marks . TokMarkTyp ; KindLabel : TEXT )
+
+      = VAR LOldNodeCt : INTEGER 
+      ; VAR LIsOnOrRightOfRightPath
+            , LIsOnOrRightOfLeftPath
+            , LIsOnOrLeftOfLeftPath
+            , LIsOnOrLeftOfRightPath
+            : BOOLEAN
+            (* Interpretation: Concerning an Est node N, identified by its
+               node number, LIsOnOrXOfYPath, for X and Y IN {Left, Right},
+               means N is on or to the X side of the path from the Y node to
+               the root.  Y will be the from- or to-node of the merged region. *)
+               
+      ; BEGIN 
+          IF OldFromTokMark . TkmEstNodeNo <= TokMark . TkmEstNodeNo
+             AND TokMark . TkmEstNodeNo
+                 < OldFromTokMark . TkmEstNodeNo
+                   + OldFromTokMark . TkmEstNodeCt
+             (* Mark denotes a descendent of OldFromTokMark's node *) 
+          THEN (* No patching needed. *)
+  NotePatchedTokMark ( TokMark , KindLabel )  
+          ELSIF OldToTokMark . TkmEstNodeNo <= TokMark . TkmEstNodeNo
+                AND TokMark . TkmEstNodeNo
+                    < OldToTokMark . TkmEstNodeNo
+                      + OldToTokMark . TkmEstNodeCt
+             (* Mark denotes a descendent of OldToTokMark's node *) 
+          THEN (* Patch NodeNo  *) 
+            INC ( TokMark . TkmEstNodeNo , IfteNodeNoChange )
+; NotePatchedTokMark ( TokMark , KindLabel ) 
+          ELSE 
+            LIsOnOrRightOfRightPath
+              := TokMark . TkmEstNodeNo + TokMark . TkmEstNodeCt
+                 >= OldToTokMark . TkmEstNodeNo + OldToTokMark . TkmEstNodeCt 
+          ; LIsOnOrRightOfLeftPath
+              := TokMark . TkmEstNodeNo + TokMark . TkmEstNodeCt
+                 >= OldFromTokMark . TkmEstNodeNo + OldFromTokMark . TkmEstNodeCt 
+          ; LIsOnOrLeftOfRightPath
+              := TokMark . TkmEstNodeNo <= OldToTokMark . TkmEstNodeNo
+          ; LIsOnOrLeftOfLeftPath
+              := TokMark . TkmEstNodeNo <= OldFromTokMark . TkmEstNodeNo
+
+          ; IF LIsOnOrRightOfRightPath AND LIsOnOrLeftOfLeftPath
+            THEN (* On the common path to the root.  Patch node count. *) 
+              INC ( TokMark . TkmEstNodeCt , IfteNodeNoChange )
+; NotePatchedTokMark ( TokMark , KindLabel ) 
+            ELSIF NOT LIsOnOrLeftOfRightPath
+            THEN (* To right of merged region.  Patch node nuber. *)
+              INC ( TokMark . TkmEstNodeNo , IfteNodeNoChange ) 
+; NotePatchedTokMark ( TokMark , KindLabel )  
+            ELSIF NOT LIsOnOrRightOfLeftPath
+            THEN (* To left of merged region.  No patch needed. *)
+  NotePatchedTokMark ( TokMark , KindLabel )  
+            ELSIF Marks . Compare ( TokMark , OldToTokMark ) = 0
+                  AND ( TokMark . TkmKind
+                        = MarkKindTyp . LeftSibFmtNo
+                        OR TokMark . TkmKind
+                           IN Marks . MarkKindSetEstLeaf
+                           AND NOT TokMark . TkmStartAtEnd
+                      )
+(* REVIEW: ^Doubtful that this is needed at all.  This would have been handled
+      the right descendent* check of this node, done earlier. *) 
+            THEN (* It's the To mark, on the right path, but the merge
+                    region stops short of it, so treat it as right of
+                    right. *) 
+              INC ( TokMark . TkmEstNodeNo , IfteNodeNoChange ) 
+; NotePatchedTokMark ( TokMark , KindLabel ) 
+            ELSE (* Between the forks in paths, inclusive.  Must get
+                    the node count brute force from the Est. *)
+              LOldNodeCt := TokMark . TkmEstNodeCt 
+            ; TokMark . TkmEstNodeCt
+                := TravUtil . NodeCtOfDescendantWithNodeNo
+                     ( NewEstRoot , TokMark . TkmEstNodeNo )
+; NotePatchedTokMark ( TokMark , KindLabel ) 
+            END (* IF *) 
+          END (* IF *)
+        END IfteRblPatchTokMark 
 
     ; TYPE SideTyp = { Left , Right } 
 
@@ -1798,20 +1915,26 @@ End old version^ *)
         ( READONLY CopyToTokMark : Marks . TokMarkTyp ; Side : SideTyp )
       (* Copy some matching Mark and LinesRef nodes. *)
 
-      = BEGIN
+      = VAR LNewLinesRefMeat : PaintHs . LinesRefMeatTyp
+      ; VAR LNewMarkMeat : PaintHs . LineMarkMeatTyp 
+      ; VAR LBreakpoint : INTEGER 
+
+      ; BEGIN
           LOOP (* Thru' lists of LinesRefs and Marks, while matching
                   pairs with equal TokMarks. *)
 
-            (* Set up the next LinesRef. *) 
+            (* Set up the next old LinesRef. *) 
             IF IfteRblCurOldLinesRefMeat = NIL 
-            THEN (* At end of LinesRef list. *) 
-              IfteRblCmpLinesTo := 1 
-            ELSIF Side = SideTyp . Right THEN IfteRblCmpLinesTo := - 1 
+            THEN (* Beyond the end of the old LinesRef list. *) 
+              IfteRblCmpLinesToEnd := 1 
+            ELSIF Side = SideTyp . Right THEN IfteRblCmpLinesToEnd := - 1 
             ELSE
               TRY 
-                IfteRblCmpLinesTo
+                IfteRblCmpLinesToEnd
                   := Marks . Compare
-                       ( IfteRblCurOldLinesRefMeat . LrBolTokMark , CopyToTokMark )
+                       ( IfteRblCurOldLinesRefMeat . LrBolTokMark
+                       , CopyToTokMark
+                       )
               EXCEPT Marks . Unordered
               => <* ASSERT FALSE , "Marks.Unordered." *>
 (* TODO: Wouldn't it be nicer to just make Unordered another integer value,
@@ -1820,48 +1943,50 @@ End old version^ *)
 *) 
               END (* EXCEPT *)
             END (* IF *)
-          ; IF Side = SideTyp . Left
-               AND IfteRblCmpLinesTo = 0
-               AND CopyToTokMark . TkmKind = MarkKindTyp . RightSibFmtNo 
-            THEN (* MergeTextEdit will have skipped this Est Node, so don't
-                    stop short of it.  Instead copy it . *) 
-              IfteRblCmpLinesTo := - 1
-            END (* IF *) 
+          ; IF IfteRblCmpLinesToEnd = 0
+               AND ( CopyToTokMark . TkmKind = MarkKindTyp . RightSibFmtNo
+                     OR CopyToTokMark . TkmKind IN Marks . MarkKindSetEstLeaf
+                        AND CopyToTokMark . TkmStartAtEnd  
+                   ) 
+            THEN (* MergeTextEdit will have skipped this Est Node, so copy it . *) 
+              IfteRblCmpLinesToEnd := - 1
+            END (* IF *)
 
-            (* Set up the next Mark. *) 
+            (* Set up the next old Mark. *) 
           ; IF IfteRblCurOldMarkMeat = NIL 
-            THEN (* At end of Marks list. *)
-              IfteRblCmpMarkTo := 1
-            ELSIF Side = SideTyp . Right THEN IfteRblCmpMarkTo := - 1 
+            THEN (* Beyond end of Marks list. *)
+              IfteRblCmpMarkToEnd := 1
+            ELSIF Side = SideTyp . Right THEN IfteRblCmpMarkToEnd := - 1 
             ELSE 
               TRY 
-                IfteRblCmpMarkTo
+                IfteRblCmpMarkToEnd
                   := Marks . Compare
                        ( IfteRblCurOldMarkMeat . LmTokMark , CopyToTokMark ) 
               EXCEPT Marks . Unordered 
               => <* ASSERT FALSE , "Marks.Unordered." *>
               END (* EXCEPT *)
             END (* IF *)
-          ; IF Side = SideTyp . Left
-               AND IfteRblCmpMarkTo = 0
-               AND CopyToTokMark . TkmKind = MarkKindTyp . RightSibFmtNo 
-            THEN (* MergeTextEdit will have skipped this Est Node, so copy 
-                    it instead of stopping short of it. *) 
-              IfteRblCmpMarkTo := - 1
+          ; IF IfteRblCmpMarkToEnd = 0
+               AND ( CopyToTokMark . TkmKind = MarkKindTyp . RightSibFmtNo
+                     OR CopyToTokMark . TkmKind IN Marks . MarkKindSetEstLeaf
+                        AND CopyToTokMark . TkmStartAtEnd  
+                   ) 
+            THEN (* MergeTextEdit will have skipped this Est Node, so copy it. *) 
+              IfteRblCmpMarkToEnd := - 1
             END (* IF *) 
 
           (* Which list node is next? *) 
-          ; IF IfteRblCmpLinesTo >= 0 AND IfteRblCmpMarkTo >= 0 
+          ; IF IfteRblCmpLinesToEnd >= 0 AND IfteRblCmpMarkToEnd >= 0 
             THEN (* Done with this portion of both liste. *)
               EXIT
-            ELSIF IfteRblCurOldMarkMeat = NIL
-            THEN (* IMPLIES IfteRblCurOldLinesRefMeat # NIL *)
-              IfteRblCmpMutual := - 1 (* Current LinesRef is behind. *) 
-            ELSIF IfteRblCurOldLinesRefMeat = NIL
-            THEN IfteRblCmpMutual := 1 (* Current Mark is behind. *) 
+            ELSIF IfteRblCmpMarkToEnd >= 0 
+            THEN (* IMPLIES IfteRblCmpLinesToMark := - 1 *)
+              IfteRblCmpLinesToMark := - 1 (* Current LinesRef is behind. *) 
+            ELSIF IfteRblCmpLinesToEnd >= 0 
+            THEN IfteRblCmpLinesToMark := 1 (* Current Mark is behind. *) 
             ELSE
               TRY 
-                IfteRblCmpMutual
+                IfteRblCmpLinesToMark
                   := Marks . Compare
                        ( IfteRblCurOldLinesRefMeat . LrBolTokMark
                        , IfteRblCurOldMarkMeat . LmTokMark
@@ -1871,62 +1996,40 @@ End old version^ *)
               END (* EXCEPT *)
             END (* IF *) 
 
-          (* Copy a LinesRef, if it is not to the right of current Mark. *) 
-          ; IF IfteRblCmpMutual # 1 (* LinesRef's TokMark is <= Mark's. *)   
+          (* If current LinesRef is behind the current Mark, copy LinesRef
+             and advance to the next LinesRef. *) 
+          ; IF IfteRblCmpLinesToMark = - 1 (* LinesRef's TokMark is <= Mark's. *)   
             THEN (* Copy a LinesRef. *)
 
-  IF  IfteRblCurOldLinesRefMeat . LrBolTokMark . TkmEstNodeNo = 76
+  IF  IfteRblCurOldLinesRefMeat . LrBolTokMark . TkmEstNodeNo = 62
   THEN
-    IfteRblCmpMarks := IfteRblCmpMarks 
+    LBreakpoint := LBreakpoint (* Breakpoint. *) 
   END
 ; 
 
-              IfteRblCurNewLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp )
-            ; WITH WNewTokMark = IfteRblCurNewLinesRefMeat . LrBolTokMark
+              LNewLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp )
+            ; LNewLinesRefMeat . LrBolTokMark
+                := IfteRblCurOldLinesRefMeat . LrBolTokMark
+            ; IfteRblPatchTokMark ( LNewLinesRefMeat . LrBolTokMark , "LinesRef" ) 
+(* 
+            ; WITH WNewTokMark = LNewLinesRefMeat . LrBolTokMark
               DO
                 WNewTokMark := IfteRblCurOldLinesRefMeat . LrBolTokMark
-(* Wrong idea: **
-              ; IF Side = SideTyp . Right
-                THEN
-
-  IF NOT WNewTokMark . TkmEstNodeNo + WNewTokMark . TkmEstNodeCt
-                       >= IfteRblToNodeNoOfToTokMark 
-  THEN
-    IfteRblCmpMarks := IfteRblCmpMarks 
-  END
-; 
-
-
-                  <* ASSERT (* On or right of right path to root. *) 
-                       WNewTokMark . TkmEstNodeNo + WNewTokMark . TkmEstNodeCt
-                       >= IfteRblToNodeNoOfToTokMark
-                  , MCI ( AFT . A_RightSideNotOnRight ) 
-                  *>
-                  IF WNewTokMark . TkmEstNodeNo <= OldFromTokMark . TkmEstNodeNo
-                     (* ^On or left of left path to root, which => on
-                         the common path to root of the merged region. *)
-                  THEN (* Patch the node count. *) 
-                    INC ( WNewTokMark . TkmEstNodeCt , IfteNodeNoChange )
-                  ELSE (* Strictly right of changed nodes.  Patch the
-                          node count. *) 
-                    INC ( WNewTokMark . TkmEstNodeNo , IfteNodeNoChange ) 
-                  END (* IF *) 
-                END (* IF *) 
-** end Wrong idea *)
-
-              ; IF OldFromTokMark . TkmEstNodeNo < WNewTokMark . TkmEstNodeNo
+              ; IF OldFromTokMark . TkmEstNodeNo <= WNewTokMark . TkmEstNodeNo
                    AND WNewTokMark . TkmEstNodeNo
-                       <= OldFromTokMark . TkmEstNodeNo
-                          + OldFromTokMark . TkmEstNodeCt
+                       < OldFromTokMark . TkmEstNodeNo
+                         + OldFromTokMark . TkmEstNodeCt
                    (* Mark denotes a descendent of OldFromTokMark's node *) 
-                THEN (* No patching needed. *) 
-                ELSIF OldToTokMark . TkmEstNodeNo < WNewTokMark . TkmEstNodeNo
+                THEN (* No patching needed. *)
+  NoteNewLinesRef ( LNewLinesRefMeat ) 
+                ELSIF OldToTokMark . TkmEstNodeNo <= WNewTokMark . TkmEstNodeNo
                       AND WNewTokMark . TkmEstNodeNo
-                          <= OldToTokMark . TkmEstNodeNo
-                             + OldToTokMark . TkmEstNodeCt
+                          < OldToTokMark . TkmEstNodeNo
+                            + OldToTokMark . TkmEstNodeCt
                    (* Mark denotes a descendent of OldToTokMark's node *) 
                 THEN (* Patch NodeNo  *) 
                   INC ( WNewTokMark . TkmEstNodeNo , IfteNodeNoChange )
+; NoteNewLinesRef ( LNewLinesRefMeat )
                 ELSE 
                   LIsOnOrRightOfRightPath
                     := WNewTokMark . TkmEstNodeNo + WNewTokMark . TkmEstNodeCt
@@ -1934,90 +2037,108 @@ End old version^ *)
                 ; LIsOnOrRightOfLeftPath
                     := WNewTokMark . TkmEstNodeNo + WNewTokMark . TkmEstNodeCt
                        >= IfteRblToNodeNoOfFromTokMark
+                ; LIsOnOrLeftOfRightPath
+                    := WNewTokMark . TkmEstNodeNo <= OldToTokMark . TkmEstNodeNo
                 ; LIsOnOrLeftOfLeftPath
                     := WNewTokMark . TkmEstNodeNo
                        <= OldFromTokMark . TkmEstNodeNo
-                ; LIsOnOrLeftOfRightPath
-                    := WNewTokMark . TkmEstNodeNo <= OldToTokMark . TkmEstNodeNo
                     
                 ; IF LIsOnOrRightOfRightPath AND LIsOnOrLeftOfLeftPath
                   THEN (* On the common path to the root. *) 
                     INC ( WNewTokMark . TkmEstNodeCt , IfteNodeNoChange )
+; NoteNewLinesRef ( LNewLinesRefMeat )
                   ELSIF NOT LIsOnOrLeftOfRightPath
                   THEN                     
                     INC ( WNewTokMark . TkmEstNodeNo , IfteNodeNoChange ) 
+; NoteNewLinesRef ( LNewLinesRefMeat ) 
                   ELSIF NOT LIsOnOrRightOfLeftPath
                   THEN (* No patch needed. *)
+  NoteNewLinesRef ( LNewLinesRefMeat ) 
                   ELSIF Marks . Compare ( WNewTokMark , OldToTokMark ) = 0
                         AND ( WNewTokMark . TkmKind
                               = MarkKindTyp . LeftSibFmtNo
                               OR WNewTokMark . TkmKind
                                  IN Marks . MarkKindSetEstLeaf
                                  AND NOT WNewTokMark . TkmStartAtEnd
-                            ) 
+                            )
+(* REVIEW: ^Doubtful that this is needed at all.  This would have been handled
+            the right descendent* check of this node, done earlier. *) 
                   THEN (* It's the To mark, on the right path, but the merge
                           region stops short of it, so treat it as right of
                           right. *) 
                     INC ( WNewTokMark . TkmEstNodeNo , IfteNodeNoChange ) 
+; NoteNewLinesRef ( LNewLinesRefMeat )
                   ELSE (* Between the forks in paths, inclusive.  Must get
                           the node count brute force from the Est. *)
-                    WNewTokMark . TkmEstNodeCt
+                    LOldNodeCt := WNewTokMark . TkmEstNodeCt 
+                  ; WNewTokMark . TkmEstNodeCt
                       := TravUtil . NodeCtOfDescendantWithNodeNo
                            ( NewEstRoot , WNewTokMark . TkmEstNodeNo )
+; NoteNewLinesRef ( LNewLinesRefMeat )
                   END (* IF *) 
                 END (* IF *)
-              END (* WITH *) 
+              END (* WITH WNewTokMark *)
+*) 
 
-            ; IfteRblCurNewLinesRefMeat . LrTextAttrArrayRef
+
+
+
+
+
+            ; LNewLinesRefMeat . LrTextAttrArrayRef
                 := IfteRblCurOldLinesRefMeat . LrTextAttrArrayRef
-            ; IfteRblCurNewLinesRefMeat . LrLineErrArrayRef
+            ; LNewLinesRefMeat . LrLineErrArrayRef
                 := IfteRblCurOldLinesRefMeat . LrLineErrArrayRef
-            ; IfteRblCurNewLinesRefMeat . LrLineCt
+            ; LNewLinesRefMeat . LrLineCt
                 := IfteRblCurOldLinesRefMeat . LrLineCt 
-            ; IfteRblCurNewLinesRefMeat . LrVisibleIn
+            ; LNewLinesRefMeat . LrVisibleIn
                 := IfteRblCurOldLinesRefMeat . LrVisibleIn 
-            ; IfteRblCurNewLinesRefMeat . LrIsStopper
+            ; LNewLinesRefMeat . LrIsStopper
                 := IfteRblCurOldLinesRefMeat . LrIsStopper
-            ; IfteRblCurNewLinesRefMeat . LrHasMark
+            ; LNewLinesRefMeat . LrHasMark
                 := IfteRblCurOldLinesRefMeat . LrHasMark
-            ; IfteRblCurNewLinesRefMeat . LrFromPos
+            ; LNewLinesRefMeat . LrFromPos
                 := IfteRblCurOldLinesRefMeat . LrFromPos
-            ; IfteRblCurNewLinesRefMeat . LrLineLen
+            ; LNewLinesRefMeat . LrLineLen
                 := IfteRblCurOldLinesRefMeat . LrLineLen
-            ; IfteRblCurNewLinesRefMeat . LrLineText
+            ; LNewLinesRefMeat . LrLineText
                 := IfteRblCurOldLinesRefMeat . LrLineText
 
 
 (* CHECK: Do we want to assert  TkmNodeCt = node ct in new tree? *)
 
-            ; IftePrevNewLinesRef . LrRightLink := IfteRblCurNewLinesRefMeat
-            ; IfteRblCurNewLinesRefMeat . LrLeftLink := IftePrevNewLinesRef
+            ; IfteRMNewLinesRef . LrRightLink := LNewLinesRefMeat
+            ; LNewLinesRefMeat . LrLeftLink := IfteRMNewLinesRef
+            ; IfteRMNewLinesRef := LNewLinesRefMeat
             ; IfteCheckNodeCtMismatch
-                ( IfteNewEstRoot , IfteRblCurNewLinesRefMeat , "New copied" , TRUE ) 
+                ( IfteNewEstRoot , LNewLinesRefMeat , "New copied" , TRUE ) 
             ; IfteRblAdvanceOldLinesRef ( )
             ; IfteCheckNodeCtMismatch
-                ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old copied:" ) 
-            END (* IF *)
+                ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old copied:" )
+              (* And loop, since we copied a LinesRef.  Copy Marks only if we
+                 did not copy a LinesRef. *) 
+            END (* IF copy a LinesRef. *)
 
           ; IF IfteRblCurOldMarkMeat # NIL
-               AND IfteRblCmpMutual # - 1 (* Mark's TokMark is <= LinesRef's. *)
+               AND IfteRblCmpLinesToMark # - 1 (* >= *) 
+               (* Mark's TokMark is <= LinesRef's. *)
             THEN
 
               (* Copy this Mark and all Marks having equal LmTokMark. *) 
-              IF IfteRblCmpMutual = 0
+              IF IfteRblCmpLinesToMark = 0
               THEN IfteRblMarkLinesRefMeat 
                      := NARROW 
-                          ( IftePrevNewLinesRef 
+                          ( IfteRMNewLinesRef 
                           , PaintHs . LinesRefMeatTyp 
                           ) (* Nothik can goo wroong. *) 
               ELSE IfteRblMarkLinesRefMeat := NIL 
               END (* IF *) 
             ; LOOP 
-                IfteRblCurNewMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
-              ; IfteRblCurNewMarkMeat . LmLinesRef := IfteRblMarkLinesRefMeat 
-              ; IfteRblCurNewMarkMeat . LmWindowRef
+                LNewMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
+              ; LNewMarkMeat . LmLinesRef := IfteRblMarkLinesRefMeat 
+              ; LNewMarkMeat . LmWindowRef
                   := IfteRblCurOldMarkMeat . LmWindowRef 
-              ; IfteRblCurNewMarkMeat . LmMarkSs
+              ; LNewMarkMeat . LmMarkSs
                   := IfteRblCurOldMarkMeat . LmMarkSs
               ; IF IfteRblCurOldMarkMeat . LmWindowRef # NIL 
                    AND MarkSsTyp . MarkSsStartSel
@@ -2027,19 +2148,29 @@ End old version^ *)
                 THEN IfteNewMarks [ IfteRblCurOldMarkMeat . LmMarkSs ] 
                        := IfteRblCurOldMarkMeat . LmWindowRef
                             . WrMarks [ IfteRblCurOldMarkMeat . LmMarkSs ]
+(* REVIEW       ^ *) 
+                END (* IF *)
+
+              ; IF IfteRblMarkLinesRefMeat = NIL
+                THEN
+                  LNewMarkMeat . LmTokMark
+                    := IfteRblCurOldMarkMeat . LmTokMark
+                ; IfteRblPatchTokMark ( LNewMarkMeat . LmTokMark , "Mark" ) 
+                ELSE 
+                  LNewMarkMeat . LmTokMark
+                    := IfteRblMarkLinesRefMeat . LrBolTokMark
                 END (* IF *) 
-              ; IfteRblCurNewMarkMeat . LmTokMark
-                  := IfteRblMarkLinesRefMeat . LrBolTokMark 
-              ; IfteRblCurNewMarkMeat . LmCharPos
+
+              ; LNewMarkMeat . LmCharPos
                   := IfteRblCurOldMarkMeat . LmCharPos 
-              ; IfteRblCurNewMarkMeat . LmLineNo
+              ; LNewMarkMeat . LmLineNo
                   := IfteRblCurOldMarkMeat . LmLineNo
 
 (* CHECK: Do we want to assert .TmNodeCt = node ct in new tree? *)
 
-              ; IfteRblPrevNewMark . LmRightLink := IfteRblCurNewMarkMeat
-              ; IfteRblCurNewMarkMeat . LmLeftLink := IfteRblPrevNewMark
-              ; IfteRblPrevNewMark := IfteRblCurNewMarkMeat 
+              ; IfteRblRMNewMark . LmRightLink := LNewMarkMeat
+              ; LNewMarkMeat . LmLeftLink := IfteRblRMNewMark
+              ; IfteRblRMNewMark := LNewMarkMeat 
               ; IfteRblPrevOldMarkMeat := IfteRblCurOldMarkMeat
               ; IF IfteRblCurOldMarkMeat . LmRightLink = IfteOldMarkHeader
                 THEN
@@ -2066,221 +2197,258 @@ End old version^ *)
         END IfteRblCopyNodes
         
     ; BEGIN (* IfteRebuildLists *)
-        IfteNewMarks := PaintHs . MarkArrayTyp { NIL , .. }
+        VAR LNewLinesRefMeat : PaintHs . LinesRefMeatTyp
+      ; VAR LNewMarkMeat : PaintHs . LineMarkMeatTyp  
+      ; VAR LCmpMarks : [ - 1 .. 1 ]
+      ; BEGIN (* Block. *) 
+          IfteNewMarks := PaintHs . MarkArrayTyp { NIL , .. }
 
-      (* Set up new LinesRefList: *) 
-      ; IF IfteOldLinesRefHeader = NIL
-        THEN (* No old LinesRef list. *) 
-          NewLinesRefHeader := NIL
-        ; IfteRblCurOldLinesRefMeat := NIL
-(* Check: How do we get out of this? *) 
-        ELSE 
-          NewLinesRefHeader := NEW ( PaintHs . LinesRefHeaderTyp )
-        ; IF IfteOldLinesRefHeader = IfteOldLinesRefHeader . LrRightLink 
-          THEN (* Old LinesRefList is empty. *) 
-            NewLinesRefHeader . LrLeftLink := NewLinesRefHeader 
-          ; NewLinesRefHeader . LrRightLink := NewLinesRefHeader 
+        (* Set up new LinesRef listHeader: *) 
+        ; IF IfteOldLinesRefHeader = NIL
+          THEN (* No old LinesRef list. *) 
+            NewLinesRefHeader := NIL
           ; IfteRblCurOldLinesRefMeat := NIL
-          ELSE IfteRblCurOldLinesRefMeat := IfteOldLinesRefHeader . LrRightLink
-          END (* IF *) 
-        END (* IF *) 
-      ; IftePrevNewLinesRef := NewLinesRefHeader 
-
-      (* Set up new MarkList: *) 
-      ; IF IfteOldMarkHeader = NIL
-        THEN (* No old Marks list. *) 
-          NewMarkHeader := NIL
-        ; IfteRblCurOldMarkMeat := NIL 
 (* Check: How do we get out of this? *) 
-        ELSE
-          NewMarkHeader := NEW ( PaintHs . LineMarkHeaderTyp )
-        ; IF IfteOldMarkHeader = IfteOldMarkHeader . LmRightLink 
-          THEN (* Empty old Marks list. *) 
-            NewMarkHeader . LmLeftLink := NewMarkHeader 
-          ; NewMarkHeader . LmRightLink := NewMarkHeader 
-          ; IfteRblCurOldMarkMeat := NIL
           ELSE 
-            IfteRblCurOldMarkMeat := IfteOldMarkHeader . LmRightLink
+            NewLinesRefHeader := NEW ( PaintHs . LinesRefHeaderTyp )
+          ; IF IfteOldLinesRefHeader = IfteOldLinesRefHeader . LrRightLink 
+            THEN (* Old LinesRefList is empty. *) 
+              NewLinesRefHeader . LrLeftLink := NewLinesRefHeader 
+            ; NewLinesRefHeader . LrRightLink := NewLinesRefHeader 
+            ; IfteRblCurOldLinesRefMeat := NIL
+            ELSE IfteRblCurOldLinesRefMeat
+                   := IfteOldLinesRefHeader . LrRightLink
+            END (* IF *) 
           END (* IF *) 
-        END (* IF *) 
-      ; IfteRblPrevNewMark := NewMarkHeader
+        ; IfteRMNewLinesRef := NewLinesRefHeader 
 
-      ; IfteRblToNodeNoOfFromTokMark
-          := OldFromTokMark . TkmEstNodeNo + OldFromTokMark . TkmEstNodeCt
-      ; IfteRblToNodeNoOfToTokMark
-          := OldToTokMark . TkmEstNodeNo + OldToTokMark . TkmEstNodeCt
-
-      (* Copy things that are to the left of the merged region. *)
-      ; IfteRblCopyNodes
-          ( CopyToTokMark := OldFromTokMark , Side := SideTyp . Left ) 
-
-      (* Recompute things inside the merged region. *)
-      ; IfteBuildMergedLinesRefs ( IfteLinesRefArray )
-      ; IfteVerifyMergedLinesRefs ( IfteLinesRefArray )
-
-      (* Link the merged LinesRefs into the new list. *)
-      ; IfteRblCurNewLinesRefMeat := NIL
-(* CHECK: What if there no new linesRefs? *) 
-      ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine
-            TO MarkIdTyp . MiTrailingLine 
-        DO WITH WLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ]
-          DO IF WLinesRefMeat # NIL
-            THEN
-              IF IfteRblCurNewLinesRefMeat = NIL
-                 (* WLinesRefMeat is leftmost new LinesRef. *) 
-              THEN IfteRblCurNewLinesRefMeat := WLinesRefMeat
-              END (* IF *) 
-            ; IftePrevNewLinesRef . LrRightLink := WLinesRefMeat 
-            ; WLinesRefMeat . LrLeftLink := IftePrevNewLinesRef
-            ; WLinesRefMeat . LrRightLink := NIL
-              (* ^To detect going off end of Marks list. *) 
-            ; IftePrevNewLinesRef := WLinesRefMeat 
-            END (* IF *) 
-          END (* WITH *) 
-        END (* FOR *)
-      ; IfteCheckNodeCtMismatch
-          ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" ) 
-
-      (* Construct new LinesRefs and Marks within the merged region. *) 
-      ; IfteRblOldLineCtToLeft := 0 
-      ; IfteRblIn2ndOldLinesRef := FALSE 
-      ; IfteRblPrevNewMergeToLineNo := 0 
-      ; IF IfteRblCurOldLinesRefMeat = NIL (* Off end of old LinesRef list. *) 
-        THEN IfteRblMergeMiddleLineNo := 0 
-        ELSE IfteRblMergeMiddleLineNo  
-               := Display . ActualNoOfLines
-                    ( IfteRblCurOldLinesRefMeat . LrLineCt )
-        END (* IF *) 
-      ; IfteRblCurNewMergeToLineNo
-          := Display . ActualNoOfLines ( IfteRblCurNewLinesRefMeat . LrLineCt ) 
-
-      ; LOOP (* Thru marks in the merged region. *) 
-          IF IfteRblCurOldMarkMeat = NIL 
-          THEN IfteRblCmpMarks := 1 
-          ELSE  
-            TRY 
-              IfteRblCmpMarks 
-                := Marks . Compare
-                     ( IfteRblCurOldMarkMeat . LmTokMark
-                     , IfteOldThruLinesRef . LrBolTokMark
-                     )
-            EXCEPT Marks . Unordered 
-            => <* ASSERT FALSE , "Marks.Unordered." *> 
-            END (* EXCEPT *)
-          END (* IF *)
-          
-        ; IF IfteRblCmpMarks = 1 (* Next Mark is to right of merge region. *)
-          THEN EXIT (* No more marks in the merge region. *) 
+        (* Set up new Mark list header: *) 
+        ; IF IfteOldMarkHeader = NIL
+          THEN (* No old Marks list. *) 
+            NewMarkHeader := NIL
+          ; IfteRblCurOldMarkMeat := NIL 
+(* Check: How do we get out of this? *) 
           ELSE
-            IF NOT IfteRblIn2ndOldLinesRef
-               AND DelNlShift # LbeStd . LimitedCharNoInfinity 
-               AND IfteRblCurOldMarkMeat . LmLineNo >= IfteRblMergeMiddleLineNo
-            THEN (* Advance to 2nd old LinesRef. *) 
-              IfteRblOldLineCtToLeft   
-                := Display . ActualNoOfLines
-                     ( IfteRblCurOldLinesRefMeat . LrLineCt ) - 1
-            ; IfteRblAdvanceOldLinesRef ( )
-            ; IfteCheckNodeCtMismatch
-                ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" ) 
-            ; IfteRblIn2ndOldLinesRef := TRUE 
-            END (* IF *)
-
-          (* Compute new character position within the merged region: *) 
-          ; IfteRblMergeLineNo
-              := IfteRblOldLineCtToLeft + IfteRblCurOldMarkMeat . LmLineNo 
-          ; IF IfteRblCurOldMarkMeat . LmCharPos = IfteRblMergeLineNo 
-            THEN IF IfteRblIn2ndOldLinesRef
-              THEN IfteRblNewCharPos
-                     := DelNlShift + IfteRblCurOldMarkMeat . LmCharPos
-              ELSE IfteRblNewCharPos
-                     := MIN ( IfteRblCurOldMarkMeat . LmCharPos , DelNlShift )  
-              END (*IF *) 
-            ELSE IfteRblNewCharPos := IfteRblCurOldMarkMeat . LmCharPos
-            END (* IF *)
-
-            (* Skip already linked in new LinesRefs to left of
-               IfteRblMergeLineNo. *)
-          ; WHILE IfteRblCurNewMergeToLineNo <= IfteRblMergeLineNo 
-            DO IftePrevNewLinesRef := IfteRblCurNewLinesRefMeat 
-            ; IfteRblCurNewLinesRefMeat
-                := IfteRblCurNewLinesRefMeat . LrRightLink 
-            ; <* ASSERT IfteRblCurNewLinesRefMeat # NIL , "NIL LrRightLink" *>
-              IfteRblPrevNewMergeToLineNo := IfteRblCurNewMergeToLineNo 
-            ; INC ( IfteRblCurNewMergeToLineNo
-                  , Display . ActualNoOfLines
-                      ( IfteRblCurNewLinesRefMeat . LrLineCt )
-                  )
-            END (* WHILE *)
-
-          (* Construct a new Mark: *) 
-          ; IfteRblCurNewMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
-          ; IfteRblCurNewMarkMeat . LmLinesRef := IfteRblCurNewLinesRefMeat 
-          ; IfteRblCurNewMarkMeat . LmWindowRef
-              := IfteRblCurOldMarkMeat . LmWindowRef 
-          ; IfteRblCurNewMarkMeat . LmMarkSs
-              := IfteRblCurOldMarkMeat . LmMarkSs 
-          ; IF IfteRblCurOldMarkMeat . LmWindowRef # NIL 
-               AND MarkSsTyp . MarkSsStartSel
-                   <= IfteRblCurOldMarkMeat . LmMarkSs
-               AND IfteRblCurOldMarkMeat . LmMarkSs <= MarkSsTyp . MarkSsEndSel 
-            THEN IfteNewMarks [ IfteRblCurOldMarkMeat . LmMarkSs ] 
-                   := IfteRblCurOldMarkMeat . LmWindowRef
-                      . WrMarks [ IfteRblCurOldMarkMeat . LmMarkSs ]
+            NewMarkHeader := NEW ( PaintHs . LineMarkHeaderTyp )
+          ; IF IfteOldMarkHeader = IfteOldMarkHeader . LmRightLink 
+            THEN (* Empty old Marks list. *) 
+              NewMarkHeader . LmLeftLink := NewMarkHeader 
+            ; NewMarkHeader . LmRightLink := NewMarkHeader 
+            ; IfteRblCurOldMarkMeat := NIL
+            ELSE 
+              IfteRblCurOldMarkMeat := IfteOldMarkHeader . LmRightLink
             END (* IF *) 
-          ; IfteRblCurNewMarkMeat . LmTokMark
-              := IfteRblCurNewLinesRefMeat . LrBolTokMark 
-          ; IfteRblCurNewMarkMeat . LmCharPos := IfteRblNewCharPos  
-          ; IfteRblCurNewMarkMeat . LmLineNo
-              := IfteRblMergeLineNo - IfteRblPrevNewMergeToLineNo 
+          END (* IF *) 
+        ; IfteRblRMNewMark := NewMarkHeader
 
-          (* Advance to next old Mark: *) 
-          ; IfteRblPrevOldMarkMeat := IfteRblCurOldMarkMeat
-          ; IF IfteRblCurOldMarkMeat . LmRightLink = IfteOldMarkHeader
-            THEN
-              IfteRblCurOldMarkMeat := NIL
+        ; IfteRblToNodeNoOfFromTokMark
+            := OldFromTokMark . TkmEstNodeNo + OldFromTokMark . TkmEstNodeCt
+        ; IfteRblToNodeNoOfToTokMark
+            := OldToTokMark . TkmEstNodeNo + OldToTokMark . TkmEstNodeCt
+
+        (* Copy things that are to the left of the merged region. *)
+        ; IfteRblCopyNodes
+            ( CopyToTokMark := OldFromTokMark , Side := SideTyp . Left ) 
+
+        (* Rebuild LinesRefs and Marks  inside the merged region. *)
+        ; IfteBuildMergedLinesRefs ( IfteLinesRefArray )
+          (* ^Lines for the merged region of the Est. *) 
+        ; IfteVerifyMergedLinesRefs ( IfteLinesRefArray )
+          (* ^Verify that they can be regenerated from the Est. *) 
+
+        (* Link the merged LinesRefs into the new list. *)
+        ; LNewLinesRefMeat := NIL
+(* CHECK: What if there are no new linesRefs? *) 
+        ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine
+              TO MarkIdTyp . MiTrailingLine 
+          DO WITH WNewLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ]
+            DO IF WNewLinesRefMeat # NIL
+              THEN
+                IF LNewLinesRefMeat = NIL
+                THEN LNewLinesRefMeat := WNewLinesRefMeat
+                     (* ^The leftmost merged region LinesRef to update.
+                        IfteRMNewLinesRef will soon be the rightmost.
+                     *) 
+                END (* IF *) 
+              ; IfteRMNewLinesRef . LrRightLink := WNewLinesRefMeat 
+              ; WNewLinesRefMeat . LrLeftLink := IfteRMNewLinesRef
+              ; WNewLinesRefMeat . LrRightLink := NIL
+                (* ^To detect going off end of Marks list. *) 
+              ; IfteRMNewLinesRef := WNewLinesRefMeat
+; NoteNewLinesRef ( WNewLinesRefMeat ) 
+              END (* IF *) 
+            END (* WITH *) 
+          END (* FOR *)
+          (* All the new LinesRefs in the merged region are now linked
+             on, and IfteRMNewLinesRef is the rightmost.
+             LNewLinesRefMeat is the leftmost, and will move rightward.
+          *) 
+        ; IfteCheckNodeCtMismatch
+            ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" ) 
+
+        (* Construct new LinesRefs and Marks within the merged region. *) 
+        ; IfteRbl0LineNoOfCurOldLinesRef := 0 
+        ; IfteRblIn2ndOldLinesRef := FALSE 
+        ; IfteRblPrevNewMergeToLineNo := 0 
+        ; IF IfteRblCurOldLinesRefMeat = NIL (* Off end of old LinesRef list. *)
+          THEN IfteRblLastLineNoOf1stOldLinesRef := 0 
+          ELSE IfteRblLastLineNoOf1stOldLinesRef  
+                 := Display . ActualNoOfLines
+                      ( IfteRblCurOldLinesRefMeat . LrLineCt )
+                    - 1
+            (* ^Last line no of 1st old LinesRef. *) 
+          END (* IF *) 
+        ; IfteRblCurNewMergeToLineNo
+            := Display . ActualNoOfLines ( LNewLinesRefMeat . LrLineCt ) 
+
+        ; LOOP (* Thru marks in the merged region. *) 
+            IF IfteRblCurOldMarkMeat = NIL 
+            THEN LCmpMarks := 1 
+            ELSE  
+              TRY 
+                LCmpMarks 
+                  := Marks . Compare
+                       ( IfteRblCurOldMarkMeat . LmTokMark
+                       , IfteOldThruLinesRef . LrBolTokMark
+                       )
+              EXCEPT Marks . Unordered 
+              => <* ASSERT FALSE , "Marks.Unordered." *> 
+              END (* EXCEPT *)
+            END (* IF *)
+
+          ; IF LCmpMarks = 1 (* Next Mark is to right of merge region. *)
+            THEN EXIT (* No more marks in the merge region. *) 
             ELSE
-              IfteRblCurOldMarkMeat 
-                := NARROW 
-                     ( IfteRblCurOldMarkMeat . LmRightLink 
-                     , PaintHs . LineMarkMeatTyp 
-                     ) (* ^NARROW shur too werk. *)
-            END (* IF *) 
+              IF NOT IfteRblIn2ndOldLinesRef
+                 AND DelNlShift # LbeStd . LimitedCharNoInfinity
+                 AND Marks . Compare
+                       ( IfteRblCurOldMarkMeat . LmTokMark
+                       , IfteRblCurOldLinesRefMeat . LrBolTokMark
+                       )
+                     = 1 (* > *)
+(* TODO: Catch Marks . Unordered. *) 
+              THEN (* Advance to 2nd old LinesRef. *) 
+                IfteRbl0LineNoOfCurOldLinesRef   
+                  := Display . ActualNoOfLines
+                       ( IfteRblCurOldLinesRefMeat . LrLineCt )
+                     - 1 
+              ; IfteRblAdvanceOldLinesRef ( )
+              ; IfteCheckNodeCtMismatch
+                  ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" )
+              ; IfteRblIn2ndOldLinesRef := TRUE 
+              END (* IF *)
 
-          (* Link in the new mark: *) 
-          ; IfteRblPrevNewMark . LmRightLink := IfteRblCurNewMarkMeat
-          ; IfteRblCurNewMarkMeat . LmLeftLink := IfteRblPrevNewMark
-          ; IfteRblPrevNewMark := IfteRblCurNewMarkMeat
+            (* Compute new line no. and character position within the merged
+               region for this Mark: *) 
+            ; IfteRblMergeLineNo
+                := IfteRbl0LineNoOfCurOldLinesRef
+                     + IfteRblCurOldMarkMeat . LmLineNo
+            ; IF IfteRblMergeLineNo = IfteRblLastLineNoOf1stOldLinesRef  
+              THEN IF IfteRblIn2ndOldLinesRef
+                THEN IfteRblNewCharPos
+                       := DelNlShift + IfteRblCurOldMarkMeat . LmCharPos
+                ELSE IfteRblNewCharPos
+                       := MIN ( IfteRblCurOldMarkMeat . LmCharPos , DelNlShift )
+                END (*IF *) 
+              ELSE IfteRblNewCharPos := IfteRblCurOldMarkMeat . LmCharPos
+              END (* IF *)
 
-(* CHECK: Shouldn't this be outside & after the loop? *) 
-          (* Advance to next old LinesRef. *) 
-          ; IfteRblAdvanceOldLinesRef ( ) 
-          ; IfteCheckNodeCtMismatch
-              ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" ) 
+              (* Skip any already linked on new LinesRefs to left of
+                 IfteRblMergeLineNo. *)
+            ; WHILE IfteRblCurNewMergeToLineNo <= IfteRblMergeLineNo 
+              DO LNewLinesRefMeat := LNewLinesRefMeat . LrRightLink
+
+; IF LNewLinesRefMeat = NIL
+  THEN
+    DelNlShift := DelNlShift (* Breakpoint. *) 
+  END (* IF *) 
+
+
+
+              ; <* ASSERT LNewLinesRefMeat # NIL
+                , "Missing new lines ref."
+                *>
+                IfteRblPrevNewMergeToLineNo := IfteRblCurNewMergeToLineNo
+              ; INC ( IfteRblCurNewMergeToLineNo
+                    , Display . ActualNoOfLines
+                        ( LNewLinesRefMeat . LrLineCt )
+                    )
+;  NoteNewLinesRef ( LNewLinesRefMeat ) 
+              END (* WHILE *)
+
+            (* Construct a new Mark: *) 
+            ; LNewMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
+            ; LNewMarkMeat . LmLinesRef := LNewLinesRefMeat 
+            ; LNewMarkMeat . LmWindowRef
+                := IfteRblCurOldMarkMeat . LmWindowRef 
+            ; LNewMarkMeat . LmMarkSs
+                := IfteRblCurOldMarkMeat . LmMarkSs 
+            ; IF IfteRblCurOldMarkMeat . LmWindowRef # NIL 
+                 AND MarkSsTyp . MarkSsStartSel
+                     <= IfteRblCurOldMarkMeat . LmMarkSs
+                 AND IfteRblCurOldMarkMeat . LmMarkSs
+                     <= MarkSsTyp . MarkSsEndSel 
+              THEN IfteNewMarks [ IfteRblCurOldMarkMeat . LmMarkSs ] 
+                     := IfteRblCurOldMarkMeat . LmWindowRef
+                        . WrMarks [ IfteRblCurOldMarkMeat . LmMarkSs ]
+              END (* IF *)
+(* Check: Is there anything to be done to VisibleIn set? *) 
+            ; LNewMarkMeat . LmTokMark
+                := LNewLinesRefMeat . LrBolTokMark 
+            ; LNewMarkMeat . LmCharPos := IfteRblNewCharPos  
+            ; LNewMarkMeat . LmLineNo
+                := IfteRblMergeLineNo - IfteRblPrevNewMergeToLineNo 
+
+            (* Advance to next old Mark: *) 
+            ; IfteRblPrevOldMarkMeat := IfteRblCurOldMarkMeat
+            ; IF IfteRblCurOldMarkMeat . LmRightLink = IfteOldMarkHeader
+              THEN IfteRblCurOldMarkMeat := NIL
+              ELSE
+                IfteRblCurOldMarkMeat 
+                  := NARROW 
+                       ( IfteRblCurOldMarkMeat . LmRightLink 
+                       , PaintHs . LineMarkMeatTyp 
+                       ) (* ^NARROW shur too werk. *)
+              END (* IF *) 
+
+            (* Link in the new mark: *) 
+            ; IfteRblRMNewMark . LmRightLink := LNewMarkMeat
+            ; LNewMarkMeat . LmLeftLink := IfteRblRMNewMark
+            ; IfteRblRMNewMark := LNewMarkMeat
+
+            END (* IF *)
+          END (* LOOP *)
+
+        (* Advance old LinesRef beyond the merged region. *) 
+        ; IF NOT IfteRblIn2ndOldLinesRef
+             AND DelNlShift # LbeStd . LimitedCharNoInfinity
+          THEN (* There are two LinesRefs in the merged region.  The first was 
+                  not advanced-over previously, for lack of a Mark pointing
+                  to the second, so advance over it now.  *) 
+            IfteRblAdvanceOldLinesRef ( )
+          END (* IF *) 
+        ; IfteRblAdvanceOldLinesRef ( ) 
+        ; IfteCheckNodeCtMismatch
+            ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" )
+
+        (* Adjust things right of the merged region: *)
+        ; IfteRblCopyNodes
+            ( CopyToTokMark := Marks . TokMarkEOI , Side := SideTyp . Right ) 
+
+        (* Complete the lists *) 
+        ; IF NewLinesRefHeader # NIL
+          THEN
+            IfteRMNewLinesRef . LrRightLink := NewLinesRefHeader 
+          ; NewLinesRefHeader . LrLeftLink := IfteRMNewLinesRef
+          END (* IF *) 
+
+        ; IF NewMarkHeader # NIL
+          THEN
+            IfteRblRMNewMark . LmRightLink := NewMarkHeader 
+          ; NewMarkHeader . LmLeftLink := IfteRblRMNewMark
           END (* IF *)
-        END (* LOOP *)
-
-      (* Adjust things right of the merged region: *)
-      ; IfteRblCopyNodes
-          ( CopyToTokMark := Marks . TokMarkEOI , Side := SideTyp . Right ) 
-
-      (* Complete the lists *) 
-      ; IF NewLinesRefHeader # NIL
-        THEN
-          IftePrevNewLinesRef . LrRightLink := NewLinesRefHeader 
-        ; NewLinesRefHeader . LrLeftLink := IftePrevNewLinesRef
-        END (* IF *) 
-
-      ; IF NewMarkHeader # NIL
-        THEN
-          IfteRblPrevNewMark . LmRightLink := NewMarkHeader 
-        ; NewMarkHeader . LmLeftLink := IfteRblPrevNewMark
-        END (* IF *) 
-
+        END (* Block for IfteRebuildLists *) 
       END IfteRebuildLists
-(**) 
-
-
-
 
   ; BEGIN (* InnerFlushTempEdit *) 
       VAR LEditedLinesRefMeat : PaintHs . LinesRefMeatTyp 
@@ -2713,11 +2881,11 @@ End old version^ *)
                 := EditWindow . SouthEastToCorner ( LWindowRef ) . h
             ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
                     TO MarkIdTyp . MiTrailingLine 
-              DO WITH WLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ] 
-                 DO IF WLinesRefMeat # NIL 
+              DO WITH WNewLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ] 
+                 DO IF WNewLinesRefMeat # NIL 
                     THEN 
                       LLineCt 
-                        := Display . ActualNoOfLines ( WLinesRefMeat . LrLineCt ) 
+                        := Display . ActualNoOfLines ( WNewLinesRefMeat . LrLineCt )
                     ; IF LLineNoInWindow + LLineCt > 0 
                          AND LLineNoInWindow 
                              < EditWindow . SouthEastToCorner 
@@ -2725,12 +2893,12 @@ End old version^ *)
                                . v 
                       THEN (* Some portion of new line is visible. *) 
                         PaintHs . IncludeLrVisibleIn 
-                          ( WLinesRefMeat , LWindowRef . WrWindowNo ) 
+                          ( WNewLinesRefMeat , LWindowRef . WrWindowNo ) 
                       ; IF LLineNoInWindow <= 0 
                         THEN (* This will be the first item visible 
                                 in the window. *) 
                           LWindowRef . WrFirstLineLinesRef 
-                            := WLinesRefMeat 
+                            := WNewLinesRefMeat 
                         ; LWindowRef . WrFirstLineLineNo 
                             := - LLineNoInWindow 
                         END (* IF *) 
@@ -2767,19 +2935,19 @@ End old version^ *)
                           => Display . PaintUneditedNonblankLine 
                                ( WindowRef := LWindowRef 
                                , LineNoInWindow := LLineNoInWindow 
-                               , LinesRef := WLinesRefMeat 
+                               , LinesRef := WNewLinesRefMeat 
                                ) 
                           END (* CASE *) 
                         END (* IF *) 
                       END (* IF *) 
                     ; INC ( LLineNoInWindow , LLineCt ) 
                     END (* IF *) 
-                 END (* WITH WLinesRefMeat *) 
+                 END (* WITH WNewLinesRefMeat *) 
               END (* FOR *) 
 
             (* Do any needed repainting of shifted lines below the 
                site of the new LinesRefs. *) 
-            ; IF IftePrevNewLinesRef . LrRightLink # IfteNewLinesRefHeader 
+            ; IF IfteRMNewLinesRef . LrRightLink # IfteNewLinesRefHeader 
                  AND LRepaintKind 
                      IN RepaintKindSetTyp 
                           { RepaintKindTyp . RepaintKindShiftUp 
@@ -2788,7 +2956,7 @@ End old version^ *)
                  AND LLineNoInWindow 
                      < EditWindow . SouthEastToCorner ( LWindowRef ) . v 
               THEN 
-                LLinesRefMeat := IftePrevNewLinesRef . LrRightLink 
+                LLinesRefMeat := IfteRMNewLinesRef . LrRightLink 
               ; LOOP 
                   IF LLineNoInWindow 
                      >= EditWindow . SouthEastToCorner ( LWindowRef ) . v 
@@ -5213,10 +5381,10 @@ EVAL LLinesRefMeat
   = BEGIN (* InitTextEdit *) 
       FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
             TO MarkIdTyp . MiTrailingLine 
-      DO WITH WLinesRefMeat = LinesRefArrayNull [ RLinesRefSs ] 
-         DO WLinesRefMeat := NIL 
-         END (* WITH WLinesRefMeat *) 
-      END (* FOR *) 
+      DO WITH WNewLinesRefMeat = LinesRefArrayNull [ RLinesRefSs ] 
+         DO WNewLinesRefMeat := NIL 
+         END (* WITH WNewLinesRefMeat *) 
+      END (* FOR *)
     END InitTextEdit 
 
 ; BEGIN (* TextEdit *) 
