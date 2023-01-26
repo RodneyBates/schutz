@@ -2068,7 +2068,9 @@ MODULE Display
   ; VAR LLinesToNext : LbeStd . LineNoTyp 
   ; VAR LTempEditLinesRef : PaintHs . LinesRefMeatTyp 
   ; VAR LTempEditLineNo : LbeStd . LineNoTyp 
-  ; VAR LAtEndOfImage : BOOLEAN 
+  ; VAR LAtEndOfImage : BOOLEAN
+
+; VAR LDebug : INTEGER 
 
   ; BEGIN (* MoveLinesRefAndNoDown *) 
       LImagePers := Window . WrImageRef . ItPers 
@@ -2106,7 +2108,12 @@ MODULE Display
           DEC ( LMovement , LLinesToNext - 1 ) 
         ; INC ( LineNo , LLinesToNext - 1 ) 
         ; EXIT 
-        ELSE 
+        ELSE
+IF NOT ISTYPE ( LinesRef . LrRightLink ,  PaintHs . LinesRefMeatTyp )
+THEN LDebug := 21
+
+END
+;
           LinesRef := LinesRef . LrRightLink 
         ; DEC ( LMovement , LLinesToNext ) 
         ; LineNo := 0 

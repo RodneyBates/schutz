@@ -239,7 +239,7 @@ INTERFACE Display
     ) 
   RAISES { Backout } 
   (* FromLinesRef .. ThruLinesRef are no longer visible in WindowNo. 
-     Node this in the LinesRefs' LrVisibleIn fields. 
+     Note this in the LinesRefs' LrVisibleIn fields. 
      If some of the LinesRefs become invisible altogether, 
      call MakeLinesRefsNotVisible for them. *) 
 

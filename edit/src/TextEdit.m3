@@ -278,278 +278,6 @@ MODULE TextEdit
                  (* >= RightNodeNo + RightNodeCt - 1 *) 
     END IsAncestorNodeNo 
 
-; PROCEDURE AdjustLinesRefs
-    ( OldEstRoot : EstHs . EstRefTyp 
-    ; NewEstRoot : EstHs . EstRefTyp 
-    ; LinesRefHeader : PaintHs . LinesRefHeaderTyp 
-    ; CentralNodeNo : LbeStd . EstNodeNoTyp 
-    ; Bias : LbeStd . EstNodeNoTyp 
-    ) 
-  RAISES { Backout } 
-
-  = VAR LLinesRef : PaintHs . LinesRefMeatTyp
-  ; VAR LOldMarkNodeNo : LbeStd . EstNodeNoTyp
-  ; VAR LOldMarkNodeCt : LbeStd . EstNodeNoTyp
-  ; VAR LNewMarkedEstNodeCt : LbeStd . EstNodeNoTyp
-
-; VAR LBreakpoint := 0 
-
-  ; BEGIN (* AdjustLinesRefs *)
-      IF LinesRefHeader = NIL THEN RETURN END (* IF *) 
-    ; IF LinesRefHeader . LrRightLink = LinesRefHeader  THEN RETURN END (* IF *) 
-    ; LLinesRef := LinesRefHeader . LrRightLink
-    ; LOOP
-        LOldMarkNodeNo := LLinesRef . LrBolTokMark . TkmEstNodeNo
-      ; LOldMarkNodeCt
-          := TravUtil . NodeCtOfDescendantWithNodeNo
-               ( OldEstRoot , LOldMarkNodeNo  )
-      ; IF LOldMarkNodeNo > CentralNodeNo
-           (* ^Node ref'd by mark is to right of changed Est region. *)
-        THEN (* Adjust mark's NodeNo. *)
-        
-IF TravUtil . NodeCtOfDescendantWithNodeNo
-     ( NewEstRoot , LOldMarkNodeNo + Bias ) 
-   # LOldMarkNodeCt
-(* ^Adjusted NodeNo points to a node with different NodeCt. *)
-THEN  
-    EstDump.WriteTreeToFile ("NodeNoOld.dump",OldEstRoot,10)
-  ; EstDump.WriteTreeToFile ( "NodeNoNew.dump",NewEstRoot, 10 )
-  ; LBreakpoint := 7 
-END (* IF *)
-;
-
-          (* Assert Adjusted NodeNo points to node with same NodeCt. *) 
-          <* ASSERT TravUtil . NodeCtOfDescendantWithNodeNo
-                      ( NewEstRoot , LOldMarkNodeNo + Bias ) 
-                    = LOldMarkNodeCt
-          , MCI ( AFT . A_AdjustedRightMarkNodeNosCtMismatch ) 
-          *> 
-          INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias )
-        ELSIF LOldMarkNodeNo + LOldMarkNodeCt <= CentralNodeNo 
-              (* ^Node ref'd by mark is to left of changed Est region. *) 
-        THEN (* Leave mark unchanged. *)
-        ELSE (* Node ref'd by mark encloses the changed Est region. *) 
-          IF NOT TravUtil . DescendantIsInteriorAstNode
-                   ( NewEstRoot , LOldMarkNodeNo )
-             (* Will not have had a NodeCt change *) 
-          THEN (* Leave mark unchanged. *)
-          ELSE (* Adjust mark's NodeCt. *)
-            LNewMarkedEstNodeCt := LOldMarkNodeCt + Bias
-
-; IF TravUtil . NodeCtOfDescendantWithNodeNo ( NewEstRoot , LOldMarkNodeNo ) 
-     # LNewMarkedEstNodeCt 
-  THEN (* Adjusted NodeCt # that of pointed-to Est node. *) 
-      EstDump.WriteTreeToFile("NodeCtOld.dump",OldEstRoot,10)
-    ; EstDump.WriteTreeToFile ( "NodeCtNew.dump", NewEstRoot , 10 ) 
-    ; LBreakpoint := 13 
-  END (* IF *)
-; 
-
-            (* Adjusted NodeCt # that of pointed-to Est node. *)
-            <* ASSERT 
-                 TravUtil . NodeCtOfDescendantWithNodeNo
-                   ( NewEstRoot , LOldMarkNodeNo ) 
-                 = LNewMarkedEstNodeCt        
-            , MCI ( AFT . A_AdjustedRightMarkNodeNoMismatch ) 
-            *> 
-            INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias )
-          END (* IF *) 
-        END (* IF *) 
-      ; IF LLinesRef . LrRightLink = LinesRefHeader
-        THEN EXIT 
-        ELSE LLinesRef := LLinesRef . LrRightLink
-        END (* IF *)
-      END (* LOOP *)
-    END AdjustLinesRefs
-
-(* Middle version: 
-; PROCEDURE AdjustLinesRefsNodeNos 
-    ( ImageRef : PaintHs . ImageTransientTyp
-    ; <* UNUSED *> OldEstRoot : EstHs . EstRefTyp 
-    ; NewEstRoot : EstHs . EstRefTyp 
-    ; FirstLinesRefToAdjust : PaintHs . LinesRefTyp 
-    ; Bias : LbeStd . EstNodeNoTyp 
-    ) 
-  RAISES { Backout } 
-
-  = VAR LLinesRef : PaintHs . LinesRefMeatTyp
-  ; VAR LNewEstRef : LbeStd . EstRootTyp 
-  ; VAR LNewKindSet : EstHs . EstChildKindSetTyp 
-  ; VAR LNewIsOptSingletonList : BOOLEAN
-  ; VAR LNewEstNodeCt : INTEGER
-
-  ; BEGIN (* AdjustLinesRefsNodeNos *) 
-      LLinesRef := FirstLinesRefToAdjust 
-    ; LOOP
-        INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias )
-      ; TravUtil . GetDescendantWithNodeNo
-          ( NewEstRoot
-          , LLinesRef . LrBolTokMark . TkmEstNodeNo 
-          , LNewEstRef 
-          , LNewKindSet 
-          , LNewIsOptSingletonList
-          )
-      ; LNewEstNodeCt := EstUtil . EstNodeCt ( LNewEstRef )
-(*
-; IF LLinesRef . LrBolTokMark . TkmEstNodeCt # LNewEstNodeCt
-  THEN
-    EstDump.WriteTreeToFile("Old.dump",OldEstRoot,10)
-  ; EstDump.WriteTreeToFile ( "NewEst.dump", NewEstRoot , 10 ) 
-  END 
-*)
-      ;  (* <* ASSERT LLinesRef . LrBolTokMark . TkmEstNodeCt = LNewEstNodeCt 
-            , TF & ":" & FI ( CTL ( ) ) & " Mismatched node counts." 
-         *> *) 
-        IF LLinesRef . LrRightLink = ImageRef . ItPers . IpLineHeaderRef 
-        THEN EXIT 
-        ELSE LLinesRef := LLinesRef . LrRightLink 
-        END (* IF *) 
-      END (* LOOP *)
-    END AdjustLinesRefsNodeNos
-*) 
-
-(* Old version: 
-
-; PROCEDURE AdjustLinesRefsNodeNos
-    ( ImageRef : PaintHs . ImageTransientTyp 
-    ; FirstLinesRefToAdjust : PaintHs . LinesRefTyp 
-    ; CentralNodeNo : LbeStd . EstNodeNoTyp 
-    ; Bias : LbeStd . EstNodeNoTyp 
-    ) 
-  RAISES { Backout } 
-
-  = VAR LLinesHeader : PaintHs . LinesRefTyp 
-  ; VAR LLinesRef : PaintHs . LinesRefMeatTyp 
-  ; VAR LPastFirstLinesRef : BOOLEAN 
-
-  ; BEGIN (* AdjustLinesRefsNodeNos *) 
-      LLinesHeader := ImageRef . ItPers . IpLineHeaderRef 
-    ; IF LLinesHeader # NIL 
-         AND LLinesHeader . LrRightLink # LLinesHeader 
-      THEN 
-        LLinesRef := LLinesHeader . LrRightLink 
-      END (* IF *) 
-    ; LPastFirstLinesRef := FALSE 
-    ; LOOP
-        IF LLinesRef = FirstLinesRefToAdjust 
-        THEN LPastFirstLinesRef := TRUE 
-        END (* IF *)  
-      ; IF IsAncestorNodeNo 
-             ( LLinesRef . LrBolTokMark . TkmEstNodeNo  
-             , LLinesRef . LrBolTokMark . TkmEstNodeCt 
-             , CentralNodeNo 
-             ) 
-        THEN 
-          INC ( LLinesRef . LrBolTokMark . TkmEstNodeCt , Bias ) 
-        END (* IF *)   
-      ; IF LLinesRef . LrBolTokMark . TkmEstNodeNo >= CentralNodeNo 
-        THEN 
-          Assert 
-            ( LPastFirstLinesRef 
-            , AFT . A_AdjustLinesRefsNodeNos_Adjusting_too_early 
-            ) 
-        ; INC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias ) 
-        END (* IF *)
-      ; IF LLinesRef . LrRightLink = ImageRef . ItPers . IpLineHeaderRef 
-        THEN 
-          EXIT 
-        ELSE 
-          LLinesRef := LLinesRef . LrRightLink 
-        END (* IF *) 
-      END (* LOOP *) 
-    END AdjustLinesRefsNodeNos 
-*)
-; PROCEDURE UnadjustLinesRefsNodeNos 
-    ( ImageRef : PaintHs . ImageTransientTyp 
-    ; FirstLinesRefToAdjust : PaintHs . LinesRefTyp 
-    ; MinNodeNoToAdjust : LbeStd . EstNodeNoTyp 
-    ; Bias : LbeStd . EstNodeNoTyp 
-    ) 
-
-  = VAR LLinesHeader : PaintHs . LinesRefTyp 
-  ; VAR LLinesRef : PaintHs . LinesRefMeatTyp 
-  ; VAR LPastFirstLinesRef : BOOLEAN 
-
-  ; BEGIN (* UnadjustLinesRefsNodeNos *) 
-      LLinesHeader := ImageRef . ItPers . IpLineHeaderRef 
-    ; IF LLinesHeader # NIL 
-         AND LLinesHeader . LrRightLink # LLinesHeader 
-      THEN 
-        LLinesRef := LLinesHeader . LrRightLink 
-      END (* IF *) 
-    ; LPastFirstLinesRef := FALSE 
-    ; LOOP 
-        IF LLinesRef = FirstLinesRefToAdjust 
-        THEN LPastFirstLinesRef := TRUE 
-        END (* IF *)  
-      ; IF LLinesRef . LrBolTokMark . TkmEstNodeNo - Bias  
-           >= MinNodeNoToAdjust 
-        THEN 
-          DEC ( LLinesRef . LrBolTokMark . TkmEstNodeNo , Bias ) 
-        END (* IF *) 
-      ; IF IsAncestorNodeNo 
-             ( LLinesRef . LrBolTokMark . TkmEstNodeNo (* Already unadjusted. *) 
-             , LLinesRef . LrBolTokMark . TkmEstNodeCt 
-             , MinNodeNoToAdjust  
-             ) 
-        THEN 
-          DEC ( LLinesRef . LrBolTokMark . TkmEstNodeCt , Bias ) 
-        END (* IF *)   
-      ; IF LLinesRef . LrRightLink = ImageRef . ItPers . IpLineHeaderRef 
-        THEN 
-          EXIT 
-        ELSE 
-          LLinesRef := LLinesRef . LrRightLink 
-        END (* IF *) 
-      END (* LOOP *) 
-    END UnadjustLinesRefsNodeNos 
-
-; PROCEDURE UnadjustLineMarksNodeNos 
-    ( ImageRef : PaintHs . ImageTransientTyp 
-    ; MinNodeNoToAdjust : LbeStd . EstNodeNoTyp 
-    ; Bias : LbeStd . EstNodeNoTyp 
-    ) 
-  (* Boy, is this fragile.  It assumes that if Bias is negative,
-     it will not have reduced any previously biased EstNodeNo field 
-     enough to misidentify what needs to have its bias removed. *) 
-
-  = VAR LImagePers : PaintHs . ImagePersistentTyp 
-  ; VAR LMark : PaintHs . LineMarkMeatTyp 
-
-  ; BEGIN (* UnadjustLineMarksNodeNos *) 
-      LImagePers := ImageRef . ItPers 
-    ; IF LImagePers . IpMarkHeader # NIL 
-         AND LImagePers . IpMarkHeader . LmRightLink 
-             # LImagePers . IpMarkHeader 
-      THEN 
-        LMark := LImagePers . IpMarkHeader . LmRightLink 
-      ; LOOP 
-          IF LMark . LmLinesRef # NIL 
-          THEN LMark . LmTokMark := LMark . LmLinesRef . LrBolTokMark 
-          ELSE 
-            IF IsAncestorNodeNo 
-                 ( LMark . LmTokMark . TkmEstNodeNo  
-                 , LMark . LmTokMark . TkmEstNodeCt 
-                 , MinNodeNoToAdjust  
-                 ) 
-            THEN 
-              DEC ( LMark . LmTokMark . TkmEstNodeCt , Bias ) 
-            END (* IF *)   
-          ; IF LMark . LmTokMark . TkmEstNodeNo >= MinNodeNoToAdjust + Bias  
-            THEN 
-              DEC ( LMark . LmTokMark . TkmEstNodeNo , Bias ) 
-            END (* IF *) 
-          END (* IF *) 
-        ; IF LMark . LmRightLink = LImagePers . IpMarkHeader 
-          THEN (* End of list. *) 
-            EXIT 
-          ELSE 
-            LMark := LMark . LmRightLink 
-          END (* IF *) 
-        END (* LOOP *) 
-      END (* IF *) 
-    END UnadjustLineMarksNodeNos 
-
 ; PROCEDURE BruteForceRepairLineMarks 
     ( MarkHeader : PaintHs . LineMarkTyp ) 
 
@@ -936,7 +664,15 @@ END (* IF *)
 
 ; TYPE LinesRefArrayTyp = ARRAY MarkIdTyp OF PaintHs . LinesRefMeatTyp 
 
-; VAR (* CONST *) LinesRefArrayNull : LinesRefArrayTyp 
+; VAR (* CONST *) LinesRefArrayNull : LinesRefArrayTyp
+
+; TYPE LineMapRowTyp
+    = RECORD
+        MrOldLinesRef , MrNewLinesRef : PaintHs . LinesRefMeatTyp := NIL 
+      ; MrOldLineNo , MrNewLineNo : LbeStd . LineNoTyp  
+      END (* RECORD *) 
+; TYPE LineMapTyp
+    = ARRAY [ PaintHs . WindowNoMin .. PaintHs . WindowNoMax ] OF LineMapRowTyp  
 
 ; PROCEDURE InnerFlushTempEdit 
     ( ImageRef : PaintHs . ImageTransientTyp  
@@ -1038,187 +774,31 @@ END (* IF *)
   ; VAR IfteActualBlankLinesAfter : LbeStd . LineNoTyp 
         (* ^Every *displayed* blank line counts in *BlankLines*. *) 
   ; VAR IfteOldEstRoot : LbeStd . EstRootTyp
-  ; VAR IfteNewMarks : PaintHs . MarkArrayTyp 
+  ; VAR IfteNewMarks : PaintHs . MarkArrayTyp
 
-(* TODO: Uncalled? remove? *) 
-; PROCEDURE IfteAdjustLineMarks 
-    ( MinNodeNoToAdjust : LbeStd . EstNodeNoTyp 
-    ; Bias : LbeStd . EstNodeNoTyp 
-    ) 
-  RAISES { Backout } 
+  ; VAR Ifte1stLineMap : LineMapTyp 
 
-  = VAR LMark : PaintHs . LineMarkMeatTyp 
-  ; VAR LNextOldLinesRef : PaintHs . LinesRefMeatTyp 
-  ; VAR LNextNewLinesSs : MarkIdTyp 
-  ; VAR LNextNewLinesRef : PaintHs . LinesRefMeatTyp 
-  ; VAR LNextOldLineNo : LbeStd . EstNodeNoTyp 
-  ; VAR LNextNewLineNo : LbeStd . EstNodeNoTyp 
-    (* The actual lines denoted by IfteOldFromLinesRefMeat through
-       IfteOldThruLinesRef correspond almost one-to-one to those
-       denoted by elements in IfteLinesRefArray.  Exceptions are when
-       a Nl is inserted or deleted.  In each group, we count line
-       numbers from zero.  LNextOldLineNo is the number of the first
-       actual line denoted by LNextOldLinesRef.  LNextNewLineNo is the
-       number of the first actual line denoted by
-       IfteLinesRefArray[LNextNewLinesSs].  LNextOldLinesRef = NIL iff
-       this list is exhausted (including initially empty.) *)
-  ; VAR LOldToNewLineNoBias : [ - 1 .. 1 ] 
-    (* Add this to LNextOldLineNo to get its equivalent line number in 
-       IfteLinesRefArray, taking into account an inserted or deleted
-       Nl that has been passed. *) 
-  ; VAR LNextNewLineCt : LbeStd . EstNodeNoTyp 
-  ; VAR LNewLineNo : LbeStd . EstNodeNoTyp 
+  ; PROCEDURE IfteMapLines ( OldLinesRef , NewLinesRef : PaintHs . LinesRefMeatTyp )
 
-  ; BEGIN (* IfteAdjustLineMarks *) 
-      IF IfteImagePers . IpMarkHeader # NIL 
-         AND IfteImagePers . IpMarkHeader . LmRightLink 
-             # IfteImagePers . IpMarkHeader 
-      THEN 
-        LMark := IfteImagePers . IpMarkHeader . LmRightLink 
-      ; LNextOldLinesRef := IfteOldFromLinesRefMeat
-      ; LNextOldLineNo := 0 
-      ; LNextNewLinesSs := MarkIdTyp . MiLeadingLine  
-      ; LNextNewLineNo := 0 
-      ; LOldToNewLineNoBias := 0 
-      ; LOOP (* Through the marks. *) 
-          TRY 
-            WHILE (* LNextOldLinesRef is behind. *) 
-                  LNextOldLinesRef # NIL 
-                  AND Marks . Compare 
-                        ( LNextOldLinesRef . LrBolTokMark , LMark . LmTokMark ) 
-                      = - 1 (* < *) 
-            DO
-              IF LNextOldLinesRef = LinesRef 
-              THEN 
-                IF InsNlPos # LbeStd . LimitedCharNoInfinity 
-                THEN LOldToNewLineNoBias := 1 
-                ELSIF DelNlShift # LbeStd . LimitedCharNoInfinity 
-                THEN LOldToNewLineNoBias := - 1 
-                END (* IF *) 
-              END (* IF *) 
-            ; INC ( LNextOldLineNo 
-                  , Display . ActualNoOfLines 
-                      ( LNextOldLinesRef . LrLineCt ) 
-                  )
-            ; IF LNextOldLinesRef = IfteOldThruLinesRef 
-              THEN LNextOldLinesRef := NIL 
-              ELSE LNextOldLinesRef := LNextOldLinesRef . LrRightLink  
-              END (* IF *) 
-            END (* WHILE *) 
-          EXCEPT Marks . Unordered 
-          => CantHappen 
-               ( AFT . A_IfteAdjustLineMarks_Unordered_markss ) 
-          END (* TRY EXCEPT *) 
+    = VAR LWindowRef : PaintHs . WindowRefTyp
+    
+    ; BEGIN 
+      ; LWindowRef := ImageTrans . ItWindowList 
+      ; WHILE LWindowRef # NIL 
+        DO IF LWindowRef . WrFirstLineLinesRef = OldLinesRef
+              AND LWindowRef . WrFirstLineNo = OldLineNo
+          THEN WITH WMapRow = Ifte1stLineMap [ LWindowRef . WrWindowNo ]
+          DO <* ASSERT WMapRow . MrOldLinesRef = NIL *> 
+           THEN
+             WMapRow . MrOldLinesRef := LWindowRef . WrFirstLineLinesRef 
+           ; WMapRow . MrOldLineNo := LWindowRef . WrFirstLineLineNo 
+           ; WMapRow . MrNewLinesRef := NewLinesRef  
+           ; WMapRow . MrNewLineNo := NewLineNo 
 
-        (* Now adjust the mark. *) 
-        ; IF ( LNextOldLinesRef # NIL 
-               (* ^Which implies IfteOldFromLinesRefMeat # NIL *) 
-               AND Marks . Equal 
-                     ( LMark . LmTokMark , LNextOldLinesRef . LrBolTokMark ) 
-             ) 
-            OR ( IfteOldFromLinesRefMeat = NIL 
-                 AND LMark . LmLineNo <= TempEditRef . TeLineNo 
-               ) 
-          THEN (* Adjustment involves the newly created LinesRefs. *) 
-            IF LNextOldLinesRef = LinesRef OR IfteOldFromLinesRefMeat = NIL 
-            THEN (* In the the edited region. *) 
-              IF InsNlPos # LbeStd . LimitedCharNoInfinity 
-              THEN (* We are in a newly split, edited LinesRef. *)  
-                IF LMark . LmLineNo = TempEditRef . TeLineNo 
-                   AND LMark . LmCharPos >= InsNlPos  
-                THEN (* In the edited line, at or past the split. *) 
-                  LOldToNewLineNoBias := 1 
-                ; LMark . LmCharPos 
-                    := LMark . LmCharPos - InsNlPos + NlIndentPos   
-                ELSIF LMark . LmLineNo > TempEditRef . TeLineNo 
-                THEN (* Past the edited line. *) 
-                  LOldToNewLineNoBias := 1 
-                END (* IF *) 
-              ELSIF DelNlShift # LbeStd . LimitedCharNoInfinity 
-              THEN 
-                IF LMark . LmLineNo = TempEditRef . TeLineNo 
-                THEN (* Squeeze LmCharPos leftward to end of line. *) 
-                  LMark . LmCharPos := MIN ( LMark . LmCharPos , DelNlShift ) 
-                ELSIF LMark . LmLineNo > TempEditRef . TeLineNo 
-                THEN (* In newly joined part of edited LinesRef. *) 
-                  LOldToNewLineNoBias := - 1 
-                ; IF LMark . LmLineNo = TempEditRef . TeLineNo + 1 
-                  THEN INC ( LMark . LmCharPos , DelNlShift ) 
-                  END (* IF *) 
-                END (* IF *) 
-              END (* IF *) 
-            ELSIF IfteSecondOldLinesRef # NIL 
-                  AND LNextOldLinesRef = IfteSecondOldLinesRef 
-                  AND DelNlShift # LbeStd . LimitedCharNoInfinity 
-                  AND LMark . LmLineNo = 0 
-                  AND TempEditRef . TeLineNo = IfteFirstOldActualLineCt - 1 
-            THEN INC ( LMark . LmCharPos , DelNlShift ) 
-            END (* IF *) 
-          ; LNewLineNo 
-              := LNextOldLineNo + LOldToNewLineNoBias + LMark . LmLineNo  
-          ; LOOP (* While LNextNewLinesSs is behind. *) 
-              LNextNewLinesRef := IfteLinesRefArray [ LNextNewLinesSs ] 
-            ; IF LNextNewLinesRef = NIL 
-              THEN INC ( LNextNewLinesSs ) (* Can't overflow. *) 
-              ELSE
-                LNextNewLineCt 
-                  := Display . ActualNoOfLines ( LNextNewLinesRef . LrLineCt)
-              ; IF LNewLineNo >= LNextNewLineNo + LNextNewLineCt 
-                THEN 
-                  INC ( LNextNewLineNo , LNextNewLineCt ) 
-                ; INC ( LNextNewLinesSs ) (* Can't overflow. *) 
-                ELSE EXIT 
-                END (* IF *) 
-              END (* IF *) 
-            END (* LOOP *) 
-          ; LMark . LmTokMark := LNextNewLinesRef . LrBolTokMark  
-          ; LMark . LmLineNo := LNewLineNo - LNextNewLineNo  
-          ; LMark . LmLinesRef := LNextNewLinesRef 
-          ; IF LMark . LmMarkSs = MarkSsTyp . MarkSsCursor 
-            THEN 
-              INC ( LMark . LmWindowRef . WrCursorLineNoInWindow 
-                  , LOldToNewLineNoBias 
-                  ) 
-            END (* IF *) 
-          ELSE (* Outside the new LinesRefs. *) 
-            IF LMark . LmLinesRef = NIL 
-            THEN (* Doesn't point to a LinesRef at all.  Adjust numerically *) 
-              IF IsAncestorNodeNo 
-                   ( LMark . LmTokMark . TkmEstNodeNo  
-                   , LMark . LmTokMark . TkmEstNodeCt 
-                   , MinNodeNoToAdjust 
-                   ) 
-              THEN 
-                INC ( LMark . LmTokMark . TkmEstNodeCt , Bias ) 
-              END (* IF *)   
-            ; IF LMark . LmTokMark . TkmEstNodeNo >= MinNodeNoToAdjust 
-              THEN 
-                INC ( LMark . LmTokMark . TkmEstNodeNo , Bias ) 
-              END (* IF *) 
-            ELSE (* Just copy the mark from the LinesRef (where it could 
-                    have changed). 
-                 *)  
-              LMark . LmTokMark := LMark . LmLinesRef . LrBolTokMark 
-            END (* IF *) 
-          END (* IF *) 
-
-        (* Advance to the next mark. *) 
-        ; IF LMark . LmRightLink = IfteImagePers . IpMarkHeader 
-          THEN (* End of list. *) 
-            EXIT 
-          ELSE 
-            Assert 
-              ( LMark . LmLinesRef = NIL 
-                OR ( LMark . LmLinesRef . LrLeftLink # NIL 
-                     AND LMark . LmLinesRef . LrRightLink # NIL 
-                   ) 
-              , AFT . A_IfteAdjustLineMarks_unlinked_LinesRef 
-              ) 
-          ; LMark := LMark . LmRightLink
-          END (* IF *) 
-        END (* LOOP *) 
-      END (* IF *) 
-    END IfteAdjustLineMarks 
+           END (* IF *) 
+          END (* WITH *)
+        END (* WHILE *)
+      END IfteMapLines 
 
 ; PROCEDURE IfteMakeChanges ( ) 
     RAISES { Backout }  
@@ -1228,148 +808,49 @@ END (* IF *)
        ignoring the failing operation. 
     *) 
 
-    = BEGIN 
-        IF IfteSuccLinesRefMeat # NIL 
-        THEN 
-          IfteOldSuccBolTokMark := IfteSuccLinesRefMeat . LrBolTokMark 
-        ; IfteSuccLinesRefMeat . LrBolTokMark := IfteNewEndBolTokMark 
-        END (* IF *) 
+    = VAR LWindowRef : PaintHs . WindowRefTyp
+    
+    ; BEGIN 
       (* Switch to the new Est and adjust the marks in LinesRefs 
          beyond the point of change. *) 
 (* TODO: do versions here: Also altered tree, although that will 
          mainly happen when chars are edited. *)
       ; ImageRef . ItPers . IpEstRoot := IfteNewEstRoot
       ; ImageRef . ItPers . IpLineHeaderRef := IfteNewLinesRefHeader 
-      ; ImageRef . ItPers . IpMarkHeader := IfteNewMarkHeader 
+      ; ImageRef . ItPers . IpMarkHeader := IfteNewMarkHeader
+      
+      ; LWindowRef := ImageTrans . ItWindowList 
+      ; WHILE LWindowRef # NIL 
+        DO WITH WMapRow = Ifte1stLineMap [ LWindowRef . WrWindowNo ]
+          DO IF WMapRow . MrOldLinesRef # NIL 
+           THEN
+             LWindowRef . WrFirstLineLinesRef := WMapRow . MrNewLinesRef 
+           ; LWindowRef . WrFirstLineLinesNo := WMapRow . MrNewLineNo  
+           END (* IF *) 
+          END (* WITH *)
+        END (* WHILE *) 
       END IfteMakeChanges 
 
-(* Old version:  
-; PROCEDURE IfteMakeChanges ( ) 
-    RAISES { Backout }  
-    (* Make changes to non-functional data structures.  Hopefully, we
-       won't crash during these.  If a crash occurs later, we can undo
-       them, with the same hope, before writing a checkpoint and for
-       ignoring the failing operation. 
-    *) 
-
-    = BEGIN 
-      (* Modify the list of LinesRefs. *)
-        PaintHs . UnlinkLinesRefRange 
-          ( IfteOldFromLinesRefMeat , IfteOldThruLinesRef ) 
-        (* NOTE: There can be marks that point into these LinesRefs.  
-                 Patch them later. 
-        *) 
-      (* Do AdjustLinesRefsAndNodeNos while neither old nor new LinesRefs are
-         linked in.  The new ones are done separately. 
-      *) 
-(* FIX: AdjustLinesRefsNodeNos can raise assertion failures.
-        Do something about it. 
-*) 
-      ; AdjustLinesRefs
-          ( IfteOldEstRoot 
-          , IfteNewEstRoot
-          , ImageRef . ItPers . IpLineHeaderRef 
-          , CentralNodeNo := IfteMaxTouchedNodeNo 
-          , Bias := IfteNodeNoChange 
-          ) 
-
-      ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
-            TO MarkIdTyp . MiTrailingLine 
-	DO WITH WLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ] 
-	   DO IF WLinesRefMeat # NIL 
-	      THEN 
-                PaintHs . InsertLinesRefToLeft 
-                  ( InsertToLeftOfRef := IfteSuccLinesRef 
-                  , RefToInsert := WLinesRefMeat 
-                  ) 
-              END (* IF *) 
-           END (* WITH *) 
-        END (* FOR *) 
-      ; IF IfteSuccLinesRefMeat # NIL 
-        THEN 
-          IfteOldSuccBolTokMark := IfteSuccLinesRefMeat . LrBolTokMark 
-        ; IfteSuccLinesRefMeat . LrBolTokMark := IfteNewEndBolTokMark 
-        END (* IF *) 
-      ; IfteAdjustLineMarks 
-          ( IfteMaxTouchedNodeNo + 1  
-          , IfteNodeNoChange 
-          ) 
-      (* Switch to the new Est and adjust the marks in LinesRefs 
-         beyond the point of change. *) 
-(* TODO: do versions here: Also altered tree, although that will 
-         mainly happen when chars are edited. *) 
-      ; ImageRef . ItPers . IpEstRoot := IfteNewEstRoot 
-      END IfteMakeChanges
-End old version^ *) 
-
   ; PROCEDURE IfteUndoChanges ( )
-    = BEGIN 
+  
+    = VAR LWindowRef : PaintHs . WindowRefTyp
+    
+    ; BEGIN 
         ImageRef . ItPers . IpEstRoot := IfteOldEstRoot
       ; ImageRef . ItPers . IpLineHeaderRef := IfteOldLinesRefHeader 
-      ; ImageRef . ItPers . IpMarkHeader := IfteOldMarkHeader 
+      ; ImageRef . ItPers . IpMarkHeader := IfteOldMarkHeader
+      
+      ; LWindowRef := ImageTrans . ItWindowList 
+      ; WHILE LWindowRef # NIL 
+        DO WITH WMapRow = Ifte1stLineMap [ LWindowRef . WrWindowNo ]
+          DO IF WMapRow . MrOldLinesRef # NIL 
+           THEN
+             LWindowRef . WrFirstLineLinesRef := WMapRow . MrOldLinesRef 
+           ; LWindowRef . WrFirstLineLinesNo := WMapRow . MrOldLineNo  
+           END (* IF *) 
+          END (* WITH *)
+        END (* WHILE *) 
       END IfteUndoChanges
-
-(* Old version:  
-    ; PROCEDURE IfteUndoChanges ( ) 
-
-    = VAR LSavedCallback : Assertions . QueryProcTyp 
-
-    ; BEGIN 
-        FOR RLinesRefSs := MarkIdTyp . MiLeadingLine 
-            TO MarkIdTyp . MiTrailingLine 
-        DO WITH WLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ] 
-           DO IF WLinesRefMeat # NIL 
-              THEN 
-                PaintHs . UnlinkLinesRef ( WLinesRefMeat ) 
-              END (* IF *) 
-           END (* WITH *) 
-        END (* FOR *) 
-      ; UnadjustLinesRefsNodeNos 
-          ( ImageRef 
-          , IfteSuccLinesRefMeat 
-          , IfteMaxTouchedNodeNo + 1  
-          , IfteNodeNoChange 
-          ) 
-
-      ; PaintHs . InsertLinesRefRangeToLeft 
-          ( InsertToLeftOfRef := IfteSuccLinesRef 
-          , FromLinesRef := IfteOldFromLinesRefMeat 
-          , ThruLinesRef := IfteOldThruLinesRef 
-          ) 
-      ; IF IfteSuccLinesRefMeat # NIL 
-        THEN 
-           IfteSuccLinesRefMeat . LrBolTokMark := IfteOldSuccBolTokMark
-        END (* IF *) 
-      ; ImageRef . ItPers . IpEstRoot := IfteOldEstRoot
-
-      (* Damn the torpedos! Full speed ahead! 
-         We need to call BruteForceVerifyAllLinesRefs, just to re-repair any
-         marks that might have been changed for the new list of lines
-         refs.  But its usual function ccould include raising assertion
-         failures if anything is wrong.  Hopefully, we really did put
-         things back together the way they were, in which case,
-         nothing will go wron...noting woll goo worn... nthig wl
-         go wg...  In any case, forge ahead, since this is the only
-         chance of getting everything back the way it was before Ifte
-         was called.
-      *)
-      ; LSavedCallback := Assertions . DefaultQueryProc 
-      ; Assertions . DefaultQueryProc := Assertions . NeverRaise 
-      ; TRY   
-          BruteForceVerifyAllLinesRefs ( ImageRef , RepairIsOK := TRUE ) 
-        EXCEPT
-        | AssertionFailure => (* Squelch this, it's too late *)
-        ELSE 
-        END (* TRY EXCEPT *) 
-      ; Assertions . DefaultQueryProc := LSavedCallback 
-
-      ; UnadjustLineMarksNodeNos 
-          ( ImageRef 
-          , IfteMaxTouchedNodeNo + 1  
-          , IfteNodeNoChange 
-          ) 
-      END IfteUndoChanges
-End old version^ *) 
 
   ; PROCEDURE IfteBuildMergedLinesRefs
       ( VAR LinesRefArray : LinesRefArrayTyp ) 
@@ -2011,74 +1492,6 @@ End old version^ *)
             ; LNewLinesRefMeat . LrBolTokMark
                 := IfteRblCurOldLinesRefMeat . LrBolTokMark
             ; IfteRblPatchTokMark ( LNewLinesRefMeat . LrBolTokMark , "LinesRef" ) 
-(* 
-            ; WITH WNewTokMark = LNewLinesRefMeat . LrBolTokMark
-              DO
-                WNewTokMark := IfteRblCurOldLinesRefMeat . LrBolTokMark
-              ; IF OldFromTokMark . TkmEstNodeNo <= WNewTokMark . TkmEstNodeNo
-                   AND WNewTokMark . TkmEstNodeNo
-                       < OldFromTokMark . TkmEstNodeNo
-                         + OldFromTokMark . TkmEstNodeCt
-                   (* Mark denotes a descendent of OldFromTokMark's node *) 
-                THEN (* No patching needed. *)
-  NoteNewLinesRef ( LNewLinesRefMeat ) 
-                ELSIF OldToTokMark . TkmEstNodeNo <= WNewTokMark . TkmEstNodeNo
-                      AND WNewTokMark . TkmEstNodeNo
-                          < OldToTokMark . TkmEstNodeNo
-                            + OldToTokMark . TkmEstNodeCt
-                   (* Mark denotes a descendent of OldToTokMark's node *) 
-                THEN (* Patch NodeNo  *) 
-                  INC ( WNewTokMark . TkmEstNodeNo , IfteNodeNoChange )
-; NoteNewLinesRef ( LNewLinesRefMeat )
-                ELSE 
-                  LIsOnOrRightOfRightPath
-                    := WNewTokMark . TkmEstNodeNo + WNewTokMark . TkmEstNodeCt
-                       >= IfteRblToNodeNoOfToTokMark 
-                ; LIsOnOrRightOfLeftPath
-                    := WNewTokMark . TkmEstNodeNo + WNewTokMark . TkmEstNodeCt
-                       >= IfteRblToNodeNoOfFromTokMark
-                ; LIsOnOrLeftOfRightPath
-                    := WNewTokMark . TkmEstNodeNo <= OldToTokMark . TkmEstNodeNo
-                ; LIsOnOrLeftOfLeftPath
-                    := WNewTokMark . TkmEstNodeNo
-                       <= OldFromTokMark . TkmEstNodeNo
-                    
-                ; IF LIsOnOrRightOfRightPath AND LIsOnOrLeftOfLeftPath
-                  THEN (* On the common path to the root. *) 
-                    INC ( WNewTokMark . TkmEstNodeCt , IfteNodeNoChange )
-; NoteNewLinesRef ( LNewLinesRefMeat )
-                  ELSIF NOT LIsOnOrLeftOfRightPath
-                  THEN                     
-                    INC ( WNewTokMark . TkmEstNodeNo , IfteNodeNoChange ) 
-; NoteNewLinesRef ( LNewLinesRefMeat ) 
-                  ELSIF NOT LIsOnOrRightOfLeftPath
-                  THEN (* No patch needed. *)
-  NoteNewLinesRef ( LNewLinesRefMeat ) 
-                  ELSIF Marks . Compare ( WNewTokMark , OldToTokMark ) = 0
-                        AND ( WNewTokMark . TkmKind
-                              = MarkKindTyp . LeftSibFmtNo
-                              OR WNewTokMark . TkmKind
-                                 IN Marks . MarkKindSetEstLeaf
-                                 AND NOT WNewTokMark . TkmStartAtEnd
-                            )
-(* REVIEW: ^Doubtful that this is needed at all.  This would have been handled
-            the right descendent* check of this node, done earlier. *) 
-                  THEN (* It's the To mark, on the right path, but the merge
-                          region stops short of it, so treat it as right of
-                          right. *) 
-                    INC ( WNewTokMark . TkmEstNodeNo , IfteNodeNoChange ) 
-; NoteNewLinesRef ( LNewLinesRefMeat )
-                  ELSE (* Between the forks in paths, inclusive.  Must get
-                          the node count brute force from the Est. *)
-                    LOldNodeCt := WNewTokMark . TkmEstNodeCt 
-                  ; WNewTokMark . TkmEstNodeCt
-                      := TravUtil . NodeCtOfDescendantWithNodeNo
-                           ( NewEstRoot , WNewTokMark . TkmEstNodeNo )
-; NoteNewLinesRef ( LNewLinesRefMeat )
-                  END (* IF *) 
-                END (* IF *)
-              END (* WITH WNewTokMark *)
-*) 
 
 
 
@@ -2103,8 +1516,11 @@ End old version^ *)
                 := IfteRblCurOldLinesRefMeat . LrLineLen
             ; LNewLinesRefMeat . LrLineText
                 := IfteRblCurOldLinesRefMeat . LrLineText
-
-
+            ; IfteIfteMapLines
+                ( IfteRblCurOldLinesRefMeat
+                , LNewLinesRefMeat
+                ) 
+             
 (* CHECK: Do we want to assert  TkmNodeCt = node ct in new tree? *)
 
             ; IfteRMNewLinesRef . LrRightLink := LNewLinesRefMeat
@@ -2845,8 +2261,7 @@ End old version^ *)
                and WrFirstLineLineNo being set.  We use it only in 
                cases where they are not changing. 
             *)    
-            ; IF LWindowRef . WrFirstLineLinesRef 
-              = LEditedLinesRefMeat 
+            ; IF LWindowRef . WrFirstLineLinesRef = LEditedLinesRefMeat 
               THEN 
                 LLineNoInWindow := - LWindowRef . WrFirstLineLineNo 
               ELSIF LWindowRef . WrFirstLineLinesRef 
@@ -5084,7 +4499,7 @@ EVAL LLinesRefMeat
           ( LTempEditRef . TeEditedString 
           , LThruMark . LmLinesRef . LrLineText 
           ) 
-      ; AssertTempEdit ( LTempEditRef , LFromMark . LmLinesRef . LrRightLink )
+      ; AssertTempEdit ( LTempEditRef , LThruMark . LmLinesRef )
       ; InnerFlushTempEdit 
           ( LImageTrans 
           , LFromMark . LmLinesRef 
