@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -42,12 +42,14 @@ MODULE Images
 
   = VAR LWindowRef : PaintHs . WindowRefTyp 
   ; VAR LWindowPredRef : PaintHs . WindowRefTyp 
-  ; VAR LWindowNo : PaintHs . WindowNoTyp 
+  ; VAR LWindowNo : PaintHs . WindowNoTyp
+  ; VAR LImagePers : PaintHs . ImagePersistentTyp 
 
   ; BEGIN 
       IF ImageRef # NIL AND WindowRef # NIL 
-      THEN 
-        LWindowRef := ImageRef . ItWindowList 
+      THEN
+        LImagePers := ImageRef . ItPers 
+      ; LWindowRef := LImagePers . IpWindowList 
       ; WHILE LWindowRef # NIL 
         DO 
           IF LWindowRef = WindowRef 
@@ -56,24 +58,24 @@ MODULE Images
           END 
         ; LWindowRef := LWindowRef . WrImageLink 
         END  
-      ; IF ImageRef . ItVisibleIn < PaintHs . WindowNoSetFull 
+      ; IF LImagePers . IpVisibleIn < PaintHs . WindowNoSetFull 
         THEN 
           EVAL PaintHs . InitWindowRef ( WindowRef ) 
         ; LWindowNo := PaintHs . WindowNoMin 
-        ; WHILE LWindowNo IN ImageRef . ItVisibleIn 
+        ; WHILE LWindowNo IN LImagePers . IpVisibleIn 
           DO INC ( LWindowNo ) 
           END 
-        ; ImageRef . ItVisibleIn 
-            := ImageRef . ItVisibleIn
+        ; LImagePers . IpVisibleIn 
+            := LImagePers . IpVisibleIn
                + PaintHs . WindowNoSetTyp { LWindowNo }  
         ; WindowRef . WrWindowNo := LWindowNo 
-        ; IF ImageRef . ItWindowList = NIL 
-             OR ImageRef . ItWindowList . WrWindowNo > LWindowNo 
+        ; IF LImagePers . IpWindowList = NIL 
+             OR LImagePers . IpWindowList . WrWindowNo > LWindowNo 
           THEN 
-            WindowRef . WrImageLink := ImageRef . ItWindowList 
-          ; ImageRef . ItWindowList := WindowRef 
+            WindowRef . WrImageLink := LImagePers . IpWindowList 
+          ; LImagePers . IpWindowList := WindowRef 
           ELSE
-            LWindowPredRef := ImageRef . ItWindowList  
+            LWindowPredRef := LImagePers . IpWindowList  
           ; LOOP 
               LWindowRef := LWindowPredRef . WrImageLink 
             ; IF LWindowRef = NIL OR LWindowRef . WrWindowNo > LWindowNo 
@@ -226,14 +228,18 @@ MODULE Images
   RAISES { Backout } 
   (* PRE: ImageRef # NIL *) 
 
-  = VAR LLinesRef : PaintHs . LinesRefMeatTyp  
+  = VAR LImagePers : PaintHs . ImagePersistentTyp 
+  ; VAR LLinesRef : PaintHs . LinesRefMeatTyp  
   ; VAR LFromLinesRef : PaintHs . LinesRefMeatTyp  
   
-  ; BEGIN 
-      ImageRef . ItVisibleIn := ImageRef . ItVisibleIn - WindowNoSet 
-    ; IF ImageRef . ItPers . IpLineHeaderRef # NIL 
+  ; BEGIN
+      IF ImageRef = NIL THEN RETURN END (* IF *)
+    ; LImagePers := ImageRef . ItPers 
+    ; IF LImagePers = NIL THEN RETURN END (* IF *)
+    ; LImagePers . IpVisibleIn := LImagePers . IpVisibleIn - WindowNoSet 
+    ; IF LImagePers . IpLineHeaderRef # NIL 
       THEN 
-        TYPECASE ImageRef . ItPers . IpLineHeaderRef . LrRightLink <* NOWARN *>
+        TYPECASE LImagePers . IpLineHeaderRef . LrRightLink <* NOWARN *>
         OF PaintHs . LinesRefMeatTyp ( TFirstLinesRef ) 
         => LLinesRef := TFirstLinesRef 
         ; LOOP 
@@ -287,16 +293,16 @@ MODULE Images
     ; WindowRef : PaintHs . WindowRefTyp 
     ; VAR (* IN OUT *) RemovedWindowNoSet : PaintHs . WindowNoSetTyp 
     ) 
-  (* PRE: ImageRef # NIL *) 
+  (* PRE: ImageRef # NIL AND ImageRef . ItPers # NIL *) 
 
   = VAR LWindowRef : PaintHs . WindowRefTyp 
   ; VAR LWindowPredRef : PaintHs . WindowRefTyp 
 
   ; BEGIN 
-      LWindowRef := ImageRef . ItWindowList 
+      LWindowRef := ImageRef . ItPers . IpWindowList 
     ; IF LWindowRef = WindowRef 
       THEN (* The first window is the one.  Unlink it. *) 
-        ImageRef . ItWindowList := LWindowRef . WrImageLink 
+        ImageRef . ItPers . IpWindowList := LWindowRef . WrImageLink 
       ELSE 
         LOOP 
           LWindowPredRef := LWindowRef  
@@ -343,19 +349,24 @@ MODULE Images
 
   = VAR LWindowNoSet : PaintHs . WindowNoSetTyp 
   ; VAR LWindowRef : PaintHs . WindowRefTyp 
+  ; VAR LImagePers : PaintHs . ImagePersistentTyp 
 
   ; BEGIN 
-      IF ImageRef # NIL 
+      IF ImageRef # NIL
       THEN 
-        LWindowNoSet := PaintHs . WindowNoSetEmpty
-      ; LWindowRef := ImageRef . ItWindowList 
-      ; WHILE LWindowRef # NIL 
-        DO  
-          InnerRemoveImageFromWindow ( ImageRef , LWindowRef , LWindowNoSet ) 
-        ; LWindowRef := LWindowRef . WrImageLink 
-        END 
-      ; RemoveWindowNosFromImageRef ( ImageRef , LWindowNoSet ) 
-      END 
+        LImagePers := ImageRef . ItPers
+      ; IF LImagePers # NIL 
+        THEN 
+          LWindowNoSet := PaintHs . WindowNoSetEmpty
+        ; LWindowRef := LImagePers . IpWindowList 
+        ; WHILE LWindowRef # NIL 
+          DO  
+            InnerRemoveImageFromWindow ( ImageRef , LWindowRef , LWindowNoSet ) 
+          ; LWindowRef := LWindowRef . WrImageLink 
+          END (* WHILE *) 
+        ; RemoveWindowNosFromImageRef ( ImageRef , LWindowNoSet ) 
+        END (* IF *)
+      END (* IF *) 
     END DisconnectImageFromAllWindows 
 
 (* VISIBLE: *) 
@@ -365,7 +376,9 @@ MODULE Images
   = VAR LRef : REFANY 
 
   ; BEGIN 
-      IF ImageRef # NIL AND ImageRef . ItWindowList = NIL 
+      IF ImageRef # NIL
+         AND ImageRef . ItPers #  NIL
+         AND ImageRef . ItPers . IpWindowList = NIL 
       THEN 
         EVAL ImageTable . delete 
                ( ImageRef . ItPers . IpImageName , (* VAR *) LRef ) 

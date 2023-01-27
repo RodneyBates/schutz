@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -692,8 +692,6 @@ MODULE Files
           ; LImagePers . IpImageName := LImageName 
 (* TODO: Check/handle the case where previously existing name or path
          has changed. *) 
-          ; LImageRef . ItWindowList := NIL 
-          ; LImageRef . ItVisibleIn := PaintHs . WindowNoSetEmpty 
           ; LImageRef . ItScannerIf := NIL 
           ; LImageRef . ItIsSaved := TRUE  
           ; LResult . ItHistoryWrT := TextWr . New ( ) 

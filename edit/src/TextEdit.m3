@@ -53,7 +53,7 @@ MODULE TextEdit
 ; TYPE MarkKindTyp = Marks . MarkKindTyp
 
 ; PROCEDURE PaintTempEditedLineInAllWindows 
-    ( ImageTrans : PaintHs . ImageTransientTyp 
+    ( ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefMeatTyp 
     ; TempEditRef : PaintHs . TempEditRefTyp 
     ) 
@@ -62,7 +62,9 @@ MODULE TextEdit
   = VAR LWindowRef : PaintHs . WindowRefTyp 
 
   ; BEGIN (* PaintTempEditedLineInAllWindows *) 
-      LWindowRef := ImageTrans . ItWindowList 
+      IF ImageRef = NIL THEN RETURN END (* IF *) 
+    ; IF ImageRef . ItPers = NIL THEN RETURN END (* IF *) 
+    ; LWindowRef := ImageRef . ItPers . IpWindowList 
     ; WHILE LWindowRef # NIL 
       DO IF LWindowRef . WrWindowNo IN LinesRef . LrVisibleIn 
          THEN 
@@ -778,25 +780,29 @@ MODULE TextEdit
 
   ; VAR Ifte1stLineMap : LineMapTyp 
 
-  ; PROCEDURE IfteMapLines ( OldLinesRef , NewLinesRef : PaintHs . LinesRefMeatTyp )
+  ; PROCEDURE IfteMapLines
+       ( WindowRef : PaintHs . WindowRefTyp
+       ; OldLinesRef , NewLinesRef : PaintHs . LinesRefMeatTyp
+       ; OldLineNo , NewLineNo : LbeStd . LineNoTyp
+       )
+    (* Use the LinesRef map to adjust WrFirstLineLinesRef of any window that needs it. *)  
 
     = VAR LWindowRef : PaintHs . WindowRefTyp
     
     ; BEGIN 
-      ; LWindowRef := ImageTrans . ItWindowList 
+        LWindowRef := WindowRef 
       ; WHILE LWindowRef # NIL 
         DO IF LWindowRef . WrFirstLineLinesRef = OldLinesRef
-              AND LWindowRef . WrFirstLineNo = OldLineNo
-          THEN WITH WMapRow = Ifte1stLineMap [ LWindowRef . WrWindowNo ]
-          DO <* ASSERT WMapRow . MrOldLinesRef = NIL *> 
-           THEN
-             WMapRow . MrOldLinesRef := LWindowRef . WrFirstLineLinesRef 
-           ; WMapRow . MrOldLineNo := LWindowRef . WrFirstLineLineNo 
-           ; WMapRow . MrNewLinesRef := NewLinesRef  
-           ; WMapRow . MrNewLineNo := NewLineNo 
-
-           END (* IF *) 
-          END (* WITH *)
+              AND LWindowRef . WrFirstLineLineNo = OldLineNo
+          THEN
+            WITH WMapRow = Ifte1stLineMap [ LWindowRef . WrWindowNo ]
+            DO <* ASSERT WMapRow . MrOldLinesRef = NIL *> 
+              WMapRow . MrOldLinesRef := LWindowRef . WrFirstLineLinesRef 
+            ; WMapRow . MrOldLineNo := LWindowRef . WrFirstLineLineNo 
+            ; WMapRow . MrNewLinesRef := NewLinesRef  
+            ; WMapRow . MrNewLineNo := NewLineNo   
+            END (* WITH *)
+          END (* IF *) 
         END (* WHILE *)
       END IfteMapLines 
 
@@ -808,24 +814,30 @@ MODULE TextEdit
        ignoring the failing operation. 
     *) 
 
-    = VAR LWindowRef : PaintHs . WindowRefTyp
+    = VAR LImagePers : PaintHs . ImagePersistentTyp 
+    ; VAR LWindowRef : PaintHs . WindowRefTyp
     
     ; BEGIN 
       (* Switch to the new Est and adjust the marks in LinesRefs 
          beyond the point of change. *) 
 (* TODO: do versions here: Also altered tree, although that will 
          mainly happen when chars are edited. *)
-      ; ImageRef . ItPers . IpEstRoot := IfteNewEstRoot
-      ; ImageRef . ItPers . IpLineHeaderRef := IfteNewLinesRefHeader 
-      ; ImageRef . ItPers . IpMarkHeader := IfteNewMarkHeader
+        LImagePers := ImageRef . ItPers 
+      ; LImagePers . IpEstRoot := IfteNewEstRoot
+      ; LImagePers . IpLineHeaderRef := IfteNewLinesRefHeader 
+      ; LImagePers . IpMarkHeader := IfteNewMarkHeader
       
-      ; LWindowRef := ImageTrans . ItWindowList 
+      ; LWindowRef := LImagePers . IpWindowList 
       ; WHILE LWindowRef # NIL 
         DO WITH WMapRow = Ifte1stLineMap [ LWindowRef . WrWindowNo ]
           DO IF WMapRow . MrOldLinesRef # NIL 
            THEN
              LWindowRef . WrFirstLineLinesRef := WMapRow . MrNewLinesRef 
-           ; LWindowRef . WrFirstLineLinesNo := WMapRow . MrNewLineNo  
+           ; LWindowRef . WrFirstLineLineNo := WMapRow . MrNewLineNo  
+(* TODO: Figure out a way to get the correct value for WrFirstLineLineNo.
+         It depends on the window,, as well as possible mergeed-region
+         changes to the LinesRef and it's lineCt.
+*)  
            END (* IF *) 
           END (* WITH *)
         END (* WHILE *) 
@@ -833,20 +845,22 @@ MODULE TextEdit
 
   ; PROCEDURE IfteUndoChanges ( )
   
-    = VAR LWindowRef : PaintHs . WindowRefTyp
+    = VAR LImagePers : PaintHs . ImagePersistentTyp 
+    ; VAR LWindowRef : PaintHs . WindowRefTyp
     
     ; BEGIN 
-        ImageRef . ItPers . IpEstRoot := IfteOldEstRoot
-      ; ImageRef . ItPers . IpLineHeaderRef := IfteOldLinesRefHeader 
-      ; ImageRef . ItPers . IpMarkHeader := IfteOldMarkHeader
+        LImagePers := ImageRef . ItPers 
+      ; LImagePers . IpEstRoot := IfteOldEstRoot
+      ; LImagePers . IpLineHeaderRef := IfteOldLinesRefHeader 
+      ; LImagePers . IpMarkHeader := IfteOldMarkHeader
       
-      ; LWindowRef := ImageTrans . ItWindowList 
+      ; LWindowRef := LImagePers . IpWindowList 
       ; WHILE LWindowRef # NIL 
         DO WITH WMapRow = Ifte1stLineMap [ LWindowRef . WrWindowNo ]
           DO IF WMapRow . MrOldLinesRef # NIL 
            THEN
              LWindowRef . WrFirstLineLinesRef := WMapRow . MrOldLinesRef 
-           ; LWindowRef . WrFirstLineLinesNo := WMapRow . MrOldLineNo  
+           ; LWindowRef . WrFirstLineLineNo := WMapRow . MrOldLineNo  
            END (* IF *) 
           END (* WITH *)
         END (* WHILE *) 
@@ -1493,11 +1507,6 @@ MODULE TextEdit
                 := IfteRblCurOldLinesRefMeat . LrBolTokMark
             ; IfteRblPatchTokMark ( LNewLinesRefMeat . LrBolTokMark , "LinesRef" ) 
 
-
-
-
-
-
             ; LNewLinesRefMeat . LrTextAttrArrayRef
                 := IfteRblCurOldLinesRefMeat . LrTextAttrArrayRef
             ; LNewLinesRefMeat . LrLineErrArrayRef
@@ -1516,10 +1525,13 @@ MODULE TextEdit
                 := IfteRblCurOldLinesRefMeat . LrLineLen
             ; LNewLinesRefMeat . LrLineText
                 := IfteRblCurOldLinesRefMeat . LrLineText
-            ; IfteIfteMapLines
-                ( IfteRblCurOldLinesRefMeat
-                , LNewLinesRefMeat
-                ) 
+(*
+            ; IfteMapLines
+                ( NIL
+                , NIL 
+                , 0 
+                )
+*) 
              
 (* CHECK: Do we want to assert  TkmNodeCt = node ct in new tree? *)
 
@@ -1700,7 +1712,12 @@ MODULE TextEdit
              LNewLinesRefMeat is the leftmost, and will move rightward.
           *) 
         ; IfteCheckNodeCtMismatch
-            ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" ) 
+            ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" )
+
+        (* Create map entry for this pair of lines refs, in case it is a
+           WrFirstLineLinesRef for some window. *)
+
+
 
         (* Construct new LinesRefs and Marks within the merged region. *) 
         ; IfteRbl0LineNoOfCurOldLinesRef := 0 
@@ -2230,7 +2247,7 @@ MODULE TextEdit
 
         (* Now go thru all windows, updating their fields and 
            repainting, as needed. *) 
-        ; LWindowRef := ImageRef . ItWindowList 
+        ; LWindowRef := ImageRef . ItPers . IpWindowList 
         ; WHILE LWindowRef # NIL 
           DO IF LWindowRef . WrWindowNo 
                 IN LEditedLinesRefMeat . LrVisibleIn 

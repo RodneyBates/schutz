@@ -1,7 +1,7 @@
  
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -506,8 +506,8 @@ MODULE Ui
             ; Self . ImagePers . IpAbsTextFileName := LAbsTextFileName  
             ; Self . ImagePers . IpAbsPklFileName := LAbsPickleFileName   
          (* ; Self . ImagePers . IpLineHeaderRef := NIL *) 
-            ; Self . ImageTrans . ItWindowList := NIL 
-            ; Self . ImageTrans . ItVisibleIn := PaintHs . WindowNoSetEmpty 
+            ; Self . ImagePers . IpWindowList := NIL 
+            ; Self . ImagePers . IpVisibleIn := PaintHs . WindowNoSetEmpty 
             ; Self . ImageTrans . ItScannerIf := NIL 
             ; Self . ImageTrans . ItIsSaved := TRUE  
             ; EVAL Images . ImageTable . put 
@@ -1073,7 +1073,7 @@ MODULE Ui
                 ) 
       ; Images . DisconnectImageFromWindow 
           ( Closure . ImageTrans , Closure . Window ) 
-      ; IF Closure . ImageTrans . ItWindowList = NIL 
+      ; IF Closure . ImageTrans . ItPers . IpWindowList = NIL 
         THEN 
           Images . DiscardImage ( Closure . ImageTrans )  
         ; FormsVBT . MakeActive ( LForm , "Fv_File_Open" ) 
@@ -1867,7 +1867,7 @@ MODULE Ui
       ; IF Closure . ImageTrans # NIL 
         THEN 
           EVAL SetImagePers ( Closure ) 
-        ; Closure . Window := Closure . ImageTrans . ItWindowList 
+        ; Closure . Window := Closure . ImageTrans . ItPers . IpWindowList 
         ; LCommandString 
             := UiRecPlay . BeginCommandPlusStringInt 
                  ( UiRecPlay . CommandTyp . FileCloseWindow  
@@ -1889,7 +1889,7 @@ MODULE Ui
 (* TODO: ^Decide and implement something about closing the window itself.  
          Also do so in CloseWindowProc. 
 *) 
-            ; IF Closure . ImageTrans . ItWindowList = NIL 
+            ; IF Closure . ImageTrans . ItPers . IpWindowList = NIL 
               THEN
                 Images . DiscardImage ( Closure . ImageTrans ) 
               ; FormsVBT . MakeActive 
@@ -1948,8 +1948,8 @@ MODULE Ui
       ; IF Closure . Window # NIL 
         THEN IF Closure . ImageTrans # NIL 
           THEN 
-            IF Closure . ImageTrans . ItWindowList # NIL 
-               AND Closure . ImageTrans . ItWindowList . WrImageLink # NIL 
+            IF Closure . ImageTrans . ItPers . IpWindowList # NIL 
+               AND Closure . ImageTrans . ItPers . IpWindowList . WrImageLink # NIL 
             THEN (* There are plural windows into this image. *) 
               Images . DisconnectImageFromWindow 
                 ( Closure . ImageTrans , Closure . Window ) 

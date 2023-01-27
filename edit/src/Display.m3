@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -1320,7 +1320,7 @@ MODULE Display
       THEN 
         LImagePers := ImageTrans . ItPers 
       ; LTempEditRef := LImagePers . IpTempEditRef 
-      ; LWindow := ImageTrans . ItWindowList 
+      ; LWindow := LImagePers . IpWindowList 
       ; WHILE LWindow # NIL 
         DO 
           InnerPaintLinesRange 
@@ -1369,7 +1369,7 @@ MODULE Display
         ; LImagePers . IpLineCtIsExact := TRUE
         (* Go thru other windows and proportion any estimated
            WrVertScroll values. *) 
-        ; LWindowRef := WindowRef . WrImageRef . ItWindowList  
+        ; LWindowRef := LImagePers . IpWindowList  
         ; WHILE LWindowRef # NIL 
           DO
             IF LWindowRef # WindowRef 
@@ -2196,7 +2196,7 @@ END
       IF ImageTrans # NIL 
       THEN 
         LImagePers := ImageTrans . ItPers 
-      ; LWindowRef := ImageTrans . ItWindowList 
+      ; LWindowRef := LImagePers . IpWindowList 
       ; LLineHeader := LImagePers . IpLineHeaderRef 
 
       (* Handle Lines list. *) 
@@ -3718,8 +3718,10 @@ END
 
   = VAR LWindowRef : PaintHs . WindowRefTyp 
 
-  ; BEGIN (* DisplayImageState *) 
-      LWindowRef := ImageRef . ItWindowList 
+  ; BEGIN (* DisplayImageState *)
+      IF ImageRef = NIL THEN RETURN END (* IF *) 
+    ; IF ImageRef . ItPers = NIL THEN RETURN END (* IF *) 
+    ; LWindowRef := ImageRef . ItPers . IpWindowList 
     ; WHILE LWindowRef # NIL 
       DO EditWindow . PaintWindowState ( LWindowRef , VbtName , State ) 
       ; LWindowRef := LWindowRef . WrImageLink 

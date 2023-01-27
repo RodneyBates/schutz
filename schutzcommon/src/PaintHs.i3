@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -541,6 +541,8 @@ INTERFACE PaintHs
         ; IpTempEditState : TempEditStateTyp 
             := TempEditStateTyp . TeStateIdle 
         ; IpTempEditRef : TempEditRefTyp := NIL 
+        ; IpWindowList : WindowRefTyp := NIL 
+        ; IpVisibleIn : WindowNoSetTyp  := WindowNoSetEmpty 
         ; IpImageName : TEXT := NIL 
         (* ^Simple name, with text file suffix. *) 
         ; IpAbsPklFileName : TEXT := NIL 
@@ -549,7 +551,10 @@ INTERFACE PaintHs
         ; IpVerNo : VerNoTyp := 0 
         ; IpVerUpdKind : VerUpdKindTyp := 0 
         ; IpVerState : VerStateTyp := VerStateTyp . VerStateNull 
-        ; IpHistoryText : TEXT := NIL  
+        ; IpHistoryText : TEXT := NIL
+            (* Recorded command history as text.  Only set prior to pickling.
+               May be used when pickle is reopened. 
+               During editing, it's accumulated in ItHistoryWrT. *) 
         ; IpLineCtDisplay : LbeStd . LineNoTyp := 0 
           (* ^This is maintained only approximately during incremental
              reparsing.  It is used only for scrollbar thumb positioning. 
@@ -568,7 +573,7 @@ INTERFACE PaintHs
         ; IpIsMutatedSinceCommandStarted : BOOLEAN := FALSE 
         METHODS 
           initDefaults ( ) : ImagePersistentTyp := IpInitDefaults 
-        END (* OBJECT *) 
+        END (* OBJECT ImagePersistentTyp *) 
 
 ; PROCEDURE IpInitDefaults ( Ip : ImagePersistentTyp ) 
   : ImagePersistentTyp 
@@ -581,10 +586,10 @@ INTERFACE PaintHs
           (* ^For the language this image is in. 
              A cache of LangUtil . LangIdRef ( ItPersistent . IpLang ) 
              (Simplifies debugging.)  
-          *) 
-        ; ItVisibleIn : WindowNoSetTyp  := WindowNoSetEmpty 
-        ; ItWindowList : WindowRefTyp := NIL 
-        ; ItHistoryWrT : Wr . T := NIL  
+          *)
+        ; ItHistoryWrT : Wr . T := NIL
+          (* Accumulates recorded history while editing.  Converted and transferred
+             to IpHistoryText during pickling. *) 
         ; ItScannerIf : ScannerIf . ScanIfTyp := NIL 
         ; ItIsSaved : BOOLEAN := TRUE 
         METHODS 
