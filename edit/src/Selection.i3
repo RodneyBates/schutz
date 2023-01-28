@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -27,7 +27,7 @@ INTERFACE Selection
 
     ; SelText : TEXT := NIL 
       (* The selection could be stored here.  NIL if not. If so, use it.
-         otherwise, Manifest the text from the variables below. 
+         otherwise, manifest the text from the variables below. 
       *) 
     ; SelImage : PaintHs . ImageTransientTyp := NIL 
     ; SelStartMark : PaintHs . LineMarkMeatTyp := NIL 

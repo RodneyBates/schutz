@@ -100,6 +100,31 @@ MODULE PaintHs
       RETURN Ref . LrVisibleIn # WindowNoSetEmpty 
     END LineIsVisible 
 
+; VAR GNextLinesRefListNo := 0 
+
+(* EXPORTED: *) 
+; PROCEDURE NewLinesRefHeader ( ) : LinesRefHeaderTyp
+
+  = VAR LResult : LinesRefHeaderTyp
+
+  ; BEGIN
+      LResult := NEW ( LinesRefHeaderTyp )
+    ; LResult . LrListNo := GNextLinesRefListNo
+    ; INC ( GNextLinesRefListNo )
+    ; RETURN LResult 
+    END NewLinesRefHeader 
+
+(* EXPORTED: *) 
+; PROCEDURE NewLinesRefMeat ( Header : LinesRefHeaderTyp  ) : LinesRefMeatTyp
+
+  = VAR LResult : LinesRefHeaderTyp
+
+  ; BEGIN
+      LResult := NEW ( LinesRefMeatTyp )
+    ; LResult . LrListNo := Header . LrListNo
+    ; RETURN LResult 
+    END NewLinesRefMeat  
+
 (* EXPORTED: *) 
 ; PROCEDURE InsertLinesRefToRight 
     ( InsertToRightOfRef : LinesRefTyp ; RefToInsert : LinesRefMeatTyp ) 
@@ -186,6 +211,31 @@ MODULE PaintHs
       ; ThruLinesRef . LrRightLink := NIL 
       END (* IF *) 
     END UnlinkLinesRefRange 
+
+; VAR GNextMarkListNo := 0 
+
+(* EXPORTED: *) 
+; PROCEDURE NewLineMarkHeader ( ) : LineMarkHeaderTyp
+
+  = VAR LResult : LineMarkHeaderTyp
+
+  ; BEGIN
+      LResult := NEW ( LineMarkHeaderTyp )
+    ; LResult . LmListNo := GNextMarkListNo
+    ; INC ( GNextMarkListNo )
+    ; RETURN LResult 
+    END NewLineMarkHeader 
+
+(* EXPORTED: *) 
+; PROCEDURE NewLineMarkMeat ( Header : LineMarkHeaderTyp ) : LineMarkMeatTyp
+
+  = VAR LResult : LineMarkHeaderTyp
+
+  ; BEGIN
+      LResult := NEW ( LineMarkMeatTyp )
+    ; LResult . LmListNo := Header . LmListNo
+    ; RETURN LResult 
+    END NewLineMarkMeat  
 
 (* EXPORTED: *) 
 ; PROCEDURE ResetAllLrHasMarkFields ( ImageTrans : ImageTransientTyp ) 
@@ -629,13 +679,13 @@ MODULE PaintHs
       IF Mark1 # NIL AND Mark2 # NIL 
       THEN 
         CASE CompareLineMarks ( Mark1 , Mark2 ) 
-        OF - 1 
+        OF - 1 (* < *) 
         => Left := Mark1 
         ; Right := Mark2  
-        | 0 (* Treat as no selection. *) 
+        | 0 (* = *) (* Treat as no selection. *) 
         => Left := NIL 
         ; Right := NIL
-        | 1 
+        | 1 (* > *) 
         => Left := Mark2 
         ; Right := Mark1  
         END (* CASE *) 
@@ -797,6 +847,8 @@ MODULE PaintHs
       ; Wr . PutText ( LWrT , RefanyImage ( FLinesRef . LrLeftLink ) ) 
       ; Wr . PutText ( LWrT , " LrRightLink:" )
       ; Wr . PutText ( LWrT , RefanyImage ( FLinesRef . LrRightLink ) ) 
+      ; Wr . PutText ( LWrT , " LrListNo:" )
+      ; Wr . PutText ( LWrT , PaintHs . ListNoImage ( FLinesRef . LrListNo ) ) 
       ; Wr . PutText ( LWrT , " LrGapAfter:" )
       ; Wr . PutText ( LWrT , BoolImage ( FLinesRef . LrGapAfter ) ) 
       ; TYPECASE FLinesRef
@@ -875,6 +927,10 @@ MODULE PaintHs
         ; WX ( FHeader . LrLeftLink ) 
         ; Wr . PutText ( WrT , " LrRightLink: " )
         ; WX ( FHeader . LrRightLink )
+        ; Wr . PutText ( WrT , " LrListNo:" )
+        ; Wr . PutText ( WrT , PaintHs . ListNoImage ( FHeader . LrLineNo ) ) 
+        ; Wr . PutText ( WrT , " LrGapAfter:" )
+        ; Wr . PutText ( WrT , BoolImage ( FHeader . LrGapAfter ) ) 
         END (* IF *) 
       ; Wr . PutText ( Wr . EOL )
       END DumpHeader

@@ -192,21 +192,31 @@ INTERFACE PaintHs
      denotes EOI, has zero LrLineCt, no LrLineText, and its
      LrBolTokMark is the rightmost Nl of EOI.
 
-  INVARIANT: 
-     NOT IpLineHeaderRef . LrGapAfter 
-     => IpLineHeaderRef . LrRightLink holds the BegOfImage TokMark. 
+     INVARIANT: 
+        NOT IpLineHeaderRef . LrGapAfter 
+        => IpLineHeaderRef . LrRightLink holds the BegOfImage TokMark. 
+
+     INVARIANT: 
+        NOT IpLineHeaderRef . LrLeftLink . LrGapAfter 
+        => IpLineHeaderRef . LrLeftLink holds the EndOfImage TokMark. 
  
-  INVARIANT: 
-     NOT IpLineHeaderRef . LrLeftLink . LrGapAfter 
-     => IpLineHeaderRef . LrLeftLink holds the EndOfImage TokMark. 
- 
-   *) 
+  *)
+
+(* Every doubly-linked list has a list number, unique from other lists
+   of the same type, but equal in each of the list's nodes, including its
+   header.  For debugging.
+*) 
+; TYPE ListNoTyp = PortTypes . Int32Typ
+; CONST ListNoImage = PortTypes . Int32Image 
+; CONST ListNoNull = FIRST ( ListNoTyp ) 
+
 ; TYPE LinesRefTyp 
     = OBJECT 
         LrLeftLink : LinesRefTyp := NIL 
-      ; LrRightLink : LinesRefTyp := NIL 
+      ; LrRightLink : LinesRefTyp := NIL
+      ; LrListNo : ListNoTyp := ListNoNull
       ; LrGapAfter : BOOLEAN 
-      END (* OBJECT *) 
+      END (* OBJECT *)
 
 ; TYPE LinesRefHeaderTyp = LinesRefTyp 
 
@@ -233,6 +243,10 @@ INTERFACE PaintHs
           (* Including the unstored leading blanks. *) 
         ; LrLineText : TEXT := NIL (* Leading blanks removed. *) 
         END (* OBJECT LinesRefMeatTyp *) 
+
+; PROCEDURE NewLinesRefHeader ( ) : LinesRefHeaderTyp
+
+; PROCEDURE NewLinesRefMeat ( Header : LinesRefHeaderTyp  ) : LinesRefMeatTyp
 
 ; PROCEDURE LinesRefImage ( FLinesRef : LinesRefTyp ; LineIndent : INTEGER )
   : TEXT 
@@ -308,11 +322,12 @@ INTERFACE PaintHs
     = OBJECT  
         LmLeftLink : LineMarkTyp := NIL 
       ; LmRightLink : LineMarkTyp := NIL 
+      ; LmListNo : ListNoTyp := ListNoNull
       END (* OBJECT *) 
 
 ; TYPE LineMarkHeaderTyp 
     = LineMarkTyp OBJECT END (* OBJECT *)
-(* TODO ^ Eliminate uses of this, in favor of LineMarkTyp. *) 
+(* TODO ^ Eliminate uses of this, in favor of LineMarkTyp. *)
 
 ; TYPE LineMarkMeatTyp 
     = LineMarkHeaderTyp 
@@ -324,6 +339,10 @@ INTERFACE PaintHs
         ; LmCharPos : LbeStd . LimitedCharNoSignedTyp 
         ; LmLineNo : LbeStd . LineNoTyp 
         END (* OBJECT *) 
+
+; PROCEDURE NewLineMarkHeader ( ) : LineMarkHeaderTyp 
+
+; PROCEDURE NewLineMarkMeat ( Header : LineMarkHeaderTyp ) : LineMarkMeatTyp 
 
 ; TYPE MarkArrayTyp 
     = ARRAY [ MarkSsTyp . MarkSsStartSel .. MarkSsTyp . MarkSsTemp ] 

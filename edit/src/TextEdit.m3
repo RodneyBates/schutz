@@ -424,8 +424,7 @@ MODULE TextEdit
                       , StartBolTokMark := LLinesRef . LrBolTokMark 
                       , ExpectedLineCt := LLinesRef . LrLineCt 
                       , ExpectedAtEndOfImage 
-                          := LLinesRef . LrRightLink 
-                             = LHeader 
+                          := LLinesRef . LrRightLink = LHeader 
                       , ExpectedString := LineString ( LLinesRef ) 
                       , (* VAR *) RegeneratedString := LRegeneratedString 
                       , (* VAR *) RegeneratedTextAttrArrayRef 
@@ -743,6 +742,7 @@ MODULE TextEdit
   ; VAR IfteNewMarkHeader : PaintHs . LineMarkTyp 
   ; VAR IfteLinesRefArray : LinesRefArrayTyp 
   ; VAR IfteNewEstRoot : EstHs . EstRefTyp 
+  ; VAR IftePredOfNewEditedLinesRefs : PaintHs . LinesRefTyp 
   ; VAR IfteStartBolTokMark : Marks . TokMarkTyp 
   ; VAR IfteLinesRefsAccountedFor : LbeStd . LineNoTyp 
   ; VAR IfteFirstOldActualLineCt : LbeStd . LineNoTyp 
@@ -782,28 +782,19 @@ MODULE TextEdit
 
   ; PROCEDURE IfteMapLines
        ( WindowRef : PaintHs . WindowRefTyp
-       ; OldLinesRef , NewLinesRef : PaintHs . LinesRefMeatTyp
-       ; OldLineNo , NewLineNo : LbeStd . LineNoTyp
+       ; NewLinesRef : PaintHs . LinesRefMeatTyp
+       ; NewLineNo : LbeStd . LineNoTyp
        )
     (* Use the LinesRef map to adjust WrFirstLineLinesRef of any window that needs it. *)  
 
-    = VAR LWindowRef : PaintHs . WindowRefTyp
-    
-    ; BEGIN 
-        LWindowRef := WindowRef 
-      ; WHILE LWindowRef # NIL 
-        DO IF LWindowRef . WrFirstLineLinesRef = OldLinesRef
-              AND LWindowRef . WrFirstLineLineNo = OldLineNo
-          THEN
-            WITH WMapRow = Ifte1stLineMap [ LWindowRef . WrWindowNo ]
-            DO <* ASSERT WMapRow . MrOldLinesRef = NIL *> 
-              WMapRow . MrOldLinesRef := LWindowRef . WrFirstLineLinesRef 
-            ; WMapRow . MrOldLineNo := LWindowRef . WrFirstLineLineNo 
-            ; WMapRow . MrNewLinesRef := NewLinesRef  
-            ; WMapRow . MrNewLineNo := NewLineNo   
-            END (* WITH *)
-          END (* IF *) 
-        END (* WHILE *)
+    = BEGIN 
+        WITH WMapRow = Ifte1stLineMap [ WindowRef . WrWindowNo ]
+        DO <* ASSERT WMapRow . MrOldLinesRef = NIL *> 
+          WMapRow . MrOldLinesRef := WindowRef . WrFirstLineLinesRef 
+        ; WMapRow . MrOldLineNo := WindowRef . WrFirstLineLineNo 
+        ; WMapRow . MrNewLinesRef := NewLinesRef  
+        ; WMapRow . MrNewLineNo := NewLineNo   
+        END (* WITH *)
       END IfteMapLines 
 
 ; PROCEDURE IfteMakeChanges ( ) 
@@ -831,15 +822,12 @@ MODULE TextEdit
       ; WHILE LWindowRef # NIL 
         DO WITH WMapRow = Ifte1stLineMap [ LWindowRef . WrWindowNo ]
           DO IF WMapRow . MrOldLinesRef # NIL 
-           THEN
-             LWindowRef . WrFirstLineLinesRef := WMapRow . MrNewLinesRef 
-           ; LWindowRef . WrFirstLineLineNo := WMapRow . MrNewLineNo  
-(* TODO: Figure out a way to get the correct value for WrFirstLineLineNo.
-         It depends on the window,, as well as possible mergeed-region
-         changes to the LinesRef and it's lineCt.
-*)  
-           END (* IF *) 
+            THEN
+              LWindowRef . WrFirstLineLinesRef := WMapRow . MrNewLinesRef 
+            ; LWindowRef . WrFirstLineLineNo := WMapRow . MrNewLineNo  
+            END (* IF *) 
           END (* WITH *)
+        ; LWindowRef := LWindowRef . WrImageLink 
         END (* WHILE *) 
       END IfteMakeChanges 
 
@@ -867,7 +855,9 @@ MODULE TextEdit
       END IfteUndoChanges
 
   ; PROCEDURE IfteBuildMergedLinesRefs
-      ( VAR LinesRefArray : LinesRefArrayTyp ) 
+      ( Header : PaintHs . LinesRefHeaderTyp
+      ; VAR LinesRefArray : LinesRefArrayTyp
+      ) 
     RAISES { Backout , Thread . Alerted }
     (* POST:
          LinesRefArray is filled in with refs to new LinesRefs, some
@@ -914,7 +904,7 @@ MODULE TextEdit
             ; IfteActualBlankLinesBefore := LLineCt 
             ; IF LNewLinesNo < IfteNewLinesRefCt 
               THEN 
-                WLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp ) 
+                WLinesRefMeat := PaintHs . NewLinesRefMeat ( Header ) 
               ; WLinesRefMeat . LrBolTokMark := LStartBolTokMark 
               ; WLinesRefMeat . LrVisibleIn := PaintHs . WindowNoSetEmpty 
               ; WLinesRefMeat . LrFromPos := 0 
@@ -957,7 +947,7 @@ MODULE TextEdit
                  ) 
             ; IF LNewLinesNo < IfteNewLinesRefCt 
               THEN 
-                WLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp ) 
+                WLinesRefMeat := PaintHs . NewLinesRefMeat ( Header ) 
               ; WLinesRefMeat . LrBolTokMark := LStartBolTokMark 
               ; WLinesRefMeat . LrVisibleIn := PaintHs . WindowNoSetEmpty 
               ; WLinesRefMeat . LrFromPos 
@@ -1001,7 +991,7 @@ MODULE TextEdit
                  ) 
             ; IF LNewLinesNo < IfteNewLinesRefCt 
               THEN 
-                WLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp ) 
+                WLinesRefMeat := PaintHs . NewLinesRefMeat ( Header )  
               ; WLinesRefMeat . LrBolTokMark := LStartBolTokMark 
               ; WLinesRefMeat . LrVisibleIn := PaintHs . WindowNoSetEmpty 
               ; WLinesRefMeat . LrFromPos 
@@ -1043,7 +1033,7 @@ MODULE TextEdit
           ; IfteActualBlankLinesAfter := LLineCt 
           ; IF LNewLinesNo < IfteNewLinesRefCt 
             THEN 
-              WLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp ) 
+              WLinesRefMeat := PaintHs . NewLinesRefMeat ( Header )  
             ; WLinesRefMeat . LrBolTokMark := LStartBolTokMark 
             ; WLinesRefMeat . LrVisibleIn := PaintHs . WindowNoSetEmpty 
             ; WLinesRefMeat . LrFromPos := 0 
@@ -1313,18 +1303,19 @@ MODULE TextEdit
              means N is on or to the X side of the path from the Y node to
              the root.  Y will be the from- or to-node of the merged region. *)
 
-    ; PROCEDURE IfteRblAdvanceOldLinesRef ( )
+    ; PROCEDURE IfteRblAdvanceLinesRef
+        ( VAR (* IN OUT *) LinesRefMeat : PaintHs . LinesRefMeatTyp )
 
       = BEGIN
-          IF IfteRblCurOldLinesRefMeat . LrRightLink = IfteOldLinesRefHeader
-          THEN IfteRblCurOldLinesRefMeat := NIL 
-          ELSE IfteRblCurOldLinesRefMeat 
-                 := NARROW 
-                      ( IfteRblCurOldLinesRefMeat . LrRightLink 
-                      , PaintHs . LinesRefMeatTyp 
-                      ) (* Ca'nt faail. *) 
-          END (* IF *) 
-        END IfteRblAdvanceOldLinesRef
+          IF LinesRefMeat = NIL THEN RETURN END (* IF *) 
+(* TODO: Use this method of end-of-list check everywhere. *) 
+        ; TYPECASE LinesRefMeat . LrRightLink 
+          OF NULL => LinesRefMeat := NIL 
+          | PaintHs . LinesRefMeatTyp ( TLinesRefSucc ) 
+            => LinesRefMeat := TLinesRefSucc 
+          ELSE LinesRefMeat := NIL 
+          END (* TYPECASE *) 
+        END IfteRblAdvanceLinesRef
         
     ; PROCEDURE IfteRblPatchTokMark
         ( VAR TokMark : Marks . TokMarkTyp ; KindLabel : TEXT )
@@ -1411,7 +1402,8 @@ MODULE TextEdit
       (* Copy some matching Mark and LinesRef nodes. *)
 
       = VAR LNewLinesRefMeat : PaintHs . LinesRefMeatTyp
-      ; VAR LNewMarkMeat : PaintHs . LineMarkMeatTyp 
+      ; VAR LNewMarkMeat : PaintHs . LineMarkMeatTyp
+      ; VAR LWindowRef : PaintHs . WindowRefTyp 
       ; VAR LBreakpoint : INTEGER 
 
       ; BEGIN
@@ -1502,10 +1494,12 @@ MODULE TextEdit
   END
 ; 
 
-              LNewLinesRefMeat := NEW ( PaintHs . LinesRefMeatTyp )
+              LNewLinesRefMeat
+                := PaintHs . NewLinesRefMeat ( NewLinesRefHeader ) 
             ; LNewLinesRefMeat . LrBolTokMark
                 := IfteRblCurOldLinesRefMeat . LrBolTokMark
-            ; IfteRblPatchTokMark ( LNewLinesRefMeat . LrBolTokMark , "LinesRef" ) 
+            ; IfteRblPatchTokMark
+                ( LNewLinesRefMeat . LrBolTokMark , "LinesRef" ) 
 
             ; LNewLinesRefMeat . LrTextAttrArrayRef
                 := IfteRblCurOldLinesRefMeat . LrTextAttrArrayRef
@@ -1525,13 +1519,18 @@ MODULE TextEdit
                 := IfteRblCurOldLinesRefMeat . LrLineLen
             ; LNewLinesRefMeat . LrLineText
                 := IfteRblCurOldLinesRefMeat . LrLineText
-(*
-            ; IfteMapLines
-                ( NIL
-                , NIL 
-                , 0 
-                )
-*) 
+            ; LWindowRef := IfteImagePers . IpWindowList
+            
+            ; WHILE LWindowRef # NIL
+              DO IF LWindowRef . WrFirstLineLinesRef = IfteRblCurOldLinesRefMeat
+                THEN IfteMapLines
+                       ( LWindowRef
+                       , LNewLinesRefMeat
+                       , LWindowRef . WrFirstLineLineNo (* No change. *)  
+                       ) 
+                END (* IF *) 
+              ; LWindowRef := LWindowRef . WrImageLink
+              END (* WHILE *) 
              
 (* CHECK: Do we want to assert  TkmNodeCt = node ct in new tree? *)
 
@@ -1540,7 +1539,7 @@ MODULE TextEdit
             ; IfteRMNewLinesRef := LNewLinesRefMeat
             ; IfteCheckNodeCtMismatch
                 ( IfteNewEstRoot , LNewLinesRefMeat , "New copied" , TRUE ) 
-            ; IfteRblAdvanceOldLinesRef ( )
+            ; IfteRblAdvanceLinesRef ( IfteRblCurOldLinesRefMeat )
             ; IfteCheckNodeCtMismatch
                 ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old copied:" )
               (* And loop, since we copied a LinesRef.  Copy Marks only if we
@@ -1562,7 +1561,7 @@ MODULE TextEdit
               ELSE IfteRblMarkLinesRefMeat := NIL 
               END (* IF *) 
             ; LOOP 
-                LNewMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
+                LNewMarkMeat := PaintHs . NewLineMarkMeat ( NewMarkHeader ) 
               ; LNewMarkMeat . LmLinesRef := IfteRblMarkLinesRefMeat 
               ; LNewMarkMeat . LmWindowRef
                   := IfteRblCurOldMarkMeat . LmWindowRef 
@@ -1625,7 +1624,14 @@ MODULE TextEdit
         END IfteRblCopyNodes
         
     ; BEGIN (* IfteRebuildLists *)
-        VAR LNewLinesRefMeat : PaintHs . LinesRefMeatTyp
+        VAR LWindowRef : PaintHs . WindowRefTyp 
+      ; VAR LOldLinesRefMeat : PaintHs . LinesRefMeatTyp 
+      ; VAR L2ndOldLinesRefMeat : PaintHs . LinesRefMeatTyp 
+      ; VAR LNewLinesRefMeat : PaintHs . LinesRefMeatTyp
+      ; VAR LLMLinesRefMeat : PaintHs . LinesRefMeatTyp
+      ; VAR L2ndNewLinesRefMeat : PaintHs . LinesRefMeatTyp
+      ; VAR LLineNoInRegion : LbeStd . LineNoTyp 
+      ; VAR LNewMergedToLineNo : LbeStd . LineNoTyp 
       ; VAR LNewMarkMeat : PaintHs . LineMarkMeatTyp  
       ; VAR LCmpMarks : [ - 1 .. 1 ]
       ; BEGIN (* Block. *) 
@@ -1638,7 +1644,7 @@ MODULE TextEdit
           ; IfteRblCurOldLinesRefMeat := NIL
 (* Check: How do we get out of this? *) 
           ELSE 
-            NewLinesRefHeader := NEW ( PaintHs . LinesRefHeaderTyp )
+            NewLinesRefHeader := PaintHs . NewLinesRefHeader ( ) 
           ; IF IfteOldLinesRefHeader = IfteOldLinesRefHeader . LrRightLink 
             THEN (* Old LinesRefList is empty. *) 
               NewLinesRefHeader . LrLeftLink := NewLinesRefHeader 
@@ -1657,7 +1663,7 @@ MODULE TextEdit
           ; IfteRblCurOldMarkMeat := NIL 
 (* Check: How do we get out of this? *) 
           ELSE
-            NewMarkHeader := NEW ( PaintHs . LineMarkHeaderTyp )
+            NewMarkHeader := PaintHs . NewLineMarkHeader ( ) 
           ; IF IfteOldMarkHeader = IfteOldMarkHeader . LmRightLink 
             THEN (* Empty old Marks list. *) 
               NewMarkHeader . LmLeftLink := NewMarkHeader 
@@ -1679,21 +1685,24 @@ MODULE TextEdit
             ( CopyToTokMark := OldFromTokMark , Side := SideTyp . Left ) 
 
         (* Rebuild LinesRefs and Marks  inside the merged region. *)
-        ; IfteBuildMergedLinesRefs ( IfteLinesRefArray )
+        ; IfteBuildMergedLinesRefs
+            ( NewLinesRefHeader , (* VAR *) IfteLinesRefArray ) 
           (* ^Lines for the merged region of the Est. *) 
         ; IfteVerifyMergedLinesRefs ( IfteLinesRefArray )
-          (* ^Verify that they can be regenerated from the Est. *) 
+          (* ^Verify that they can be regenerated from the Est. *)
+
+        ; IftePredOfNewEditedLinesRefs := IfteRMNewLinesRef . LrLeftLink 
 
         (* Link the merged LinesRefs into the new list. *)
-        ; LNewLinesRefMeat := NIL
+        ; LLMLinesRefMeat := NIL
 (* CHECK: What if there are no new linesRefs? *) 
         ; FOR RLinesRefSs := MarkIdTyp . MiLeadingLine
               TO MarkIdTyp . MiTrailingLine 
           DO WITH WNewLinesRefMeat = IfteLinesRefArray [ RLinesRefSs ]
             DO IF WNewLinesRefMeat # NIL
               THEN
-                IF LNewLinesRefMeat = NIL
-                THEN LNewLinesRefMeat := WNewLinesRefMeat
+                IF LLMLinesRefMeat = NIL
+                THEN LLMLinesRefMeat := WNewLinesRefMeat
                      (* ^The leftmost merged region LinesRef to update.
                         IfteRMNewLinesRef will soon be the rightmost.
                      *) 
@@ -1709,15 +1718,59 @@ MODULE TextEdit
           END (* FOR *)
           (* All the new LinesRefs in the merged region are now linked
              on, and IfteRMNewLinesRef is the rightmost.
-             LNewLinesRefMeat is the leftmost, and will move rightward.
+             LLMLinesRefMeat is the leftmost, and will move rightward.
           *) 
         ; IfteCheckNodeCtMismatch
             ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" )
 
-        (* Create map entry for this pair of lines refs, in case it is a
-           WrFirstLineLinesRef for some window. *)
-
-
+        (* Create LinesRef map entries for any windows that have a
+           WrFirstLineLinesRef value pointing to the merged region.  These
+           do not follow the Marks order, so do them all here. *)
+        ; LWindowRef := IfteImagePers . IpWindowList 
+        ; IF DelNlShift = LbeStd . LimitedCharNoInfinity
+          THEN
+            L2ndOldLinesRefMeat := NIL
+          ELSE 
+            L2ndOldLinesRefMeat := IfteRblCurOldLinesRefMeat 
+          ; IfteRblAdvanceLinesRef ( L2ndOldLinesRefMeat )
+          END (* IF *) 
+        ; WHILE LWindowRef # NIL 
+          DO
+            LOldLinesRefMeat := NIL 
+          ; LLineNoInRegion := 0 
+          ; IF IfteRblCurOldLinesRefMeat # NIL
+               AND LWindowRef . WrFirstLineLinesRef = IfteRblCurOldLinesRefMeat
+            THEN
+              LOldLinesRefMeat := IfteRblCurOldLinesRefMeat 
+            ; LLineNoInRegion := LWindowRef . WrFirstLineLineNo
+            ELSIF L2ndOldLinesRefMeat # NIL  
+                  AND LWindowRef . WrFirstLineLinesRef = L2ndOldLinesRefMeat 
+            THEN 
+              LOldLinesRefMeat := L2ndOldLinesRefMeat 
+            ; LLineNoInRegion
+                := LWindowRef . WrFirstLineLineNo
+                   + Display . ActualNoOfLines
+                       ( IfteRblCurOldLinesRefMeat . LrLineCt )
+            END (* IF *)
+          ; IF LOldLinesRefMeat # NIL 
+            THEN
+              LNewLinesRefMeat := LLMLinesRefMeat
+            ; LNewMergedToLineNo
+                := Display . ActualNoOfLines ( LNewLinesRefMeat . LrLineCt )
+            ; WHILE LNewMergedToLineNo >= LLineNoInRegion
+              DO IfteRblAdvanceLinesRef ( LNewLinesRefMeat ) 
+              ; INC ( LNewMergedToLineNo
+                    , Display . ActualNoOfLines ( LNewLinesRefMeat . LrLineCt )
+                    )
+              END (* WHILE *)
+            ; IfteMapLines
+                ( LWindowRef
+                , LNewLinesRefMeat
+                , LLineNoInRegion + LWindowRef . WrFirstLineLineNo 
+                )  
+            END (* IF *)
+          ; LWindowRef := LWindowRef . WrImageLink 
+          END (* WHILE LWindowRef *) 
 
         (* Construct new LinesRefs and Marks within the merged region. *) 
         ; IfteRbl0LineNoOfCurOldLinesRef := 0 
@@ -1730,7 +1783,9 @@ MODULE TextEdit
                       ( IfteRblCurOldLinesRefMeat . LrLineCt )
                     - 1
             (* ^Last line no of 1st old LinesRef. *) 
-          END (* IF *) 
+          END (* IF *)
+          
+        ; LNewLinesRefMeat := LLMLinesRefMeat 
         ; IfteRblCurNewMergeToLineNo
             := Display . ActualNoOfLines ( LNewLinesRefMeat . LrLineCt ) 
 
@@ -1765,7 +1820,7 @@ MODULE TextEdit
                   := Display . ActualNoOfLines
                        ( IfteRblCurOldLinesRefMeat . LrLineCt )
                      - 1 
-              ; IfteRblAdvanceOldLinesRef ( )
+              ; IfteRblAdvanceLinesRef ( IfteRblCurOldLinesRefMeat)
               ; IfteCheckNodeCtMismatch
                   ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" )
               ; IfteRblIn2ndOldLinesRef := TRUE 
@@ -1810,7 +1865,7 @@ MODULE TextEdit
               END (* WHILE *)
 
             (* Construct a new Mark: *) 
-            ; LNewMarkMeat := NEW ( PaintHs . LineMarkMeatTyp )
+            ; LNewMarkMeat := PaintHs . NewLineMarkMeat ( NewMarkHeader ) 
             ; LNewMarkMeat . LmLinesRef := LNewLinesRefMeat 
             ; LNewMarkMeat . LmWindowRef
                 := IfteRblCurOldMarkMeat . LmWindowRef 
@@ -1858,9 +1913,9 @@ MODULE TextEdit
           THEN (* There are two LinesRefs in the merged region.  The first was 
                   not advanced-over previously, for lack of a Mark pointing
                   to the second, so advance over it now.  *) 
-            IfteRblAdvanceOldLinesRef ( )
+            IfteRblAdvanceLinesRef ( IfteRblCurOldLinesRefMeat )
           END (* IF *) 
-        ; IfteRblAdvanceOldLinesRef ( ) 
+        ; IfteRblAdvanceLinesRef ( IfteRblCurOldLinesRefMeat ) 
         ; IfteCheckNodeCtMismatch
             ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" )
 
@@ -1884,8 +1939,9 @@ MODULE TextEdit
       END IfteRebuildLists
 
   ; BEGIN (* InnerFlushTempEdit *) 
-      VAR LEditedLinesRefMeat : PaintHs . LinesRefMeatTyp 
-    ; VAR LPredOfEditedLinesRefs : PaintHs . LinesRefTyp 
+      VAR LOldEditedLinesRefMeat : PaintHs . LinesRefMeatTyp 
+    ; VAR LNewEditedLinesRefMeat : PaintHs . LinesRefMeatTyp 
+    ; VAR LPredOfOldEditedLinesRefs : PaintHs . LinesRefTyp 
     ; VAR LSuccOfEditedLinesRefs : PaintHs . LinesRefTyp 
       (* If two LinesRefs joined, successor of the second joined one. *)  
     ; VAR LLinesRefMeat : PaintHs . LinesRefMeatTyp 
@@ -1922,35 +1978,34 @@ MODULE TextEdit
       ; IfteOldEstRoot := IfteImagePers . IpEstRoot 
       ; IfteOldLinesRefHeader := IfteImagePers . IpLineHeaderRef
       ; IfteOldMarkHeader := IfteImagePers . IpMarkHeader
-      ; LEditedLinesRefMeat := TempEditRef . TeLinesRef 
+      ; LOldEditedLinesRefMeat := TempEditRef . TeLinesRef 
       ; Assert 
-          ( NOT LEditedLinesRefMeat . LrGapAfter 
+          ( NOT LOldEditedLinesRefMeat . LrGapAfter 
           , AFT . A_InnerFlushTempEdit_EditingWithGapAfter   
           ) 
-      ; LPredOfEditedLinesRefs := LEditedLinesRefMeat . LrLeftLink 
       ; IfteSecondOldLinesRef := NIL 
       ; LSecondOldActualLineCt := 0 
-      ; IF Display . LinesRefIsEndOfImage ( ImageRef , LEditedLinesRefMeat ) 
-        THEN (* LEditedLinesRefMeat is the empty EOI one. *) 
+      ; IF Display . LinesRefIsEndOfImage ( ImageRef , LOldEditedLinesRefMeat ) 
+        THEN (* LOldEditedLinesRefMeat is the empty EOI one. *) 
         (* Do not unlink anything, not even LinesRef. *) 
           IfteOldFromLinesRefMeat := NIL 
         ; IfteOldThruLinesRef := NIL 
         ; IfteFirstOldActualLineCt := TempEditRef . TeLineNo + 1 
-        ; LSuccOfEditedLinesRefs := LEditedLinesRefMeat . LrRightLink   
+        ; LSuccOfEditedLinesRefs := LOldEditedLinesRefMeat . LrRightLink   
           (* ^Which will be the list header. *) 
         ; DelNlShift := LbeStd . LimitedCharNoInfinity 
           (* ^Callers may ensure this, but if not, it's robust. *) 
-        ; IfteSuccLinesRef := LEditedLinesRefMeat
-        ; IfteSuccLinesRefMeat := LEditedLinesRefMeat 
+        ; IfteSuccLinesRef := LOldEditedLinesRefMeat
+        ; IfteSuccLinesRefMeat := LOldEditedLinesRefMeat 
         ELSE (* Not editing in EOI. *) 
-          IfteOldFromLinesRefMeat := LEditedLinesRefMeat  
+          IfteOldFromLinesRefMeat := LOldEditedLinesRefMeat  
         ; IfteFirstOldActualLineCt 
-            := Display . ActualNoOfLines ( LEditedLinesRefMeat . LrLineCt ) 
+            := Display . ActualNoOfLines ( LOldEditedLinesRefMeat . LrLineCt ) 
         ; Assert 
             ( TempEditRef . TeLineNo < IfteFirstOldActualLineCt 
             , AFT . A_InnerFlushTempEdit_EditingBeyondLineCt   
             ) 
-        ; TYPECASE LEditedLinesRefMeat . LrRightLink 
+        ; TYPECASE LOldEditedLinesRefMeat . LrRightLink 
           OF PaintHs . LinesRefMeatTyp ( TSecondOldLinesRef ) 
           => IF DelNlShift # LbeStd . LimitedCharNoInfinity 
             THEN (* Two lines are joined. *) 
@@ -1958,7 +2013,7 @@ MODULE TextEdit
                 RepaintKindPseudoShift in some windows, at least one
                 window has the original line visible, because this is
                 a change to the original first line.  So the new
-                LEditedLinesRefMeat we are about to construct will never 
+                LOldEditedLinesRefMeat we are about to construct will never 
                 be unnecessary garbage. 
              *)
               IfteOldThruLinesRef := TSecondOldLinesRef 
@@ -1975,13 +2030,13 @@ MODULE TextEdit
             ; LSuccOfEditedLinesRefs := IfteSecondOldLinesRef . LrRightLink 
             ELSE (* No joined lines. *) 
               IfteOldThruLinesRef := IfteOldFromLinesRefMeat
-            ; LSuccOfEditedLinesRefs := LEditedLinesRefMeat . LrRightLink 
+            ; LSuccOfEditedLinesRefs := LOldEditedLinesRefMeat . LrRightLink 
             END (* IF *) 
           ELSE 
             CantHappen 
               ( AFT . A_InnerFlushTempEdit_NonEoiLinesRefIsLast ) 
           ; IfteOldThruLinesRef := IfteOldFromLinesRefMeat
-          ; LSuccOfEditedLinesRefs := LEditedLinesRefMeat . LrRightLink 
+          ; LSuccOfEditedLinesRefs := LOldEditedLinesRefMeat . LrRightLink 
           END (* TYPECASE *) 
         END (* IF *) 
 
@@ -2023,7 +2078,7 @@ MODULE TextEdit
       ; MergeTxt . MergeTextEdit 
           ( Lang := IfteImagePers . IpLang 
           , EstRootRef := IfteOldEstRoot 
-          , StartTokMark := LEditedLinesRefMeat . LrBolTokMark 
+          , StartTokMark := LOldEditedLinesRefMeat . LrBolTokMark 
           , EndTokMark := IfteOldEndBolTokMark 
           , BlankLineNo := TempEditRef . TeLineNo 
           , DelFromPos := TempEditRef . TeDelFromPos 
@@ -2184,7 +2239,7 @@ MODULE TextEdit
 
       ; IfteRebuildLists
           ( OldEstRoot := IfteOldEstRoot
-          , OldFromTokMark := LEditedLinesRefMeat . LrBolTokMark 
+          , OldFromTokMark := LOldEditedLinesRefMeat . LrBolTokMark 
           , OldToTokMark := IfteOldEndBolTokMark 
           , NewEstRoot := IfteNewEstRoot
           , NewFromTokMark := IfteStartBolTokMark 
@@ -2220,7 +2275,7 @@ MODULE TextEdit
       ; Assert 
           ( IfteLinesRefsAccountedFor = IfteNewLinesRefCt  
           , AFT . A_InnerFlushTempEditLineCtMismatch 
-          ) 
+          )
 
       (* Nothing has been changed yet, so any assertion failures raised
          before here will just propagate out.  The state of everything
@@ -2243,14 +2298,16 @@ MODULE TextEdit
          undo the changes. *)
 
       ; TRY 
-          BruteForceVerifyAllLinesRefs ( ImageRef , RepairIsOK := TRUE ) 
+          BruteForceVerifyAllLinesRefs ( ImageRef , RepairIsOK := TRUE )
+
+        ; LNewEditedLinesRefMeat := IftePredOfNewEditedLinesRefs . LrRightLink 
 
         (* Now go thru all windows, updating their fields and 
            repainting, as needed. *) 
         ; LWindowRef := ImageRef . ItPers . IpWindowList 
         ; WHILE LWindowRef # NIL 
           DO IF LWindowRef . WrWindowNo 
-                IN LEditedLinesRefMeat . LrVisibleIn 
+                IN LNewEditedLinesRefMeat . LrVisibleIn 
                 OR IfteSecondOldLinesRef # NIL 
                    AND LWindowRef . WrWindowNo 
                        IN IfteSecondOldLinesRef . LrVisibleIn 
@@ -2264,7 +2321,7 @@ MODULE TextEdit
               ELSIF DelNlShift # LbeStd . LimitedCharNoInfinity 
               THEN 
                 IF NOT LWindowRef . WrWindowNo 
-                       IN LEditedLinesRefMeat . LrVisibleIn 
+                       IN LNewEditedLinesRefMeat . LrVisibleIn 
                 THEN 
                   LRepaintKind 
                     := RepaintKindTyp . RepaintKindPseudoShift 
@@ -2278,7 +2335,7 @@ MODULE TextEdit
                and WrFirstLineLineNo being set.  We use it only in 
                cases where they are not changing. 
             *)    
-            ; IF LWindowRef . WrFirstLineLinesRef = LEditedLinesRefMeat 
+            ; IF LWindowRef . WrFirstLineLinesRef = LNewEditedLinesRefMeat 
               THEN 
                 LLineNoInWindow := - LWindowRef . WrFirstLineLineNo 
               ELSIF LWindowRef . WrFirstLineLinesRef 
@@ -2287,13 +2344,11 @@ MODULE TextEdit
                 LLineNoInWindow 
                   := - LWindowRef . WrFirstLineLineNo 
                      - Display . ActualNoOfLines 
-                         ( LEditedLinesRefMeat . LrLineCt ) 
+                         ( LNewEditedLinesRefMeat . LrLineCt ) 
               ELSE 
                 LLineNoInWindow 
                   := Display . LineNoInWindow 
-                       ( LWindowRef 
-                       , LPredOfEditedLinesRefs . LrRightLink 
-                       )
+                       ( LWindowRef , LNewEditedLinesRefMeat )
               END (* IF *) 
             (* INVARIANT: LLineNoInWindow is the window-relative line 
                  number of the first line represented by the current
@@ -4411,7 +4466,8 @@ EVAL LLinesRefMeat
     ; IF LLinesInvolved = 3 (* Or more *) 
       THEN 
         LLinesRef := LThruMark . LmLinesRef . LrLeftLink 
-      ; LTempMark := NEW ( PaintHs . LineMarkMeatTyp ) 
+      ; LTempMark
+          := PaintHs . NewLineMarkMeat ( LImageTrans . ItPers . IpMarkHeader)  
       ; LTempMark . LmWindowRef := NIL 
       ; LTempMark . LmMarkSs := MarkSsTyp . MarkSsTemp  
       ; WindowRef . WrMarks [ MarkSsTyp . MarkSsTemp ] := LTempMark 

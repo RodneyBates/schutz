@@ -64,8 +64,9 @@ MODULE Selection
       ; Current := LNewSel 
       ; TRY 
           PaintHs . BruteForceVerifyLineMarks ( LOldSel . SelImage ) 
-        ; IF LRightMark # LLeftMark 
-          THEN (* Just defensive.  Shouldn't happen. *) 
+        ; IF LRightMark = LLeftMark 
+          THEN (* Just defensive.  Shouldn't happen. *)
+          ELSE 
             PaintHs . DeleteLineMark 
               ( Mark := LRightMark 
               , (* VAR *) PredMark := LRightMarkPred 
@@ -74,9 +75,7 @@ MODULE Selection
           END (* IF *) 
         ; TRY 
             PaintHs . BruteForceVerifyLineMarks ( LOldSel . SelImage ) 
-          ; IF LOldSel . SelImage # NIL 
-               AND LLeftMark # NIL 
-               AND LRightMark # NIL 
+          ; IF LOldSel . SelImage # NIL AND LLeftMark # NIL AND LRightMark # NIL 
             THEN 
               Display . PaintLinesRangeAllWindows 
                 ( ImageTrans := LOldSel . SelImage  
