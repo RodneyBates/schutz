@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -27,7 +27,7 @@ MODULE Selection
 
 ; TYPE AFT = MessageCodes . T 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ClearSelection ( ) 
   RAISES { Backout , Thread . Alerted } 
   (* Does not clear preselection or SelText. *) 
@@ -37,24 +37,30 @@ MODULE Selection
   ; VAR LLeftMark : PaintHs . LineMarkMeatTyp 
   ; VAR LRightMark : PaintHs . LineMarkMeatTyp 
   ; VAR LLeftMarkPred : PaintHs . LineMarkTyp 
-  ; VAR LRightMarkPred : PaintHs . LineMarkTyp 
+  ; VAR LRightMarkPred : PaintHs . LineMarkTyp
 
   ; BEGIN (* ClearSelection *) 
       LOldSel := Current 
     ; IF LOldSel # NIL 
       THEN 
-        PaintHs . GetMarksInOrder 
+        PaintHs . UpdateLineMarkMeat
+          ( LOldSel . SelImage , (* IN OUT *) LOldSel . SelStartMark ) 
+      ; PaintHs . UpdateLineMarkMeat
+          ( LOldSel . SelImage , (* IN OUT *) LOldSel . SelEndMark ) 
+      ; PaintHs . UpdateLineMarkMeat
+          ( LOldSel . SelPreselImage , (* IN OUT *) LOldSel . SelPreselMark ) 
+      ; PaintHs . GetMarksInOrder 
           ( Mark1 := LOldSel . SelStartMark 
           , Mark2 := LOldSel . SelEndMark  
           , (* VAR *) Left := LLeftMark 
           , (* VAR *) Right := LRightMark 
-          ) 
+          )
       ; LNewSel := NEW ( SelectionTyp ) 
       ; LNewSel . SelImage := NIL 
       ; LNewSel . SelStartMark := NIL 
       ; LNewSel . SelEndMark := NIL 
-      ; LNewSel . PreselImage := LOldSel . PreselImage 
-      ; LNewSel . PreselMark := LOldSel . PreselMark 
+      ; LNewSel . SelPreselImage := LOldSel . SelPreselImage 
+      ; LNewSel . SelPreselMark := LOldSel . SelPreselMark 
       ; LNewSel . SelText := NIL 
       ; PaintHs . DeleteLineMark 
           ( Mark := LLeftMark 
@@ -136,7 +142,7 @@ MODULE Selection
       END (* IF *) 
     END ClearSelection  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE Preselect ( Window : PaintHs . WindowRefTyp ) 
   RAISES { Backout , Thread . Alerted } <* NOWARN *>
   (* Notes the current cursor location as preselection.  Leaves any 
@@ -151,19 +157,32 @@ MODULE Selection
   ; BEGIN 
       IF Window # NIL AND Window . WrImageRef # NIL 
       THEN 
-        LOldSel := Current 
+        LOldSel := Current
+      ; IF LOldSel # NIL
+        THEN 
+          PaintHs . UpdateLineMarkMeat
+            ( LOldSel . SelImage , (* IN OUT *) LOldSel . SelStartMark ) 
+        ; PaintHs . UpdateLineMarkMeat
+            ( LOldSel . SelImage , (* IN OUT *) LOldSel . SelEndMark ) 
+        ; PaintHs . UpdateLineMarkMeat
+            ( LOldSel . SelPreselImage , (* IN OUT *) LOldSel . SelPreselMark )
+        END (* IF *) 
       ; WITH WCursorMark 
              = Window . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
         DO 
-          LNewSel := NEW ( SelectionTyp ) 
-        ; LNewSel . PreselImage := Window . WrImageRef  
-        ; LNewSel . PreselMark := NEW ( PaintHs . LineMarkMeatTyp )
-        ; LNewSel . PreselMark . LmTokMark := WCursorMark . LmTokMark  
-        ; LNewSel . PreselMark . LmLinesRef := WCursorMark . LmLinesRef  
-        ; LNewSel . PreselMark . LmCharPos := WCursorMark . LmCharPos  
-        ; LNewSel . PreselMark . LmLineNo := WCursorMark . LmLineNo   
-        ; LNewSel . PreselMark . LmWindowRef := NIL 
-        ; LNewSel . PreselMark . LmMarkSs 
+          PaintHs . UpdateLineMarkMeat
+            ( Window . WrImageRef , (* IN OUT *) WCursorMark )
+        ; LNewSel := NEW ( SelectionTyp ) 
+        ; LNewSel . SelPreselImage := Window . WrImageRef  
+        ; LNewSel . SelPreselMark
+            := PaintHs . NewLineMarkMeat
+                 ( Window . WrImageRef . ItPers . IpMarkHeader )
+        ; LNewSel . SelPreselMark . LmTokMark := WCursorMark . LmTokMark  
+        ; LNewSel . SelPreselMark . LmLinesRef := WCursorMark . LmLinesRef  
+        ; LNewSel . SelPreselMark . LmCharPos := WCursorMark . LmCharPos  
+        ; LNewSel . SelPreselMark . LmLineNo := WCursorMark . LmLineNo   
+        ; LNewSel . SelPreselMark . LmWindowRef := NIL 
+        ; LNewSel . SelPreselMark . LmMarkSs 
             := PaintHs . MarkSsTyp . MarkSsStartSel 
         ; IF LOldSel = NIL 
           THEN 
@@ -176,19 +195,18 @@ MODULE Selection
           ; LNewSel . SelStartMark := LOldSel . SelStartMark 
           ; LNewSel . SelEndMark := LOldSel . SelEndMark 
           ; LNewSel . SelText := LOldSel . SelText 
-          ; IF LOldSel . PreselMark # NIL 
-               AND NOT KeepLeftoverMarks 
+          ; IF LOldSel . SelPreselMark # NIL AND NOT KeepLeftoverMarks 
             THEN
               PaintHs . DeleteLineMark 
-                ( Mark := LOldSel . PreselMark 
+                ( Mark := LOldSel . SelPreselMark 
                 , (* VAR *) PredMark := LPreselPredMark (* Dead *)  
-                , Image := LOldSel . PreselImage
+                , Image := LOldSel . SelPreselImage
                 ) 
             END (* IF *) 
           END (* IF *) 
         (* Must insert now, to prevent the LinesRef from being discarded: *) 
         ; PaintHs . InsertLineMarkToRight 
-            ( InsertMark := LNewSel . PreselMark 
+            ( InsertMark := LNewSel . SelPreselMark 
             , PredMark := WCursorMark 
             , Image := Window . WrImageRef 
             ) 
@@ -197,16 +215,16 @@ MODULE Selection
             PaintHs . BruteForceVerifyLineMarks ( Window . WrImageRef ) 
           EXCEPT Backout ( EArg ) 
           => PaintHs . DeleteLineMark 
-              ( Mark := LNewSel . PreselMark 
+              ( Mark := LNewSel . SelPreselMark 
               , (* VAR *) PredMark := LPredMark (* Dead *) 
               , Image := Window . WrImageRef 
               )
           ; IF LOldSel # NIL 
-               AND LOldSel . PreselMark # NIL 
+               AND LOldSel . SelPreselMark # NIL 
                AND NOT KeepLeftoverMarks
             THEN 
               PaintHs . InsertLineMarkToRight 
-                ( InsertMark := LOldSel . PreselMark 
+                ( InsertMark := LOldSel . SelPreselMark 
                 , PredMark := LPreselPredMark 
                 , Image := Window . WrImageRef  
                 ) 
@@ -226,7 +244,7 @@ MODULE Selection
       END (* IF *) 
     END Preselect 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE DragSelection 
     ( Window : PaintHs . WindowRefTyp 
     ; AbsPosition : EditWindow . CharPointTyp 
@@ -243,8 +261,16 @@ MODULE Selection
   ; VAR LLeftPaintMark : PaintHs . LineMarkMeatTyp  
   ; VAR LRightPaintMark : PaintHs . LineMarkMeatTyp  
 
-  ; BEGIN 
-      IF Window # NIL 
+  ; BEGIN
+(* TODO: Make sure the drag is all within the same image.
+         (Tho' perhaps it need not be the same window.)
+         Trestle may ensure it's all the same image and window.
+*)
+      PaintHs . UpdateLineMarkMeat
+        ( Window . WrImageRef 
+        , Window . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
+        ) 
+    ; IF Window # NIL 
          AND Window . WrImageRef # NIL 
          AND NOT Point . Equal 
               ( EditWindow . CharPointTyp 
@@ -262,30 +288,38 @@ MODULE Selection
               , AbsPosition . h 
               , AbsPosition . v 
               ) 
-      ; Display . MoveCursorAbsoluteInsideWindow ( Window , AbsPosition ) 
+      ; LOldSel := Current
+      
+      ; PaintHs . UpdateLineMarkMeat
+          ( LOldSel . SelImage , (* IN OUT *) LOldSel . SelPreselMark )
+      ; PaintHs . UpdateLineMarkMeat
+          ( LOldSel . SelImage , (* IN OUT *) LOldSel . SelStartMark )
+      ; PaintHs . UpdateLineMarkMeat
+          ( LOldSel . SelPreselImage , (* IN OUT *) LOldSel . SelEndMark )
+
+      ; Display . MoveCursorAbsoluteInsideWindow ( Window , AbsPosition )  
       ; LNewSel := NEW ( SelectionTyp ) 
       ; LNewSel . SelText := NIL 
-      ; LNewSel . PreselImage := NIL 
-      ; LNewSel . PreselMark := NIL 
-      ; IF Current . PreselImage # NIL 
+      ; LNewSel . SelPreselImage := NIL 
+      ; LNewSel . SelPreselMark := NIL
+      
+      ; IF Current . SelPreselImage # NIL 
         THEN (* This is the first drag of the sweep. *) 
           ClearSelection ( ) 
-        ; LOldSel := Current 
         ; Assert 
-            ( LOldSel . PreselImage = Window . WrImageRef 
+            ( LOldSel . SelPreselImage = Window . WrImageRef 
             , AFT . A_DragSelection_Preselect_Image_changed  
             ) 
-        ; LNewSel . SelImage := LOldSel . PreselImage
+        ; LNewSel . SelImage := LOldSel . SelPreselImage
         ; Assert 
-            ( LOldSel . PreselMark # NIL  
+            ( LOldSel . SelPreselMark # NIL  
             , AFT . A_DragSelection_Preselect_No_Start  
             ) 
-        ; LNewSel . SelStartMark := LOldSel . PreselMark 
+        ; LNewSel . SelStartMark := LOldSel . SelPreselMark 
         ; LPaintMark1 := LNewSel . SelStartMark 
         ; LOldEndPredMark := NIL 
-        ELSE 
-          LOldSel := Current 
-        ; Assert 
+        ELSE (* Subsequent drag of a sweep. *)  
+          Assert 
             ( LOldSel . SelImage = Window . WrImageRef 
             , AFT . A_DragSelection_Image_changed  
             ) 
@@ -323,11 +357,14 @@ MODULE Selection
       ; WITH WCursorMark 
              = Window . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
         DO 
-          IF PaintHs . CompareLineMarks 
+          PaintHs . UpdateLineMarkMeat
+            ( Window . WrImageRef , (* IN OUT *) WCursorMark )
+(* Check^ Can it be a different image? *)
+        ; IF PaintHs . CompareLineMarks 
                ( WCursorMark , LNewSel . SelStartMark ) = 0 
           THEN (* Selection is now empty. *) 
-            LNewSel . PreselImage := LNewSel . SelImage 
-          ; LNewSel . PreselMark := LNewSel . SelStartMark 
+            LNewSel . SelPreselImage := LNewSel . SelImage 
+          ; LNewSel . SelPreselMark := LNewSel . SelStartMark 
           ; LNewSel . SelStartMark := NIL 
           ; LNewSel . SelEndMark := NIL 
           ; LNewSel . SelImage := NIL 
@@ -335,7 +372,7 @@ MODULE Selection
           ; TRY 
               PaintHs . GetMarksInOrder 
                 ( Mark1 := LPaintMark1   
-                , Mark2 := LNewSel . PreselMark  
+                , Mark2 := LNewSel . SelPreselMark  
                 , (* VAR *) Left := LLeftPaintMark 
                 , (* VAR *) Right := LRightPaintMark 
                 ) 
@@ -374,8 +411,10 @@ MODULE Selection
               *) 
             ; RAISE Backout ( EArg ) 
             END (* TRY EXCEPT *) 
-          ELSE 
-            LNewSel . SelEndMark := NEW ( PaintHs . LineMarkMeatTyp ) 
+          ELSE (* Nonempty selection. *)
+            LNewSel . SelEndMark
+              := PaintHs . NewLineMarkMeat
+                   ( LNewSel . SelImage . ItPers . IpMarkHeader ) 
           ; LNewSel . SelEndMark . LmTokMark := WCursorMark . LmTokMark  
           ; LNewSel . SelEndMark . LmLinesRef := WCursorMark . LmLinesRef  
           ; LNewSel . SelEndMark . LmCharPos := WCursorMark . LmCharPos  
@@ -448,7 +487,7 @@ MODULE Selection
       END (* IF *) 
     END DragSelection 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ManifestSelectionAsText ( ) : TEXT 
   RAISES { Backout , Thread . Alerted } <* NOWARN *> 
 
@@ -471,17 +510,21 @@ MODULE Selection
          AND LSel . SelStartMark # NIL 
          AND LSel . SelEndMark # NIL  
       THEN
-        PaintHs . GetMarksInOrder 
+        PaintHs . UpdateLineMarkMeat
+          ( LSel . SelImage , (* IN OUT *) LSel . SelStartMark )
+      ; PaintHs . UpdateLineMarkMeat
+          ( LSel . SelImage , (* IN OUT *) LSel . SelEndMark )
+      ; PaintHs . GetMarksInOrder 
           ( Mark1 := LSel . SelStartMark 
           , Mark2 := LSel . SelEndMark  
           , (* VAR *) Left := LLeftMark 
           , (* VAR *) Right := LRightMark 
           ) 
-      ; LThruLinesRef := LRightMark . LmLinesRef 
       ; LLinesRef := LLeftMark . LmLinesRef 
       ; LLineNo := LLeftMark . LmLineNo 
       ; LLineCt := LLinesRef . LrLineCt 
       ; LFromPos := LLeftMark . LmCharPos 
+      ; LThruLinesRef := LRightMark . LmLinesRef 
       ; LResult := "" 
       ; LOOP 
           IF LLinesRef = LThruLinesRef 
@@ -492,8 +535,7 @@ MODULE Selection
         ; IF LLineCt > 0 (* In blank lines. *) 
              OR LLinesRef . LrLineText = NIL (* Otherwise blank. *) 
           THEN  
-            IF LLinesRef = LThruLinesRef 
-               AND LLineNo = LRightMark . LmLineNo 
+            IF LLinesRef = LThruLinesRef AND LLineNo = LRightMark . LmLineNo 
             THEN 
               LResult := LResult & Fmt . Pad ( "" , LToPos - LFromPos ) 
             ; EXIT 

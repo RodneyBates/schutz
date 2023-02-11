@@ -104,26 +104,51 @@ MODULE PaintHs
 
 (* EXPORTED: *) 
 ; PROCEDURE NewLinesRefHeader ( ) : LinesRefHeaderTyp
+  (* Allocate a LinesRef list header node and give it a new list number. *) 
+  (* Does not assign anything to link fields. *) 
 
   = VAR LResult : LinesRefHeaderTyp
 
   ; BEGIN
       LResult := NEW ( LinesRefHeaderTyp )
     ; LResult . LrListNo := GNextLinesRefListNo
+    ; LResult . LrUpdateRef := NIL 
     ; INC ( GNextLinesRefListNo )
     ; RETURN LResult 
     END NewLinesRefHeader 
 
 (* EXPORTED: *) 
 ; PROCEDURE NewLinesRefMeat ( Header : LinesRefHeaderTyp  ) : LinesRefMeatTyp
+  (* Allocate a LinesRef meat node, giving it the same list number as Header. *)
 
-  = VAR LResult : LinesRefHeaderTyp
+  = VAR LResult : LinesRefMeatTyp
 
   ; BEGIN
       LResult := NEW ( LinesRefMeatTyp )
     ; LResult . LrListNo := Header . LrListNo
+    ; LResult . LrUpdateRef := NIL 
     ; RETURN LResult 
     END NewLinesRefMeat  
+
+(* EXPORTED: *) 
+; PROCEDURE UpdateLinesRefMeat
+    ( Image : PaintHs . ImageTransientTyp
+    ; VAR (* IN OUT *) LinesRef : LinesRefMeatTyp
+    )
+  (* Alter LinesRef by following update links until we reach the one
+     with the same list no as the header from Image. *) 
+
+  = VAR LHeader : PaintHs . LinesRefHeaderTyp 
+
+  ; BEGIN
+      IF Image = NIL THEN RETURN END (* IF *) 
+    ; IF LinesRef = NIL THEN RETURN END (* IF *) 
+    ; LHeader := Image . ItPers . IpLineHeaderRef 
+    ; WHILE LinesRef . LrListNo < LHeader . LrListNo 
+      DO <* ASSERT LinesRef . LrUpdateRef # NIL *>
+        LinesRef := LinesRef . LrUpdateRef 
+      END (* WHILE *) 
+    END UpdateLinesRefMeat 
 
 (* EXPORTED: *) 
 ; PROCEDURE InsertLinesRefToRight 
@@ -216,26 +241,55 @@ MODULE PaintHs
 
 (* EXPORTED: *) 
 ; PROCEDURE NewLineMarkHeader ( ) : LineMarkHeaderTyp
+  (* Allocate a Mark list header node and give it a new list number. *)
+  (* Does not assign anything to link fields. *) 
 
   = VAR LResult : LineMarkHeaderTyp
 
   ; BEGIN
       LResult := NEW ( LineMarkHeaderTyp )
     ; LResult . LmListNo := GNextMarkListNo
+    ; LResult . LmUpdateRef := NIL 
     ; INC ( GNextMarkListNo )
     ; RETURN LResult 
     END NewLineMarkHeader 
 
 (* EXPORTED: *) 
 ; PROCEDURE NewLineMarkMeat ( Header : LineMarkHeaderTyp ) : LineMarkMeatTyp
+  (* Allocate a Mark meat node, giving it the same list number as Header. *)
 
-  = VAR LResult : LineMarkHeaderTyp
+  = VAR LResult : LineMarkMeatTyp
 
   ; BEGIN
       LResult := NEW ( LineMarkMeatTyp )
     ; LResult . LmListNo := Header . LmListNo
+    ; LResult . LmUpdateRef := NIL 
     ; RETURN LResult 
-    END NewLineMarkMeat  
+    END NewLineMarkMeat
+
+(* EXPORTED: *) 
+; PROCEDURE UpdateLineMarkMeat
+    ( Image : PaintHs . ImageTransientTyp
+    ; VAR (* IN OUT *) Mark : LineMarkMeatTyp
+    )
+  (* Alter Mark by following update links until we reach the one
+     with the same lint no as the header from Image.
+     Additionally, update the LmLinesRef field of the updated Mark.
+  *) 
+
+  = VAR LHeader : LineMarkHeaderTyp 
+
+  ; BEGIN
+      IF Image = NIL THEN RETURN END (* IF *) 
+    ; IF Mark = NIL THEN RETURN END (* IF *) 
+    ; LHeader := Image . ItPers . IpMarkHeader  
+    ; WHILE Mark . LmListNo < LHeader . LmListNo 
+      DO
+        <* ASSERT Mark . LmUpdateRef # NIL *>
+        Mark := Mark . LmUpdateRef 
+      END (* WHILE *)
+    ; UpdateLinesRefMeat ( Image , (* IN OUT *) Mark . LmLinesRef ) 
+    END UpdateLineMarkMeat 
 
 (* EXPORTED: *) 
 ; PROCEDURE ResetAllLrHasMarkFields ( ImageTrans : ImageTransientTyp ) 
@@ -283,8 +337,6 @@ MODULE PaintHs
       | MarkSsTyp . MarkSsTemp => RETURN "MarkSsTemp"
       END (* CASE *) 
     END MarkSsImage 
-
-
 
 (* EXPORTED: *) 
 ; PROCEDURE RecomputeLrHasMark ( Mark : LineMarkMeatTyp ) 

@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -1880,9 +1880,13 @@ MODULE EditWindow
             EVAL Worker . AwaitIdle ( ) 
           ; IF Selection . Current # NIL 
                AND Selection . Current . SelEndMark # NIL 
-  (* CHECK: ^This seems like a questionable way to get this info. *) 
-            THEN 
-              EndSweepSelection ( Window , MouseRec . time ) 
+(* CHECK: ^This seems like a questionable way to get this info. *) 
+            THEN
+              PaintHs . UpdateLineMarkMeat
+                ( Selection . Current . SelImage
+                , Selection . Current . SelEndMark
+                ) 
+            ; EndSweepSelection ( Window , MouseRec . time ) 
             END (* IF *) 
           END (* IF *) 
         ELSIF MouseRec . whatChanged = VBT . Modifier . MouseM 

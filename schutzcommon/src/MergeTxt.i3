@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -29,7 +29,6 @@ INTERFACE MergeTxt
 
 ; CONST TokMarkCt = 4 
 ; TYPE TokMarkSsTyp = [ 0 .. TokMarkCt - 1 ] 
-; TYPE TokMarkArrayTyp = ARRAY TokMarkSsTyp OF Marks . TokMarkTyp 
 ; TYPE EstRefArrayTyp = ARRAY TokMarkSsTyp OF LbeStd . EstRootTyp   
 
 ; PROCEDURE MergeTextEdit 

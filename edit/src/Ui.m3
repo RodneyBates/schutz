@@ -2135,6 +2135,8 @@ MODULE Ui
       ; LTextSel := LSel . SelText 
       (* ^Paranoid coding, in case ClearSelection clears SelText too. *) 
       ; LImage := LSel . SelImage 
+      ; PaintHs . UpdateLineMarkMeat ( LImage , LSel . SelStartMark ) 
+      ; PaintHs . UpdateLineMarkMeat ( LImage , LSel . SelEndMark ) 
       ; PaintHs . GetMarksInOrder 
           ( Mark1 := LSel . SelStartMark 
           , Mark2 := LSel . SelEndMark 

@@ -33,7 +33,7 @@ MODULE Images
 ; IMPORT TreeBrowse 
 ; IMPORT UiRecPlay 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ConnectImageToWindow
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; WindowRef : PaintHs . WindowRefTyp 
@@ -96,7 +96,7 @@ MODULE Images
     END ConnectImageToWindow  
 
 ; PROCEDURE ExcerptMarkList 
-    ( OldImagePers : PaintHs . ImagePersistentTyp 
+    ( Image : PaintHs . ImageTransientTyp 
     ; NewImagePers : PaintHs . ImagePersistentTyp 
     ; RemoveLinesRefs : BOOLEAN 
     ) 
@@ -109,24 +109,24 @@ MODULE Images
   ; VAR LNewMark : PaintHs . LineMarkMeatTyp 
 
   ; BEGIN 
-      IF OldImagePers . IpMarkHeader = NIL 
+      IF Image . ItPers . IpMarkHeader = NIL 
       THEN NewImagePers . IpMarkHeader := NIL 
       ELSE 
-        NewImagePers . IpMarkHeader := NEW ( PaintHs . LineMarkHeaderTyp ) 
-      ; NewImagePers . IpMarkHeader . LmLeftLink 
-          := NewImagePers . IpMarkHeader 
-      ; NewImagePers . IpMarkHeader . LmRightLink 
-          := NewImagePers . IpMarkHeader 
+        NewImagePers . IpMarkHeader := PaintHs . NewLineMarkHeader ( ) 
+      ; NewImagePers . IpMarkHeader . LmLeftLink := NewImagePers . IpMarkHeader 
+      ; NewImagePers . IpMarkHeader . LmRightLink := NewImagePers . IpMarkHeader 
       ; NewImagePers . IpMarkCt := 0 
-      ; LMark := OldImagePers . IpMarkHeader 
+      ; LMark := Image . ItPers . IpMarkHeader 
       ; LOOP 
           TYPECASE LMark . LmRightLink 
           OF PaintHs . LineMarkMeatTyp ( TRightMark ) 
              (* NIL can't happen. *) 
-          => IF TRightMark . LmMarkSs = PaintHs . MarkSsTyp . MarkSsCursor 
+          => PaintHs . UpdateLineMarkMeat ( Image , TRightMark ) 
+          ; IF TRightMark . LmMarkSs = PaintHs . MarkSsTyp . MarkSsCursor 
                 OR Selection . KeepLeftoverMarks 
             THEN (* Found a mark to keep. *) 
-              LNewMark := NEW ( PaintHs . LineMarkMeatTyp ) 
+              LNewMark
+                := PaintHs . NewLineMarkMeat ( NewImagePers . IpMarkHeader ) 
             ; LNewMark . LmWindowRef := NIL  
             ; LNewMark . LmMarkSs := TRightMark . LmMarkSs  
             ; LNewMark . LmTokMark := TRightMark . LmTokMark  
@@ -140,18 +140,17 @@ MODULE Images
                 ( InsertToRightOfRef := NewImagePers . IpMarkHeader 
                 , RefToInsert := LNewMark 
                 ) 
-            ; INC ( NewImagePers . IpMarkCt ) 
-            ; EXIT 
-            ELSE LMark := TRightMark 
+            ; INC ( NewImagePers . IpMarkCt )
             END (* IF *) 
-          ELSE (* No cursor found. *) 
+          ; LMark := TRightMark 
+          ELSE (* On the right is the header.  End of Marks list. *) 
             EXIT 
           END (* TYPECASE *) 
         END (* LOOP *) 
       END (* IF *) 
     END ExcerptMarkList 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PersistentImageToSave  
     ( ImageTrans : PaintHs . ImageTransientTyp 
     ; ForSave : BOOLEAN 
@@ -199,7 +198,7 @@ MODULE Images
           := LOldImagePers . IpIsMutatedSinceCommandStarted  
       END (* IF *) 
     ; ExcerptMarkList 
-        ( LOldImagePers , LNewImagePers , RemoveLinesRefs := ForSave ) 
+        ( ImageTrans , LNewImagePers , RemoveLinesRefs := ForSave ) 
     ; LNewImagePers . IpIsAnalyzed := FALSE (* Since IpSemRoot not copied. *) 
 
     (* Remaining Ip fields are just copied: *) 
@@ -324,7 +323,7 @@ MODULE Images
            + PaintHs . WindowNoSetTyp { LWindowRef . WrWindowNo } 
     END InnerRemoveImageFromWindow 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE DisconnectImageFromWindow
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; WindowRef : PaintHs . WindowRefTyp 
@@ -342,7 +341,7 @@ MODULE Images
       END 
     END DisconnectImageFromWindow 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE DisconnectImageFromAllWindows 
     ( ImageRef : PaintHs . ImageTransientTyp ) 
   RAISES { Backout } 
@@ -369,7 +368,7 @@ MODULE Images
       END (* IF *) 
     END DisconnectImageFromAllWindows 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE DiscardImage ( ImageRef : PaintHs . ImageTransientTyp )  
   (* ^No action if ImageRef is in any window. *) 
 
@@ -385,7 +384,7 @@ MODULE Images
       END (* IF *) 
     END DiscardImage 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE WriteCheckpoint  
     ( ImageRef : PaintHs . ImageTransientTyp ) 
   : BOOLEAN (* Success *) 
@@ -395,11 +394,11 @@ MODULE Images
   *) 
 
   = BEGIN 
-      ImageRef . ItPers . IpCrashCode := ORD ( MessageCodes . T . NullCode )   
-    ; ImageRef . ItPers . IpCrashCommand := UiRecPlay . CurrentCommand ( ) 
-    ; IF ImageRef # NIL 
+      IF ImageRef # NIL 
       THEN 
-        TRY 
+        ImageRef . ItPers . IpCrashCode := ORD ( MessageCodes . T . NullCode )   
+      ; ImageRef . ItPers . IpCrashCommand := UiRecPlay . CurrentCommand ( ) 
+      ; TRY 
           Files . WriteImagePickle 
             ( PersistentImageToSave ( ImageRef , ForSave := FALSE ) 
             , Misc . CheckpointName ( ImageRef . ItPers . IpAbsPklFileName )  
@@ -417,7 +416,7 @@ MODULE Images
       END (* IF *) 
     END WriteCheckpoint 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ParseTree 
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; InsertNilFixedChildren := FALSE 

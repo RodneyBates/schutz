@@ -1,7 +1,7 @@
 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
-(* Copyright 1988..2022, Rodney M. Bates.                                    *)
+(* Copyright 1988..2023, Rodney M. Bates.                                    *)
 (* rodney.m.bates@acm.org                                                    *)
 (* Licensed under the MIT License.                                           *)
 (* -----------------------------------------------------------------------2- *)
@@ -24,7 +24,7 @@ MODULE Search
 
 ; CONST MarkKindBlankLine = Marks . MarkKindTyp . BlankLine  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ClearMatch 
     ( Window : PaintHs . WindowRefTyp 
     ; VAR (* IN OUT *) MustRepaint : BOOLEAN 
@@ -64,7 +64,7 @@ MODULE Search
       END (* IF *) 
     END ClearMatch 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SetMatchAndRepaint 
     ( Window : PaintHs . WindowRefTyp 
     ; LinesRef : PaintHs . LinesRefMeatTyp 
@@ -96,9 +96,12 @@ MODULE Search
         = Window . WrMarks [ MarkSsTyp . MarkSsCursor ] 
       DO 
         LImageTrans := Window . WrImageRef 
+      ; PaintHs . UpdateLineMarkMeat
+          ( LImageTrans , (* IN OUT *) WCursorMark )
       ; LOldCursorMark := WCursorMark 
 
-      ; LMatchStartMark := NEW ( PaintHs . LineMarkMeatTyp )  
+      ; LMatchStartMark
+          := PaintHs . NewLineMarkMeat ( LImageTrans . ItPers . IpMarkHeader )  
       ; LMatchStartMark . LmWindowRef := Window   
       ; LMatchStartMark . LmMarkSs := MarkSsTyp . MarkSsStartMatch   
       ; LMatchStartMark . LmLinesRef := LinesRef  
@@ -106,7 +109,8 @@ MODULE Search
       ; LMatchStartMark . LmLineNo := LineNo  
       ; LMatchStartMark . LmCharPos := FromPos  
 
-      ; LMatchEndMark := NEW ( PaintHs . LineMarkMeatTyp )  
+      ; LMatchEndMark 
+          := PaintHs . NewLineMarkMeat ( LImageTrans . ItPers . IpMarkHeader ) 
       ; LMatchEndMark . LmWindowRef := Window   
       ; LMatchEndMark . LmMarkSs := MarkSsTyp . MarkSsEndMatch   
       ; LMatchEndMark . LmLinesRef := LinesRef  
@@ -114,7 +118,8 @@ MODULE Search
       ; LMatchEndMark . LmLineNo := LineNo  
       ; LMatchEndMark . LmCharPos := ToPos 
 
-      ; LNewCursorMark := NEW ( PaintHs . LineMarkMeatTyp )  
+      ; LNewCursorMark
+          := PaintHs . NewLineMarkMeat ( LImageTrans . ItPers . IpMarkHeader ) 
       ; LNewCursorMark . LmWindowRef := Window   
       ; LNewCursorMark . LmMarkSs := WCursorMark . LmMarkSs  
       ; LNewCursorMark . LmLinesRef := LinesRef  
@@ -337,7 +342,7 @@ MODULE Search
       END (* IF *) 
     END SearchNonblankLineFwd 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE StringSearchFwd  
     ( Window : PaintHs . WindowRefTyp 
     ; SearchString : TEXT 
@@ -371,7 +376,9 @@ MODULE Search
           DO 
             IF WCursorMark # NIL 
             THEN 
-              IF StartAtBOI 
+              PaintHs . UpdateLineMarkMeat
+                ( Window . WrImageRef , (* IN OUT *) WCursorMark )
+            ; IF StartAtBOI 
               THEN 
                 Display . SecureSucc ( LImageTrans , LLinesHeader ) 
               ; LLinesRef := LLinesHeader . LrRightLink  
@@ -609,7 +616,7 @@ MODULE Search
       END (* IF *) 
     END SearchNonblankLineBwd 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE StringSearchBwd  
     ( Window : PaintHs . WindowRefTyp 
     ; SearchString : TEXT 
@@ -643,7 +650,9 @@ MODULE Search
           DO 
             IF WCursorMark # NIL 
             THEN 
-              IF StartAtEOI 
+              PaintHs . UpdateLineMarkMeat
+                ( Window . WrImageRef , (* IN OUT *) WCursorMark )
+            ; IF StartAtEOI 
               THEN 
                 Display . SecurePred ( LImageTrans , LLinesHeader ) 
               ; LLinesRef := LLinesHeader . LrLeftLink 
@@ -737,7 +746,7 @@ MODULE Search
     ; RETURN FALSE 
     END StringSearchBwd 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE Replace 
     ( Window : PaintHs . WindowRefTyp 
     ; SearchString : TEXT 

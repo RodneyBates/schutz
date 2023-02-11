@@ -14,10 +14,11 @@ INTERFACE Selection
 ; IMPORT EditWindow 
 ; FROM Failures IMPORT Backout 
 
-; TYPE SelectionTyp 
+(* TODO: Can't SelectionTyp be opaque here? *) 
+; TYPE SelectionTyp
   = OBJECT 
-      PreselImage : PaintHs . ImageTransientTyp := NIL 
-    ; PreselMark : PaintHs . LineMarkMeatTyp := NIL 
+      SelPreselImage : PaintHs . ImageTransientTyp := NIL 
+    ; SelPreselMark : PaintHs . LineMarkMeatTyp := NIL 
       (* The Presel* fields are for preselection.  We want not to clear
          the current selection on a new downclick, because it might be
          just a cursor-setting click, not the start of a drag.  So we
@@ -51,7 +52,6 @@ INTERFACE Selection
   RAISES { Backout , Thread . Alerted } 
   (* Does not clear preselection or SelText. *) 
 
-(* VISIBLE: *) 
 ; PROCEDURE Preselect ( Window : PaintHs . WindowRefTyp ) 
   RAISES { Backout , Thread . Alerted } <* NOWARN *>
   (* Notes the current cursor location as preselection.  Leaves any 

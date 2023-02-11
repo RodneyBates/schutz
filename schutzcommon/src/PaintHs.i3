@@ -206,14 +206,15 @@ INTERFACE PaintHs
    of the same type, but equal in each of the list's nodes, including its
    header.  For debugging.
 *) 
-; TYPE ListNoTyp = PortTypes . Int32Typ
-; CONST ListNoImage = PortTypes . Int32Image 
+; TYPE ListNoTyp = INTEGER 
+; CONST ListNoImage = PortTypes . IntImage 
 ; CONST ListNoNull = FIRST ( ListNoTyp ) 
 
 ; TYPE LinesRefTyp 
     = OBJECT 
         LrLeftLink : LinesRefTyp := NIL 
       ; LrRightLink : LinesRefTyp := NIL
+      ; LrUpdateRef : LinesRefTyp := NIL 
       ; LrListNo : ListNoTyp := ListNoNull
       ; LrGapAfter : BOOLEAN 
       END (* OBJECT *)
@@ -245,8 +246,18 @@ INTERFACE PaintHs
         END (* OBJECT LinesRefMeatTyp *) 
 
 ; PROCEDURE NewLinesRefHeader ( ) : LinesRefHeaderTyp
+  (* Allocate a LinesRef list header node and give it a new list number. *) 
+  (* Does not assign anything to link fields. *) 
 
 ; PROCEDURE NewLinesRefMeat ( Header : LinesRefHeaderTyp  ) : LinesRefMeatTyp
+  (* Allocate a LinesRef meat node, giving it the same list number as Header. *)
+
+; PROCEDURE UpdateLinesRefMeat
+    ( Image : ImageTransientTyp
+    ; VAR (* IN OUT *) LinesRef : LinesRefMeatTyp
+    )
+  (* Alter LinesRef by following update links until we reach the one
+     with the same list no as the header from Image. *) 
 
 ; PROCEDURE LinesRefImage ( FLinesRef : LinesRefTyp ; LineIndent : INTEGER )
   : TEXT 
@@ -297,7 +308,7 @@ INTERFACE PaintHs
    LineMarkHeaderTyp.  The ImageTransientTyp object has a ref 
    to the header, and it also points back to the image. 
  
-   Each window can have five LineMarks of LineMarkMeatTyp, one 
+   Each window can have several LineMarks of LineMarkMeatTyp, one 
    of each kind in [MarkSsStartSel .. MarkSsEndMatch].
    The WindowRef has an array of pointers to these, and each 
    points back to the window and also notes which kind of mark 
@@ -308,8 +319,8 @@ INTERFACE PaintHs
 *) 
 ; TYPE MarkSsTyp 
     = { MarkSsNull 
-      , MarkSsStartSel   (* Start point of selected text. *) 
       , MarkSsCursor     (* The true cursor. *) 
+      , MarkSsStartSel   (* Start point of selected text. *) 
       , MarkSsEndSel     (* End point of selected text. *) 
       , MarkSsStartMatch (* Start point of matched text. *)  
       , MarkSsEndMatch   (* End point of matched text. *) 
@@ -322,6 +333,7 @@ INTERFACE PaintHs
     = OBJECT  
         LmLeftLink : LineMarkTyp := NIL 
       ; LmRightLink : LineMarkTyp := NIL 
+      ; LmUpdateRef : LineMarkTyp := NIL 
       ; LmListNo : ListNoTyp := ListNoNull
       END (* OBJECT *) 
 
@@ -341,11 +353,23 @@ INTERFACE PaintHs
         END (* OBJECT *) 
 
 ; PROCEDURE NewLineMarkHeader ( ) : LineMarkHeaderTyp 
+  (* Allocate a Mark list header node and give it a new list number. *) 
+  (* Does not assign anything to link fields. *) 
 
 ; PROCEDURE NewLineMarkMeat ( Header : LineMarkHeaderTyp ) : LineMarkMeatTyp 
+  (* Allocate a Mark meat node, giving it the same list number as Header. *)
+
+; PROCEDURE UpdateLineMarkMeat
+    ( Image : ImageTransientTyp
+    ; VAR (* IN OUT *) Mark : LineMarkMeatTyp
+    )
+  (* Alter Mark by following update links until we reach the one
+     with the same lint no as the header from Image.
+     Additionally, update the LmLinesRef field of the updated Mark.
+  *) 
 
 ; TYPE MarkArrayTyp 
-    = ARRAY [ MarkSsTyp . MarkSsStartSel .. MarkSsTyp . MarkSsTemp ] 
+    = ARRAY [ MarkSsTyp . MarkSsCursor .. MarkSsTyp . MarkSsTemp ] 
       OF LineMarkMeatTyp 
 
 ; PROCEDURE RecomputeLrHasMark ( Mark : LineMarkMeatTyp ) 

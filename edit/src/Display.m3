@@ -27,7 +27,7 @@ MODULE Display
 ; IMPORT LangUtil 
 ; IMPORT LbeStd 
 ; IMPORT LineMarks 
-; IMPORT LineNumbers 
+; IMPORT LineNumbers
 ; IMPORT Marks 
 ; IMPORT MessageCodes 
 ; IMPORT Misc 
@@ -54,7 +54,7 @@ MODULE Display
 
 ; CONST Point1_1 = Point . T { 1 , 1 } 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE LinesRefIsBegOfImage 
     ( (* UNCHANGED *) ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefMeatTyp 
@@ -69,7 +69,7 @@ MODULE Display
         AND NOT ImageRef . ItPers . IpLineHeaderRef . LrGapAfter 
     END LinesRefIsBegOfImage 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE LinesRefIsEndOfImage 
     ( (* UNCHANGED *) ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefMeatTyp 
@@ -84,7 +84,7 @@ MODULE Display
         AND NOT LinesRef . LrGapAfter 
     END LinesRefIsEndOfImage 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE LineCtOfBolTokMark 
     ( EstRoot : LbeStd . EstRootTyp ; TokMark : Marks . TokMarkTyp ) 
   : LbeStd . LineNoTyp 
@@ -132,7 +132,7 @@ MODULE Display
       END (* CASE *) 
     END LineCtOfBolTokMark 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ActualNoOfLines 
     ( LineCt : LbeStd . LineNoTyp ) : LbeStd . LineNoTyp 
 
@@ -146,7 +146,7 @@ MODULE Display
       RETURN MAX ( 1 , LineCt ) 
     END ActualNoOfLines 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ActualLineCtOfLinesRef 
     ( (* UNCHANGED *) ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefMeatTyp 
@@ -170,7 +170,7 @@ MODULE Display
       END (* IF *) 
     END ActualLineCtOfLinesRef 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE LineNoInWindow 
     ( (* UNCHANGED *) WindowRef : PaintHs . WindowRefTyp 
     ; DesiredLinesRef : PaintHs . LinesRefMeatTyp 
@@ -190,8 +190,10 @@ MODULE Display
 
   ; BEGIN (* LineNoInWindow *) 
       IF WindowRef # NIL AND WindowRef . WrImageRef # NIL 
-      THEN 
-        LLinesRef := WindowRef . WrFirstLineLinesRef 
+      THEN
+        PaintHs . UpdateLinesRefMeat
+          ( WindowRef . WrImageRef , WindowRef . WrFirstLineLinesRef )
+      ; LLinesRef := WindowRef . WrFirstLineLinesRef 
       ; IF LLinesRef = DesiredLinesRef 
         THEN 
           RETURN - WindowRef . WrFirstLineLineNo 
@@ -235,6 +237,8 @@ MODULE Display
         ( LineNoInWindow < EditWindow . SouthEastToCorner ( WindowRef ) . v 
         , AFT . A_GetLinesRefAndLineNoInWindowBigLineNo 
         ) 
+    ; PaintHs . UpdateLinesRefMeat
+        ( WindowRef . WrImageRef , WindowRef . WrFirstLineLinesRef )
     ; LLineNoInWindow := - WindowRef . WrFirstLineLineNo 
     ; LLinesRef := WindowRef . WrFirstLineLinesRef 
     ; LOOP 
@@ -253,7 +257,7 @@ MODULE Display
       END (* LOOP *) 
     END GetLinesRefAndLineNoInWindow 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SecureSucc 
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefTyp 
@@ -353,7 +357,9 @@ MODULE Display
           ; IF LMetSuccessors 
             THEN (* Have met up with another group of lines. No more to do. *) 
             ELSE (* Build a new incomplete LinesRef with the new BolTokMark. *) 
-              LSuccLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
+              LSuccLinesRef
+                := PaintHs . NewLinesRefMeat
+                     ( ImageRef . ItPers . IpLineHeaderRef )  
             ; LSuccLinesRef . LrBolTokMark := LActualBolTokMark 
             ; LSuccLinesRef . LrVisibleIn := PaintHs . WindowNoSetEmpty 
             ; LSuccLinesRef . LrFromPos := 0 
@@ -398,7 +404,8 @@ MODULE Display
           ELSE 
           END (* TYPECASE *) 
         (* Build an incomplete successor to the header. *) 
-        ; LSuccLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
+        ; LSuccLinesRef
+            := PaintHs . NewLinesRefMeat ( ImageRef . ItPers . IpLineHeaderRef )
         ; LineMarks . GetRMBegOfImage 
             ( Lang := LImagePers . IpLang 
             , EstRef := LImagePers . IpEstRoot 
@@ -509,7 +516,7 @@ MODULE Display
       END (* IF *) 
     END DeleteRedundantLinesRef 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE SecurePred 
     ( ImageRef : PaintHs . ImageTransientTyp 
     ; LinesRef : PaintHs . LinesRefTyp 
@@ -611,7 +618,9 @@ MODULE Display
                     ) 
                 ; IF LTempLinesRef = NIL 
                   THEN 
-                    LTempLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
+                    LTempLinesRef
+                      := PaintHs . NewLinesRefMeat
+                            ( ImageRef . ItPers . IpLineHeaderRef )  
                   ; LTempLinesRef . LrBolTokMark := LBolTokMark1 
                   ; LTempLinesRef . LrVisibleIn := PaintHs . WindowNoSetEmpty 
                   ; LTempLinesRef . LrHasMark := FALSE 
@@ -663,7 +672,8 @@ MODULE Display
             END (* IF *) 
           END (* IF *) 
         ELSE (* LinesRef is header.  Build the dummy successor. *) 
-          LTempLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
+          LTempLinesRef
+            := PaintHs . NewLinesRefMeat  ( ImageRef . ItPers . IpLineHeaderRef )
         ; LineMarks . GetEndOfImage 
             ( LImagePers . IpLang 
             , LImagePers . IpEstRoot 
@@ -687,7 +697,7 @@ MODULE Display
       END (* IF *) 
     END SecurePred 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ClearWindow ( WindowRef : PaintHs . WindowRefTyp ) 
   <* LL.sup < Window *> 
 
@@ -840,7 +850,8 @@ MODULE Display
     ; LineNo : LbeStd . LineNoTyp 
     ; READONLY TextAttrArray : PaintHs . TextAttrArrayTyp 
     ) 
-  RAISES { Backout } 
+  RAISES { Backout }
+  (* PRE: WrFirstLineLinesRef has been updated. *) 
 
   = VAR LLeftSelMark : PaintHs . LineMarkMeatTyp  
   ; VAR LRightSelMark : PaintHs . LineMarkMeatTyp  
@@ -867,8 +878,16 @@ MODULE Display
         THEN 
           LLeftSelMark := NIL 
         ; LRightSelMark := NIL 
-        ELSE 
-          PaintHs . GetMarksInOrder 
+        ELSE
+          PaintHs . UpdateLineMarkMeat
+            ( Selection . Current . SelImage
+            , Selection . Current . SelStartMark
+            ) 
+        ; PaintHs . UpdateLineMarkMeat
+            ( Selection . Current . SelImage
+            , Selection . Current . SelEndMark
+            ) 
+        ; PaintHs . GetMarksInOrder 
             ( Selection . Current . SelStartMark 
             , Selection . Current . SelEndMark 
             , (* VAR *) LLeftSelMark 
@@ -1028,7 +1047,7 @@ MODULE Display
     ; EditWindow . EndPaintGroup ( WindowRef ) 
     END InnerPaintLine 
  
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintTempEditedLine 
     ( (* UNCHANGED *) WindowRef : PaintHs . WindowRefTyp 
     ; LineNoInWindow : LbeStd . LineNoSignedTyp 
@@ -1041,7 +1060,9 @@ MODULE Display
   = BEGIN 
     (* All this trouble, just so we can pass a SUBARRAY to InnerPaintLine, 
        without copying! *) 
-      IF TempEditRef . TeTextAttrArrayRef = NIL  
+      PaintHs . UpdateLinesRefMeat
+        ( WindowRef . WrImageRef , WindowRef . WrFirstLineLinesRef )
+    ; IF TempEditRef . TeTextAttrArrayRef = NIL  
       THEN 
         InnerPaintLine 
           ( WindowRef := WindowRef 
@@ -1072,7 +1093,7 @@ MODULE Display
       END (* IF *)  
     END PaintTempEditedLine 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintUneditedNonblankLine 
     ( (* UNCHANGED *) WindowRef : PaintHs . WindowRefTyp 
     ; LineNoInWindow : LbeStd . LineNoSignedTyp 
@@ -1085,6 +1106,8 @@ MODULE Display
       THEN 
         Assert 
           ( LinesRef . LrLineCt = 0 , AFT . A_PaintUneditedNonblankLineBlank ) 
+      ; PaintHs . UpdateLinesRefMeat
+          ( WindowRef . WrImageRef , WindowRef . WrFirstLineLinesRef )
       ; IF LinesRef . LrTextAttrArrayRef = NIL 
         THEN 
           InnerPaintLine 
@@ -1122,6 +1145,7 @@ MODULE Display
     ; ThruLineNo : LbeStd . LineNoTyp
     ) 
   RAISES { Backout , Thread . Alerted } 
+  (* PRE: WrFirstLineLinesRef has been updated. *) 
   (* PRE: ImageTrans # NIL 
           AND Window # NIL 
           AND FromLinesRef # NIL 
@@ -1250,14 +1274,17 @@ MODULE Display
                   END (* IF *) 
                 END (* IF *) 
               END (* IF *) 
-            END (* LOOP *) 
-          ; EditWindow . SetCursorPosition 
-              ( Window 
-              , Window . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
-                . LmCharPos 
-                - Window . WrHorizScroll 
-              , Window . WrCursorLineNoInWindow 
-              ) 
+            END (* LOOP *)
+          ; WITH WCursorMark
+                 = Window . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ]
+            DO PaintHs . UpdateLineMarkMeat
+                 ( Window . WrImageRef , (* IN OUT *) WCursorMark )
+            ; EditWindow . SetCursorPosition 
+                ( Window 
+                , WCursorMark . LmCharPos - Window . WrHorizScroll 
+                , Window . WrCursorLineNoInWindow 
+                )
+            END (* WITH *) 
           ; EditWindow . PaintCursorCoordinates ( Window ) 
           END (* IF *) 
         END (* IF *) 
@@ -1266,7 +1293,7 @@ MODULE Display
       END (* TRY EXCEPT *) 
     END InnerPaintLinesRange 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintLinesRangeOneWindow 
     ( Window : PaintHs . WindowRefTyp 
     ; FromLinesRef : PaintHs . LinesRefMeatTyp  
@@ -1286,7 +1313,9 @@ MODULE Display
         LImageTrans := Window . WrImageRef  
       ; IF LImageTrans # NIL 
         THEN 
-          LImagePers := LImageTrans . ItPers 
+          PaintHs . UpdateLinesRefMeat
+            ( LImageTrans , Window . WrFirstLineLinesRef )
+        ; LImagePers := LImageTrans . ItPers 
         ; LTempEditRef := LImagePers . IpTempEditRef 
         ; InnerPaintLinesRange 
             ( LImageTrans 
@@ -1301,7 +1330,7 @@ MODULE Display
       END (* IF *)
     END PaintLinesRangeOneWindow 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintLinesRangeAllWindows 
     ( ImageTrans : PaintHs . ImageTransientTyp 
     ; FromLinesRef : PaintHs . LinesRefMeatTyp  
@@ -1323,7 +1352,9 @@ MODULE Display
       ; LWindow := LImagePers . IpWindowList 
       ; WHILE LWindow # NIL 
         DO 
-          InnerPaintLinesRange 
+          PaintHs . UpdateLinesRefMeat
+            ( LWindow . WrImageRef , LWindow . WrFirstLineLinesRef )
+        ; InnerPaintLinesRange 
             ( ImageTrans 
             , LWindow
             , LTempEditRef 
@@ -1405,7 +1436,7 @@ MODULE Display
       END (* IF *) 
     END AdjustEstimatesForEndOfImage  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintWindowFromLines 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; VAR BlankLinesAtEnd : LbeStd . LineNoTyp 
@@ -1456,7 +1487,9 @@ MODULE Display
         ; EditWindow . SetCursorPosition ( WindowRef , 0 , 0 ) 
         ; IF WindowRef . WrImageRef # NIL 
           THEN 
-            LImagePers := WindowRef . WrImageRef . ItPers  
+            PaintHs . UpdateLinesRefMeat
+              ( WindowRef . WrImageRef , WindowRef . WrFirstLineLinesRef )
+          ; LImagePers := WindowRef . WrImageRef . ItPers  
           ; IF LImagePers . IpTempEditState 
                = PaintHs . TempEditStateTyp . TeStateText 
             THEN 
@@ -1538,14 +1571,17 @@ MODULE Display
               *) 
             ; SecureSucc ( WindowRef . WrImageRef , PwLinesRef ) 
             ; LLineCt := PwLinesRef . LrLineCt 
-            END (* LOOP *) 
-          ; EditWindow . SetCursorPosition 
-              ( WindowRef 
-              , WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
-                . LmCharPos 
-                - WindowRef . WrHorizScroll 
-              , WindowRef . WrCursorLineNoInWindow 
-              ) 
+            END (* LOOP *)
+          ; WITH WCursorMark
+                 = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ]
+            DO PaintHs . UpdateLineMarkMeat
+                 ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+            ; EditWindow . SetCursorPosition 
+                ( WindowRef 
+                , WCursorMark . LmCharPos - WindowRef . WrHorizScroll 
+                , WindowRef . WrCursorLineNoInWindow 
+                )
+            END (* WITH *)
           ; EditWindow . PaintWindowState 
               ( WindowRef 
               , "Fv_Modified" 
@@ -1599,7 +1635,7 @@ MODULE Display
       END (* Block *) 
     END PaintWindowFromLines 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE HorizScrollWindowRefToContainCursor 
     ( (* IN OUT *) WindowRef : PaintHs . WindowRefTyp 
     ; VAR (* IN OUT *) MustRepaint : BOOLEAN 
@@ -1615,20 +1651,22 @@ MODULE Display
         WITH 
           WCursorMark 
           = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
-        DO IF WCursorMark . LmCharPos < WindowRef . WrHorizScroll 
-           THEN (* Cursor is outside window to the left. *) 
-             WindowRef . WrHorizScroll := WCursorMark . LmCharPos 
-           ; MustRepaint := TRUE 
-           ELSIF WCursorMark . LmCharPos 
-                 > ( EditWindow . SouthEastToCorner ( WindowRef ) . h 
-                     + WindowRef . WrHorizScroll 
-                   ) 
-           THEN (* Cursor is outside window to the right. *) 
-             WindowRef . WrHorizScroll 
-               := WCursorMark . LmCharPos 
-                  - EditWindow . SouthEastToCorner ( WindowRef ) . h 
-           ; MustRepaint := TRUE 
-           END (* IF *) 
+        DO PaintHs . UpdateLineMarkMeat
+             ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+        ; IF WCursorMark . LmCharPos < WindowRef . WrHorizScroll 
+          THEN (* Cursor is outside window to the left. *) 
+            WindowRef . WrHorizScroll := WCursorMark . LmCharPos 
+          ; MustRepaint := TRUE 
+          ELSIF WCursorMark . LmCharPos 
+                > ( EditWindow . SouthEastToCorner ( WindowRef ) . h 
+                    + WindowRef . WrHorizScroll 
+                  ) 
+          THEN (* Cursor is outside window to the right. *) 
+            WindowRef . WrHorizScroll 
+              := WCursorMark . LmCharPos 
+                 - EditWindow . SouthEastToCorner ( WindowRef ) . h 
+          ; MustRepaint := TRUE 
+          END (* IF *) 
         END (* WITH WCursorMark *) 
       END (* IF *) 
     END HorizScrollWindowRefToContainCursor 
@@ -1645,24 +1683,26 @@ MODULE Display
       WITH 
         WCursorMark 
           = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
-      DO IF WCursorMark . LmCharPos < WindowRef . WrHorizScroll 
-         THEN (* Cursor is outside window to the left. *) 
-           WCursorMark . LmCharPos := WindowRef . WrHorizScroll 
-         ; MustRepaint := TRUE 
-         ELSE 
-           LRightmostCharPos 
-             := EditWindow . SouthEastToCorner ( WindowRef ) . h 
-                + WindowRef . WrHorizScroll 
-         ; IF WCursorMark . LmCharPos > LRightmostCharPos 
-           THEN (* Cursor is outside window to the right. *) 
-             WCursorMark . LmCharPos := LRightmostCharPos 
-           ; MustRepaint := TRUE 
-           END (* IF *) 
-         END (* IF *) 
+      DO PaintHs . UpdateLineMarkMeat
+           ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+      ; IF WCursorMark . LmCharPos < WindowRef . WrHorizScroll 
+        THEN (* Cursor is outside window to the left. *) 
+          WCursorMark . LmCharPos := WindowRef . WrHorizScroll 
+        ; MustRepaint := TRUE 
+        ELSE 
+          LRightmostCharPos 
+            := EditWindow . SouthEastToCorner ( WindowRef ) . h 
+               + WindowRef . WrHorizScroll 
+        ; IF WCursorMark . LmCharPos > LRightmostCharPos 
+          THEN (* Cursor is outside window to the right. *) 
+            WCursorMark . LmCharPos := LRightmostCharPos 
+          ; MustRepaint := TRUE 
+          END (* IF *) 
+        END (* IF *) 
       END (* WITH WCursorMark *) 
     END HorizProjectCursorIntoWindow 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE HorizMoveCursorWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; CursorMovement : EditWindow . CharCoordTyp 
@@ -1679,13 +1719,26 @@ MODULE Display
       IF WindowRef # NIL 
          AND WindowRef . WrImageRef # NIL 
          AND CursorMovement # 0 
-      THEN 
-        WITH 
+      THEN
+        IF Selection . Current # NIL
+        THEN
+          PaintHs . UpdateLineMarkMeat
+            ( WindowRef . WrImageRef
+            , (* IN OUT *) Selection . Current . SelStartMark
+            ) 
+        ; PaintHs . UpdateLineMarkMeat
+            ( WindowRef . WrImageRef
+            , (* IN OUT *) Selection . Current . SelEndMark
+            ) 
+        END (* IF *) 
+      ; WITH 
           WCursorMark 
           = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
         DO IF WCursorMark # NIL 
            THEN 
-             LCursorMovement 
+             PaintHs . UpdateLineMarkMeat
+               ( WindowRef . WrImageRef , WCursorMark ) 
+           ; LCursorMovement 
                := MIN 
                     ( LbeStd . LimitedCharNoMax - WCursorMark . LmCharPos 
                     , MAX ( - WCursorMark . LmCharPos , CursorMovement ) 
@@ -1694,7 +1747,9 @@ MODULE Display
              THEN 
                TYPECASE WCursorMark . LmLeftLink 
                OF PaintHs . LineMarkMeatTyp ( TFirstMark ) 
-               => LMark := TFirstMark 
+               => PaintHs . UpdateLineMarkMeat
+                    ( WindowRef . WrImageRef , (* IN OUT *) TFirstMark ) 
+               ; LMark := TFirstMark 
                ; LOOP 
                    IF NOT Marks . Equal 
                             ( LMark . LmLinesRef . LrBolTokMark 
@@ -1828,7 +1883,7 @@ MODULE Display
       END (* IF *) 
     END HorizMoveCursorWindowRef 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE HorizMoveCursorAndRepaintWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; CursorMovement : EditWindow . CharCoordTyp 
@@ -1860,7 +1915,7 @@ MODULE Display
       END (* IF *) 
     END HorizMoveCursorAndRepaintWindowRef 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE NonblankLengthOfCurrentLine ( WindowRef : PaintHs . WindowRefTyp ) 
   : LbeStd . CharNoTyp 
 
@@ -1876,27 +1931,29 @@ MODULE Display
           WITH 
             WCursorMark 
             = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
-          DO IF WCursorMark # NIL AND WCursorMark . LmLinesRef # NIL 
-             THEN 
-               IF LImageRef . ItPers . IpTempEditState 
-                  = PaintHs . TempEditStateTyp . TeStateText 
-               THEN 
-                 LTempEditRef := LImageRef . ItPers . IpTempEditRef 
-               ; IF LTempEditRef # NIL 
-                    AND LTempEditRef . TeLinesRef = WCursorMark . LmLinesRef 
-                    AND LTempEditRef . TeLineNo = WCursorMark . LmLineNo 
-                 THEN RETURN Strings . Length ( LTempEditRef . TeEditedString ) 
-                 END (* IF *) 
-               END (* IF *) 
-             ; RETURN WCursorMark . LmLinesRef . LrLineLen
-             END (* IF *) 
+          DO PaintHs . UpdateLineMarkMeat
+               ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+          ; IF WCursorMark # NIL AND WCursorMark . LmLinesRef # NIL 
+            THEN 
+              IF LImageRef . ItPers . IpTempEditState 
+                 = PaintHs . TempEditStateTyp . TeStateText 
+              THEN 
+                LTempEditRef := LImageRef . ItPers . IpTempEditRef 
+              ; IF LTempEditRef # NIL 
+                   AND LTempEditRef . TeLinesRef = WCursorMark . LmLinesRef 
+                   AND LTempEditRef . TeLineNo = WCursorMark . LmLineNo 
+                THEN RETURN Strings . Length ( LTempEditRef . TeEditedString ) 
+                END (* IF *) 
+              END (* IF *) 
+            ; RETURN WCursorMark . LmLinesRef . LrLineLen
+            END (* IF *) 
           END (* WITH *) 
         END (* IF *) 
       END (* IF *) 
     ; RETURN 0 
     END NonblankLengthOfCurrentLine
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE HorizMoveCursorToEndAndRepaint 
     ( WindowRef : PaintHs . WindowRefTyp ) 
   RAISES { Backout , Thread . Alerted } 
@@ -1908,7 +1965,9 @@ MODULE Display
           WCursorMark 
           = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
         DO
-          HorizMoveCursorAndRepaintWindowRef 
+          PaintHs . UpdateLineMarkMeat
+            ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+        ; HorizMoveCursorAndRepaintWindowRef 
             ( WindowRef 
             , NonblankLengthOfCurrentLine ( WindowRef ) 
               - WCursorMark . LmCharPos 
@@ -1917,7 +1976,7 @@ MODULE Display
       END (* IF *) 
     END HorizMoveCursorToEndAndRepaint 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE HorizScrollWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; WindowMovement : LbeStd . LimitedCharNoSignedTyp 
@@ -1945,48 +2004,50 @@ MODULE Display
       ; WITH 
           WCursorMark 
             = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
-        DO IF WindowMovement < 0 
-           THEN 
-             LTrimmedWindowMovement 
-               := MAX ( WindowMovement , - WindowRef . WrHorizScroll ) 
-           (* LTrimmedWindowMovement <= 0 *) 
-           ; IF DoDragCursor 
-             THEN 
-               LCursorMovement := LTrimmedWindowMovement 
-             ELSE 
-               LCursorMovement 
-                 := MIN 
-                      ( 0 
-                      , EditWindow . SouthEastToCorner ( WindowRef ) . h 
-                        + WindowRef . WrHorizScroll 
-                        - 1 
-                        + LTrimmedWindowMovement (* <= 0 *) 
-                        - WCursorMark . LmCharPos 
-                      ) 
-             END (* IF *) 
-           ELSE (* WindowMovement >= 0 *) 
-             LTrimmedWindowMovement 
-               := MIN 
-                    ( WindowMovement 
-                    , LbeStd . LimitedCharNoMax 
-                      - EditWindow . SouthEastToCorner ( WindowRef ) . h 
-                      + 1 
-                      - WindowRef . WrHorizScroll 
-                    ) 
-              (* LTrimmedWindowMovement >= 0 *) 
-           ; IF DoDragCursor 
-             THEN 
-               LCursorMovement := LTrimmedWindowMovement 
-             ELSE 
-               LCursorMovement 
-                 := MAX 
-                      ( 0 
-                      , WindowRef . WrHorizScroll 
-                        + LTrimmedWindowMovement 
-                        - WCursorMark . LmCharPos 
-                      ) 
-             END (* IF *) 
-           END (* IF *) 
+        DO PaintHs . UpdateLineMarkMeat
+             ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+        ; IF WindowMovement < 0 
+          THEN 
+            LTrimmedWindowMovement 
+              := MAX ( WindowMovement , - WindowRef . WrHorizScroll ) 
+          (* LTrimmedWindowMovement <= 0 *) 
+          ; IF DoDragCursor 
+            THEN 
+              LCursorMovement := LTrimmedWindowMovement 
+            ELSE 
+              LCursorMovement 
+                := MIN 
+                     ( 0 
+                     , EditWindow . SouthEastToCorner ( WindowRef ) . h 
+                       + WindowRef . WrHorizScroll 
+                       - 1 
+                       + LTrimmedWindowMovement (* <= 0 *) 
+                       - WCursorMark . LmCharPos 
+                     ) 
+            END (* IF *) 
+          ELSE (* WindowMovement >= 0 *) 
+            LTrimmedWindowMovement 
+              := MIN 
+                   ( WindowMovement 
+                   , LbeStd . LimitedCharNoMax 
+                     - EditWindow . SouthEastToCorner ( WindowRef ) . h 
+                     + 1 
+                     - WindowRef . WrHorizScroll 
+                   ) 
+             (* LTrimmedWindowMovement >= 0 *) 
+          ; IF DoDragCursor 
+            THEN 
+              LCursorMovement := LTrimmedWindowMovement 
+            ELSE 
+              LCursorMovement 
+                := MAX 
+                     ( 0 
+                     , WindowRef . WrHorizScroll 
+                       + LTrimmedWindowMovement 
+                       - WCursorMark . LmCharPos 
+                     ) 
+            END (* IF *) 
+          END (* IF *) 
         ; IF LTrimmedWindowMovement # 0 
           THEN 
             INC ( WindowRef . WrHorizScroll , LTrimmedWindowMovement ) 
@@ -2133,7 +2194,9 @@ END
   ; VAR LActualMovement : LbeStd . LineNoSignedTyp 
   
   ; BEGIN 
-      LinesRef := Window . WrFirstLineLinesRef 
+      PaintHs . UpdateLinesRefMeat
+        ( Window . WrImageRef , Window . WrFirstLineLinesRef )
+    ; LinesRef := Window . WrFirstLineLinesRef 
     ; LineNo := Window . WrFirstLineLineNo 
     ; LMovement := EditWindow . SouthEastToCorner ( Window ) . v - 1 
     ; MoveLinesRefAndNoDown 
@@ -2149,7 +2212,7 @@ END
         ) 
     END GetLinesRefAndNoOfEndOfWindow  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE CreateEmptyLinesRefList 
     ( (* IN OUT *) ImageRef : PaintHs . ImageTransientTyp ) 
 
@@ -2159,7 +2222,7 @@ END
       LImagePers := ImageRef . ItPers 
     ; IF LImagePers . IpLineHeaderRef = NIL 
       THEN 
-        LImagePers . IpLineHeaderRef := NEW ( PaintHs . LinesRefHeaderTyp ) 
+        LImagePers . IpLineHeaderRef := PaintHs . NewLinesRefHeader ( ) 
       END (* IF *) 
     ; LImagePers . IpLineHeaderRef . LrLeftLink 
         := LImagePers . IpLineHeaderRef 
@@ -2172,7 +2235,7 @@ END
         PaintHs . WindowRefTyp and EditWindow . WindowTyp ) 
 *) 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE InitImageFirstWindow ( ImageTrans : PaintHs . ImageTransientTyp ) 
   RAISES { Backout , Thread . Alerted } 
   (* Creates a mark list if there is none.  
@@ -2235,7 +2298,7 @@ END
       ; LCursorMark := NIL 
       ; IF LMarkHeader = NIL 
         THEN (* Absent mark list.  Construct an empty one. *) 
-          LMarkHeader := NEW ( PaintHs . LineMarkHeaderTyp ) 
+          LMarkHeader := PaintHs . NewLineMarkHeader ( ) 
         ; LMarkHeader . LmLeftLink 
             := LMarkHeader 
         ; LMarkHeader . LmRightLink 
@@ -2332,7 +2395,8 @@ END
 (* TODO: Generalize the above for other marks and multiple windows. *) 
       ; IF LCursorMark = NIL  
         THEN (* No cursor mark exists.  Create one cursor mark at BOI *) 
-          LCursorMark := NEW ( PaintHs . LineMarkMeatTyp ) 
+          LCursorMark
+            := PaintHs . NewLineMarkMeat ( ImageTrans . ItPers . IpMarkHeader ) 
         ; LCursorMark . LmMarkSs := PaintHs . MarkSsTyp . MarkSsCursor 
         ; LineMarks . GetRMBegOfImage 
             ( LImagePers . IpLang 
@@ -2348,7 +2412,9 @@ END
           THEN 
             IF LLineHeader . LrGapAfter 
             THEN
-              LLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
+              LLinesRef
+                := PaintHs . NewLinesRefMeat
+                     ( ImageTrans . ItPers . IpLineHeaderRef )  
             ; LLinesRef . LrBolTokMark := LCursorMark . LmTokMark 
             ; LLinesRef . LrVisibleIn := PaintHs . WindowNoSetEmpty 
             ; LLinesRef . LrFromPos := LbeStd . LimitedCharNoNull 
@@ -2402,7 +2468,9 @@ END
     ) 
 
   = BEGIN 
-      IF NOT WindowRef . WrVertScrollIsExact
+      PaintHs . UpdateLinesRefMeat
+        ( WindowRef . WrImageRef , WindowRef . WrFirstLineLinesRef )
+    ; IF NOT WindowRef . WrVertScrollIsExact
          AND LinesRefIsBegOfImage 
                ( WindowRef . WrImageRef , WindowRef . WrFirstLineLinesRef )  
       THEN
@@ -2416,7 +2484,7 @@ END
       END (* IF *) 
     END AdjustEstimatesForMaybeBegOfImage  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintWindowFromCursor 
     ( (* IN OUT *) WindowRef : PaintHs . WindowRefTyp 
     ; VAR BlankLinesAtEnd : LbeStd . LineNoTyp 
@@ -2439,12 +2507,15 @@ END
         LImageTrans := WindowRef . WrImageRef  
       ; IF LImageTrans # NIL 
         THEN 
-          LImagePers := LImageTrans . ItPers 
+          PaintHs . UpdateLinesRefMeat
+            ( LImageTrans , WindowRef . WrFirstLineLinesRef )
+        ; LImagePers := LImageTrans . ItPers 
         ; WITH 
             WCursorMark 
               = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
-          DO
-            LineNumbers . EstimateLineNo
+          DO PaintHs . UpdateLineMarkMeat
+               ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark ) 
+          ; LineNumbers . EstimateLineNo
               ( WCursorMark 
               , LImageTrans 
               , (* VAR *) WindowRef . WrVertScroll 
@@ -2506,7 +2577,7 @@ END
       END (* IF *) 
     END PaintWindowFromCursor 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ReconstructLinesAndPaint 
     ( (* IN OUT *) ImageRef : PaintHs . ImageTransientTyp ) 
   RAISES { Backout , Thread . Alerted } 
@@ -2542,7 +2613,9 @@ END
                OR NOT Marks . Equal 
                         ( LMark . LmTokMark , LLinesRef . LrBolTokMark ) 
             THEN 
-              LLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
+              LLinesRef
+                := PaintHs . NewLinesRefMeat
+                     ( ImageRef . ItPers . IpLineHeaderRef )  
             ; LLinesRef . LrBolTokMark := LMark . LmTokMark 
             ; LLinesRef . LrVisibleIn := PaintHs . WindowNoSetEmpty 
             ; LLinesRef . LrFromPos := LbeStd . LimitedCharNoNull 
@@ -2650,7 +2723,7 @@ END
       END (* LOOP *) 
     END VerifyLinesRefToUnlink 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE MakeLinesRefsNotVisible 
     ( (* UNCHANGED *) ImageRef : PaintHs . ImageTransientTyp 
     ; VAR (* IN OUT *) FromLinesRef : PaintHs . LinesRefMeatTyp 
@@ -2797,7 +2870,8 @@ END
           LThruLinesRef . LrBolTokMark := LFromLinesRef . LrBolTokMark 
         ; LThruLinesRef := LThruLinesRef . LrLeftLink 
         ELSE (* Create a new GapAfter LinesRef for the newly opened gap. *) 
-          LTempLinesRef := NEW ( PaintHs . LinesRefMeatTyp ) 
+          LTempLinesRef
+            := PaintHs . NewLinesRefMeat ( ImageRef . ItPers . IpLineHeaderRef )
         ; LTempLinesRef . LrBolTokMark := LFromLinesRef . LrBolTokMark 
         ; LTempLinesRef . LrVisibleIn := PaintHs . WindowNoSetEmpty 
         ; LTempLinesRef . LrLineCt := 0 
@@ -2816,7 +2890,7 @@ END
       END (* IF *) 
     END MakeLinesRefsNotVisible 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE MakeLinesRefsNotVisibleInWindow 
     ( (* UNCHANGED *) ImageRef : PaintHs . ImageTransientTyp 
     ; VAR (* IN OUT *) FromLinesRef : PaintHs . LinesRefMeatTyp 
@@ -3014,14 +3088,17 @@ END
             WITH 
               WCursorMark 
               = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
-            DO LFinalHorizPos 
-                 := MAX 
-                      ( 0 
-                      , MIN 
-                          ( LbeStd . LimitedCharNoMax 
-                          , WCursorMark . LmCharPos + WantedMovement . h 
-                          ) 
-                      ) 
+            DO
+              PaintHs . UpdateLineMarkMeat
+                ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+            ; LFinalHorizPos 
+                := MAX 
+                     ( 0 
+                     , MIN 
+                         ( LbeStd . LimitedCharNoMax 
+                         , WCursorMark . LmCharPos + WantedMovement . h 
+                         ) 
+                     ) 
             ; ActualMovement . h := LFinalHorizPos - WCursorMark . LmCharPos 
             ; ActualMovement . v := 0 
             ; McVertMovementRemaining := WantedMovement . v 
@@ -3209,6 +3286,8 @@ END
 
   ; BEGIN (* VertScrollNoMoveCursor *) 
       LImageRef := WindowRef . WrImageRef 
+    ; PaintHs . UpdateLinesRefMeat
+        ( LImageRef , WindowRef . WrFirstLineLinesRef )
     ; IF WantedMovement < 0 
       THEN (* Window moves up, relative to image, toward BOI . *) 
         GetLinesRefAndLineNoInWindow 
@@ -3312,7 +3391,7 @@ END
     ; IF ActualMovement # 0 THEN MustRepaint := TRUE END (* IF *) 
     END VertScrollNoMoveCursor 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE MoveCursorWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; WantedMovement : EditWindow . CharPointTyp 
@@ -3378,19 +3457,24 @@ END
         END (* IF *) 
       ; IF NOT MustRepaint 
         THEN (* But we moved the cursor locally, so set it in the window. *) 
-          EditWindow . SetCursorPosition 
-            ( WindowRef 
-            , WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
-              . LmCharPos 
-              - WindowRef . WrHorizScroll 
-            , WindowRef . WrCursorLineNoInWindow 
-            ) 
-        ; EditWindow . PaintCursorCoordinates ( WindowRef ) 
+          WITH WCursorMark
+               = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ]
+          DO PaintHs . UpdateLineMarkMeat
+               ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+          ; EditWindow . SetCursorPosition 
+              ( WindowRef 
+              , WCursorMark 
+                . LmCharPos 
+                - WindowRef . WrHorizScroll 
+              , WindowRef . WrCursorLineNoInWindow 
+              ) 
+          ; EditWindow . PaintCursorCoordinates ( WindowRef )
+          END (* WITH *) 
         END (* IF *) 
       END (* IF *) 
     END MoveCursorWindowRef 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE MoveCursorAndRepaintWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; WantedMovement : EditWindow . CharPointTyp 
@@ -3421,7 +3505,7 @@ END
       END (* IF *) 
     END MoveCursorAndRepaintWindowRef 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE AbsoluteCursorPositionInWindow 
     ( WindowRef : PaintHs . WindowRefTyp ) 
   : EditWindow . CharPointTyp 
@@ -3440,7 +3524,9 @@ END
           = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
         DO IF WCursorMark # NIL 
            THEN 
-             LHorizPositionInWindow 
+             PaintHs . UpdateLineMarkMeat
+               ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+           ; LHorizPositionInWindow 
                := WCursorMark . LmCharPos - WindowRef . WrHorizScroll 
            ; LResult 
                := EditWindow . CharPointTyp 
@@ -3453,7 +3539,7 @@ END
     ; RETURN LResult 
     END AbsoluteCursorPositionInWindow  
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE MoveCursorAbsoluteInsideWindow 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; AbsPosition : EditWindow . CharPointTyp 
@@ -3477,7 +3563,9 @@ END
           = WindowRef . WrMarks [ PaintHs . MarkSsTyp . MarkSsCursor ] 
         DO IF WCursorMark # NIL 
            THEN 
-             LHorizPositionInWindow 
+             PaintHs . UpdateLineMarkMeat
+               ( WindowRef . WrImageRef , (* IN OUT *) WCursorMark )
+           ; LHorizPositionInWindow 
                := WCursorMark . LmCharPos - WindowRef . WrHorizScroll 
            ; LRelMovement 
                := Point . Sub 
@@ -3514,7 +3602,7 @@ END
       END (* IF *) 
     END MoveCursorAbsoluteInsideWindow 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE VertScroll 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; WantedMovement : LbeStd . LineNoSignedTyp 
@@ -3612,7 +3700,7 @@ END
       END (* IF *) 
     END VertScrollAndRepaint 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE ReshapeWindowRef 
     ( WindowRef : PaintHs . WindowRefTyp 
     ; OldSize : EditWindow . CharPointTyp 
@@ -3702,7 +3790,7 @@ END
       END (* IF *) 
     END ReshapeWindowRef 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE Beep ( Code : Errors . ErrorTyp ) 
 
   = BEGIN (* Beep *) 
@@ -3728,7 +3816,7 @@ END
       END (* WHILE *) 
     END DisplayImageState 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE NoteImageSavedState 
     ( ImageRef : PaintHs . ImageTransientTyp ; State : BOOLEAN ) 
 
@@ -3740,7 +3828,7 @@ END
       END (* IF *) 
     END NoteImageSavedState 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE PaintImageParsedState 
     ( ImageRef : PaintHs . ImageTransientTyp ) 
   
@@ -3765,7 +3853,7 @@ END
       END (* IF *) 
     END PaintImageParsedState 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE NoteImageParsedState 
     ( ImageRef : PaintHs . ImageTransientTyp ; State : BOOLEAN ) 
 
@@ -3777,7 +3865,7 @@ END
       END (* IF *) 
     END NoteImageParsedState 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE NoteImageAnalyzedState 
     ( ImageRef : PaintHs . ImageTransientTyp ; State : BOOLEAN ) 
 
@@ -3789,7 +3877,7 @@ END
       END (* IF *) 
     END NoteImageAnalyzedState 
 
-(* VISIBLE: *) 
+(* EXPORTED *) 
 ; PROCEDURE Reparse ( (* IN OUT *) ImageRef : PaintHs . ImageTransientTyp ) 
   RAISES { Backout , Thread . Alerted } 
 
