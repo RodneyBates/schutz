@@ -113,8 +113,6 @@ MODULE Images
       THEN NewImagePers . IpMarkHeader := NIL 
       ELSE 
         NewImagePers . IpMarkHeader := PaintHs . NewLineMarkHeader ( ) 
-      ; NewImagePers . IpMarkHeader . LmLeftLink := NewImagePers . IpMarkHeader 
-      ; NewImagePers . IpMarkHeader . LmRightLink := NewImagePers . IpMarkHeader 
       ; NewImagePers . IpMarkCt := 0 
       ; LMark := Image . ItPers . IpMarkHeader 
       ; LOOP 

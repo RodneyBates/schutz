@@ -2223,12 +2223,8 @@ END
     ; IF LImagePers . IpLineHeaderRef = NIL 
       THEN 
         LImagePers . IpLineHeaderRef := PaintHs . NewLinesRefHeader ( ) 
+      ; LImagePers . IpLineHeaderRef . LrGapAfter := TRUE 
       END (* IF *) 
-    ; LImagePers . IpLineHeaderRef . LrLeftLink 
-        := LImagePers . IpLineHeaderRef 
-    ; LImagePers . IpLineHeaderRef . LrRightLink 
-        := LImagePers . IpLineHeaderRef 
-    ; LImagePers . IpLineHeaderRef . LrGapAfter := TRUE 
     END CreateEmptyLinesRefList 
 
 (* FIX: Put some sanity into the willy-nilly mix of 
@@ -2299,10 +2295,6 @@ END
       ; IF LMarkHeader = NIL 
         THEN (* Absent mark list.  Construct an empty one. *) 
           LMarkHeader := PaintHs . NewLineMarkHeader ( ) 
-        ; LMarkHeader . LmLeftLink 
-            := LMarkHeader 
-        ; LMarkHeader . LmRightLink 
-            := LMarkHeader 
         ; LImagePers . IpMarkCt := 0 
         ; LImagePers . IpMarkHeader := LMarkHeader 
         ELSIF ( LMarkHeader . LmRightLink = LMarkHeader 

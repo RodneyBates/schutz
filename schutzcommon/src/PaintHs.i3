@@ -246,8 +246,8 @@ INTERFACE PaintHs
         END (* OBJECT LinesRefMeatTyp *) 
 
 ; PROCEDURE NewLinesRefHeader ( ) : LinesRefHeaderTyp
-  (* Allocate a LinesRef list header node and give it a new list number. *) 
-  (* Does not assign anything to link fields. *) 
+  (* Allocate a LinesRef list header node, self-link it as empty,
+     and give it a new list number. *) 
 
 ; PROCEDURE NewLinesRefMeat ( Header : LinesRefHeaderTyp  ) : LinesRefMeatTyp
   (* Allocate a LinesRef meat node, giving it the same list number as Header. *)
@@ -353,8 +353,8 @@ INTERFACE PaintHs
         END (* OBJECT *) 
 
 ; PROCEDURE NewLineMarkHeader ( ) : LineMarkHeaderTyp 
-  (* Allocate a Mark list header node and give it a new list number. *) 
-  (* Does not assign anything to link fields. *) 
+  (* Allocate a Mark list header node, self-link it as empty,
+     and give it a new list number. *)
 
 ; PROCEDURE NewLineMarkMeat ( Header : LineMarkHeaderTyp ) : LineMarkMeatTyp 
   (* Allocate a Mark meat node, giving it the same list number as Header. *)

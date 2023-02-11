@@ -104,13 +104,15 @@ MODULE PaintHs
 
 (* EXPORTED: *) 
 ; PROCEDURE NewLinesRefHeader ( ) : LinesRefHeaderTyp
-  (* Allocate a LinesRef list header node and give it a new list number. *) 
-  (* Does not assign anything to link fields. *) 
+  (* Allocate a LinesRef list header node, self-link it as empty,
+     and give it a new list number. *) 
 
   = VAR LResult : LinesRefHeaderTyp
 
   ; BEGIN
-      LResult := NEW ( LinesRefHeaderTyp )
+      LResult := NEW ( LinesRefHeaderTyp ) 
+    ; LResult . LrLeftLink := LResult 
+    ; LResult . LrRightLink := LResult 
     ; LResult . LrListNo := GNextLinesRefListNo
     ; LResult . LrUpdateRef := NIL 
     ; INC ( GNextLinesRefListNo )
@@ -241,13 +243,15 @@ MODULE PaintHs
 
 (* EXPORTED: *) 
 ; PROCEDURE NewLineMarkHeader ( ) : LineMarkHeaderTyp
-  (* Allocate a Mark list header node and give it a new list number. *)
-  (* Does not assign anything to link fields. *) 
+  (* Allocate a Mark list header node, self-link it as empty,
+     and give it a new list number. *)
 
   = VAR LResult : LineMarkHeaderTyp
 
   ; BEGIN
       LResult := NEW ( LineMarkHeaderTyp )
+    ; LResult . LmLeftLink := LResult 
+    ; LResult . LmRightLink := LResult 
     ; LResult . LmListNo := GNextMarkListNo
     ; LResult . LmUpdateRef := NIL 
     ; INC ( GNextMarkListNo )

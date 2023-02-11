@@ -1666,9 +1666,7 @@ FALSE (* DON"T DO THIS ANY MORE. *) AND
             NewLinesRefHeader := PaintHs . NewLinesRefHeader ( ) 
           ; IF IfteOldLinesRefHeader = IfteOldLinesRefHeader . LrRightLink 
             THEN (* Old LinesRefList is empty. *) 
-              NewLinesRefHeader . LrLeftLink := NewLinesRefHeader 
-            ; NewLinesRefHeader . LrRightLink := NewLinesRefHeader 
-            ; IfteRblCurOldLinesRefMeat := NIL
+              IfteRblCurOldLinesRefMeat := NIL
             ELSE IfteRblCurOldLinesRefMeat
                    := IfteOldLinesRefHeader . LrRightLink
             END (* IF *) 
@@ -1685,9 +1683,7 @@ FALSE (* DON"T DO THIS ANY MORE. *) AND
             NewMarkHeader := PaintHs . NewLineMarkHeader ( ) 
           ; IF IfteOldMarkHeader = IfteOldMarkHeader . LmRightLink 
             THEN (* Empty old Marks list. *) 
-              NewMarkHeader . LmLeftLink := NewMarkHeader 
-            ; NewMarkHeader . LmRightLink := NewMarkHeader 
-            ; IfteRblCurOldMarkMeat := NIL
+              IfteRblCurOldMarkMeat := NIL
             ELSE 
               IfteRblCurOldMarkMeat := IfteOldMarkHeader . LmRightLink
             END (* IF *) 
@@ -1770,7 +1766,7 @@ FALSE (* DON"T DO THIS ANY MORE. *) AND
         ; IF L2ndOldLinesRefMeat # NIL
           THEN L2ndOldLinesRefMeat . LrUpdateRef := LLMNewLinesRefMeat 
           END (* IF *)
-          
+(*
         (* Create LinesRef map entries for any windows that have a
            WrFirstLineLinesRef value pointing to the merged region. 
            These do not follow the Marks order, so do them all here. *)
@@ -1812,7 +1808,7 @@ FALSE (* DON"T DO THIS ANY MORE. *) AND
             END (* IF *)
           ; LWindowRef := LWindowRef . WrImageLink 
           END (* WHILE LWindowRef *) 
-
+*)
         (* Construct new LinesRefs and Marks within the merged region. *) 
         ; IfteRbl0LineNoOfCurOldLinesRef := 0 
         ; IfteRblIn2ndOldLinesRef := FALSE 
@@ -3952,7 +3948,7 @@ EVAL LLinesRefMeat
           END (* CASE *) 
         END (* WITH *) 
       END (* FOR *) 
-    END InsertOrOverlayString  
+    END InsertOrOverlayString 
 
 (* EXPORTED: *)
 ; PROCEDURE TransposeChars ( WindowRef : PaintHs . WindowRefTyp ) 
