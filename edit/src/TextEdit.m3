@@ -760,6 +760,7 @@ MODULE TextEdit
            when editing "beyond" EOI. 
         *) 
   ; VAR IfteRMNewLinesRef : PaintHs . LinesRefHeaderTyp
+  ; VAR IfteRMNewMergedLinesRefMeat : PaintHs . LinesRefMeatTyp 
   ; VAR IfteSuccLinesRef : PaintHs . LinesRefTyp 
         (* Points to the LinesRef following _all_ new LinesRefs. *) 
   ; VAR IfteSuccLinesRefMeat : PaintHs . LinesRefMeatTyp 
@@ -1477,7 +1478,7 @@ FALSE (* DON"T DO THIS ANY MORE. *) AND
               IfteRblCmpMarkToEnd := - 1
             END (* IF *) 
 
-          (* Which list node is next? *) 
+          (* Which list node is next?  Mark or LinesRef? *) 
           ; IF IfteRblCmpLinesToEnd >= 0 AND IfteRblCmpMarkToEnd >= 0 
             THEN (* Done with this portion of both liste. *)
               EXIT
@@ -1762,6 +1763,7 @@ FALSE (* DON"T DO THIS ANY MORE. *) AND
           *) 
         ; IfteCheckNodeCtMismatch
             ( IfteOldEstRoot , IfteRblCurOldLinesRefMeat , "Old merged:" )
+        ; IfteRMNewMergedLinesRefMeat := IfteRMNewLinesRef 
 
         (* Store update links for Old LinesRefs in the merged region. *) 
         ; IfteRblCurOldLinesRefMeat . LrUpdateRef := LLMNewLinesRefMeat
@@ -2466,7 +2468,8 @@ FALSE (* DON"T DO THIS ANY MORE. *) AND
 
             (* Do any needed repainting of shifted lines below the 
                site of the new LinesRefs. *) 
-            ; IF IfteRMNewLinesRef . LrRightLink # IfteNewLinesRefHeader 
+            ; LLinesRefMeat := IfteRMNewMergedLinesRefMeat . LrRightLink 
+            ; IF LLinesRefMeat . LrRightLink # IfteNewLinesRefHeader 
                  AND LRepaintKind 
                      IN RepaintKindSetTyp 
                           { RepaintKindTyp . RepaintKindShiftUp 
@@ -2474,9 +2477,8 @@ FALSE (* DON"T DO THIS ANY MORE. *) AND
                           } 
                  AND LLineNoInWindow 
                      < EditWindow . SouthEastToCorner ( LWindowRef ) . v 
-              THEN 
-                LLinesRefMeat := IfteRMNewLinesRef . LrRightLink 
-              ; LOOP 
+              THEN (* There are lines below, that need to be repainted. *)  
+                LOOP 
                   IF LLineNoInWindow 
                      >= EditWindow . SouthEastToCorner ( LWindowRef ) . v 
                   THEN EXIT 

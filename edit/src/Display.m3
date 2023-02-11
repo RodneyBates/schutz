@@ -1,4 +1,4 @@
-
+ 
 (* -----------------------------------------------------------------------1- *)
 (* This file is part of the Schutz semantic editor.                          *)
 (* Copyright 1988..2023, Rodney M. Bates.                                    *)
